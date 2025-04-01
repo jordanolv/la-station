@@ -1,0 +1,31 @@
+{
+  "name": "discord-bot-modular",
+  "version": "1.0.0",
+  "description": "Un bot Discord modulaire organisé par fonctionnalités",
+  "main": "dist/bot/app.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/bot/app.js",
+    "dev": "ts-node src/bot/app.ts",
+    "watch": "nodemon --exec ts-node src/bot/app.ts"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "typescript",
+    "modular"
+  ],
+  "dependencies": {
+    "@discordjs/builders": "^1.6.5",
+    "@discordjs/rest": "^2.0.1",
+    "discord.js": "^14.13.0",
+    "dotenv": "^16.3.1",
+    "mongoose": "^7.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.3",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
