@@ -1,4 +1,5 @@
 import { Client, Message } from 'discord.js';
+import { BotClient } from '../../../BotClient';
 
 export default {
   name: 'messageCreate',
@@ -9,7 +10,7 @@ export default {
    * @param client Le client Discord
    * @param message Le message reçu
    */
-  async execute(client: Client, message: Message) {
+  async execute(client: BotClient, message: Message) {
     // Ignorer les messages des bots et les messages sans préfixe
     if (message.author.bot) return;
     

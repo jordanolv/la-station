@@ -1,57 +1,56 @@
-import { Client, GatewayIntentBits, Collection } from 'discord.js';
-import path from 'path';
+// main.ts
+import { BotClient } from './BotClient';
 import { connectToDatabase } from './handlers/mongoose';
 import { loadFeatures } from './handlers/feature';
+import path from 'path';
+import { REST, Routes } from 'discord.js';
 
-// Création du client Discord avec les intents nécessaires
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers
-  ]
-});
+(async () => {
+  // 1) Initialiser la classe
+  const client = await BotClient.init();
 
-// Définition des collections pour stocker commandes et slash commands
-client.commands = new Collection();
-client.slashCommands = new Collection();
-
-// Fonction principale pour démarrer le bot
-async function main() {
-  console.log('Démarrage du bot...');
-  
-  // Connexion à la base de données MongoDB
+  // 2) Connexion à MongoDB
   await connectToDatabase();
-  
-  // Chargement des fonctionnalités
+
+  // 3) Charger les fonctionnalités
   const featuresPath = path.join(__dirname, 'features');
   await loadFeatures(client, featuresPath);
-  
-  // Connexion à Discord
+
+  // 4) Connexion à Discord
   try {
-    await client.login(process.env.DISCORD_TOKEN);
-    console.log('Bot connecté avec succès!');
+    const token = process.env.DISCORD_TOKEN;
+    if (!token) throw new Error("DISCORD_TOKEN n'est pas défini dans l'environnement");
+
+    await client.login(token);
+
+    // 5) Auto-déploiement des slash commands (optionnel)
+    if (process.env.AUTO_DEPLOY_COMMANDS === 'true') {
+      const slashCommands = Array.from(client.slashCommands.values());
+      if (slashCommands.length > 0) {
+        console.log(`Déploiement de ${slashCommands.length} slash commands...`);
+        const rest = new REST({ version: '10' }).setToken(token);
+        const commandsData = slashCommands.map(cmd => cmd.data.toJSON());
+
+        if (process.env.GUILD_ID) {
+          await rest.put(
+            Routes.applicationGuildCommands(client.user?.id || '', process.env.GUILD_ID),
+            { body: commandsData }
+          );
+          console.log("Commandes Slash déployées pour la guild !");
+        } else {
+          await rest.put(
+            Routes.applicationCommands(client.user?.id || ''),
+            { body: commandsData }
+          );
+          console.log("Commandes Slash déployées globalement !");
+        }
+        console.log('Slash commands enregistrées avec succès!');
+      } else {
+        console.log("Aucune slash command à déployer.");
+      }
+    }
   } catch (error) {
     console.error('Erreur lors de la connexion à Discord:', error);
     process.exit(1);
   }
-}
-
-// Gestion des erreurs non capturées
-process.on('unhandledRejection', (error) => {
-  console.error('Erreur non gérée:', error);
-});
-
-// Démarrage du bot
-main();
-
-// Ajout des types pour TypeScript
-declare module 'discord.js' {
-  interface Client {
-    commands: Collection<string, any>;
-    slashCommands: Collection<string, any>;
-  }
-}
-
-export { client };
+})();
