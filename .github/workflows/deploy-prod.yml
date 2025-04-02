@@ -27,7 +27,7 @@ jobs:
 
             if [ ! -d ".git" ]; then
               echo "📁 Clonage initial"
-              git clone -b main https://github.com/jordan-olv/la-station .
+              git clone -b main https://github.com/jordan-olv/la-station.git .
             fi
 
             echo "📥 Pull du dernier code"
