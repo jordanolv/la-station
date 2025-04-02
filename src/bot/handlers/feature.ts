@@ -55,7 +55,7 @@ async function loadCommands(botClient: BotClient, featurePath: string, featureNa
       
       if (command && command.name) {
         botClient.commands.set(command.name, command);
-        //console.log(`Commande chargée: ${command.name} (${featureName})`);
+        console.log(`Commande chargée: ${command.name} (${featureName})`);
       }
     } catch (error) {
       console.error(`Erreur lors du chargement de la commande ${filePath}:`, error);
