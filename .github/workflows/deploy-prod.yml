@@ -34,7 +34,7 @@ jobs:
             git config --global --add safe.directory /home/deploy/project/LaStationBot/prod
             git reset --hard
             git clean -fd
-            git pull origin MAIN
+            git pull origin main
 
             echo "🔧 Droits"
             chown -R deploy:deploy ~/project/LaStationBot/prod
@@ -44,7 +44,7 @@ jobs:
             npm run build
 
             echo "🚀 PM2 Restart"
-            pm2 start dist/app.js --name "LaStationBot"
+            pm2 restart dist/app.js --name "LaStationBot"
             pm2 save
 
             echo "✅ Déploiement PROD terminé 🎉"
