@@ -5,7 +5,7 @@
   "main": "dist/bot/app.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/bot/app.js",
+    "start": "pm2 start src/bot/app.ts --name la-station",
     "dev": "ts-node src/bot/app.ts",
     "watch": "nodemon --exec ts-node src/bot/app.ts"
   },
