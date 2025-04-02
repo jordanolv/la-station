@@ -2,7 +2,7 @@ import { BotClient } from '../../../BotClient';
 import { GuildService } from '../../../../database/services/GuildService';
 
 export default {
-  name: 'VoiceStateUpdate',
+  name: 'voiceStateUpdate',
   once: false,
 
   async execute(client: BotClient, oldMember: any, newMember: any) {
@@ -18,7 +18,7 @@ export default {
 
     // Si un utilisateur rejoint un salon vocal
     if (newMember.channelId) {
-      if (vocGaming.channelsCreated.includes(newMember.channelId)) {
+      if (vocGaming.channelToJoin === newMember.channelId) {
         client.emit('addVoiceChannel', newMember, guildData, client);
       }
     }

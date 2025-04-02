@@ -54,8 +54,8 @@ async function loadCommands(botClient: BotClient, featurePath: string, featureNa
       const command = require(filePath).default;
       
       if (command && command.name) {
-        botClient.commands.set(command.name, command);
-        console.log(`Commande chargée: ${command.name} (${featureName})`);
+        botClient.commands.set(command.name.toLowerCase(), command);
+        // console.log(`Commande chargée: ${command.name} (${featureName})`);
       }
     } catch (error) {
       console.error(`Erreur lors du chargement de la commande ${filePath}:`, error);
@@ -80,7 +80,7 @@ async function loadSlashCommands(botClient: BotClient, featurePath: string, feat
       const slashCommand = require(filePath).default;
       
       if (slashCommand && slashCommand.data) {
-        botClient.slashCommands.set(slashCommand.data.name, slashCommand);
+        botClient.slashCommands.set(slashCommand.data.name.toLowerCase(), slashCommand);
         //console.log(`Slash command chargée: ${slashCommand.data.name} (${featureName})`);
       }
     } catch (error) {

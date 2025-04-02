@@ -1,6 +1,8 @@
 import { Client, Message } from 'discord.js';
 import { BotClient } from '../../../BotClient';
 import { GuildService } from '../../../../database/services/GuildService';
+import { EmbedUtils } from '../../../utils/EmbedUtils';
+import { Command } from '../../../interfaces/Command';
 
 export default {
   name: 'messageCreate',
@@ -32,9 +34,21 @@ export default {
     if (!commandName) return;
     
     // Recherche de la commande dans la collection
-    const command = client.commands.get(commandName);
+    const command = client.commands.get(commandName) as Command;
     
     if (!command) return;
+
+    // Vérification des rôles requis
+    if (command.roles && command.roles.length > 0) {
+      const hasRole = message.member?.roles.cache.some(role => command.roles!.includes(role.id));
+      if (!hasRole) {
+        const embed = EmbedUtils.createErrorEmbed(
+          'Permission refusée',
+          'Vous n\'avez pas les rôles requis pour utiliser cette commande.'
+        );
+        return message.reply({ embeds: [embed] });
+      }
+    }
     
     // Exécution de la commande
     try {

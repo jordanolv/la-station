@@ -32,7 +32,7 @@ export class GuildService {
       registeredAt: new Date(),
       config: { prefix: prefix || '!' },
       features: {
-        VocGaming: {
+        vocGaming: {
           enabled: false,
           channelToJoin: '',
           channelsCreated: [],
