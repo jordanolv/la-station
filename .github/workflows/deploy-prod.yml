@@ -44,7 +44,7 @@ jobs:
             npm run build
 
             echo "🚀 PM2 Restart"
-            pm2 restart dist/bot/app.js --name LaStationBot
+            pm2 restart /home/deploy/project/LaStationBot/prod/dist/bot/app.js --name LaStationBot
             pm2 save
 
             echo "✅ Déploiement PROD terminé 🎉"
