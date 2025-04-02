@@ -47,7 +47,7 @@ async function loadCommands(botClient: BotClient, featurePath: string, featureNa
   }
   
   // Lecture récursive des commandes dans les sous-dossiers
-  const commandFiles = getFilesRecursively(commandsPath, '.ts');
+  const commandFiles = getFilesRecursively(commandsPath, ['.ts', '.js']);
   
   for (const filePath of commandFiles) {
     try {
@@ -73,7 +73,7 @@ async function loadSlashCommands(botClient: BotClient, featurePath: string, feat
     return; // Pas de dossier "slash", on passe
   }
   
-  const slashFiles = getFilesRecursively(slashPath, '.ts');
+  const slashFiles = getFilesRecursively(slashPath, ['.ts', '.js']);
   
   for (const filePath of slashFiles) {
     try {
@@ -99,7 +99,7 @@ async function loadEvents(botClient: BotClient, featurePath: string, featureName
     return; // Pas de dossier "events", on passe
   }
   
-  const eventFiles = getFilesRecursively(eventsPath, '.ts');
+  const eventFiles = getFilesRecursively(eventsPath, ['.ts', '.js']);
   
   for (const filePath of eventFiles) {
     try {
@@ -122,7 +122,7 @@ async function loadEvents(botClient: BotClient, featurePath: string, featureName
 /**
  * Récupère tous les fichiers de manière récursive dans un dossier
  */
-function getFilesRecursively(dir: string, extension: string): string[] {
+function getFilesRecursively(dir: string, extensions: string[]): string[] {
   let files: string[] = [];
   
   if (!fs.existsSync(dir)) {
@@ -135,8 +135,8 @@ function getFilesRecursively(dir: string, extension: string): string[] {
     const res = path.resolve(dir, dirent.name);
     
     if (dirent.isDirectory()) {
-      files = [...files, ...getFilesRecursively(res, extension)];
-    } else if (res.endsWith(extension)) {
+      files = [...files, ...getFilesRecursively(res, extensions)];
+    } else if (extensions.some(ext => res.endsWith(ext))) {
       files.push(res);
     }
   }
