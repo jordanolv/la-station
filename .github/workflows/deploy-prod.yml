@@ -1,0 +1,51 @@
+name: 🚀 Deploy PROD to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔐 Préparer la clé SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 🚀 Déploiement SSH
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            echo "✅ Connexion SSH réussie"
+
+            mkdir -p ~/project/LaStationBot/prod
+            cd ~/project/LaStationBot/prod
+
+            if [ ! -d ".git" ]; then
+              echo "📁 Clonage initial"
+              git clone -b main https://github.com/jordan-olv/la-station .
+            fi
+
+            echo "📥 Pull du dernier code"
+            git config --global --add safe.directory /home/deploy/project/LaStationBot/prod
+            git reset --hard
+            git clean -fd
+            git pull origin MAIN
+
+            echo "🔧 Droits"
+            chown -R deploy:deploy ~/project/LaStationBot/prod
+
+            echo "🛠 Backend - Installation & Build"
+            npm install
+            npm run build
+
+            echo "🚀 PM2 Restart"
+            pm2 start dist/app.js --name "LaStationBot"
+            pm2 save
+
+            echo "✅ Déploiement PROD terminé 🎉"
+          EOF
