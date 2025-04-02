@@ -13,7 +13,7 @@ export default {
     if (!command) return;
     
     try {
-      await command.execute(interaction);
+      await command.execute(client, interaction);
     } catch (error) {
       console.error(`Erreur lors de l'exécution de la commande ${interaction.commandName}:`, error);
       const errorMessage = 'Une erreur est survenue lors de l\'exécution de cette commande.';

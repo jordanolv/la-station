@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
-
+import { BotClient } from '../../../../BotClient';
 export default {
   data: new SlashCommandBuilder()
     .setName('test')
@@ -10,10 +10,12 @@ export default {
    * Exécute la slash command test
    * @param interaction L'interaction Discord
    */
-  async execute(interaction: CommandInteraction) {
+  async execute(client: BotClient, interaction: CommandInteraction) {
     try {
+      client.emit('test');
+
       await interaction.reply({
-        content: '✅ La slash command test fonctionne correctement! v2',
+        content: '✅ La slash command test fonctionne correctement!',
         ephemeral: true
       });
     } catch (error) {

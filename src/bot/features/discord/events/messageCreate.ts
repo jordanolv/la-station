@@ -1,5 +1,6 @@
 import { Client, Message } from 'discord.js';
 import { BotClient } from '../../../BotClient';
+import { GuildService } from '../../../../database/services/GuildService';
 
 export default {
   name: 'messageCreate',
@@ -12,9 +13,15 @@ export default {
    */
   async execute(client: BotClient, message: Message) {
     // Ignorer les messages des bots et les messages sans préfixe
+    if (message.channel.type !== 0) return;
     if (message.author.bot) return;
+    if (!message.guild) return;
+
+    const guildData = await GuildService.ensureGuild(message.guild.id, message.guild.name);
+
+    if (!guildData) return;
     
-    const prefix = process.env.PREFIX || '!';
+    const prefix = guildData.config.prefix;
     
     if (!message.content.startsWith(prefix)) return;
     

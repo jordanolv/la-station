@@ -1,4 +1,4 @@
-import { Client, REST, Routes } from 'discord.js';
+import { BotClient } from '../../../BotClient';
 
 export default {
   name: 'test',
@@ -8,7 +8,7 @@ export default {
    * Gère l'événement ready du bot
    * @param client Le client Discord
    */
-  async execute(client: Client) {
+  async execute(client: BotClient) {
     console.log(`test ${client.user?.tag}`);
   }
 };
