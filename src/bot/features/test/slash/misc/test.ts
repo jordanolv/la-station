@@ -13,7 +13,7 @@ export default {
   async execute(interaction: CommandInteraction) {
     try {
       await interaction.reply({
-        content: '✅ La slash command test fonctionne correctement!',
+        content: '✅ La slash command test fonctionne correctement! v2',
         ephemeral: true
       });
     } catch (error) {
