@@ -41,10 +41,9 @@ jobs:
 
             echo "🛠 Backend - Installation & Build"
             npm install
-            npm run build
 
             echo "🚀 PM2 Restart"
-            pm2 restart dist/app.js --name "LaStationBot"
+            pm2 restart src/bot/app.ts --name "LaStationBot"
             pm2 save
 
             echo "✅ Déploiement PROD terminé 🎉"
