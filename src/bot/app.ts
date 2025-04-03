@@ -4,6 +4,7 @@ import { connectToDatabase } from './handlers/mongoose';
 import { loadFeatures } from './handlers/feature';
 import path from 'path';
 import { REST, Routes } from 'discord.js';
+import { createAPI } from '../webapp/api';
 
 (async () => {
   // 1) Initialiser la classe
@@ -16,14 +17,20 @@ import { REST, Routes } from 'discord.js';
   const featuresPath = path.join(__dirname, 'features');
   await loadFeatures(client, featuresPath);
 
-  // 4) Connexion à Discord
+  // 4) Initialiser l'API
+  const api = createAPI(client);
+  api.listen(3002, () => {
+    console.log('API démarrée sur http://localhost:3002');
+  });
+
+  // 5) Connexion à Discord
   try {
     const token = process.env.DISCORD_TOKEN;
     if (!token) throw new Error("DISCORD_TOKEN n'est pas défini dans l'environnement");
 
     await client.login(token);
 
-    // 5) Auto-déploiement des slash commands (optionnel)
+    // 6) Auto-déploiement des slash commands (optionnel)
     if (process.env.AUTO_DEPLOY_COMMANDS === 'true') {
       const slashCommands = Array.from(client.slashCommands.values());
       if (slashCommands.length > 0) {

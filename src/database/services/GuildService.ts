@@ -9,6 +9,10 @@ export class GuildService {
     return guildData;
   }
 
+  static async findAll(): Promise<IGuild[]> {
+    return GuildModel.find({});
+  }
+
   static async getGuildById(guildId: string): Promise<IGuild | null> {
     return GuildModel.findOne({ guildId: guildId });
   }
