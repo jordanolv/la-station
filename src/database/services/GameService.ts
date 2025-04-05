@@ -46,8 +46,8 @@ export class GameService {
   ): Promise<IGame | null> {
     return GameModel.findOneAndUpdate(
       { id },
-      { 
-        $set: { 
+      {
+        $set: {
           threadId,
           messageId
         }
@@ -83,8 +83,8 @@ export class GameService {
   ): Promise<IGame | null> {
     return GameModel.findOneAndUpdate(
       { _id: gameId },
-      { 
-        $push: { 
+      {
+        $push: {
           reactions: {
             messageId,
             emoji,

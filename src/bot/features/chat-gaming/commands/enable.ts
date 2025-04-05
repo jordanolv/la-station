@@ -6,7 +6,7 @@ export default {
   name: 'enable-chatGaming',
   description: 'Active ou désactive la fonctionnalité chatGaming',
   usage: 'enable-chatGaming <true/false>',
-  roles: ['1356046483413008476'],
+  roles: ['1160997258247032963'],
 
   /**
    * Active ou désactive la fonctionnalité chatGaming

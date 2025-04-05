@@ -2,12 +2,12 @@ import { Message, TextChannel } from 'discord.js';
 import { GuildService } from '../../../../database/services/GuildService';
 
 export default {
-  name: 'set-channel-vocGaming',
-  description: 'Définit le salon vocal pour le vocGaming',
-  usage: 'set-channel-vocGaming #channel',
+  name: 'set-channel-chatGaming',
+  description: 'Définit le salon vocal pour le chatGaming',
+  usage: 'set-channel-chatGaming #channel',
   
   /**
-   * Définit le salon vocal pour le vocGaming
+   * Définit le salon vocal pour le chatGaming
    * @param message Le message Discord
    * @param args Les arguments de la commande
    */
@@ -16,7 +16,7 @@ export default {
       // Vérifier si un channel a été mentionné
       if (!args.length || !message.mentions.channels.first()) {
         return message.reply({
-          content: '❌ Veuillez mentionner un salon vocal. Exemple: `set-channel-vocGaming #nom-du-salon`'
+          content: '❌ Veuillez mentionner un salon vocal. Exemple: `set-channel-chatGaming #nom-du-salon`'
         });
       }
 
@@ -24,20 +24,20 @@ export default {
 
       if (!channel) {
         return message.reply({
-          content: '❌ Veuillez mentionner un salon vocal valide. Exemple: `set-channel-vocGaming #nom-du-salon`'
+          content: '❌ Veuillez mentionner un salon vocal valide. Exemple: `set-channel-chatGaming #nom-du-salon`'
         });
       }
       
       // Utiliser GuildService au lieu d'accéder directement au modèle
-      await GuildService.updateFeatureSettings(message.guild?.id || '', 'vocGaming', {
-        channelToJoin: channel.id
+      await GuildService.updateFeatureSettings(message.guild?.id || '', 'chatGaming', {
+        channelId: channel.id
       });
 
       await message.reply({
-        content: `✅ Le salon ${channel} a été défini comme salon vocal pour le vocGaming!`
+        content: `✅ Le salon ${channel} a été défini comme salon vocal pour le chatGaming!`
       });
     } catch (error) {
-      console.error('Erreur dans la commande set-channel-vocGaming:', error);
+      console.error('Erreur dans la commande set-channel-chatGaming:', error);
       await message.reply({
         content: '❌ Une erreur est survenue lors de l\'exécution de la commande.'
       });

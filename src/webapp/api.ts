@@ -73,13 +73,13 @@ export function createAPI(client: BotClient) {
   }));
 
   app.get('/test', async (req: Request, res: Response) => {
-    const guild = await getGuild('1299121206431191181');
+    const guild = await getGuild('1148634282093445150');
     
     res.send(guild?.name);
   });
 
   app.post('/game/create', upload.single('gameimage'), async (req: Request, res: Response) => {
-    const guild = await getGuild('1299121206431191181');
+    const guild = await getGuild('1148634282093445150');
 
     const gameName = req.body.gamename;
     const gameDescription = req.body.gamedescription;
