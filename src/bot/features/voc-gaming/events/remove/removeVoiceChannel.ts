@@ -1,5 +1,6 @@
 import { BotClient } from '../../../../BotClient';
 import { VocGamingService } from '../../../../services/VocGamingService';
+import * as Sentry from '@sentry/node';
 
 export default {
   name: 'removeVoiceChannel',
@@ -20,6 +21,17 @@ export default {
       }
     } catch (error) {
       console.error('Erreur dans l\'événement removeVoiceChannel:', error);
+
+      // 👇 Envoie l'erreur à Sentry avec contexte
+      Sentry.withScope(scope => {
+        scope.setTag('event', 'removeVoiceChannel');
+        scope.setUser({ id: oldMember.id });
+        scope.setContext('Guild', {
+          id: oldMember.guild.id,
+          name: oldMember.guild.name,
+        });
+        Sentry.captureException(error);
+      });
     }
   }
 };

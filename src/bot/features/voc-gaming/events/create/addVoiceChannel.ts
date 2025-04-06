@@ -1,6 +1,7 @@
 import { BotClient } from '../../../../BotClient';
 import { ChannelType } from 'discord.js';
 import { VocGamingService } from '../../../../services/VocGamingService';
+import * as Sentry from '@sentry/node';
 
 export default {
   name: 'addVoiceChannel',
@@ -8,18 +9,29 @@ export default {
 
   async execute(client: BotClient, member: any, guildData: any) {
     try {
-        const channel = await member.guild.channels.create({
-          name: `🎮 Gaming ${guildData.features.vocGaming.nbChannelsCreated + 1}`,
-          type: ChannelType.GuildVoice,
-          parent: member.channel.parentId,
-        });
+      const channel = await member.guild.channels.create({
+        name: `🎮 Gaming ${guildData.features.vocGaming.nbChannelsCreated + 1}`,
+        type: ChannelType.GuildVoice,
+        parent: member.channel.parentId,
+      });
 
-        await member.member.voice.setChannel(channel);
+      await member.member.voice.setChannel(channel);
 
-        // Mettre à jour la base de données
-        await VocGamingService.addChannel(member.guild.id, channel.id);
+      // Mettre à jour la base de données
+      await VocGamingService.addChannel(member.guild.id, channel.id);
     } catch (error) {
       console.error('Erreur dans l\'événement addVoiceChannel:', error);
+
+      // 👇 Envoie l'erreur à Sentry avec contexte
+      Sentry.withScope(scope => {
+        scope.setTag('event', 'addVoiceChannel');
+        scope.setUser({ id: member.id });
+        scope.setContext('Guild', {
+          id: member.guild.id,
+          name: member.guild.name,
+        });
+        Sentry.captureException(error);
+      });
     }
   }
 };
