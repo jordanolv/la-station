@@ -8,10 +8,11 @@ export default {
 
   async execute(client: BotClient, oldMember: any, guildData: any) {
     try {
-      if (!guildData.features?.vocGaming?.channelsCreated) return;
+      if (guildData.features?.vocGaming?.channelsCreated.length() < 1) return;
 
       for (const channelId of guildData.features.vocGaming.channelsCreated) {
         const channel = oldMember.guild.channels.cache.get(channelId);
+        Sentry.captureMessage(`Channel: ${channel}`);
         if (channel && channel.members.size <= 0) {
           await channel.delete();
 
