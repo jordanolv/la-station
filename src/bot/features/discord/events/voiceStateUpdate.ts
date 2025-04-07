@@ -29,6 +29,13 @@ export default {
         client.emit('removeVoiceChannel', oldMember, guildData, client);
       }
     }
+
+    // Si un utilisateur change de salon vocal
+    if (oldMember.channelId && newMember.channelId) {
+      if (vocGaming.channelsCreated.includes(oldMember.channelId)) {
+        client.emit('removeVoiceChannel', oldMember, newMember, guildData, client);
+      }
+    }
   }
 };
 
