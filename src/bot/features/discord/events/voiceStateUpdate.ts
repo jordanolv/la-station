@@ -24,7 +24,7 @@ export default {
     }
 
     // Si un utilisateur quitte un salon vocal
-    if (oldMember.channelId) {
+    if (oldMember.channelId && !newMember.channelId) {
       if (vocGaming.channelsCreated.includes(oldMember.channelId)) {
         client.emit('removeVoiceChannel', oldMember, guildData, client);
       }
