@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import { config } from 'dotenv';
+import dotenv from 'dotenv';
 import { updateGuilds } from './updateGuilds';
 
-config();
+dotenv.config();
 
 async function main() {
   try {
