@@ -25,6 +25,10 @@ export interface IGuild extends Document {
       reactionsList: string[];
       nbForumCreated: number;
     };
+    leveling: {
+      enabled: boolean;
+      taux: number;
+    };
   };
 }
 
@@ -52,6 +56,10 @@ const GuildSchema = new Schema<IGuild>({
       channelsList: [String],
       reactionsList: [String],
       nbForumCreated: Number,
+    },
+    leveling: {
+      enabled: { type: Boolean, default: true },
+      taux: { type: Number, default: 1 }
     },
   },
 });

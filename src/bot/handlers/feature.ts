@@ -111,7 +111,7 @@ async function loadEvents(botClient: BotClient, featurePath: string, featureName
         } else {
           botClient.on(event.name, (...args) => event.execute(botClient, ...args));
         }
-        //console.log(`Événement chargé: ${event.name} (${featureName})`);
+        // console.log(`Événement chargé: ${event.name} (${featureName})`);
       }
     } catch (error) {
       console.error(`Erreur lors du chargement de l'événement ${filePath}:`, error);

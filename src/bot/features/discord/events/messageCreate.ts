@@ -3,7 +3,7 @@ import { BotClient } from '../../../BotClient';
 import { GuildService } from '../../../../database/services/GuildService';
 import { EmbedUtils } from '../../../utils/EmbedUtils';
 import { Command } from '../../../interfaces/Command';
-
+import { UserService } from '../../../../database/services/UserService';
 export default {
   name: 'messageCreate',
   once: false,
@@ -18,13 +18,24 @@ export default {
     if (message.channel.type !== 0) return;
     if (message.author.bot) return;
     if (!message.guild) return;
-
+    
     const guildData = await GuildService.ensureGuild(message.guild.id, message.guild.name);
-
     if (!guildData) return;
-    
+
+    let user = await UserService.getUserByDiscordId(message.author.id);
+    if (!user) {
+      user = await UserService.createUser(message.author, message.guild);
+    }
+
+    // Incrémentation du nombre de messages total
+    await UserService.incrementTotalMsg(message.author.id);
+
+    // Donne de l'xp aléatoire entre 6 et 10
+    const randomXp = Math.floor(Math.random() * (10 - 6 + 1)) + 6;
+    await UserService.giveXpToUser(client, message.author.id, randomXp);
+
+    // Vérifie si c'est une commande
     const prefix = guildData.config.prefix;
-    
     if (!message.content.startsWith(prefix)) return;
     
     // Extraction du nom de la commande et des arguments

@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 import * as Sentry from '@sentry/node';
-
+import { UserService } from '../../../../../database/services/UserService';
 export default {
   name: 'test',
   description: 'Une commande de test simple',
@@ -17,8 +17,8 @@ export default {
         content: '✅ La commande test fonctionne correctement !'
       });
 
-      // ❗ Force une erreur pour test
-      throw new Error('Erreur de test Sentry 😈');
+      const user = await UserService.getUserByDiscordId(message.author.id);
+      console.log(user);
 
     } catch (error) {
       console.error('Erreur dans la commande test:', error);
