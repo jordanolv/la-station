@@ -22,8 +22,8 @@ jobs:
           ssh -i ~/.ssh/pulseheberg_vps -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
             echo "✅ Connexion SSH réussie"
 
-            mkdir -p ~/project/LaStationBot/prod
-            cd ~/project/LaStationBot/prod
+            mkdir -p ~/projects/LaStationBot/prod
+            cd ~/projects/LaStationBot/prod
 
             if [ ! -d ".git" ]; then
               echo "📁 Clonage initial"
@@ -31,13 +31,13 @@ jobs:
             fi
 
             echo "📥 Pull du dernier code"
-            git config --global --add safe.directory /home/deploy/project/LaStationBot/prod
+            git config --global --add safe.directory /home/deploy/projects/LaStationBot/prod
             git reset --hard
             git clean -fd
             git pull origin main
 
             echo "🔧 Droits"
-            chown -R deploy:deploy ~/project/LaStationBot/prod
+            chown -R deploy:deploy ~/projects/LaStationBot/prod
 
             echo "🛠 Backend - Installation & Build"
             npm install
