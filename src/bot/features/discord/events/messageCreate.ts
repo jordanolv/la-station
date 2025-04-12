@@ -63,7 +63,7 @@ export default {
     
     // Exécution de la commande
     try {
-      await command.execute(message, args);
+      await command.execute(message, args, guildData);
     } catch (error) {
       console.error(`Erreur lors de l'exécution de la commande ${commandName}:`, error);
       await message.reply('Une erreur est survenue lors de l\'exécution de cette commande.');
