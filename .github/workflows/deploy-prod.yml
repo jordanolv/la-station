@@ -19,7 +19,7 @@ jobs:
 
       - name: 🚀 Déploiement SSH
         run: |
-          ssh -i ~/.ssh/hetzner_vps -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+          ssh -i ~/.ssh/hetzner_vps -p 7623 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
             echo "✅ Connexion SSH réussie"
 
             mkdir -p ~/projects/LaStationBot/prod
