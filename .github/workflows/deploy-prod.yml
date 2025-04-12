@@ -50,4 +50,3 @@ jobs:
 
             echo "✅ Déploiement PROD terminé 🎉"
           EOF
-

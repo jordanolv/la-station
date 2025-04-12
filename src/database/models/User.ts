@@ -21,6 +21,7 @@ export interface IUser extends Document {
   infos: {
     registeredAt: Date;
     updatedAt: Date;
+    birthDate: Date;
   };
 }
 
@@ -54,10 +55,22 @@ const UserSchema = new Schema<IUser>({
   infos: {
     type: {
       registeredAt: { type: Date, default: Date.now },
-      updatedAt: { type: Date, default: Date.now }
+      updatedAt: { type: Date, default: Date.now },
+      birthDate: { type: Date }
     },
     _id: false
   }
+});
+
+UserSchema.pre('save', function (next) {
+  if (!this.isModified()) return next();
+  this.infos.updatedAt = new Date();
+  next();
+});
+
+UserSchema.pre('findOneAndUpdate', function (next) {
+  this.set({ 'infos.updatedAt': new Date() });
+  next();
 });
 
 const UserModel = mongoose.model<IUser>('User', UserSchema);

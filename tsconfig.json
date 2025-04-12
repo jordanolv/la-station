@@ -17,9 +17,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@database/*": ["src/database/*"]
+      "@database/*": ["src/database/*"],
     }
   },
   "include": ["src/**/*", "types/**/*"],
   "exclude": ["node_modules"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
 }
