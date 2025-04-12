@@ -59,6 +59,27 @@ import { CronManager } from './cron';
       if (slashCommands.length > 0) {
         console.log(`Déploiement de ${slashCommands.length} slash commands...`);
         const rest = new REST({ version: '10' }).setToken(token);
+
+        // Supprimer toutes les commandes existantes
+        try {
+          if (process.env.GUILD_ID) {
+            await rest.put(
+              Routes.applicationGuildCommands(client.user?.id || '', process.env.GUILD_ID),
+              { body: [] }
+            );
+            console.log("Anciennes commandes supprimées pour la guild !");
+          } else {
+            await rest.put(
+              Routes.applicationCommands(client.user?.id || ''),
+              { body: [] }
+            );
+            console.log("Anciennes commandes supprimées globalement !");
+          }
+        } catch (error) {
+          console.error("Erreur lors de la suppression des anciennes commandes:", error);
+        }
+
+        // Déployer les nouvelles commandes
         const commandsData = slashCommands.map(cmd => cmd.data.toJSON());
 
         if (process.env.GUILD_ID) {
