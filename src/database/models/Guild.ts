@@ -6,6 +6,9 @@ export interface IGuild extends Document {
   registeredAt: Date;
   config: {
     prefix: string;
+    channels: {
+      birthday: string;
+    };
   };
   features: {
     logs: {
@@ -38,6 +41,9 @@ const GuildSchema = new Schema<IGuild>({
   registeredAt: Date,
   config: {
     prefix: String,
+    channels: {
+      birthday: String
+    }
   },
   features: {
     logs: {

@@ -17,6 +17,11 @@ export interface IUser extends Document {
   bio: string;
   stats: {
     totalMsg: number;
+    voiceTime: number;
+    voiceHistory: Array<{
+      date: Date;
+      time: number;
+    }>;
   };
   infos: {
     registeredAt: Date;
@@ -48,7 +53,12 @@ const UserSchema = new Schema<IUser>({
   bio: { type: String },
   stats: {
     type: {
-      totalMsg: { type: Number, default: 0 }
+      totalMsg: { type: Number, default: 0 },
+      voiceTime: { type: Number, default: 0 },
+      voiceHistory: [{
+        date: { type: Date, default: Date.now },
+        time: { type: Number, default: 0 }
+      }]
     },
     _id: false
   },
