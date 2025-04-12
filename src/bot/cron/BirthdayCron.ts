@@ -9,8 +9,8 @@ export class BirthdayCron {
     constructor(client: Client) {
         this.client = client;
         // */5 * * * * * signifie toutes les 5 secondes
-        // this.job = new CronJob('0 0 * * *', this.checkBirthdays.bind(this));
-        this.job = new CronJob('*/5 * * * * *', this.checkBirthdays.bind(this));
+        this.job = new CronJob('0 0 * * *', this.checkBirthdays.bind(this));
+        // this.job = new CronJob('*/5 * * * * *', this.checkBirthdays.bind(this));
     }
 
     public start(): void {
