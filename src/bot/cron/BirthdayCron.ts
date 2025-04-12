@@ -1,6 +1,7 @@
 import { CronJob } from 'cron';
-import { Client } from 'discord.js';
+import { Client, EmbedBuilder, TextChannel, ChannelType } from 'discord.js';
 import UserModel from '../../database/models/User';
+import { GuildService } from '@/database/services/GuildService';
 
 export class BirthdayCron {
     private job: CronJob;
@@ -8,7 +9,6 @@ export class BirthdayCron {
 
     constructor(client: Client) {
         this.client = client;
-        // */5 * * * * * signifie toutes les 5 secondes
         this.job = new CronJob('0 0 * * *', this.checkBirthdays.bind(this));
         // this.job = new CronJob('*/5 * * * * *', this.checkBirthdays.bind(this));
     }
@@ -24,10 +24,9 @@ export class BirthdayCron {
     }
 
     private async checkBirthdays(): Promise<void> {
-        console.log('Checking birthdays...');
         try {
             const today = new Date();
-            const todayMonth = today.getMonth() + 1; // +1 car getMonth() retourne 0-11
+            const todayMonth = today.getMonth() + 1;
             const todayDay = today.getDate();
 
             const users = await UserModel.find({
@@ -45,9 +44,26 @@ export class BirthdayCron {
                 const birthDay = birthDate.getDate();
 
                 if (birthMonth === todayMonth && birthDay === todayDay) {
-                    // TODO: Implémenter la logique pour souhaiter l'anniversaire
-                    // Par exemple, envoyer un message dans un canal spécifique
-                    console.log(`C'est l'anniversaire de ${user.name} aujourd'hui !`);
+                    const guild = await GuildService.getGuildById(user.guild.guildId);
+                    if (!guild) continue;
+
+                    const channelId = guild.config.channels.birthday;
+                    if (!channelId) continue;
+
+                    const channelBirthday = await this.client.channels.fetch(channelId);
+                    if (!channelBirthday || channelBirthday.type !== ChannelType.GuildText) continue;
+
+                    const textChannel = channelBirthday as TextChannel;
+                    //use my embed build utils
+                    const embed = new EmbedBuilder()
+                    .setTitle('🎉 Joyeux Anniversaire ! 🎉')
+                    .setDescription(`Toute l'équipe souhaite un joyeux anniversaire à <@${user.discordId}> ! 🎂\n\nAujourd'hui, ${user.name} souffle sa ${new Date().getFullYear() - new Date(user.infos.birthDate).getFullYear()}ème bougie !`)
+                    .setColor('#43B581')
+                    .setImage('https://c.tenor.com/GscosXEDKhcAAAAd/tenor.gif')
+                    .setFooter({ text: 'La Station - Système d\'anniversaire' })
+                    .setTimestamp();
+
+                    await textChannel.send({ embeds: [embed] });
                 }
             }
         } catch (error) {
