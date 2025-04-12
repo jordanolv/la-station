@@ -13,13 +13,13 @@ jobs:
       - name: 🔐 Préparer la clé SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/hetzner_vps
-          chmod 600 ~/.ssh/hetzner_vps
-          ssh-keyscan -p 7623 -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }}
+          chmod 600 ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }}
+          ssh-keyscan -p ${{ secrets.VPS_PORT }} -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
       - name: 🚀 Déploiement SSH
         run: |
-          ssh -i ~/.ssh/hetzner_vps -p 7623 -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+          ssh -i ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }} -p ${{ secrets.VPS_PORT }} -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
             echo "✅ Connexion SSH réussie"
 
             mkdir -p ~/projects/LaStationBot/prod
