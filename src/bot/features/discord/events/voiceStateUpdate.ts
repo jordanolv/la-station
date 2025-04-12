@@ -1,5 +1,9 @@
 import { BotClient } from '../../../BotClient';
 import { GuildService } from '../../../../database/services/GuildService';
+import { UserService } from '../../../../database/services/UserService';
+
+// Map pour stocker les temps de début de session vocale
+const voiceStartTimes = new Map<string, number>();
 
 export default {
   name: 'voiceStateUpdate',
@@ -13,6 +17,34 @@ export default {
     if (!guildData) return;
 
     const vocGaming = guildData.features?.vocGaming;
+
+    // Gestion du temps passé en vocal
+    const userId = oldMember.id || newMember.id;
+    
+    // Si l'utilisateur rejoint un salon vocal
+    if (newMember.channelId && !oldMember.channelId) {
+      voiceStartTimes.set(userId, Date.now());
+    }
+    
+    // Si l'utilisateur quitte un salon vocal
+    if (!newMember.channelId && oldMember.channelId) {
+      const startTime = voiceStartTimes.get(userId);
+      if (startTime) {
+        const timeSpent = Math.floor((Date.now() - startTime) / 1000); // Convertir en secondes
+        await UserService.incrementVoiceTime(userId, timeSpent);
+        voiceStartTimes.delete(userId);
+      }
+    }
+
+    // Si l'utilisateur change de salon vocal
+    if (oldMember.channelId && newMember.channelId) {
+      const startTime = voiceStartTimes.get(userId);
+      if (startTime) {
+        const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+        await UserService.incrementVoiceTime(userId, timeSpent);
+        voiceStartTimes.set(userId, Date.now());
+      }
+    }
 
     if (!vocGaming?.enabled) return;
 
