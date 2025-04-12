@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { BotClient } from '../../../../BotClient';
-import UserModel from '../../../../../database/models/User';
+import { BotClient } from '../../../BotClient';
+import UserModel from '../../../../database/models/User';
 import { UserService } from '@database/services/UserService';
 
 function formatDate(date: Date): string { 
