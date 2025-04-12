@@ -25,6 +25,13 @@ export default {
       bio: 'Hello, je suis un test',
       stats: {
         totalMsg: 1000,
+        voiceTime: 1000,
+        voiceHistory: [
+          {
+            date: new Date(),
+            time: 1000,
+          },
+        ],
       },
       infos: {
         registeredAt: user.infos.registeredAt,
