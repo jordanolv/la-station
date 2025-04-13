@@ -3,21 +3,15 @@ import { GuildService } from '../../../../database/services/GuildService';
 import { IGuild } from '@/database/models/Guild';
 
 export default {
-  name: 'set-channel-logs',
-  description: 'Définit le salon pour les logs',
-  usage: 'set-channel-logs #channel',
+  name: 'set-channel-birthday',
+  description: 'Définit le salon pour les anniversaires',
+  usage: 'set-channel-birthday #channel',
   
-  /**
-   * Définit le salon pour les logs
-   * @param message Le message Discord
-   * @param args Les arguments de la commande
-   * @param guildData Les données du serveur
-   */
   async execute(message: Message, args: string[], guildData: IGuild) {
     try {
       if (!args.length || !message.mentions.channels.first()) {
         return message.reply({
-          content: '❌ Veuillez mentionner un salon textuel. Exemple: `set-logs-channel #logs`'
+          content: '❌ Veuillez mentionner un salon textuel. Exemple: `set-birthday-channel #birthday`'
         });
       }
 
@@ -29,12 +23,21 @@ export default {
         });
       }
 
-        await GuildService.updateFeatureSettings(message.guild?.id || '', 'logs', {
-          channel: channel.id
+      if (!guildData) {
+        return message.reply({
+          content: '❌ Une erreur est survenue lors de la récupération des données du serveur.'
+        });
+      }
+
+      await GuildService.updateSettings(message.guild?.id || '', {
+        ...guildData.config,
+        channels: {
+          birthday: channel.id
+        }
       });
 
       const reply = await message.reply({
-        content: `✅ Le salon ${channel} a été défini comme salon de logs!`
+        content: `✅ Le salon ${channel} a été défini comme salon d'anniversaire!`
       });
 
       setTimeout(() => {
@@ -42,7 +45,7 @@ export default {
         message.delete();
       }, 5000);
     } catch (error) {
-      console.error('Erreur dans la commande set-logs-channel:', error);
+      console.error('Erreur dans la commande set-birthday-channel:', error);
       await message.reply({
         content: '❌ Une erreur est survenue lors de l\'exécution de la commande.'
       });

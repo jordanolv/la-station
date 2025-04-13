@@ -4,6 +4,7 @@ import { GuildService } from '../../../../database/services/GuildService';
 import { EmbedUtils } from '../../../utils/EmbedUtils';
 import { Command } from '../../../interfaces/Command';
 import { UserService } from '../../../../database/services/UserService';
+
 export default {
   name: 'messageCreate',
   once: false,
@@ -22,17 +23,18 @@ export default {
     const guildData = await GuildService.ensureGuild(message.guild.id, message.guild.name);
     if (!guildData) return;
 
-    let user = await UserService.getUserByDiscordId(message.author.id);
-    if (!user) {
-      user = await UserService.createUser(message.author, message.guild);
+    // Vérifier et créer l'utilisateur du serveur si nécessaire
+    let guildUser = await UserService.getGuildUserByDiscordId(message.author.id, message.guild.id);
+    if (!guildUser) {
+      guildUser = await UserService.createGuildUser(message.author, message.guild);
     }
 
     // Incrémentation du nombre de messages total
-    await UserService.incrementTotalMsg(message.author.id);
+    await UserService.incrementTotalMsg(message.author.id, message.guild.id);
 
     // Donne de l'xp aléatoire entre 6 et 10
     const randomXp = Math.floor(Math.random() * (10 - 6 + 1)) + 6;
-    await UserService.giveXpToUser(client, message.author.id, randomXp);
+    await UserService.giveXpToUser(client, message, randomXp);
 
     // Vérifie si c'est une commande
     const prefix = guildData.config.prefix;
@@ -63,7 +65,7 @@ export default {
     
     // Exécution de la commande
     try {
-      await command.execute(message, args);
+      await command.execute(message, args, guildData);
     } catch (error) {
       console.error(`Erreur lors de l'exécution de la commande ${commandName}:`, error);
       await message.reply('Une erreur est survenue lors de l\'exécution de cette commande.');

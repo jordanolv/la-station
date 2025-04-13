@@ -1,19 +1,20 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-interface IUser extends Document {
+export interface IGlobalUser extends Document {
   id: string;
-  username: string;
-  registeredAt: Date;
+  name: string;
+  registeredAt: number;
 }
 
-const UserSchema = new Schema<IUser>({
+const GlobalUserSchema = new Schema<IGlobalUser>({
   id: { type: String, required: true, unique: true },
-  username: { type: String, required: true },
-  registeredAt: { type: Date, default: Date.now },
+  name: { type: String, required: true },
+  registeredAt: { type: Number, default: Date.now() },
+}, {
+  timestamps: false,
+  collection: 'globalUsers'
 });
 
+const GlobalUserModel = mongoose.model<IGlobalUser>('GlobalUser', GlobalUserSchema);
 
-
-const UserModel = mongoose.model<IUser>('User', UserSchema);
-
-export default UserModel;
+export default GlobalUserModel;

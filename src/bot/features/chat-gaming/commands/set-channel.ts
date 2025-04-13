@@ -1,5 +1,6 @@
 import { Message, TextChannel } from 'discord.js';
 import { GuildService } from '../../../../database/services/GuildService';
+import { IGuild } from '@/database/models/Guild';
 
 export default {
   name: 'set-channel-chatGaming',
@@ -10,8 +11,9 @@ export default {
    * Définit le salon vocal pour le chatGaming
    * @param message Le message Discord
    * @param args Les arguments de la commande
+   * @param guildData Les données du serveur
    */
-  async execute(message: Message, args: string[]) {
+  async execute(message: Message, args: string[], guildData: IGuild) {
     try {
       // Vérifier si un channel a été mentionné
       if (!args.length || !message.mentions.channels.first()) {

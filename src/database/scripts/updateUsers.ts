@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import UserModel from '../models/User';
+import UserModel from '@/database/models/GuildUser';
 import { UserService } from '../services/UserService';
 import dotenv from 'dotenv';
 
@@ -19,10 +19,10 @@ dotenv.config();
       }
     );
 
-    console.log(`✅ Mise à jour terminée : ${result.modifiedCount} guildes mises à jour.`);
+    console.log(`✅ Mise à jour terminée : ${result.modifiedCount} users mises à jour.`);
     process.exit(0);
   } catch (error) {
-    console.error('❌ Erreur lors de la mise à jour des guildes:', error);
+    console.error('❌ Erreur lors de la mise à jour des users:', error);
     process.exit(1);
   }
 })();

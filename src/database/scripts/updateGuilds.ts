@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import GuildModel from '../models/Guild';
+import GuildModel from '@/database/models/Guild';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -17,6 +17,15 @@ dotenv.config();
             enabled: true,
             taux: 1,
           },
+        },
+      },
+    );
+
+    const updateColors = await GuildModel.updateMany(
+      { 'config.colors': { $exists: false }},
+      {
+        $set: {
+          'config.colors.primary': '#dac1ff',
         },
       }
     );

@@ -1,20 +1,25 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { BotClient } from '../../../../BotClient';
-import UserModel from '../../../../../database/models/User';
 import { UserService } from '@database/services/UserService';
+import { IGuildUser } from '@/database/models/GuildUser';
+import { formatDate, formatTime } from '../../../../utils/DateFormat';
+import { GuildService } from '@/database/services/GuildService';
 
-function formatDate(date: Date): string { 
-  return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
-}
-
-function createProgressBar(current: number, total: number, size = 20): string {
-  const percentage = current / total;
+async function createProgressBar(user: IGuildUser, current: number, total: number, size = 10): Promise<string> {
+  const xpForCurrentLevel = await UserService.getXpToLevelUp(user.profil.lvl);
+  const xpForPreviousLevel = user.profil.lvl > 1 ? await UserService.getXpToLevelUp(user.profil.lvl - 1) : 0;
+  
+  // Calculate XP relative to current level
+  const currentLevelXp = user.profil.exp - xpForPreviousLevel;
+  const xpNeededForThisLevel = xpForCurrentLevel - xpForPreviousLevel;
+  
+  const percentage = currentLevelXp / xpNeededForThisLevel;
   const progress = Math.round(size * percentage);
   const empty = size - progress;
-  return `[\`${'█'.repeat(progress)}${'░'.repeat(empty)}\`] \`${current}/${total}\``;
+  
+  return `\`${'▰'.repeat(progress)}${'▱'.repeat(empty)}\` \`${currentLevelXp}/${xpNeededForThisLevel}\``;
 }
-
 
 export default {
   data: new SlashCommandBuilder()
@@ -47,7 +52,8 @@ export default {
 
       // ──────── /me view ────────
       if (subcommand === 'view') {
-        const user = await UserService.getUserByDiscordId(interaction.user.id);
+        const user = await UserService.getGuildUserByDiscordId(interaction.user.id, interaction.guild.id);
+        const guild = await GuildService.getGuildById(interaction.guild.id);
 
         if (!user) {
           await interaction.reply({
@@ -57,39 +63,43 @@ export default {
           return;
         }
 
-const embed = new EmbedBuilder()
-  .setColor('#00ffe1') // turquoise flashy
-  .setTitle(`👤 Profil de ${interaction.user.username}`)
-  .setThumbnail(interaction.user.displayAvatarURL({ size: 1024 }))
-  .setDescription(`✨ Voici les infos de ton compte, mises à jour avec style !`)
-  .addFields(
-    {
-      name: '💼 Statistiques Générales',
-      value: [
-        `💰 **Argent** : \`${user.profil.money.toLocaleString('fr-FR')} 💸\``,
-        `📊 **Niveau** : \`${user.profil.lvl}\``,
-        `⭐ **XP** : \`${user.profil.exp} XP\``,
-        `🔋 **Progression XP** : ${createProgressBar(user.profil.exp % 100, 100)}`
-      ].join('\n'),
-      inline: false
-    },
-    {
-      name: '🧠 Bio',
-      value: user.bio || '_Aucune bio définie._',
-      inline: false
-    },
-    {
-      name: '📅 Informations',
-      value: [
-        `🗓️ **Anniversaire** : \`${user.infos.birthDate ? formatDate(user.infos.birthDate) : 'Non défini'}\``,
-        `📆 **Inscription** : \`${formatDate(user.infos.registeredAt)}\``,
-        `💬 **Messages** : \`${user.stats.totalMsg}\``
-      ].join('\n'),
-      inline: false
-    }
-  )
-  .setFooter({ text: '🛠️ Dernière mise à jour' })
-  .setTimestamp(user.infos.updatedAt);
+        const embed = new EmbedBuilder()
+          .setColor(parseInt(guild.config.colors.primary.replace('#', ''), 16))
+          .setTitle(`👤 Profil de ${interaction.user.username}`)
+          .setThumbnail(interaction.user.displayAvatarURL({ size: 1024 }))
+          .setDescription(user.bio || 'Aucune bio définie.')
+          .addFields(
+            {
+              name: '💼 Statistiques Générales',
+              value: [
+                `Argent : \`${user.profil.money.toLocaleString('fr-FR')}\`  <:solar:1360719775197822976>`,
+                `Niveau : \`${user.profil.lvl}\``,
+                `XP : ${await createProgressBar(user, user.profil.exp, await UserService.getXpToLevelUp(user.profil.lvl))}`,
+              ].join('\n'),
+              inline: false
+            },
+            {
+              name: '📊 Stats',
+              value: [
+                `Messages : \`${user.stats.totalMsg}\``,
+                `Temps en vocal : \`${formatTime(user.stats.voiceTime || 0)}\` \n(\`${formatTime((await UserService.getVoiceStatsLast7Days(interaction.user.id, interaction.guild.id)).reduce((acc, curr) => acc + curr.time, 0))}\` 7 jours)`
+              ].join('\n'),
+              inline: true
+            },
+            {
+              name: '📅 Informations',
+              value: [
+                `Anniversaire : \`${user.infos.birthDate ? formatDate(user.infos.birthDate) : 'Non défini'}\``,
+                `Inscrit depuis : \`${formatDate(user.infos.registeredAt)}\``,
+              ].join('\n'),
+              inline: true
+            }
+          )
+          .setFooter({ 
+            text: '🛠️ Dernière mise à jour',
+            iconURL: interaction.client.user?.displayAvatarURL()
+          })
+          .setTimestamp(user.infos.updatedAt);
 
 
         await interaction.reply({ embeds: [embed] });
@@ -130,7 +140,7 @@ const embed = new EmbedBuilder()
           updateData['infos.birthDate'] = date;
         }
 
-        const updatedUser = await UserService.updateUser(interaction.user.id, updateData);
+        const updatedUser = await UserService.updateGuildUser(interaction.user.id, interaction.guild.id, updateData);
 
         if (!updatedUser) {
           await interaction.reply({

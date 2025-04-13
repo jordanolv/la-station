@@ -1,6 +1,5 @@
 // src/bot/utils/EmbedUtils.ts
 import { EmbedBuilder, ColorResolvable } from 'discord.js';
-
 export class EmbedUtils {
   // Couleurs communes
   static readonly Colors = {

@@ -1,44 +1,94 @@
 import { BotClient } from '../../../BotClient';
 import { GuildService } from '../../../../database/services/GuildService';
+import { UserService } from '../../../../database/services/UserService';
+import { VoiceState } from 'discord.js';
+
+// Map pour stocker les temps de début de session vocale
+const voiceStartTimes = new Map<string, number>();
 
 export default {
   name: 'voiceStateUpdate',
   once: false,
 
-  async execute(client: BotClient, oldMember: any, newMember: any) {
-    const guild = oldMember.guild || newMember.guild;
-    if (!guild) return;
+  async execute(client: BotClient, oldState: VoiceState, newState: VoiceState) {
+    // Ignorer les bots
+    if (oldState.member?.user.bot) return;
+    if (!oldState.guild || !newState.guild) return;
 
-    const guildData = await GuildService.getGuildById(guild.id);
+    const guildId = oldState.guild.id;
+    const userId = oldState.member?.id;
+
+    if (!userId) return;
+
+    // Vérifier et créer l'utilisateur du serveur si nécessaire
+    let guildUser = await UserService.getGuildUserByDiscordId(userId, guildId);
+    if (!guildUser) {
+      guildUser = await UserService.createGuildUser(oldState.member.user, oldState.guild);
+    }
+
+    const guildData = await GuildService.getGuildById(guildId);
     if (!guildData) return;
 
     const vocGaming = guildData.features?.vocGaming;
 
+    // Gestion du temps passé en vocal
+    if (oldState.channelId && !newState.channelId) {
+      const joinTime = voiceStartTimes.get(userId);
+      if (joinTime) {
+        const timeSpent = Math.floor((Date.now() - joinTime) / 1000);
+        await UserService.incrementVoiceTime(userId, guildId, timeSpent);
+      }
+    }
+    
+    // Si l'utilisateur rejoint un salon vocal
+    if (newState.channelId && !oldState.channelId) {
+      voiceStartTimes.set(userId, Date.now());
+    }
+    
+    // Si l'utilisateur quitte un salon vocal
+    if (!newState.channelId && oldState.channelId) {
+      const joinTime = voiceStartTimes.get(userId);
+      if (joinTime) {
+        const timeSpent = Math.floor((Date.now() - joinTime) / 1000);
+        await UserService.incrementVoiceTime(userId, guildId, timeSpent);
+        voiceStartTimes.delete(userId);
+      }
+    }
+
+    // Si l'utilisateur change de salon vocal
+    if (oldState.channelId && newState.channelId) {
+      const joinTime = voiceStartTimes.get(userId);
+      if (joinTime) {
+        const timeSpent = Math.floor((Date.now() - joinTime) / 1000);
+        await UserService.incrementVoiceTime(userId, guildId, timeSpent);
+        voiceStartTimes.set(userId, Date.now());
+      }
+    }
+
     if (!vocGaming?.enabled) return;
 
     // Si un utilisateur rejoint un salon vocal
-    if (newMember.channelId) {
-      if (vocGaming.channelToJoin === newMember.channelId) {
-        client.emit('addVoiceChannel', newMember, guildData, client);
+    if (newState.channelId) {
+      if (vocGaming.channelToJoin === newState.channelId) {
+        client.emit('addVoiceChannel', newState, guildData, client);
       }
     }
 
     // Si un utilisateur quitte un salon vocal
-    if (oldMember.channelId && !newMember.channelId) {
-      if (vocGaming.channelsCreated.includes(oldMember.channelId)) {
-        client.emit('removeVoiceChannel', oldMember, guildData, client);
+    if (oldState.channelId && !newState.channelId) {
+      if (vocGaming.channelsCreated.includes(oldState.channelId)) {
+        client.emit('removeVoiceChannel', oldState, guildData, client);
       }
     }
 
     // Si un utilisateur change de salon vocal
-    if (oldMember.channelId && newMember.channelId) {
-      if (vocGaming.channelsCreated.includes(oldMember.channelId)) {
-        client.emit('removeVoiceChannel', oldMember, guildData, client);
+    if (oldState.channelId && newState.channelId) {
+      if (vocGaming.channelsCreated.includes(oldState.channelId)) {
+        client.emit('removeVoiceChannel', oldState.member, guildData, client);
       }
     }
   }
 };
-
 /* client.on("voiceStateUpdate", async (oldMember, newMember) => {
   let guildData = await client.Database.fetchGuild(oldMember);
 
