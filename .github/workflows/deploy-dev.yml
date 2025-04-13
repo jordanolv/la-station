@@ -22,8 +22,8 @@ jobs:
           ssh -i ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }} -p ${{ secrets.VPS_PORT }} -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
             echo "✅ Connexion SSH réussie"
 
-            mkdir -p ~/projects/LaStationBot/prod
-            cd ~/projects/LaStationBot/prod
+            mkdir -p ~/projects/LaStationBot/dev
+            cd ~/projects/LaStationBot/dev
 
             if [ ! -d ".git" ]; then
               echo "📁 Clonage initial"
@@ -31,13 +31,13 @@ jobs:
             fi
 
             echo "📥 Pull du dernier code"
-            git config --global --add safe.directory /home/deploy/projects/LaStationBot/prod
+            git config --global --add safe.directory /home/deploy/projects/LaStationBot/dev
             git reset --hard
             git clean -fd
             git pull origin dev
 
             echo "🔧 Droits"
-            chown -R deploy:deploy ~/projects/LaStationBot/prod
+            chown -R deploy:deploy ~/projects/LaStationBot/dev
 
             echo "🛠 Backend - Installation & Build"
             npm install
@@ -48,5 +48,5 @@ jobs:
             pm2 start ecosystem.config.cjs
             pm2 save
 
-            echo "✅ Déploiement PROD terminé 🎉"
+            echo "✅ Déploiement DEV terminé 🎉"
           EOF
