@@ -4,6 +4,7 @@ import { BotClient } from '../../../../BotClient';
 import { UserService } from '@database/services/UserService';
 import { IGuildUser } from '@/database/models/GuildUser';
 import { formatDate, formatTime } from '../../../../utils/DateFormat';
+import { GuildService } from '@/database/services/GuildService';
 
 async function createProgressBar(user: IGuildUser, current: number, total: number, size = 10): Promise<string> {
   const xpForCurrentLevel = await UserService.getXpToLevelUp(user.profil.lvl);
@@ -52,6 +53,7 @@ export default {
       // ──────── /me view ────────
       if (subcommand === 'view') {
         const user = await UserService.getGuildUserByDiscordId(interaction.user.id, interaction.guild.id);
+        const guild = await GuildService.getGuildById(interaction.guild.id);
 
         if (!user) {
           await interaction.reply({
@@ -62,7 +64,7 @@ export default {
         }
 
         const embed = new EmbedBuilder()
-          .setColor('#00ffe1')
+          .setColor(parseInt(guild.config.colors.primary.replace('#', ''), 16))
           .setTitle(`👤 Profil de ${interaction.user.username}`)
           .setThumbnail(interaction.user.displayAvatarURL({ size: 1024 }))
           .setDescription(user.bio || 'Aucune bio définie.')
