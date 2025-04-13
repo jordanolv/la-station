@@ -55,11 +55,11 @@ export class BirthdayCron {
                     if (!channelBirthday || channelBirthday.type !== ChannelType.GuildText) continue;
 
                     const textChannel = channelBirthday as TextChannel;
-                    //use my embed build utils
+
                     const embed = new EmbedBuilder()
                     .setTitle('🎉 Joyeux Anniversaire ! 🎉')
                     .setDescription(`Toute l'équipe souhaite un joyeux anniversaire à <@${user.discordId}> ! 🎂\n\nAujourd'hui, ${user.name} souffle sa ${new Date().getFullYear() - new Date(user.infos.birthDate).getFullYear()}ème bougie !`)
-                    .setColor('#43B581')
+                    .setColor(parseInt(guild.config.colors.primary.replace('#', ''), 16))
                     .setImage('https://c.tenor.com/GscosXEDKhcAAAAd/tenor.gif')
                     .setFooter({ text: 'La Station - Système d\'anniversaire' })
                     .setTimestamp();

@@ -7,6 +7,9 @@ export interface IGuild extends Document {
   registeredAt: Date;
   config: {
     prefix: string;
+    colors: {
+      primary: string;
+    };
     channels: {
       birthday: string;
     };
@@ -43,6 +46,9 @@ const GuildSchema = new Schema<IGuild>({
   registeredAt: { type: Date, default: Date.now },
   config: {
     prefix: { type: String, default: '!' },
+    colors: {
+      primary: { type: String, default: '#dac1ff' },
+    },
     channels: {
       birthday: { type: String, default: '' }
     }
@@ -76,6 +82,5 @@ const GuildModel = mongoose.model<IGuild>('Guild', GuildSchema);
 
 export default GuildModel;
 
-// Supprimer l'index sur id s'il existe
 GuildSchema.index({ id: 1 }, { unique: false });
 
