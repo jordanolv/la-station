@@ -4,7 +4,7 @@ import GuildUserModel from '../models/GuildUser';
 import { GuildService } from './GuildService';
 import { BotClient } from '@/bot/BotClient';
 import { getDateDaysAgo } from '@/bot/utils/DateFormat';
-
+import { IGuildUser } from '../models/GuildUser';
 export class UserService {
   static xpCooldown: Record<string, number> = {};
 
@@ -117,14 +117,14 @@ export class UserService {
     return 5 * (lvl * lvl) + 110 * lvl + 100;
   }
 
-  static async checkLevelUp(client: BotClient, user: any, message: Message) {
+  static async checkLevelUp(client: BotClient, user: IGuildUser, message: Message) {
     if(!user) return;
 
     const neededXpToLevelUp = 5 * (user.profil.lvl * user.profil.lvl) + 110 * user.profil.lvl + 100;
     
     if (user.profil.exp > neededXpToLevelUp) {
       user.profil.lvl++;
-      client.emit("levelUp", user, message);
+      client.emit('levelUp', user, message);
     }
     return user;
   }
@@ -160,6 +160,7 @@ export class UserService {
       xpMinToGive * guild.features.leveling.taux;
 
     user.profil.exp += xpToGive;
+    (user as IGuildUser & { guild: any }).guild = guild;
 
     await this.checkLevelUp(client, user, message);
     await user.save();

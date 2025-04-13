@@ -4,6 +4,7 @@ export interface IGuildUser extends Document {
   discordId: string;
   name: string;
   guildId: string;
+  guild?: any;
   profil: {
     money: number;
     exp: number;
@@ -49,10 +50,10 @@ const GuildUserSchema = new Schema<IGuildUser>({
     birthDate: { type: Date }
   }
 }, {
-  timestamps: false
+  timestamps: false,
+  collection: 'guildUsers'
 });
 
-// Index composé pour s'assurer qu'un utilisateur n'a qu'une seule entrée par serveur
 GuildUserSchema.index({ discordId: 1, guildId: 1 }, { unique: true });
 
 GuildUserSchema.pre('save', function (next) {
