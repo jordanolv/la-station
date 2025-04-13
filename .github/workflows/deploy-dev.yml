@@ -1,0 +1,52 @@
+name: 🚀 Deploy PROD to VPS
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🔐 Préparer la clé SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }}
+          chmod 600 ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }}
+          ssh-keyscan -p ${{ secrets.VPS_PORT }} -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 🚀 Déploiement SSH
+        run: |
+          ssh -i ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }} -p ${{ secrets.VPS_PORT }} -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            echo "✅ Connexion SSH réussie"
+
+            mkdir -p ~/projects/LaStationBot/prod
+            cd ~/projects/LaStationBot/prod
+
+            if [ ! -d ".git" ]; then
+              echo "📁 Clonage initial"
+              git clone -b dev https://github.com/jordan-olv/la-station.git .
+            fi
+
+            echo "📥 Pull du dernier code"
+            git config --global --add safe.directory /home/deploy/projects/LaStationBot/prod
+            git reset --hard
+            git clean -fd
+            git pull origin dev
+
+            echo "🔧 Droits"
+            chown -R deploy:deploy ~/projects/LaStationBot/prod
+
+            echo "🛠 Backend - Installation & Build"
+            npm install
+            npm run build
+
+            echo "🚀 PM2 Restart"
+            pm2 delete la-station-bot || true
+            pm2 start ecosystem.config.cjs
+            pm2 save
+
+            echo "✅ Déploiement PROD terminé 🎉"
+          EOF
