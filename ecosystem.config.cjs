@@ -5,7 +5,7 @@ module.exports = {
       script: "./dist/bot/app.js",
       cwd: ".",
       env: {
-        NODE_ENV: "development",
+        NODE_ENV: "production",
       },
     },
   ],
