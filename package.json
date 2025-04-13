@@ -4,7 +4,7 @@
   "description": "Un bot Discord modulaire organisé par fonctionnalités",
   "main": "dist/bot/app.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "pm2 start src/bot/app.ts --name la-station",
     "dev": "ts-node src/bot/app.ts",
     "devt": "concurrently \"ts-node src/bot/app.ts\" \"ts-node src/webapp/api.ts\"",
