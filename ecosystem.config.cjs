@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "la-station-bot-dev",
+      name: "la-station-bot",
       script: "./dist/bot/app.js",
       cwd: ".",
       env: {
