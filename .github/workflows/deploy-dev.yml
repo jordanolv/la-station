@@ -1,4 +1,4 @@
-name: 🚀 Deploy PROD to VPS
+name: 🚀 Deploy DEV to VPS
 
 on:
   push:
@@ -44,7 +44,7 @@ jobs:
             npm run build
 
             echo "🚀 PM2 Restart"
-            pm2 delete la-station-bot || true
+            pm2 delete la-station-bot-dev || true
             pm2 start ecosystem.config.cjs
             pm2 save
 
