@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import { GuildService } from '../../../../database/services/GuildService';
 import { LogService } from '../../../services/LogService';
+import { IGuild } from '@/database/models/Guild';
 
 export default {
   name: 'enable-vocGaming',
@@ -11,8 +12,9 @@ export default {
    * Active ou désactive la fonctionnalité vocGaming
    * @param message Le message Discord
    * @param args Les arguments de la commande
+   * @param guildData Les données du serveur
    */
-  async execute(message: Message, args: string[]) {
+  async execute(message: Message, args: string[], guildData: IGuild) {
     try {
       // Vérifier si un argument a été fourni
       if (!args.length) {

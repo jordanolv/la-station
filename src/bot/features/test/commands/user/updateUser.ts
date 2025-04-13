@@ -11,12 +11,12 @@ export default {
    * @param message Le message Discord
    */
   async execute(message: Message) {
-    const user = await UserService.getUserByDiscordId(message.author.id);
+    const user = await UserService.getGuildUserByDiscordId(message.author.id, message.guild.id);
     if (!user) {
       return message.reply('Vous n\'êtes pas enregistré dans la base de données.');
     }
 
-    await UserService.updateUser(user.discordId, {
+    await UserService.updateGuildUser(user.discordId, user.guildId, {
       profil: {
         money: 1000,
         exp: 1000,

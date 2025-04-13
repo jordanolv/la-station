@@ -1,7 +1,8 @@
 import { CronJob } from 'cron';
 import { Client, EmbedBuilder, TextChannel, ChannelType } from 'discord.js';
-import UserModel from '../../database/models/User';
 import { GuildService } from '@/database/services/GuildService';
+import GuildUserModel from '@/database/models/GuildUser';
+
 
 export class BirthdayCron {
     private job: CronJob;
@@ -29,7 +30,7 @@ export class BirthdayCron {
             const todayMonth = today.getMonth() + 1;
             const todayDay = today.getDate();
 
-            const users = await UserModel.find({
+            const users = await GuildUserModel.find({
                 'infos.birthDate': {
                     $exists: true,
                     $ne: null
@@ -44,7 +45,7 @@ export class BirthdayCron {
                 const birthDay = birthDate.getDate();
 
                 if (birthMonth === todayMonth && birthDay === todayDay) {
-                    const guild = await GuildService.getGuildById(user.guild.guildId);
+                    const guild = await GuildService.getGuildById(user.guildId);
                     if (!guild) continue;
 
                     const channelId = guild.config.channels.birthday;

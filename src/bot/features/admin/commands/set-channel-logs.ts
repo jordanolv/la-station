@@ -1,12 +1,19 @@
 import { Message, TextChannel } from 'discord.js';
 import { GuildService } from '../../../../database/services/GuildService';
+import { IGuild } from '@/database/models/Guild';
 
 export default {
   name: 'set-channel-logs',
   description: 'Définit le salon pour les logs',
-  usage: 'set-logs-channel #channel',
+  usage: 'set-channel-logs #channel',
   
-  async execute(message: Message, args: string[]) {
+  /**
+   * Définit le salon pour les logs
+   * @param message Le message Discord
+   * @param args Les arguments de la commande
+   * @param guildData Les données du serveur
+   */
+  async execute(message: Message, args: string[], guildData: IGuild) {
     try {
       if (!args.length || !message.mentions.channels.first()) {
         return message.reply({

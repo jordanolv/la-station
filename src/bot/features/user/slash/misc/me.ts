@@ -2,10 +2,10 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { BotClient } from '../../../../BotClient';
 import { UserService } from '@database/services/UserService';
-import { IUser } from '@/database/models/User';
+import { IGuildUser } from '@/database/models/GuildUser';
 import { formatDate, formatTime } from '../../../../utils/DateFormat';
 
-async function createProgressBar(user: IUser, current: number, total: number, size = 10): Promise<string> {
+async function createProgressBar(user: IGuildUser, current: number, total: number, size = 10): Promise<string> {
   const xpForCurrentLevel = await UserService.getXpToLevelUp(user.profil.lvl);
   const xpForPreviousLevel = user.profil.lvl > 1 ? await UserService.getXpToLevelUp(user.profil.lvl - 1) : 0;
   
@@ -51,7 +51,7 @@ export default {
 
       // ──────── /me view ────────
       if (subcommand === 'view') {
-        const user = await UserService.getUserByDiscordId(interaction.user.id);
+        const user = await UserService.getGuildUserByDiscordId(interaction.user.id, interaction.guild.id);
 
         if (!user) {
           await interaction.reply({
@@ -80,7 +80,7 @@ export default {
               name: '📊 Stats',
               value: [
                 `Messages : \`${user.stats.totalMsg}\``,
-                `Temps en vocal : \`${formatTime(user.stats.voiceTime || 0)}\` \n(\`${formatTime((await UserService.getVoiceStatsLast7Days(interaction.user.id)).reduce((acc, curr) => acc + curr.time, 0))}\` 7 jours)`
+                `Temps en vocal : \`${formatTime(user.stats.voiceTime || 0)}\` \n(\`${formatTime((await UserService.getVoiceStatsLast7Days(interaction.user.id, interaction.guild.id)).reduce((acc, curr) => acc + curr.time, 0))}\` 7 jours)`
               ].join('\n'),
               inline: true
             },
@@ -138,7 +138,7 @@ export default {
           updateData['infos.birthDate'] = date;
         }
 
-        const updatedUser = await UserService.updateUser(interaction.user.id, updateData);
+        const updatedUser = await UserService.updateGuildUser(interaction.user.id, interaction.guild.id, updateData);
 
         if (!updatedUser) {
           await interaction.reply({

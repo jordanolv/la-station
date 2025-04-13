@@ -1,53 +1,77 @@
-import { User, Guild } from 'discord.js';
-import UserModel, { IUser } from '../models/User';
+import { User, Guild, Message } from 'discord.js';
+import GlobalUserModel from '../models/GlobalUser';
+import GuildUserModel from '../models/GuildUser';
 import { GuildService } from './GuildService';
 import { BotClient } from '@/bot/BotClient';
 import { getDateDaysAgo } from '@/bot/utils/DateFormat';
 
 export class UserService {
   static xpCooldown: Record<string, number> = {};
-  static async getUserByDiscordId(discordId: string): Promise<IUser | null> {
-    return UserModel.findOne({ discordId });
+
+  static async getGlobalUserByDiscordId(discordId: string) {
+    return GlobalUserModel.findOne({ id: discordId });
   }
 
-  static async createUser(userData: User, guildData: Guild): Promise<IUser> {
-    return UserModel.create(
-      {
-        discordId: userData.id,
-        name: userData.username,
-        guild: {
-          guildId: guildData.id,
-          guildName: guildData.name
-        },
-        profil: {},
-        stats: {},
-        infos: {}
-      }
-    );
+  static async getAllGlobalUsers() {
+    return GlobalUserModel.find({});
   }
 
-  static async updateUser(discordId: string, updates: Partial<IUser>): Promise<IUser | null> {
-    return UserModel.findOneAndUpdate(
-      { discordId: discordId },
+  static async getGuildUserByDiscordId(discordId: string, guildId: string) {
+    return GuildUserModel.findOne({ discordId, guildId });
+  }
+
+  static async getGuildUsersByGuildId(guildId: string) {
+    return GuildUserModel.find({ guildId });
+  }
+
+  static async createGlobalUser(userData: User) {
+    return GlobalUserModel.create({
+      id: userData.id,
+      name: userData.username,
+      registeredAt: Date.now()
+    });
+  }
+
+  static async createGuildUser(userData: User, guildData: Guild) {
+    const guildUser = await GuildUserModel.create({
+      discordId: userData.id,
+      name: userData.username,
+      guildId: guildData.id,
+      profil: {},
+      stats: {},
+      infos: {}
+    });
+
+    const globalUser = await this.getGlobalUserByDiscordId(userData.id);
+    if (!globalUser) {
+      await this.createGlobalUser(userData);
+    }
+
+    return guildUser;
+  }
+
+  static async updateGuildUser(discordId: string, guildId: string, updates: any) {
+    return GuildUserModel.findOneAndUpdate(
+      { discordId, guildId },
       { $set: updates },
       { new: true }
     );
   }
 
-  static async incrementTotalMsg(discordId: string): Promise<IUser | null> {
-    return UserModel.findOneAndUpdate(
-      { discordId: discordId },
+  static async incrementTotalMsg(discordId: string, guildId: string) {
+    return GuildUserModel.findOneAndUpdate(
+      { discordId, guildId },
       { $inc: { 'stats.totalMsg': 1 } },
       { new: true }
     );
   }
 
-  static async incrementVoiceTime(discordId: string, seconds: number): Promise<IUser | null> {
+  static async incrementVoiceTime(discordId: string, guildId: string, seconds: number) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    return UserModel.findOneAndUpdate(
-      { discordId: discordId },
+    return GuildUserModel.findOneAndUpdate(
+      { discordId, guildId },
       { 
         $inc: { 'stats.voiceTime': seconds },
         $push: {
@@ -61,8 +85,8 @@ export class UserService {
     );
   }
 
-  static async getVoiceStatsLast7Days(discordId: string): Promise<Array<{ date: Date; time: number }>> {
-    const user = await UserModel.findOne({ discordId });
+  static async getVoiceStatsLast7Days(discordId: string, guildId: string) {
+    const user = await GuildUserModel.findOne({ discordId, guildId });
     if (!user) return [];
 
     const sevenDaysAgo = getDateDaysAgo(7);
@@ -93,50 +117,53 @@ export class UserService {
     return 5 * (lvl * lvl) + 110 * lvl + 100;
   }
 
-  static async checkLevelUp(client: BotClient, user: IUser): Promise<IUser | null> {
-    
+  static async checkLevelUp(client: BotClient, user: any, message: Message) {
     if(!user) return;
 
     const neededXpToLevelUp = 5 * (user.profil.lvl * user.profil.lvl) + 110 * user.profil.lvl + 100;
     
     if (user.profil.exp > neededXpToLevelUp) {
       user.profil.lvl++;
-      client.emit("levelUp", user);
+      client.emit("levelUp", user, message);
     }
     return user;
   }
   
-  static async giveXpToUser(client: BotClient, discordId: string, amount: number): Promise<IUser | null> {
-    await UserModel.findOneAndUpdate(
-      { discordId: discordId },
+  static async giveXpToUser(client: BotClient, message: Message, amount: number) {
+    const discordId = message.author.id;
+    const guildId = message.guild?.id;
+
+    if (!guildId) return null;
+
+    await GuildUserModel.findOneAndUpdate(
+      { discordId, guildId },
       { $inc: { 'profil.exp': amount } },
       { new: true }
     );
 
-        const user = await UserModel.findOne({ discordId });
-        const guild = await GuildService.getGuildById(user?.guild.guildId);
+    const user = await GuildUserModel.findOne({ discordId, guildId });
+    const guild = await GuildService.getGuildById(guildId);
 
-        const isInCooldown = this.xpCooldown[discordId];
-        if (isInCooldown) {
-          if (isInCooldown > Date.now()) {
-            return;
-          }
-        }
-        const toWait = Date.now() + 2500;
-        this.xpCooldown[discordId] = toWait;
-      
-        const xpMaxToGive = 8;
-        const xpMinToGive = 4;
-        const xpToGive =
-          Math.floor(Math.random() * (xpMaxToGive - xpMinToGive + 1)) +
-          xpMinToGive * guild.features.leveling.taux;
+    const isInCooldown = this.xpCooldown[discordId];
+    if (isInCooldown) {
+      if (isInCooldown > Date.now()) {
+        return;
+      }
+    }
+    const toWait = Date.now() + 2500;
+    this.xpCooldown[discordId] = toWait;
+  
+    const xpMinToGive = 10;
+    const xpMaxToGive = 20;
+    const xpToGive =
+      Math.floor(Math.random() * (xpMaxToGive - xpMinToGive + 1)) +
+      xpMinToGive * guild.features.leveling.taux;
 
-        user.profil.exp += xpToGive;
+    user.profil.exp += xpToGive;
 
-        await this.checkLevelUp(client,user);
-        await user.save();
+    await this.checkLevelUp(client, user, message);
+    await user.save();
 
-        return user;
-
+    return user;
   }
 } 

@@ -1,13 +1,20 @@
 import { Message } from 'discord.js';
 import { GuildService } from '../../../../database/services/GuildService';
 import { LogService } from '../../../services/LogService';
+import { IGuild } from '@/database/models/Guild';
 
 export default {
   name: 'enable-logs',
   description: 'Active ou désactive les logs',
   usage: 'enable-logs <true/false>',
   
-  async execute(message: Message, args: string[]) {
+  /**
+   * Active ou désactive les logs
+   * @param message Le message Discord
+   * @param args Les arguments de la commande
+   * @param guildData Les données du serveur
+   */
+  async execute(message: Message, args: string[], guildData: IGuild) {
     try {
       if (!args.length) {
         return message.reply({
