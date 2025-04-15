@@ -7,7 +7,6 @@
     "build": "tsc && tsc-alias",
     "start": "pm2 start src/bot/app.ts --name la-station",
     "dev": "ts-node src/bot/app.ts",
-    "devt": "concurrently \"ts-node src/bot/app.ts\" \"ts-node src/webapp/api.ts\"",
     "mg": "concurrently \"ts-node src/database/scripts/updateGuilds.ts\" \"ts-node src/database/scripts/updateUsers.ts\"",
     "watch": "nodemon --exec ts-node src/bot/app.ts"
   },
