@@ -72,7 +72,7 @@ export default {
             {
               name: '💼 Statistiques Générales',
               value: [
-                `Argent : \`${user.profil.money.toLocaleString('fr-FR')}\`  <:solar:1360719775197822976>`,
+                `Argent : \`${user.profil.money.toLocaleString('fr-FR')}\`  <:solar:1361687030626779166>`,
                 `Niveau : \`${user.profil.lvl}\``,
                 `XP : ${await createProgressBar(user, user.profil.exp, await UserService.getXpToLevelUp(user.profil.lvl))}`,
               ].join('\n'),
