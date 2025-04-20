@@ -1,13 +1,19 @@
 // main.ts
+import { config } from 'dotenv';
 import { BotClient } from './BotClient';
 import { connectToDatabase } from './handlers/mongoose';
 import { loadFeatures } from './handlers/feature';
 import path from 'path';
 import { REST, Routes } from 'discord.js';
-import { createAPI } from '../webapp/api';
+import { createAPI } from '../api';
 import * as Sentry from "@sentry/node";
 import { CronManager } from './cron';
- 
+import { serve } from '@hono/node-server'
+
+// Charger les variables d'environnement
+const envPath = path.resolve(__dirname, '../../.env');
+config({ path: envPath });
+
 
 (async () => {
   // 1) Initialiser la classe
@@ -38,14 +44,19 @@ import { CronManager } from './cron';
 
   // 4) Initialiser l'API
   const api = createAPI(client);
-  api.listen(3002, () => {
-    console.log('API démarrée sur http://localhost:3002');
-  });
+  serve({
+    fetch: api.fetch,
+    port: 3002
+  }, (info) => {
+    console.log(`API démarrée sur http://localhost:${info.port}`)
+  })
+
 
   // 5) Initialiser tous les crons
   const cronManager = new CronManager(client);
   cronManager.startAll();
 
+  console.log(process.env.DISCORD_CLIENT_ID)
   // 6) Connexion à Discord
   try {
     const token = process.env.DISCORD_TOKEN;

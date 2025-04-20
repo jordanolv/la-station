@@ -1,14 +1,14 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export interface IGame extends Document {
   name: string;
-  description: string;
-  image: string;
-  color: string;
+  description?: string;
+  image?: string;
+  color?: string;
   guildId: string;
-  threadId: string;
-  messageId: string;
-  roleId: string;
+  threadId?: string;
+  messageId?: string;
+  roleId?: string;
   reactions?: Array<{
     messageId: string;
     emoji: string;
@@ -30,7 +30,11 @@ const GameSchema = new Schema<IGame>({
     emoji: { type: String },
     roleId: { type: String }
   }]
+}, {
+  timestamps: true
 });
+
+
 
 const GameModel = mongoose.model<IGame>('Game', GameSchema);
 

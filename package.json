@@ -6,9 +6,14 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "start": "pm2 start src/bot/app.ts --name la-station",
-    "dev": "ts-node src/bot/app.ts",
     "mg": "concurrently \"ts-node src/database/scripts/updateGuilds.ts\" \"ts-node src/database/scripts/updateUsers.ts\"",
-    "watch": "nodemon --exec ts-node src/bot/app.ts"
+    "watch": "nodemon --exec ts-node src/bot/app.ts",
+    "api": "ts-node src/api/index.ts",
+    "frontend": "cd src/frontend && npm run dev",
+    "dev:all": "concurrently \"npm run api\" \"npm run frontend\"",
+    "dev:front": "cd src/frontend && npm run dev",
+    "dev:bot": "cd src/bot && ts-node app.ts",
+    "dev": "concurrently \"npm run dev:front\" \"npm run dev:bot\""
   },
   "keywords": [
     "discord",
@@ -19,9 +24,12 @@
   "dependencies": {
     "@discordjs/builders": "^1.6.5",
     "@discordjs/rest": "^2.0.1",
-    "@hono/node-server": "^1.14.0",
+    "@hono/node-server": "^1.14.1",
     "@sentry/node": "^9.11.0",
     "@types/cron": "^2.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@vueuse/core": "^13.1.0",
+    "axios": "^1.8.4",
     "cron": "^4.1.4",
     "discord-oauth2": "^2.12.1",
     "discord.js": "^14.13.0",
@@ -29,16 +37,18 @@
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.2",
     "multer": "^1.4.5-lts.1",
     "passport": "^0.7.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "pinia": "^3.0.2",
+    "vue-router": "^4.5.0",
+    "concurrently": "^8.2.2"
   },
   "devDependencies": {
     "@types/node": "^20.17.30",
-    "concurrently": "^9.1.2",
     "nodemon": "^3.0.1",
-    "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.15",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.2.2"
