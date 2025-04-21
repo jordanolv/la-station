@@ -5,7 +5,8 @@ module.exports = {
       name: "la-station-bot",
       cwd: `${__dirname}/dist/bot`,
       script: "app.js",
-      env: { NODE_ENV: "production", MONGODB_URI: process.env.MONGODB_URI},
+      env_file: `${__dirname}/.env`,
+      env: { NODE_ENV: "production"},
     },
     {
       name: "la-station-front",
