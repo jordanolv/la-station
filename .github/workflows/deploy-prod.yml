@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 🔐 Préparer la clé SSH
         run: |
@@ -19,9 +19,13 @@ jobs:
 
       - name: 🚀 Déploiement SSH
         run: |
-          ssh -i ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }} -p ${{ secrets.VPS_PORT }} -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
-            echo "✅ Connexion SSH réussie"
+          ssh -i ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }} \
+              -p ${{ secrets.VPS_PORT }} \
+              -o StrictHostKeyChecking=no \
+              ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            set -e
 
+            echo "✅ Connexion SSH réussie"
             mkdir -p ~/projects/LaStationBot/prod
             cd ~/projects/LaStationBot/prod
 
@@ -30,17 +34,16 @@ jobs:
               git clone -b main https://github.com/jordan-olv/la-station.git .
             fi
 
-            echo "📥 Pull du dernier code"
-            git config --global --add safe.directory /home/deploy/projects/LaStationBot/prod
-            git reset --hard
+            echo "📥 Synchronisation avec origin/main"
+            git fetch --prune origin main
+            git reset --hard origin/main
             git clean -fd
-            git pull origin main
 
-            echo "🔧 Droits"
+            echo "🔧 Ajustement des droits"
             chown -R deploy:deploy ~/projects/LaStationBot/prod
 
-            echo "🛠 Backend - Installation & Build"
-            npm install
+            echo "🛠 Backend – install & build"
+            npm ci
             npm run build
 
             echo "🚀 PM2 Restart"
