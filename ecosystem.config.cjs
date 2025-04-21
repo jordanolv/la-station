@@ -1,12 +1,18 @@
+// ecosystem.config.cjs
 module.exports = {
   apps: [
     {
       name: "la-station-bot",
-      script: "./dist/bot/app.js",
-      cwd: ".",
-      env: {
-        NODE_ENV: "production",
-      },
+      cwd: `${__dirname}/dist/bot`,
+      script: "app.js",
+      env: { NODE_ENV: "production" },
+    },
+    {
+      name: "la-station-front",
+      cwd: `${__dirname}/src/frontend/dist`,
+      script: "serve",
+      args: "-s . -l 3050",
+      env: { NODE_ENV: "production" },
     },
   ],
 };

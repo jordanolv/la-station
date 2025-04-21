@@ -43,6 +43,7 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pinia": "^3.0.2",
+    "serve": "^14.2.4",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
