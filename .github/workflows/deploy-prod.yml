@@ -46,6 +46,12 @@ jobs:
             npm ci
             npm run build
 
+            echo "🛠 Frontend – install & build"
+            cd src/frontend
+            npm ci
+            npm run build
+            cd ../../
+
             echo "🚀 PM2 Restart"
             pm2 delete la-station-bot || true
             pm2 start ecosystem.config.cjs
