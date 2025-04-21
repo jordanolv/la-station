@@ -8,7 +8,8 @@ import { REST, Routes } from 'discord.js';
 import { createAPI } from '../api';
 import * as Sentry from "@sentry/node";
 import { CronManager } from './cron';
-import { serve } from '@hono/node-server'
+import { serve } from '@hono/node-server';
+import chalk from 'chalk';
 
 // Charger les variables d'environnement
 const envPath = path.resolve(__dirname, '../../.env');
@@ -17,6 +18,7 @@ config({ path: envPath });
 
 (async () => {
   // 1) Initialiser la classe
+  console.log(chalk.blue.bold('🚀 Initialisation du bot La Station...'));
   const client = await BotClient.init();
 
   Sentry.init({
@@ -35,8 +37,10 @@ config({ path: envPath });
   });
   
 
+
   // 2) Connexion à MongoDB
   await connectToDatabase();
+  console.log(chalk.green('✅ Connexion à MongoDB réussie !'));
 
   // 3) Charger les fonctionnalités
   const featuresPath = path.join(__dirname, 'features');
@@ -48,15 +52,15 @@ config({ path: envPath });
     fetch: api.fetch,
     port: 3002
   }, (info) => {
-    console.log(`API démarrée sur http://localhost:${info.port}`)
-  })
+    console.log(chalk.magentaBright(`🌐 API démarrée sur ${chalk.underline(`http://localhost:${info.port}`)}`));
+  });
 
 
   // 5) Initialiser tous les crons
   const cronManager = new CronManager(client);
   cronManager.startAll();
+  console.log(chalk.yellow('⏰ Cron jobs démarrés !'));
 
-  console.log(process.env.DISCORD_CLIENT_ID)
   // 6) Connexion à Discord
   try {
     const token = process.env.DISCORD_TOKEN;
@@ -78,7 +82,7 @@ config({ path: envPath });
               Routes.applicationGuildCommands(client.user?.id || '', process.env.GUILD_ID),
               { body: [] }
             );
-            console.log("Anciennes commandes supprimées pour la guild !");
+            console.log(chalk.red("Anciennes commandes supprimées pour la guild !"));
           } else {
             await rest.put(
               Routes.applicationCommands(client.user?.id || ''),

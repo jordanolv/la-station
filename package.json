@@ -1,7 +1,8 @@
 {
-  "name": "discord-bot-modular",
+  "name": "la-station-app",
   "version": "1.0.0",
-  "description": "Un bot Discord modulaire organisé par fonctionnalités",
+  "description": "A modular Discord bot with a web interface",
+  "author": "Jordan.olv",
   "main": "dist/bot/app.js",
   "scripts": {
     "build": "tsc && tsc-alias",
@@ -27,6 +28,8 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@vueuse/core": "^13.1.0",
     "axios": "^1.8.4",
+    "chalk": "^5.4.1",
+    "concurrently": "^8.2.2",
     "cron": "^4.1.4",
     "discord-oauth2": "^2.12.1",
     "discord.js": "^14.13.0",
@@ -40,8 +43,7 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pinia": "^3.0.2",
-    "vue-router": "^4.5.0",
-    "concurrently": "^8.2.2"
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.30",
