@@ -63,6 +63,7 @@ config({ path: envPath });
 
   // 6) Connexion à Discord
   try {
+    console.log(process.env.DISCORD_TOKEN);
     const token = process.env.DISCORD_TOKEN;
     if (!token) throw new Error("DISCORD_TOKEN n'est pas défini dans l'environnement");
 
