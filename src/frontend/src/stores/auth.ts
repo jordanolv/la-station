@@ -10,7 +10,8 @@ interface DiscordUser {
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: localStorage.getItem('token'),
+    // token: localStorage.getItem('token'),
+    token: null as string | null,
     user: null as DiscordUser | null
   }),
 
@@ -21,7 +22,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     setToken(token: string) {
       this.token = token
-      localStorage.setItem('token', token)
+      // localStorage.setItem('token', token)
     },
 
     async logout() {
@@ -32,7 +33,7 @@ export const useAuthStore = defineStore('auth', {
       } finally {
         this.token = null
         this.user = null
-        localStorage.removeItem('token')
+        // localStorage.removeItem('token')
       }
     }
   }
