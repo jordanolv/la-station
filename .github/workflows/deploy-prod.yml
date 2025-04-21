@@ -50,7 +50,7 @@ jobs:
             cd src/frontend
             npm install
             npm run build
-            cd ..
+            cd ../..
 
             echo "🚀 PM2 Reload all apps via ecosystem"
             pm2 delete la-station-bot la-station-front || true
