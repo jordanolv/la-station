@@ -47,7 +47,7 @@ jobs:
             npm run build
 
             echo "🛠 Frontend – install & build"
-            cd frontend
+            cd src/frontend
             npm install
             npm run build
             cd ..
