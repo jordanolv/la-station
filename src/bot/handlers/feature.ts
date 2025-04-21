@@ -18,7 +18,6 @@ export async function loadFeatures(botClient: BotClient, featuresPath: string): 
     
     for (const feature of features) {
       const featurePath = path.join(featuresPath, feature);
-      console.log(`Chargement de la fonctionnalité: ${feature}`);
       
       // Chargement des commandes
       await loadCommands(botClient, featurePath, feature);
