@@ -12,6 +12,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/discor
 export async function connectToDatabase(): Promise<void> {
   try {
     // Utilisation du service de base de données externalisé
+    console.log(MONGODB_URI)
     await db.connect(MONGODB_URI);
   } catch (error) {
     console.error('Erreur lors de la connexion à MongoDB:', error);
