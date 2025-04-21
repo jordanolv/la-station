@@ -50,10 +50,10 @@ jobs:
             cd src/frontend
             npm ci
             npm run build
-            cd ../../
+            cd ..
 
             echo "🚀 PM2 Restart"
-            pm2 delete la-station-bot || true
+            pm2 delete la-station-bot la-station-front || true
             pm2 start ecosystem.config.cjs
             pm2 save
 
