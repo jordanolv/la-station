@@ -30,3 +30,6 @@ Thumbs.db
 # Git files
 *.orig
 *.rej
+
+src/bot/uploads/*
+uploads

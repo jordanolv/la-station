@@ -8,9 +8,6 @@
     "start": "pm2 start src/bot/app.ts --name la-station",
     "mg": "concurrently \"ts-node src/database/scripts/updateGuilds.ts\" \"ts-node src/database/scripts/updateUsers.ts\"",
     "watch": "nodemon --exec ts-node src/bot/app.ts",
-    "api": "ts-node src/api/index.ts",
-    "frontend": "cd src/frontend && npm run dev",
-    "dev:all": "concurrently \"npm run api\" \"npm run frontend\"",
     "dev:front": "cd src/frontend && npm run dev",
     "dev:bot": "cd src/bot && ts-node app.ts",
     "dev": "concurrently \"npm run dev:front\" \"npm run dev:bot\""

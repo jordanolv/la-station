@@ -33,36 +33,24 @@ export default {
 
     // Gestion du temps passé en vocal
     if (oldState.channelId && !newState.channelId) {
-      const joinTime = voiceStartTimes.get(userId);
-      if (joinTime) {
-        const timeSpent = Math.floor((Date.now() - joinTime) / 1000);
-        await UserService.incrementVoiceTime(userId, guildId, timeSpent);
-      }
-    }
-    
-    // Si l'utilisateur rejoint un salon vocal
-    if (newState.channelId && !oldState.channelId) {
-      voiceStartTimes.set(userId, Date.now());
-    }
-    
-    // Si l'utilisateur quitte un salon vocal
-    if (!newState.channelId && oldState.channelId) {
+      // Quitte un salon
       const joinTime = voiceStartTimes.get(userId);
       if (joinTime) {
         const timeSpent = Math.floor((Date.now() - joinTime) / 1000);
         await UserService.incrementVoiceTime(userId, guildId, timeSpent);
         voiceStartTimes.delete(userId);
       }
-    }
-
-    // Si l'utilisateur change de salon vocal
-    if (oldState.channelId && newState.channelId) {
+    } else if (oldState.channelId && newState.channelId && oldState.channelId !== newState.channelId) {
+      // Change de salon
       const joinTime = voiceStartTimes.get(userId);
       if (joinTime) {
         const timeSpent = Math.floor((Date.now() - joinTime) / 1000);
         await UserService.incrementVoiceTime(userId, guildId, timeSpent);
         voiceStartTimes.set(userId, Date.now());
       }
+    } else if (!oldState.channelId && newState.channelId) {
+      // Rejoint un salon
+      voiceStartTimes.set(userId, Date.now());
     }
 
     if (!vocGaming?.enabled) return;
