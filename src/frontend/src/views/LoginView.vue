@@ -26,7 +26,7 @@ if (route.query.token) {
 }
 
 const loginWithDiscord = () => {
-  window.location.href = 'http://localhost:3002/api/auth/discord'
+  window.location.href = 'http://94.130.72.168:3002/api/auth/discord'
 }
 </script>
 
