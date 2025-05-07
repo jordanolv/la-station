@@ -15,8 +15,8 @@ export class BirthdayCron {
 
     // Tous les jours à 00:00:00 (Paris)
     this.job = new CronJob(
-    //   '0 0 0 * * *',               // sec min hr day mon wday
-    '*/5 * * * * *',
+      '0 0 0 * * *',               // sec min hr day mon wday
+    // '*/5 * * * * *',
       this.checkBirthdays.bind(this),
       null,
       false,
