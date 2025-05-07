@@ -1,5 +1,4 @@
 import { Message } from 'discord.js';
-import * as Sentry from '@sentry/node';
 import { UserService } from '../../../../../database/services/UserService';
 export default {
   name: 'test-update-user',

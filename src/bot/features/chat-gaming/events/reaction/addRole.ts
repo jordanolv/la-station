@@ -1,7 +1,6 @@
 import { ForumChannel, Guild } from "discord.js";
 import { BotClient } from '../../../../BotClient';
 import { GameService } from '../../../../../database/services/GameService';
-import * as Sentry from '@sentry/node';
 
 export default {
   name: 'fg-addRole',
@@ -38,18 +37,6 @@ export default {
       }
     } catch (error) {
       console.error("Erreur dans l'événement fg-addRole:", error);
-
-      // 👇 Log vers Sentry avec contexte
-      Sentry.withScope(scope => {
-        scope.setTag('event', 'fg-addRole');
-        scope.setUser({ id: user?.id, username: user?.username });
-        scope.setContext('MessageReaction', {
-          emoji: messageReaction?.emoji?.name,
-          messageId: messageReaction?.message?.id,
-          guildId: messageReaction?.message?.guild?.id,
-        });
-        Sentry.captureException(error);
-      });
     }
   }
 };
