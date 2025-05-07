@@ -20,7 +20,7 @@ config({ path: envPath });
   const client = await BotClient.init();
 
   // 2) Connexion à MongoDB
-  await connectToDatabase();
+  await connectToDatabase(process.env.MONGODB_URI);
   console.log(chalk.green('✅ Connexion à MongoDB réussie !'));
 
   // 3) Charger les fonctionnalités
