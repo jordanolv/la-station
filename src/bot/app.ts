@@ -6,7 +6,6 @@ import { loadFeatures } from './handlers/feature';
 import path from 'path';
 import { REST, Routes } from 'discord.js';
 import { createAPI } from '../api';
-import * as Sentry from "@sentry/node";
 import { CronManager } from './cron';
 import { serve } from '@hono/node-server';
 import chalk from 'chalk';
@@ -15,28 +14,10 @@ import chalk from 'chalk';
 const envPath = path.resolve(__dirname, '../../.env');
 config({ path: envPath });
 
-
 (async () => {
   // 1) Initialiser la classe
   console.log(chalk.blue.bold('🚀 Initialisation du bot La Station...'));
   const client = await BotClient.init();
-
-  Sentry.init({
-    dsn: "https://3b5f8501b836288693676cb2b6be83c2@o4509106646351872.ingest.de.sentry.io/4509106650153040",
-    tracesSampleRate: 1.0, // ajuste à 0.1 si tu veux moins de traces
-  });
-
-  process.on("unhandledRejection", (reason: any) => {
-    console.error("Unhandled Rejection:", reason);
-    Sentry.captureException(reason);
-  });
-  
-  process.on("uncaughtException", (error: Error) => {
-    console.error("Uncaught Exception:", error);
-    Sentry.captureException(error);
-  });
-  
-
 
   // 2) Connexion à MongoDB
   await connectToDatabase();
@@ -54,7 +35,6 @@ config({ path: envPath });
   }, (info) => {
     console.log(chalk.magentaBright(`🌐 API démarrée sur ${chalk.underline(`http://localhost:${info.port}`)}`));
   });
-
 
   // 5) Initialiser tous les crons
   const cronManager = new CronManager(client);

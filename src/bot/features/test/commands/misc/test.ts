@@ -1,5 +1,4 @@
 import { Message } from 'discord.js';
-import * as Sentry from '@sentry/node';
 import { UserService } from '../../../../../database/services/UserService';
 import { IGuild } from '@/database/models/Guild';
 
@@ -26,8 +25,6 @@ export default {
     } catch (error) {
       console.error('Erreur dans la commande test:', error);
 
-      // Envoie l'erreur à Sentry
-      Sentry.captureException(error);
 
       await message.reply({
         content: '❌ Une erreur est survenue lors de l\'exécution de la commande.'
