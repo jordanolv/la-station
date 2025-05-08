@@ -11,6 +11,8 @@ interface LogOptions {
   title?: string;
   timestamp?: boolean;
   footer?: string;
+  file?: string;
+  line?: number;
 }
 
 export class LogService {
@@ -40,15 +42,10 @@ export class LogService {
     options: LogOptions = {}
   ): Promise<void> {
     try {
-      const { feature, title, timestamp = true, footer } = options;
+      const { feature, title, timestamp = true, footer, file, line } = options;
 
       // Vérification rapide des logs activés
       const guildData = await GuildService.getGuildById(guildId);
-      console.log(`[LogService] Guild data:`, {
-        exists: !!guildData,
-        logsEnabled: guildData?.features?.logs?.enabled,
-        logChannel: guildData?.features?.logs?.channel
-      });
 
       if (!this.isLoggingEnabled(guildData)) {
         return;
@@ -56,19 +53,18 @@ export class LogService {
 
       // Récupération du canal de logs
       const logChannel = await this.getLogChannel(guildId, guildData.features.logs.channel);
-      console.log(`[LogService] Log channel found:`, !!logChannel);
       
-      if (!logChannel) {
-        console.log(`[LogService] Could not find log channel ${guildData.features.logs.channel} in guild ${guildId}`);
-        return;
-      }
+      if (!logChannel) return;
 
-      // Création de l'embed
-      const embed = this.createLogEmbed(type, content, title, feature, timestamp, footer);
+      const embed = EmbedUtils.createLogEmbed(type, content, {
+        feature,
+        file,
+        line,
+        timestamp,
+        footer: footer || title
+      });
 
-      // Envoi du log
       await logChannel.send({ embeds: [embed] });
-      console.log(`[LogService] Successfully sent ${type} log to channel ${logChannel.id}`);
     } catch (error) {
       console.error(`[LogService] Error sending log:`, error);
     }
@@ -110,32 +106,5 @@ export class LogService {
 
     const channel = guild.channels.cache.get(channelId) as TextChannel;
     return channel || null;
-  }
-
-  private static createLogEmbed(
-    type: LogType,
-    content: string,
-    customTitle?: string,
-    feature?: LogFeature,
-    timestamp: boolean = true,
-    footer?: string
-  ) {
-    const title = customTitle || this.TITLES[type];
-    const embed = EmbedUtils.createSimpleEmbed(
-      title,
-      content,
-      this.COLORS[type],
-      feature
-    );
-
-    if (timestamp) {
-      embed.setTimestamp();
-    }
-
-    if (footer) {
-      embed.setFooter({ text: footer });
-    }
-
-    return embed;
   }
 } 

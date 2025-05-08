@@ -36,93 +36,113 @@ export class BirthdayCron {
 
   private async checkBirthdays(): Promise<void> {
     try {
-      const nowParis   = toZonedTime(new Date(), this.TZ);
+      const nowParis = toZonedTime(new Date(), this.TZ);
       const monthToday = nowParis.getMonth() + 1;
-      const dayToday   = nowParis.getDate();
+      const dayToday = nowParis.getDate();
 
-      console.log(`Checking birthdays for ${dayToday}/${monthToday} (Paris)`);
-
-      const users = await GuildUserModel.find({
-        'infos.birthDate': { $exists: true, $ne: null }
-      });
-
-      for (const user of users) {
-        if (!user.infos.birthDate) continue;
-
-        const bdParis    = toZonedTime(new Date(user.infos.birthDate), this.TZ);
-        const monthBirth = bdParis.getMonth() + 1;
-        const dayBirth   = bdParis.getDate();
-
-        if (monthBirth !== monthToday || dayBirth !== dayToday) {
+      // Récupérer toutes les guildes où le bot est présent
+      const guilds = this.client.guilds.cache;
+      
+      for (const [guildId, guild] of guilds) {
+        // Vérifier la configuration des logs pour chaque guilde
+        const guildConfig = await GuildService.getGuildById(guildId);
+        if (!guildConfig?.features?.logs?.enabled || !guildConfig?.features?.logs?.channel) {
           continue;
         }
 
-        // Récupère la config de la guilde en base
-        const guildConfig = await GuildService.getGuildById(user.guildId);
-        if (!guildConfig) {
-          console.warn(`Guild config not found for guildId=${user.guildId}`);
-          continue;
-        }
-
-        const channelId = guildConfig.config.channels?.birthday;
-        if (!channelId) {
-          console.warn(`No birthday channel configured for guildId=${user.guildId}`);
-          continue;
-        }
-
-        // Fetch le guild et le channel en une seule passe
-        const guild = await this.client.guilds.fetch(user.guildId).catch(() => null);
-        if (!guild) {
-          await LogService.error(user.guildId, `Bot not in guild ${user.guildId}`, {
-            feature: 'birthday',
-            footer: 'BirthdayCron'
-          });
-          continue;
-        }
-
-        const chan = await this.client.channels.fetch(channelId).catch(() => null);
-        if (!chan || chan.type !== ChannelType.GuildText) {
-          await LogService.error(user.guildId, `Channel ${channelId} not found or not text in guild ${user.guildId}`, {
-            feature: 'birthday',
-            footer: 'BirthdayCron'
-          });
-          continue;
-        }
-        const textChannel = chan as TextChannel;
-
-        // Vérifie la permission d'envoyer
-        const me = this.client.user;
-        if (
-          !me ||
-          !textChannel.permissionsFor(me).has(PermissionsBitField.Flags.SendMessages)
-        ) {
-          await LogService.error(user.guildId, `Missing SendMessages permission in channel ${channelId}`, {
-            feature: 'birthday',
-            footer: 'BirthdayCron'
-          });
-          continue;
-        }
-
-        // Envoi de l'embed
-        const age = nowParis.getFullYear() - bdParis.getFullYear();
-        const embed = new EmbedBuilder()
-          .setTitle('🎉 Joyeux Anniversaire ! 🎉')
-          .setDescription(
-            `Toute l'équipe souhaite un joyeux anniversaire à <@${user.discordId}> ! 🎂\n\n` +
-            `Aujourd'hui, ${user.name} souffle sa ${age}ème bougie !`
-          )
-          .setColor(parseInt(guildConfig.config.colors.primary.replace('#', ''), 16))
-          .setImage('https://c.tenor.com/GscosXEDKhcAAAAd/tenor.gif')
-          .setTimestamp(nowParis);
-
-        await textChannel.send({ embeds: [embed] });
-        await LogService.success(user.guildId, `Sent birthday message for ${user.name}`, {
+        await LogService.info(guildId, `Vérification des anniversaires pour ${dayToday}/${monthToday} (Paris)`, {
           feature: 'birthday',
-          footer: 'BirthdayCron'
+          footer: 'BirthdayCron',
+          file: 'BirthdayCron.ts',
+          line: 45
         });
+
+        const users = await GuildUserModel.find({
+          guildId,
+          'infos.birthDate': { $exists: true, $ne: null }
+        });
+
+        for (const user of users) {
+          if (!user.infos.birthDate) continue;
+
+          const bdParis = toZonedTime(new Date(user.infos.birthDate), this.TZ);
+          const monthBirth = bdParis.getMonth() + 1;
+          const dayBirth = bdParis.getDate();
+
+          if (monthBirth !== monthToday || dayBirth !== dayToday) {
+            continue;
+          }
+
+          const channelId = guildConfig.config.channels?.birthday;
+          if (!channelId) {
+            await LogService.warning(guildId, `Aucun canal d'anniversaire configuré`, {
+              feature: 'birthday',
+              footer: 'BirthdayCron',
+              file: 'BirthdayCron.ts',
+              line: 65
+            });
+            continue;
+          }
+
+          const chan = await this.client.channels.fetch(channelId).catch(() => null);
+          if (!chan || chan.type !== ChannelType.GuildText) {
+            await LogService.error(guildId, `Canal ${channelId} non trouvé ou n'est pas un canal texte`, {
+              feature: 'birthday',
+              footer: 'BirthdayCron',
+              file: 'BirthdayCron.ts',
+              line: 75
+            });
+            continue;
+          }
+          const textChannel = chan as TextChannel;
+
+          // Vérifie la permission d'envoyer
+          const me = this.client.user;
+          if (
+            !me ||
+            !textChannel.permissionsFor(me).has(PermissionsBitField.Flags.SendMessages)
+          ) {
+            await LogService.error(guildId, `Permission d'envoi manquante dans le canal ${channelId}`, {
+              feature: 'birthday',
+              footer: 'BirthdayCron',
+              file: 'BirthdayCron.ts',
+              line: 85
+            });
+            continue;
+          }
+
+          // Envoi de l'embed
+          const age = nowParis.getFullYear() - bdParis.getFullYear();
+          const embed = new EmbedBuilder()
+            .setTitle('🎉 Joyeux Anniversaire ! 🎉')
+            .setDescription(
+              `Toute l'équipe souhaite un joyeux anniversaire à <@${user.discordId}> ! 🎂\n\n` +
+              `Aujourd'hui, ${user.name} souffle sa ${age}ème bougie !`
+            )
+            .setColor(parseInt(guildConfig.config.colors.primary.replace('#', ''), 16))
+            .setImage('https://c.tenor.com/GscosXEDKhcAAAAd/tenor.gif')
+            .setTimestamp(nowParis);
+
+          await textChannel.send({ embeds: [embed] });
+          await LogService.success(guildId, `Message d'anniversaire envoyé pour ${user.name}`, {
+            feature: 'birthday',
+            footer: 'BirthdayCron',
+            file: 'BirthdayCron.ts',
+            line: 105
+          });
+        }
       }
     } catch (err) {
       console.error('Error in BirthdayCron:', err);
+      // Log l'erreur dans toutes les guildes où le bot est présent
+      for (const [guildId] of this.client.guilds.cache) {
+        await LogService.error(guildId, `Erreur lors de la vérification des anniversaires: ${err.message}`, {
+          feature: 'birthday',
+          footer: 'BirthdayCron',
+          file: 'BirthdayCron.ts',
+          line: 115
+        });
+      }
     }
   }
 }
