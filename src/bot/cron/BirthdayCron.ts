@@ -34,7 +34,7 @@ export class BirthdayCron {
     console.log('🎂 Birthday cron stopped');
   }
 
-  private async checkBirthdays(): Promise<void> {
+  public async checkBirthdays(): Promise<void> {
     try {
       const nowParis = toZonedTime(new Date(), this.TZ);
       const monthToday = nowParis.getMonth() + 1;
