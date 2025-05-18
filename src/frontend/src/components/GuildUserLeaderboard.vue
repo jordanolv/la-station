@@ -53,6 +53,8 @@ export interface LeaderboardUser { // Exporting for potential use elsewhere
   // avatar?: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051';
+
 const props = defineProps({
   guildId: {
     type: String as PropType<string>,
@@ -65,6 +67,7 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 
 const fetchLeaderboard = async () => {
+  console.log('API_BASE_URL', API_BASE_URL);
   if (!props.guildId) {
     error.value = "ID du serveur non fourni.";
     loading.value = false;
@@ -76,7 +79,7 @@ const fetchLeaderboard = async () => {
     // API endpoint: GET /api/guilds/:guildId/leaderboard
     // This endpoint should return data conforming to LeaderboardUser[]
     // and ideally be sorted by the backend.
-    const response = await axios.get<LeaderboardUser[]>(`http://localhost:3002/api/guilds/${props.guildId}/leaderboard`);
+    const response = await axios.get<LeaderboardUser[]>(`${API_BASE_URL}/api/guilds/${props.guildId}/leaderboard`);
     // Assuming backend sorts. If not, sort here:
     // users.value = response.data.sort((a, b) => b.profil.lvl - a.profil.lvl || b.profil.exp - a.profil.exp);
     users.value = response.data;

@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3002',
+        target: 'http://localhost:3051',
         changeOrigin: true
       }
     }
@@ -24,4 +24,5 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     },
   },
+  envDir: '../..',
 })

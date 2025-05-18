@@ -7,12 +7,12 @@
       <span v-if="isAuthenticated" class="text-neutral-300 font-medium">👤 {{ user?.username }}</span>
       <button
         v-if="isAuthenticated"
-        @click="logout"
+        @click="logoutAction"
         class="px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold shadow-md hover:from-violet-500 hover:to-indigo-500 transition-all duration-150"
       >Déconnexion</button>
       <button
         v-else
-        @click="login"
+        @click="loginAction"
         class="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-violet-600 text-white font-semibold shadow-md hover:from-pink-400 hover:to-violet-500 transition-all duration-150"
       >Connexion Discord</button>
     </div>
@@ -28,11 +28,15 @@ const authStore = useAuthStore()
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const user = computed(() => authStore.user)
 
-const login = () => {
-  window.location.href = 'http://localhost:3002/api/auth/discord'
+
+const loginAction = () => {
+  authStore.loginWithDiscord()
 }
-const logout = () => {
+
+const logoutAction = () => {
   authStore.logout()
   router.push('/')
 }
 </script>
+
+
