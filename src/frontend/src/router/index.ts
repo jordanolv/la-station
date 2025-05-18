@@ -10,14 +10,15 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue')
     },
     {
-      path: '/login',
-      name: 'login',
-      component: () => import('../views/LoginView.vue')
-    },
-    {
       path: '/games',
       name: 'games',
       component: () => import('../views/GamesView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/guild/:id',
+      name: 'guild-features',
+      component: () => import('../views/GuildFeaturesView.vue'),
       meta: { requiresAuth: true }
     }
   ]
@@ -27,7 +28,7 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
+    next('/')
   } else {
     next()
   }

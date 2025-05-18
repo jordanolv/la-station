@@ -6,6 +6,8 @@ import { serveStatic } from '@hono/node-server/serve-static'
 import { BotClient } from '../bot/BotClient'
 import { auth } from './routes/auth'
 import { games } from './routes/games'
+import { guilds } from './routes/guilds'
+
 import path from 'path'
 
 export function createAPI(client: BotClient) {
@@ -23,7 +25,7 @@ export function createAPI(client: BotClient) {
   // Routes
   app.route('/api/auth', auth)
   app.route('/api/games', games)
-
+  app.route('/api/guilds', guilds)
   // Health check
   app.get('/health', (c) => {
     return c.json({ status: 'ok' })

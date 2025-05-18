@@ -23,10 +23,6 @@ config({ path: envPath });
   await connectToDatabase(process.env.MONGODB_URI);
   console.log(chalk.green('✅ Connexion à MongoDB réussie !'));
 
-  // 3) Charger les fonctionnalités
-  const featuresPath = path.join(__dirname, 'features');
-  await loadFeatures(client, featuresPath);
-
   // 4) Initialiser l'API
   const api = createAPI(client);
   serve({
@@ -35,6 +31,10 @@ config({ path: envPath });
   }, (info) => {
     console.log(chalk.magentaBright(`🌐 API démarrée sur ${chalk.underline(`http://localhost:${info.port}`)}`));
   });
+
+  // 3) Charger les fonctionnalités
+  const featuresPath = path.join(__dirname, 'features');
+  await loadFeatures(client, featuresPath);
 
   // 5) Initialiser tous les crons
   const cronManager = new CronManager(client);

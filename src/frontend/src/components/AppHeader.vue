@@ -28,9 +28,11 @@ const authStore = useAuthStore()
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const user = computed(() => authStore.user)
 
+
 const loginAction = () => {
   authStore.loginWithDiscord()
 }
+
 const logoutAction = () => {
   authStore.logout()
   router.push('/')
