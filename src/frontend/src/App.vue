@@ -1,19 +1,14 @@
 <template>
-  <div class="app">
-    <nav class="navbar">
-      <router-link to="/">Accueil</router-link>
-      <router-link to="/games">Jeux</router-link>
-      <router-link to="/login" v-if="!isAuthenticated">Connexion</router-link>
-      <button v-else @click="logout">Déconnexion</button>
-    </nav>
-    
-    <main>
+  <div class="app min-h-screen bg-gradient-to-br from-[#181a20] via-[#23272f] to-[#181a20]">
+    <AppHeader />
+    <main class="flex flex-col items-center justify-start flex-1 pt-24">
       <router-view />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
+import AppHeader from './components/AppHeader.vue'
 import { useAuthStore } from './stores/auth'
 import { computed } from 'vue'
 
@@ -50,6 +45,5 @@ const logout = () => {
 
 main {
   flex: 1;
-  padding: 2rem;
 }
 </style>

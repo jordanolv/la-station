@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { jwt } from 'hono/jwt';
-import { sign } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import { BotClient } from '../../bot/BotClient';
+import { JwtPayload } from 'jsonwebtoken';
 
 interface DiscordTokenResponse {
   access_token: string;
@@ -68,26 +69,89 @@ auth.get('/discord/callback', async (c) => {
         id: user.id,
         name: user.username,
         avatar: user.avatar,
-        discriminator: user.discriminator
+        discriminator: user.discriminator,
+        access_token: access_token
       },
       process.env.JWT_SECRET || 'your-secret-key'
     );
 
-    return c.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
+    return c.redirect(`${process.env.FRONTEND_URL}/?token=${token}`);
   } catch (error) {
+    console.error('Authentication error:', error);
     return c.json({ error: 'Authentication failed' }, 500);
   }
 });
 
 // Middleware JWT pour les routes protégées
-auth.use('*', jwt({
-  secret: process.env.JWT_SECRET || 'your-secret-key',
-  alg: 'HS256'
-}));
+// auth.use('*', jwt({
+//   secret: process.env.JWT_SECRET || 'your-secret-key',
+//   alg: 'HS256'
+// }));
 
 // Logout route
 auth.post('/logout', (c) => {
   return c.json({ message: 'Logged out successfully' });
+});
+
+// Route pour récupérer les serveurs de l'utilisateur
+auth.get('/guilds', async (c) => {
+  const payload = c.get('jwtPayload');
+  console.log('Payload from middleware:', payload);
+  try {
+    const token = c.req.header('Authorization')?.split(' ')[1];
+    if (!token) {
+      return c.json({ error: 'No token provided' }, 401);
+    }
+
+    // Décoder le JWT pour obtenir le token d'accès Discord
+    const decoded = verify(token, process.env.JWT_SECRET || 'your-secret-key') as JwtPayload & { access_token: string };
+    console.log('Decoded JWT:', decoded);
+    if (!decoded.access_token) {
+      return c.json({ error: 'No Discord access token found' }, 401);
+    }
+
+    // Utiliser le token d'accès Discord pour récupérer les serveurs
+    const response = await fetch('https://discord.com/api/users/@me/guilds', {
+      headers: {
+        Authorization: `Bearer ${decoded.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch guilds');
+    }
+
+    const guilds = await response.json() as any[];
+
+    // Filtrer pour ne garder que les serveurs où l'utilisateur est admin
+    const adminGuilds = guilds.filter(guild =>
+      guild.owner === true ||
+      (typeof guild.permissions === 'string'
+        ? (BigInt(guild.permissions) & 0x8n) !== 0n
+        : (guild.permissions & 0x8) !== 0)
+    );
+
+    return c.json(adminGuilds);
+  } catch (error) {
+    console.error('Error fetching guilds:', error);
+    return c.json({ error: 'Failed to fetch guilds' }, 500);
+  }
+});
+
+// Route pour récupérer les serveurs où le bot est présent
+auth.get('/bot-guilds', async (c) => {
+  try {
+    const client = BotClient.getInstance();
+    const botGuilds = client.guilds.cache.map(guild => ({
+      id: guild.id,
+      name: guild.name,
+      icon: guild.icon
+    }));
+    return c.json(botGuilds);
+  } catch (error) {
+    console.error('Error fetching bot guilds:', error);
+    return c.json({ error: 'Failed to fetch bot guilds' }, 500);
+  }
 });
 
 export { auth }; 
