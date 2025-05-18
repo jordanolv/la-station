@@ -9,10 +9,26 @@ import { createAPI } from '../api';
 import { CronManager } from './cron';
 import { serve } from '@hono/node-server';
 import chalk from 'chalk';
+import fs from 'fs';
 
 // Charger les variables d'environnement
 const envPath = path.resolve(__dirname, '../../.env');
-config({ path: envPath });
+console.log(chalk.yellow(`Tentative de chargement du fichier .env depuis: ${envPath}`));
+
+// Vérifier si le fichier existe
+if (fs.existsSync(envPath)) {
+  console.log(chalk.green(`✅ Fichier .env trouvé à ${envPath}`));
+  config({ path: envPath });
+  
+  // Vérifier si les variables critiques sont chargées
+  console.log(chalk.yellow('Variables d\'environnement critiques:'));
+  console.log(chalk.yellow(`- DISCORD_CLIENT_ID: ${process.env.DISCORD_CLIENT_ID ? '✅' : '❌'}`));
+  console.log(chalk.yellow(`- DISCORD_REDIRECT_URI: ${process.env.DISCORD_REDIRECT_URI ? '✅' : '❌'}`));
+  console.log(chalk.yellow(`- FRONTEND_URL: ${process.env.FRONTEND_URL ? '✅' : '❌'}`));
+  console.log(chalk.yellow(`- VITE_API_BASE_URL: ${process.env.VITE_API_BASE_URL ? '✅' : '❌'}`));
+} else {
+  console.log(chalk.red(`❌ Fichier .env NON TROUVÉ à ${envPath}`));
+}
 
 (async () => {
   // 1) Initialiser la classe
