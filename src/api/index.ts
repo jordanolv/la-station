@@ -15,7 +15,17 @@ export function createAPI(client: BotClient) {
 
   // Middleware
   app.use('*', logger())
-  app.use('*', cors())
+  
+  // Configuration CORS plus permissive
+  app.use('*', cors({
+    origin: '*', // Autorise toutes les origines
+    allowHeaders: ['Authorization', 'Content-Type'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    exposeHeaders: ['Content-Length', 'Content-Type'],
+    credentials: true,
+    maxAge: 86400 // 24 heures
+  }))
+  
   app.use('*', secureHeaders())
 
   // Serve static files from uploads directory at project root
