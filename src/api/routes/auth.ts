@@ -42,6 +42,7 @@ auth.get('/discord', (c) => {
 
 // Callback route après l'authentification Discord
 auth.get('/discord/callback', async (c) => {
+  console.log('🔍 Route /discord/callback appelée');
   const code = c.req.query('code');
   if (!code) {
     return c.json({ error: 'No code provided' }, 400);
@@ -66,26 +67,53 @@ auth.get('/discord/callback', async (c) => {
       }),
     });
 
-    const { access_token } = await tokenResponse.json() as DiscordTokenResponse;
+    const tokenData = await tokenResponse.json() as DiscordTokenResponse;
+    console.log('✅ Token Discord obtenu:');
+    console.log(`- access_token: ${tokenData.access_token ? tokenData.access_token.substring(0, 10) + '...' : 'NON PRÉSENT'}`);
+    console.log(`- token_type: ${tokenData.token_type || 'NON PRÉSENT'}`);
+    console.log(`- expires_in: ${tokenData.expires_in || 'NON PRÉSENT'}`);
+    
+    if (!tokenData.access_token) {
+      console.error('❌ Erreur: pas d\'access_token dans la réponse Discord');
+      return c.json({ error: 'No access token provided by Discord' }, 500);
+    }
 
     const userResponse = await fetch('https://discord.com/api/users/@me', {
       headers: {
-        Authorization: `Bearer ${access_token}`,
+        Authorization: `Bearer ${tokenData.access_token}`,
       },
     });
 
     const user = await userResponse.json() as DiscordUser;
+    
+    // Préparer le payload du JWT
+    const jwtPayload = { 
+      id: user.id,
+      name: user.username,
+      avatar: user.avatar,
+      discriminator: user.discriminator,
+      access_token: tokenData.access_token
+    };
+    
+    console.log('📝 Création du JWT avec payload:');
+    console.log('- id:', jwtPayload.id);
+    console.log('- name:', jwtPayload.name);
+    console.log('- access_token présent:', !!jwtPayload.access_token);
 
     const token = sign(
-      { 
-        id: user.id,
-        name: user.username,
-        avatar: user.avatar,
-        discriminator: user.discriminator,
-        access_token: access_token
-      },
+      jwtPayload,
       process.env.JWT_SECRET || 'your-secret-key'
     );
+    
+    // Vérifier le JWT juste après l'avoir créé
+    try {
+      const decoded = verify(token, process.env.JWT_SECRET || 'your-secret-key') as JwtPayload & { access_token: string };
+      console.log('✅ JWT vérifié immédiatement après création:');
+      console.log('- id:', decoded.id);
+      console.log('- access_token présent:', !!decoded.access_token);
+    } catch (error) {
+      console.error('❌ Erreur lors de la vérification du JWT créé:', error);
+    }
 
     return c.redirect(`${process.env.FRONTEND_URL}/?token=${token}`);
   } catch (error) {
@@ -129,8 +157,22 @@ auth.get('/guilds', async (c) => {
   try {
     // Décoder le JWT pour obtenir le token d'accès Discord
     console.log(`🔑 JWT_SECRET défini: ${!!process.env.JWT_SECRET}`);
+    
+    // Décodage sans vérification pour voir le contenu
+    try {
+      const decodedWithoutVerify = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+      console.log('📄 Contenu du JWT (sans vérification):');
+      console.log(JSON.stringify(decodedWithoutVerify, null, 2));
+      console.log('Access token présent dans le JWT non vérifié:', !!decodedWithoutVerify.access_token);
+    } catch (err) {
+      console.error('❌ Erreur lors du décodage sans vérification:', err);
+    }
+    
+    // Décodage avec vérification (normal)
     const decoded = verify(token, process.env.JWT_SECRET || 'your-secret-key') as JwtPayload & { access_token: string };
-    console.log('✅ Token vérifié avec succès');
+    console.log('✅ Token JWT vérifié avec succès');
+    console.log('📄 Contenu du JWT après vérification:');
+    console.log(JSON.stringify(decoded, null, 2));
     
     if (!decoded.access_token) {
       console.log('❌ Access token Discord non trouvé dans le JWT');
