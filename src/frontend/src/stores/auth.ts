@@ -24,6 +24,8 @@ interface JwtPayload {
   discriminator: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051';
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     // token: localStorage.getItem('token'),
@@ -56,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
 
     async fetchUserGuilds() {
       try {
-        const response = await axios.get('http://localhost:3002/api/auth/guilds', {
+        const response = await axios.get(`${API_BASE_URL}/api/auth/guilds`, {
           headers: {
             Authorization: `Bearer ${this.token}`
           }
@@ -67,9 +69,13 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async loginWithDiscord() {
+      window.location.href = `${API_BASE_URL}/api/auth/discord`;
+    },
+
     async logout() {
       try {
-        await axios.post('http://localhost:3002/api/auth/logout')
+        await axios.post(`${API_BASE_URL}/api/auth/logout`)
       } catch (error) {
         console.error('Logout failed:', error)
       } finally {

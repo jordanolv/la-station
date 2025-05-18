@@ -49,7 +49,7 @@ onMounted(() => {
 
 /* Optional: Method to trigger login if button is moved here
 const loginWithDiscord = () => {
-  window.location.href = 'http://localhost:3002/api/auth/discord'
+  window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051'}/api/auth/discord`;
 }
 */
 </script>
