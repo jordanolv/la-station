@@ -132,31 +132,61 @@ auth.get('/guilds', async (c) => {
     const decoded = verify(token, process.env.JWT_SECRET || 'your-secret-key') as JwtPayload & { access_token: string };
     console.log('✅ Token vérifié avec succès');
     
-    // Utiliser le token d'accès Discord pour récupérer les serveurs
-    const response = await fetch('https://discord.com/api/users/@me/guilds', {
-      headers: {
-        Authorization: `Bearer ${decoded.access_token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch guilds');
+    if (!decoded.access_token) {
+      console.log('❌ Access token Discord non trouvé dans le JWT');
+      return c.json({ error: 'No Discord access token found' }, 401);
     }
+    
+    console.log(`🔑 Access token Discord (premiers caractères): ${decoded.access_token.substring(0, 10)}...`);
 
-    const guilds = await response.json() as any[];
+    // Utiliser le token d'accès Discord pour récupérer les serveurs
+    try {
+      console.log('🔄 Tentative de récupération des guilds depuis Discord API...');
+      const response = await fetch('https://discord.com/api/users/@me/guilds', {
+        headers: {
+          Authorization: `Bearer ${decoded.access_token}`,
+        },
+      });
 
-    // Filtrer pour ne garder que les serveurs où l'utilisateur est admin
-    const adminGuilds = guilds.filter(guild =>
-      guild.owner === true ||
-      (typeof guild.permissions === 'string'
-        ? (BigInt(guild.permissions) & 0x8n) !== 0n
-        : (guild.permissions & 0x8) !== 0)
-    );
+      console.log(`📊 Status de la réponse Discord: ${response.status}`);
+      
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error(`❌ Erreur Discord API: ${response.status} - ${errorBody}`);
+        return c.json({ 
+          error: 'Discord API error', 
+          status: response.status,
+          details: errorBody
+        }, 500);
+      }
 
-    return c.json(adminGuilds);
+      const guilds = await response.json() as any[];
+      console.log(`✅ Guilds récupérés: ${guilds.length}`);
+
+      // Filtrer pour ne garder que les serveurs où l'utilisateur est admin
+      const adminGuilds = guilds.filter(guild =>
+        guild.owner === true ||
+        (typeof guild.permissions === 'string'
+          ? (BigInt(guild.permissions) & 0x8n) !== 0n
+          : (guild.permissions & 0x8) !== 0)
+      );
+      
+      console.log(`👑 Guilds avec droits admin: ${adminGuilds.length}`);
+
+      return c.json(adminGuilds);
+    } catch (fetchError) {
+      console.error('❌ Erreur lors de la requête vers Discord API:', fetchError);
+      return c.json({ 
+        error: 'Failed to communicate with Discord API',
+        details: fetchError instanceof Error ? fetchError.message : String(fetchError)
+      }, 500);
+    }
   } catch (error) {
-    console.error('Error fetching guilds:', error);
-    return c.json({ error: 'Failed to fetch guilds' }, 500);
+    console.error('❌ Erreur de vérification du token:', error);
+    return c.json({ 
+      error: 'Failed to fetch guilds',
+      details: error instanceof Error ? error.message : String(error)
+    }, 500);
   }
 });
 
