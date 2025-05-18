@@ -31,7 +31,7 @@ config({ path: envPath });
   const api = createAPI(client);
   serve({
     fetch: api.fetch,
-    port: 3002
+    port: 3051
   }, (info) => {
     console.log(chalk.magentaBright(`🌐 API démarrée sur ${chalk.underline(`http://localhost:${info.port}`)}`));
   });
