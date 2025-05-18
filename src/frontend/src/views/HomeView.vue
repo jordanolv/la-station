@@ -1,23 +1,57 @@
 <template>
-  <div class="home">
-    <h1>Bienvenue sur La Station</h1>
-    <p>Gérez vos jeux et votre serveur Discord en un seul endroit.</p>
+  <div class="text-neutral-200 p-8 text-center font-sans w-full">
+    <div v-if="!isAuthenticated">
+      <h1 class="text-5xl font-semibold text-white mb-4">Bienvenue sur La Station</h1>
+      <p class="text-lg text-neutral-400 mb-8">
+        Gérez vos jeux et votre serveur Discord en un seul endroit.
+      </p>
+      <!-- Login button could be placed here if not in AppHeader -->
+      <!-- 
+      <button @click="loginWithDiscord" 
+              class="mt-8 px-6 py-3 bg-gradient-to-r from-pink-500 to-violet-600 text-white rounded-lg text-lg font-medium transition-colors">
+        Se connecter avec Discord
+      </button>
+      -->
+    </div>
+    <div v-else class="max-w-4xl mx-auto">
+      <h2 class="text-3xl font-medium text-neutral-300 mt-10 mb-6">Vos serveurs Discord</h2>
+      <GuildList @access="navigateToGuild" />
+    </div>
   </div>
 </template>
 
-<style scoped>
-.home {
-  text-align: center;
-  padding: 2rem;
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import { useAuthStore } from '../stores/auth'
+import { useRouter } from 'vue-router'
+import GuildList from '../components/GuildList.vue'
+// FeaturesPanel import removed
+
+const authStore = useAuthStore()
+const router = useRouter()
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+// selectedGuild ref removed
+
+const navigateToGuild = (guild: any) => {
+  router.push(`/guild/${guild.id}`)
 }
 
-h1 {
-  color: #2c3e50;
-  margin-bottom: 1rem;
-}
+// Gérer le token dans l'URL (callback Discord)
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search)
+  const token = params.get('token')
+  if (token) {
+    authStore.setToken(token)
+    // Clean the URL by replacing the current entry in history
+    router.replace(router.currentRoute.value.path) 
+  }
+})
 
-p {
-  color: #666;
-  font-size: 1.2rem;
+/* Optional: Method to trigger login if button is moved here
+const loginWithDiscord = () => {
+  window.location.href = 'http://localhost:3002/api/auth/discord'
 }
-</style> 
+*/
+</script>
+
+<!-- Removed <style scoped> as Tailwind is used -->
