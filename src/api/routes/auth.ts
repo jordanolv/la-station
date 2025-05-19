@@ -1,17 +1,18 @@
+<<<<<<< Updated upstream
 import { Hono } from 'hono';
 import { jwt } from 'hono/jwt';
 import { sign, verify } from 'jsonwebtoken';
 import { BotClient } from '../../bot/BotClient';
 import { JwtPayload } from 'jsonwebtoken';
+=======
+import { Hono } from 'hono'
+import { initAuthConfig, authHandler } from '@hono/auth-js'
+import Discord from '@auth/core/providers/discord'
+>>>>>>> Stashed changes
 
-interface DiscordTokenResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  refresh_token: string;
-  scope: string;
-}
+export const auth = new Hono()
 
+<<<<<<< Updated upstream
 interface DiscordUser {
   id: string;
   username: string;
@@ -64,9 +65,23 @@ auth.get('/discord/callback', async (c) => {
         grant_type: 'authorization_code',
         code: code,
         redirect_uri: process.env.DISCORD_REDIRECT_URI || '',
+=======
+auth.use(
+  '*',
+  initAuthConfig((c) => ({
+    basePath: "/api/auth",
+    secret: process.env.AUTH_SECRET!,
+    providers: [
+      Discord({
+        clientId: process.env.DISCORD_CLIENT_ID,
+        clientSecret: process.env.DISCORD_CLIENT_SECRET,
+>>>>>>> Stashed changes
       }),
-    });
+    ],
+  }))
+)
 
+<<<<<<< Updated upstream
     const tokenData = await tokenResponse.json() as DiscordTokenResponse;
     console.log('✅ Token Discord obtenu:');
     console.log(`- access_token: ${tokenData.access_token ? tokenData.access_token.substring(0, 10) + '...' : 'NON PRÉSENT'}`);
@@ -249,3 +264,6 @@ auth.get('/bot-guilds', async (c) => {
 });
 
 export { auth }; 
+=======
+auth.use('*', authHandler())
+>>>>>>> Stashed changes

@@ -1,6 +1,6 @@
-import { BotClient } from '../../../../BotClient';
+import { BotClient } from '../../../../BotClient.js';
 import { ChannelType } from 'discord.js';
-import { VocGamingService } from '../../../../services/VocGamingService';
+import { VocGamingService } from '../../../../services/VocGamingService.js';
 
 export default {
   name: 'addVoiceChannel',

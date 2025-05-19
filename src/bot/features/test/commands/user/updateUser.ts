@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import { UserService } from '../../../../../database/services/UserService';
+import { UserService } from '../../../../../database/services/UserService.js';
 export default {
   name: 'test-update-user',
   description: 'Mise à jour d\'un utilisateur',
@@ -10,6 +10,8 @@ export default {
    * @param message Le message Discord
    */
   async execute(message: Message) {
+    if (!message.guild) return message.reply('Cette commande doit être utilisée dans un serveur.');
+    
     const user = await UserService.getGuildUserByDiscordId(message.author.id, message.guild.id);
     if (!user) {
       return message.reply('Vous n\'êtes pas enregistré dans la base de données.');

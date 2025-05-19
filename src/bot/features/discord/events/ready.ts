@@ -1,5 +1,5 @@
 import { Client, REST, Routes } from 'discord.js';
-import { BotClient } from '../../../BotClient';
+import { BotClient } from '../../../BotClient.js';
 
 export default {
   name: 'ready',

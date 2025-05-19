@@ -1,8 +1,8 @@
 // BotClient.ts
 import { Client, GatewayIntentBits, Collection, Partials } from 'discord.js';
 import path from 'path';
-import { connectToDatabase } from './handlers/mongoose';
-import { loadFeatures } from './handlers/feature';
+import { connectToDatabase } from './handlers/mongoose.js';
+import { loadFeatures } from './handlers/feature.js';
 import { REST, Routes } from 'discord.js';
 
 export class BotClient extends Client {

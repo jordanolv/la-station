@@ -1,7 +1,7 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { CommandInteraction } from 'discord.js';
-import { BotClient } from '../../../../BotClient';
-import { GameService } from '../../../../../database/services/GameService';
+import { BotClient } from '../../../../BotClient.js';
+import { GameService } from '../../../../../database/services/GameService.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -101,7 +101,7 @@ export default {
         { name: "Participants", value: participants.join(", "), inline: false },
         { name: "Début de session", value: `<t:${Math.floor(startDate.getTime() / 1000)}:F>`, inline: false }
       )
-      .setColor(parseInt(game.color.replace('#', ''), 16))
+      .setColor(parseInt((game.color || '#000000').replace('#', ''), 16))
       .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
       .setFooter({ text: "Réagis avec 🔔 pour rejoindre le groupe !" })
       .setTimestamp();

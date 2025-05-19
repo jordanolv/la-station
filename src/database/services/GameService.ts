@@ -1,4 +1,4 @@
-import GameModel, { IGame } from '../models/Game';
+import GameModel, { IGame } from '../models/Game.js';
 
 export class GameService {
   static async getGameById(id: string): Promise<IGame | null> {

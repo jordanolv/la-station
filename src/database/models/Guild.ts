@@ -36,6 +36,10 @@ export interface IGuild extends Document {
       enabled: boolean;
       taux: number;
     };
+    defaultRoles: {
+      enabled: boolean;
+      roleIds: string[];
+    };
   };
 }
 
@@ -75,6 +79,10 @@ const GuildSchema = new Schema<IGuild>({
       enabled: { type: Boolean, default: true },
       taux: { type: Number, default: 1 }
     },
+    defaultRoles: {
+      enabled: { type: Boolean, default: false },
+      roleIds: { type: [String], default: [] }
+    }
   },
 });
 

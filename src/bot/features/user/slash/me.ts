@@ -1,10 +1,10 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { BotClient } from '@/bot/BotClient';
-import { UserService } from '@database/services/UserService';
-import { IGuildUser } from '@/database/models/GuildUser';
-import { formatDate, formatTime } from '../../../utils/DateFormat';
-import { GuildService } from '@/database/services/GuildService';
+import { BotClient } from '../../../BotClient.js';
+import { UserService } from '../../../../database/services/UserService.js';
+import { IGuildUser } from '../../../../database/models/GuildUser.js';
+import { formatDate, formatTime } from '../../../utils/DateFormat.js';
+import { GuildService } from '../../../../database/services/GuildService.js';
 
 async function createProgressBar(user: IGuildUser, current: number, total: number, size = 10): Promise<string> {
   const xpForCurrentLevel = await UserService.getXpToLevelUp(user.profil.lvl);
@@ -27,8 +27,23 @@ export default {
     .setDescription('Afficher vos informations personnelles'),
   async execute(client: BotClient, interaction: ChatInputCommandInteraction) {
     try {
+      if (!interaction.guild) {
+        await interaction.reply({
+          content: '❌ Cette commande doit être utilisée dans un serveur.',
+          ephemeral: true
+        });
+        return;
+      }
+
       const user = await UserService.getGuildUserByDiscordId(interaction.user.id, interaction.guild.id);
       const guild = await GuildService.getGuildById(interaction.guild.id);
+      if (!guild) {
+        await interaction.reply({
+          content: '❌ Serveur non trouvé.',
+          ephemeral: true
+        });
+        return;
+      }
 
       if (!user) {
         await interaction.reply({

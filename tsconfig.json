@@ -1,28 +1,26 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "lib": ["ES2020"],
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": false,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
+    "moduleDetection": "force",
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ],
+    "strict": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@database/*": ["src/database/*"],
+      "@database/*": ["src/database/*"]
     }
   },
-  "include": ["src/**/*", "types/**/*"],
-  "exclude": ["node_modules","src/frontend"],
-  "ts-node": {
-    "require": ["tsconfig-paths/register"]
-  },
+  "typeRoots": [
+    "./node_modules/@types",
+    "./types"
+  ],
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

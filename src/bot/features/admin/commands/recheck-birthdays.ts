@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
-import { CronManager } from '../../../cron';
-import { BotClient } from '../../../BotClient';
-import { IGuild } from '@/database/models/Guild';
+import { CronManager } from '../../../cron/index.js';
+import { BotClient } from '../../../BotClient.js';
+import { IGuild } from '../../../../database/models/Guild.js';
 
 export default {
   name: 'recheck-birthdays',

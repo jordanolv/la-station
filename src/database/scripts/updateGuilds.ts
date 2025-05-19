@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import GuildModel from '@/database/models/Guild';
+import GuildModel from '../models/Guild.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

@@ -1,5 +1,5 @@
-import { BotClient } from '../../../../BotClient';
-import { VocGamingService } from '../../../../services/VocGamingService';
+import { BotClient } from '../../../../BotClient.js';
+import { VocGamingService } from '../../../../services/VocGamingService.js';
 
 export default {
   name: 'removeVoiceChannel',

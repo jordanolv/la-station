@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
-import { GuildService } from '../../../../database/services/GuildService';
-import { LogService } from '../../../services/LogService';
+import { GuildService } from '../../../../database/services/GuildService.js';
+import { LogService } from '../../../services/LogService.js';
 
 export default {
   name: 'enable-chatGaming',

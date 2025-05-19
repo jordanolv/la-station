@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import UserModel from '@/database/models/GuildUser';
-import { UserService } from '../services/UserService';
+import UserModel from '../models/GuildUser.js';
+import { UserService } from '../services/UserService.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

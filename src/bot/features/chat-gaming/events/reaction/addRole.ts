@@ -1,6 +1,6 @@
 import { ForumChannel, Guild } from "discord.js";
-import { BotClient } from '../../../../BotClient';
-import { GameService } from '../../../../../database/services/GameService';
+import { BotClient } from '../../../../BotClient.js';
+import { GameService } from '../../../../../database/services/GameService.js';
 
 export default {
   name: 'fg-addRole',

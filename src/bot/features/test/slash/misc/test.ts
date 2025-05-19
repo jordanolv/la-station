@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction } from 'discord.js';
-import { BotClient } from '../../../../BotClient';
+import { BotClient } from '../../../../BotClient.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('test')

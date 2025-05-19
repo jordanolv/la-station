@@ -1,8 +1,8 @@
 import { Events, User } from 'discord.js';
 import { ChannelType } from "discord.js";
-import { BotClient } from '../../../BotClient';
-import { GuildService } from '../../../../database/services/GuildService';
-import { GameService } from '../../../../database/services/GameService';
+import { BotClient } from '../../../BotClient.js';
+import { GuildService } from '../../../../database/services/GuildService.js';
+import { GameService } from '../../../../database/services/GameService.js';
 
 export default {
   name: Events.MessageReactionAdd,

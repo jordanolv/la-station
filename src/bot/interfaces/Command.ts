@@ -1,4 +1,4 @@
-import { IGuild } from '@/database/models/Guild';
+import { IGuild } from '../../database/models/Guild.js';
 import { Message } from 'discord.js';
 
 export interface Command {

@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { BotClient } from '@/bot/BotClient';
-import { UserService } from '@database/services/UserService';
+import { BotClient } from '../../../BotClient.js';
+import { UserService } from '../../../../database/services/UserService.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -12,6 +12,14 @@ export default {
         .setDescription('Nouvelle date (format JJ/MM/AAAA)')
         .setRequired(true)),
   async execute(client: BotClient, interaction: ChatInputCommandInteraction) {
+    if (!interaction.guild) {
+      await interaction.reply({
+        content: '❌ Cette commande doit être utilisée dans un serveur.',
+        ephemeral: true
+      });
+      return;
+    }
+
     const value = interaction.options.getString('value', true);
     const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     const match = value.match(dateRegex);

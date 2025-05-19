@@ -1,9 +1,9 @@
 import { Client, Message } from 'discord.js';
-import { BotClient } from '../../../BotClient';
-import { GuildService } from '../../../../database/services/GuildService';
-import { EmbedUtils } from '../../../utils/EmbedUtils';
-import { Command } from '../../../interfaces/Command';
-import { UserService } from '../../../../database/services/UserService';
+import { BotClient } from '../../../BotClient.js';
+import { GuildService } from '../../../../database/services/GuildService.js';
+import { EmbedUtils } from '../../../utils/EmbedUtils.js';
+import { Command } from '../../../interfaces/Command.js';
+import { UserService } from '../../../../database/services/UserService.js';
 
 export default {
   name: 'messageCreate',

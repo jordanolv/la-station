@@ -1,7 +1,7 @@
 import { TextChannel, Guild } from 'discord.js';
-import { GuildService } from '../../database/services/GuildService';
-import { BotClient } from '../BotClient';
-import { EmbedUtils } from '../utils/EmbedUtils';
+import { GuildService } from '../../database/services/GuildService.js';
+import { BotClient } from '../BotClient.js';
+import { EmbedUtils } from '../utils/EmbedUtils.js';
 
 export type LogType = 'info' | 'warning' | 'error' | 'success' | 'debug';
 export type LogFeature = 'birthday' | 'welcome' | 'moderation' | 'games' | 'system' | string;
@@ -47,7 +47,7 @@ export class LogService {
       // Vérification rapide des logs activés
       const guildData = await GuildService.getGuildById(guildId);
 
-      if (!this.isLoggingEnabled(guildData)) {
+      if (!guildData || !this.isLoggingEnabled(guildData)) {
         return;
       }
 

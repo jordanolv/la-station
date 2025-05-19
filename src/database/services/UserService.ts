@@ -1,10 +1,10 @@
 import { User, Guild, Message } from 'discord.js';
-import GlobalUserModel from '../models/GlobalUser';
-import GuildUserModel from '../models/GuildUser';
-import { GuildService } from './GuildService';
-import { BotClient } from '@/bot/BotClient';
-import { getDateDaysAgo } from '@/bot/utils/DateFormat';
-import { IGuildUser } from '../models/GuildUser';
+import GlobalUserModel from '../models/GlobalUser.js';
+import GuildUserModel from '../models/GuildUser.js';
+import { GuildService } from './GuildService.js';
+import { BotClient } from '../../bot/BotClient.js';
+import { getDateDaysAgo } from '../../bot/utils/DateFormat.js';
+import { IGuildUser } from '../models/GuildUser.js';
 export class UserService {
   static xpCooldown: Record<string, number> = {};
 
@@ -135,14 +135,8 @@ export class UserService {
 
     if (!guildId) return null;
 
-    await GuildUserModel.findOneAndUpdate(
-      { discordId, guildId },
-      { $inc: { 'profil.exp': amount } },
-      { new: true }
-    );
-
-    const user = await GuildUserModel.findOne({ discordId, guildId });
     const guild = await GuildService.getGuildById(guildId);
+    if (!guild) return null;
 
     const isInCooldown = this.xpCooldown[discordId];
     if (isInCooldown) {
@@ -158,6 +152,9 @@ export class UserService {
     const xpToGive =
       Math.floor(Math.random() * (xpMaxToGive - xpMinToGive + 1)) +
       xpMinToGive * guild.features.leveling.taux;
+
+    const user = await GuildUserModel.findOne({ discordId, guildId });
+    if (!user) return null;
 
     user.profil.exp += xpToGive;
     (user as IGuildUser & { guild: any }).guild = guild;

@@ -1,5 +1,5 @@
 import { Client } from 'discord.js';
-import { BirthdayCron } from './BirthdayCron';
+import { BirthdayCron } from './BirthdayCron.js';
 
 export class CronManager {
     private crons: { start: () => void; stop: () => void }[] = [];

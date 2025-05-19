@@ -1,4 +1,4 @@
-import GuildModel, { IGuild } from '../models/Guild';
+import GuildModel, { IGuild } from '../models/Guild.js';
 
 export class GuildService {
   static async ensureGuild(guildId: string, name: string): Promise<IGuild> {
@@ -96,5 +96,14 @@ export class GuildService {
 
   static async getAllGuilds(): Promise<IGuild[]> {
     return GuildModel.find({}).exec();
+  }
+
+  //enable or disable a feature for a guild
+  static async toggleFeature(guildId: string, featureName: string, enabled: boolean): Promise<IGuild | null> {
+    return GuildModel.findOneAndUpdate(
+      { guildId },
+      { $set: { [`features.${featureName}.enabled`]: enabled } },
+      { new: true }
+    ).exec();
   }
 }

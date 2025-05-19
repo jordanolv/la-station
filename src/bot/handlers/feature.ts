@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { BotClient } from '../BotClient';
+import { BotClient } from '../BotClient.js';
 
 /**
  * Charge toutes les fonctionnalités du bot
@@ -51,7 +51,8 @@ async function loadCommands(botClient: BotClient, featurePath: string, featureNa
   
   for (const filePath of commandFiles) {
     try {
-      const command = require(filePath).default;
+      const commandModule = await import(filePath);
+      const command = commandModule.default;
       
       if (command && command.name) {
         botClient.commands.set(command.name.toLowerCase(), command);
@@ -77,7 +78,8 @@ async function loadSlashCommands(botClient: BotClient, featurePath: string, feat
   
   for (const filePath of slashFiles) {
     try {
-      const slashCommand = require(filePath).default;
+      const slashModule = await import(filePath);
+      const slashCommand = slashModule.default;
       
       if (slashCommand && slashCommand.data) {
         botClient.slashCommands.set(slashCommand.data.name.toLowerCase(), slashCommand);
@@ -103,7 +105,8 @@ async function loadEvents(botClient: BotClient, featurePath: string, featureName
   
   for (const filePath of eventFiles) {
     try {
-      const event = require(filePath).default;
+      const eventModule = await import(filePath);
+      const event = eventModule.default;      
       
       if (event && event.name && event.execute) {
         if (event.once) {

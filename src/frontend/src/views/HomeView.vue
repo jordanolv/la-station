@@ -1,4 +1,5 @@
 <template>
+<<<<<<< Updated upstream
   <div class="text-neutral-200 p-8 text-center font-sans w-full">
     <div v-if="!isAuthenticated">
       <h1 class="text-5xl font-semibold text-white mb-4">Bienvenue sur La Station</h1>
@@ -16,11 +17,26 @@
     <div v-else class="max-w-4xl mx-auto">
       <h2 class="text-3xl font-medium text-neutral-300 mt-10 mb-6">Vos serveurs Discord</h2>
       <GuildList @access="navigateToGuild" />
+=======
+  <div class="p-4">
+    <h1 class="text-2xl font-bold mb-4">Accueil</h1>
+
+    <div v-if="authStore.status === 'authenticated'">
+      <p>Bienvenue, {{ authStore.user?.name || 'Utilisateur inconnu' }} !</p>
+      <button @click="authStore.logout" class="mt-4 p-2 bg-red-500 text-white rounded">
+        Se déconnecter
+      </button>
+    </div>
+
+    <div v-else>
+      <p>Vous n'êtes pas connecté.</p>
+>>>>>>> Stashed changes
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+<<<<<<< Updated upstream
 import { computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
@@ -55,3 +71,11 @@ const loginWithDiscord = () => {
 </script>
 
 <!-- Removed <style scoped> as Tailwind is used -->
+=======
+import { useAuthStore } from '../stores/auth.store'
+
+const authStore = useAuthStore()
+
+authStore.fetchSession()
+</script>
+>>>>>>> Stashed changes

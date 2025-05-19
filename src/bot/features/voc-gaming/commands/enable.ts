@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
-import { GuildService } from '../../../../database/services/GuildService';
-import { LogService } from '../../../services/LogService';
-import { IGuild } from '@/database/models/Guild';
+import { GuildService } from '../../../../database/services/GuildService.js';
+import { LogService } from '../../../services/LogService.js';
+import { IGuild } from '../../../../database/models/Guild.js';
 
 export default {
   name: 'enable-vocGaming',

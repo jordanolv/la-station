@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "description": "A modular Discord bot with a web interface",
   "author": "Jordan.olv",
+  "type": "module",
   "main": "dist/bot/app.js",
   "scripts": {
     "build": "tsc && tsc-alias",
-    "start": "pm2 start src/bot/app.ts --name la-station",
+    "start": "pm2 start dist/bot/app.js --name la-station",
     "mg": "concurrently \"ts-node src/database/scripts/updateGuilds.ts\" \"ts-node src/database/scripts/updateUsers.ts\"",
     "watch": "nodemon --exec ts-node src/bot/app.ts",
     "dev:front": "cd src/frontend && npm run dev",
-    "dev:bot": "cd src/bot && ts-node app.ts",
+    "dev:bot": "tsc-watch --onSuccess \"tsx dist/bot/app.js\"",
     "dev": "concurrently \"npm run dev:front\" \"npm run dev:bot\""
   },
   "keywords": [
@@ -20,8 +21,10 @@
     "modular"
   ],
   "dependencies": {
+    "@auth/core": "^0.39.1",
     "@discordjs/builders": "^1.6.5",
     "@discordjs/rest": "^2.0.1",
+    "@hono/auth-js": "^1.0.15",
     "@hono/node-server": "^1.14.1",
     "@types/cron": "^2.0.1",
     "@types/jsonwebtoken": "^9.0.9",
@@ -50,7 +53,9 @@
     "@types/node": "^20.17.30",
     "nodemon": "^3.0.1",
     "tsc-alias": "^1.8.15",
+    "tsc-watch": "^6.2.1",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.4",
     "typescript": "^5.2.2"
   }
 }

@@ -1,7 +1,7 @@
 import { Interaction } from 'discord.js';
-import { BotClient } from '../../../BotClient';
-import { GuildService } from '@/database/services/GuildService';
-import { UserService } from '@/database/services/UserService';
+import { BotClient } from '../../../BotClient.js';
+import { GuildService } from '../../../../database/services/GuildService.js';
+import { UserService } from '../../../../database/services/UserService.js';
 
 export default {
   name: 'interactionCreate',
@@ -10,6 +10,7 @@ export default {
   async execute(client: BotClient, interaction: Interaction) {
     // Ne traiter que les slash commands
     if (!interaction.isCommand()) return;
+    if (!interaction.guild) return;
 
     const guildData = await GuildService.ensureGuild(interaction.guild.id, interaction.guild.name);
     if (!guildData) return;

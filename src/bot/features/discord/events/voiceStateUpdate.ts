@@ -1,6 +1,6 @@
-import { BotClient } from '../../../BotClient';
-import { GuildService } from '../../../../database/services/GuildService';
-import { UserService } from '../../../../database/services/UserService';
+import { BotClient } from '../../../BotClient.js';
+import { GuildService } from '../../../../database/services/GuildService.js';
+import { UserService } from '../../../../database/services/UserService.js';
 import { VoiceState } from 'discord.js';
 
 // Map pour stocker les temps de début de session vocale

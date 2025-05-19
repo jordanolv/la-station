@@ -1,9 +1,9 @@
-const { Collection, ChannelType, Events, EmbedBuilder, PermissionsBitField } = require("discord.js");
+import { Collection, ChannelType, Events, EmbedBuilder, PermissionsBitField } from "discord.js";
 import { AttachmentBuilder, ForumChannel, Guild } from "discord.js";
-import { BotClient } from '../../../../BotClient';
-import { GameService } from "../../../../../database/services/GameService";
-import { IGame } from "../../../../../database/models/Game";
-import { GuildService } from "../../../../../database/services/GuildService";
+import { BotClient } from '../../../../BotClient.js';
+import { GameService } from '../../../../../database/services/GameService.js';
+import { IGame } from '../../../../../database/models/Game.js';
+import { GuildService } from '../../../../../database/services/GuildService.js';
 
 export default {
   name: 'gameCreate',
@@ -15,13 +15,13 @@ export default {
     const guildData = await GuildService.getGuildById(guild.id);
     if (!guildData) return;
 
+    if (!game.name || !game.description || !game.image || !game.color) return;
+
     const role = await guild?.roles.create({
       name: game.name,
       color: parseInt(game.color.replace('#', ''), 16),
       mentionable: true
     });
-
-    if (!game.name || !game.description || !game.image) return;
 
     const attachment = new AttachmentBuilder('uploads/' + game.image)
       .setName('image.png');
@@ -29,7 +29,7 @@ export default {
     const embed = new EmbedBuilder()
       .setTitle(game.name)
       .setDescription(game.description)
-      .setColor(game.color)
+      .setColor(parseInt(game.color.replace('#', ''), 16))
       .setImage('attachment://image.png')
       .setFooter({ text: 'Cliquez sur la cloche pour avoir le rôle du jeu !' });
 
@@ -44,6 +44,7 @@ export default {
     const firstMessage = await thread.fetchStarterMessage();
     if (firstMessage) {
       const reactAdd = await firstMessage.react('🔔');
+      const emojiId = reactAdd.emoji.id || reactAdd.emoji.name || '🔔';
 
       const gameAdd = await GameService.createGame({
         name: game.name,
@@ -59,7 +60,7 @@ export default {
       await GameService.addReaction(
         gameAdd._id,
         firstMessage.id,
-        reactAdd.emoji.id || reactAdd.emoji.name,
+        emojiId,
         role.id
       );
     }

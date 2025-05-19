@@ -1,14 +1,17 @@
 // main.ts
-import { config } from 'dotenv';
-import { BotClient } from './BotClient';
-import { connectToDatabase } from './handlers/mongoose';
-import { loadFeatures } from './handlers/feature';
+import 'dotenv/config';
+import { BotClient } from './BotClient.js';
+import { connectToDatabase } from './handlers/mongoose.js';
+
+import { loadFeatures } from './handlers/feature.js';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { REST, Routes } from 'discord.js';
-import { createAPI } from '../api';
-import { CronManager } from './cron';
+import { createAPI } from '../api/index.js';
+import { CronManager } from './cron/index.js';
 import { serve } from '@hono/node-server';
 import chalk from 'chalk';
+<<<<<<< Updated upstream
 import fs from 'fs';
 
 // Charger les variables d'environnement
@@ -29,14 +32,20 @@ if (fs.existsSync(envPath)) {
 } else {
   console.log(chalk.red(`❌ Fichier .env NON TROUVÉ à ${envPath}`));
 }
+=======
+import { createESMPath } from './utils/esmPath.js'
+
+const { __dirname, __filename } = createESMPath(import.meta.url);
+>>>>>>> Stashed changes
 
 (async () => {
   // 1) Initialiser la classe
   console.log(chalk.blue.bold('🚀 Initialisation du bot La Station...'));
   const client = await BotClient.init();
 
+  console.log(process.env.DISCORD_TOKEN)
   // 2) Connexion à MongoDB
-  await connectToDatabase(process.env.MONGODB_URI);
+  await connectToDatabase(process.env.MONGODB_URI || '');
   console.log(chalk.green('✅ Connexion à MongoDB réussie !'));
 
   // 4) Initialiser l'API

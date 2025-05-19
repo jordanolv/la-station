@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-import UserModel from './models/GlobalUser';
-import GuildModel from './models/Guild';
+import UserModel from './models/GlobalUser.js';
+import GuildModel from './models/Guild.js';
 
 // Classe singleton pour gérer la connexion à la base de données
 class Database {

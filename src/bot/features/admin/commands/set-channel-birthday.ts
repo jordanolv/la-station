@@ -1,6 +1,6 @@
 import { Message, TextChannel } from 'discord.js';
-import { GuildService } from '../../../../database/services/GuildService';
-import { IGuild } from '@/database/models/Guild';
+import { GuildService } from '../../../../database/services/GuildService.js';
+import { IGuild } from '../../../../database/models/Guild.js';
 
 export default {
   name: 'set-channel-birthday',

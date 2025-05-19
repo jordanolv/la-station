@@ -1,9 +1,9 @@
 import { CronJob } from 'cron';
 import { Client, EmbedBuilder, TextChannel, ChannelType, PermissionsBitField } from 'discord.js';
 import { toZonedTime } from 'date-fns-tz';
-import GuildUserModel from '@/database/models/GuildUser';
-import { GuildService } from '@/database/services/GuildService';
-import { LogService } from '../services/LogService';
+import GuildUserModel from '../../database/models/GuildUser.js';
+import { GuildService } from '../../database/services/GuildService.js';
+import { LogService } from '../services/LogService.js';
 
 export class BirthdayCron {
   private job: CronJob;
@@ -98,9 +98,11 @@ export class BirthdayCron {
 
           // Vérifie la permission d'envoyer
           const me = this.client.user;
+          if (!me) continue;
+          const permissions = textChannel.permissionsFor(me);
           if (
-            !me ||
-            !textChannel.permissionsFor(me).has(PermissionsBitField.Flags.SendMessages)
+            !permissions ||
+            !permissions.has(PermissionsBitField.Flags.SendMessages)
           ) {
             await LogService.error(guildId, `Permission d'envoi manquante dans le canal ${channelId}`, {
               feature: 'birthday',
@@ -132,11 +134,11 @@ export class BirthdayCron {
           });
         }
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error in BirthdayCron:', err);
       // Log l'erreur dans toutes les guildes où le bot est présent
       for (const [guildId] of this.client.guilds.cache) {
-        await LogService.error(guildId, `Erreur lors de la vérification des anniversaires: ${err.message}`, {
+        await LogService.error(guildId, `Erreur lors de la vérification des anniversaires: ${err instanceof Error ? err.message : String(err)}`, {
           feature: 'birthday',
           footer: 'BirthdayCron',
           file: 'BirthdayCron.ts',

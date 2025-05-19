@@ -1,4 +1,4 @@
-import { db } from '../../database';
+import { db } from '../../database/index.js';
 import dotenv from 'dotenv';
 
 // Chargement des variables d'environnement

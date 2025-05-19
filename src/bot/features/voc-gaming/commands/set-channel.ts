@@ -1,5 +1,5 @@
 import { Message, TextChannel } from 'discord.js';
-import { GuildService } from '../../../../database/services/GuildService';
+import { GuildService } from '../../../../database/services/GuildService.js';
 
 export default {
   name: 'set-channel-vocGaming',

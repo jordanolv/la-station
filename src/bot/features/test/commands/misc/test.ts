@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
-import { UserService } from '../../../../../database/services/UserService';
-import { IGuild } from '@/database/models/Guild';
+import { UserService } from '../../../../../database/services/UserService.js';
+import { IGuild } from '../../../../../database/models/Guild.js';
 
 export default {
   name: 'test',

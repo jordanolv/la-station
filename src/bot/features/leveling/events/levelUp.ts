@@ -1,5 +1,5 @@
-import { IGuildUser } from '@/database/models/GuildUser';
-import { BotClient } from '../../../BotClient';
+import { IGuildUser } from '../../../../database/models/GuildUser.js';
+import { BotClient } from '../../../BotClient.js';
 import { EmbedBuilder, Message, TextChannel } from 'discord.js';
 export default {
   name: 'levelUp',
