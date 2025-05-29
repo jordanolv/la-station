@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import GuildUserModel from '../../database/models/GuildUser'; // Adjust path as needed
+import GuildUserModel from '../../bot/models/guild-user.model'; // Adjust path as needed
 import mongoose from 'mongoose';
 
 const guilds = new Hono();

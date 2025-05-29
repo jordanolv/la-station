@@ -10,6 +10,36 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue')
     },
     {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('../views/DashboardView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/leaderboard',
+      name: 'leaderboard',
+      component: () => import('../views/LeaderboardView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/leveling',
+      name: 'leveling',
+      component: () => import('../views/LevelingView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/voice-channels',
+      name: 'voice-channels',
+      component: () => import('../views/VoiceChannelsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/settings',
+      name: 'settings',
+      component: () => import('../views/SettingsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/games',
       name: 'games',
       component: () => import('../views/GamesView.vue'),

@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { BotClient } from '../../bot/BotClient';
-import { GameService } from '../../database/services/GameService';
+import { BotClient } from '../../bot/client';
+import { GameService } from '../../../database/services/GameService';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 

@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { BotClient } from '../client';
+import { BotClient } from '../../src/bot/client';
 
 /**
  * Charge toutes les fonctionnalités du bot

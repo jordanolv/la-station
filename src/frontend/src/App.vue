@@ -1,49 +1,51 @@
 <template>
-  <div class="app min-h-screen bg-gradient-to-br from-[#181a20] via-[#23272f] to-[#181a20]">
-    <AppHeader />
-    <main class="flex flex-col items-center justify-start flex-1 pt-24">
-      <router-view />
-    </main>
+  <div class="app min-h-screen bg-[#23272A] text-white">
+    <Sidebar v-if="isAuthenticated" />
+    <div :class="{ 'pl-64': isAuthenticated }">
+      <AppHeader v-if="!isAuthenticated" />
+      <main class="flex flex-col flex-1">
+        <router-view />
+      </main>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import AppHeader from './components/AppHeader.vue'
+import Sidebar from './components/Sidebar.vue'
 import { useAuthStore } from './stores/auth'
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 
-const logout = () => {
-  authStore.logout()
-}
+// Rediriger vers le dashboard si l'utilisateur est authentifié
+onMounted(() => {
+  if (isAuthenticated.value && router.currentRoute.value.path === '/') {
+    router.push('/dashboard')
+  }
+})
 </script>
 
-<style scoped>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-.navbar {
-  background-color: #2c3e50;
-  padding: 1rem;
-  display: flex;
-  gap: 1rem;
-}
-
-.navbar a {
-  color: white;
-  text-decoration: none;
-}
-
-.navbar a:hover {
-  text-decoration: underline;
-}
-
-main {
-  flex: 1;
 }
 </style>

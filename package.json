@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "A modular Discord bot with a web interface",
   "author": "Jordan.olv",
-  "main": "dist/bot/app.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc && tsc-alias",
-    "start": "pm2 start src/bot/app.ts --name la-station",
+    "start": "pm2 start src/index.ts --name la-station",
     "mg": "concurrently \"ts-node src/database/scripts/updateGuilds.ts\" \"ts-node src/database/scripts/updateUsers.ts\"",
-    "watch": "nodemon --exec ts-node src/bot/app.ts",
+    "watch": "nodemon --exec ts-node src/index.ts",
     "dev:front": "cd src/frontend && npm run dev",
-    "dev:bot": "cd src/bot && ts-node app.ts",
+    "dev:bot": "ts-node src/index.ts",
     "dev": "concurrently \"npm run dev:front\" \"npm run dev:bot\""
   },
   "keywords": [
