@@ -7,7 +7,7 @@ import path from 'path';
 import { REST, Routes } from 'discord.js';
 import chalk from 'chalk';
 import fs from 'fs';
-import { CronManager } from './cron';
+import { CronManager } from '../shared/cron/cron-manager';
 
 export async function startBot() {
   try {

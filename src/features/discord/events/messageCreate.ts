@@ -1,0 +1,56 @@
+import { Events, Message } from 'discord.js';
+import { BotClient } from '../../../bot/client';
+import { StatsService } from '../../stats/stats.service';
+import { GuildService } from '../services/guild.service';
+
+export default {
+  name: Events.MessageCreate,
+  once: false,
+
+  async execute(client: BotClient, message: Message) {
+    try {
+      // Ignorer les messages des bots
+      if (message.author?.bot) return;
+      
+      // Ignorer les messages en DM
+      if (!message.guild) return;
+      
+      // Récupérer la guild
+      const guildData = await GuildService.getOrCreateGuild(message.guild.id, message.guild.name);
+      if(!guildData) return;
+      
+      // Traiter les commandes préfixées
+      const prefix = guildData.config.prefix; 
+      
+      if (message.content.startsWith(prefix)) {
+        const args = message.content.slice(prefix.length).trim().split(/ +/);
+        const commandName = args.shift()?.toLowerCase();
+        
+        if (!commandName) return;
+        
+        const command = client.commands.get(commandName);
+        
+        if (command) {
+          try {
+            await command.execute(message, args, client);
+          } catch (error) {
+            console.error(`Erreur lors de l'exécution de la commande ${commandName}:`, error);
+            message.reply('Une erreur est survenue lors de l\'exécution de la commande.').catch(console.error);
+          }
+        }
+      }
+      
+      // Mettre à jour les statistiques de l'utilisateur (messages)
+      await StatsService.incrementMessageCount(
+        message.author.id,
+        message.guild.id,
+        message.author.username
+      );
+      
+      // Émettre un événement pour le système de leveling
+      client.emit('userMessage', message);
+    } catch (error) {
+      console.error('Erreur dans l\'événement messageCreate:', error);
+    }
+  }
+}; 

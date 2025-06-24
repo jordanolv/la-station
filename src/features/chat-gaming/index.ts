@@ -1,11 +1,15 @@
-import { games } from './api/routes';
-import { GameService } from './shared/services';
-import GameModel, { IGame } from './shared/models';
+import { ChatGamingService } from './chatGaming.service';
+import GameModel, { IGame } from './game.model';
+import ChatGamingModel, { IChatGaming } from './chatGaming.model';
+import enableChatGamingCommand from './commands/enableChatGaming';
+import setChatGamingChannelCommand from './commands/setChatGamingChannel';
 
-// Exporter les éléments de la fonctionnalité chat-gaming
 export {
-  games,
-  GameService,
+  ChatGamingService,
   GameModel,
-  IGame
+  IGame,
+  ChatGamingModel,
+  IChatGaming,
+  enableChatGamingCommand,
+  setChatGamingChannelCommand
 }; 

@@ -1,5 +1,5 @@
 import { Context } from 'hono';
-import { GameService } from './game.service';
+import { ChatGamingService } from './chatGaming.service';
 import { saveGameImage } from './game.utils';
 
 export class GameController {
@@ -13,7 +13,7 @@ export class GameController {
         return c.json({ error: 'Guild ID is required' }, 400);
       }
 
-      const games = await GameService.getGamesByGuild(guildId);
+      const games = await ChatGamingService.getGamesByGuild(guildId);
       return c.json({ games });
     } catch (error) {
       console.error('Error fetching games:', error);
@@ -44,7 +44,7 @@ export class GameController {
       // Gérer le téléchargement d'image si présente
       const imageUrl = await saveGameImage(gameImage);
 
-      const game = await GameService.createGame({
+      const game = await ChatGamingService.createGame({
         name: name.toString(),
         description: description?.toString(),
         image: imageUrl,
@@ -65,7 +65,7 @@ export class GameController {
   static async getGameById(c: Context) {
     try {
       const id = c.req.param('id');
-      const game = await GameService.getGameById(id);
+      const game = await ChatGamingService.getGameById(id);
       
       if (!game) {
         return c.json({ error: 'Game not found' }, 404);
@@ -86,7 +86,7 @@ export class GameController {
       const id = c.req.param('id');
       const updates = await c.req.json();
       
-      const game = await GameService.updateGame(id, updates);
+      const game = await ChatGamingService.updateGame(id, updates);
       
       if (!game) {
         return c.json({ error: 'Game not found' }, 404);
@@ -105,7 +105,7 @@ export class GameController {
   static async deleteGame(c: Context) {
     try {
       const id = c.req.param('id');
-      const game = await GameService.deleteGame(id);
+      const game = await ChatGamingService.deleteGame(id);
       
       if (!game) {
         return c.json({ error: 'Game not found' }, 404);

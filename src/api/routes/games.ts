@@ -1,14 +1,12 @@
 import { Hono } from 'hono';
 import { BotClient } from '../../bot/client';
-import { GameService } from '../../../database/services/GameService';
+import { ChatGamingService } from '../../features/chat-gaming/chatGaming.service';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
 const games = new Hono();
 
-// Ensure uploads directory exists
 const createUploadsDir = async () => {
-  // Remonter à la racine du projet (3 niveaux au-dessus de src/api/routes)
   const uploadsDir = path.resolve(__dirname, '../../../uploads');
   try {
     await mkdir(uploadsDir, { recursive: true });
@@ -27,7 +25,7 @@ games.get('/', async (c) => {
       return c.json({ error: 'Guild ID is required' }, 400);
     }
 
-    const games = await GameService.getGamesByGuild(guildId);
+    const games = await ChatGamingService.getGamesByGuild(guildId);
     return c.json({ games });
   } catch (error) {
     console.error('Error fetching games:', error);
@@ -74,16 +72,26 @@ games.post('/', async (c) => {
       console.log('URL de l\'image:', imageUrl);
     }
 
-    const game = await GameService.createGame({
+    const game = await ChatGamingService.createGame({
       name: name.toString(),
       description: description?.toString(),
-      image: imageUrl,
+      image: imageUrl || undefined,
       color: color.toString(),
       guildId
     });
 
-    // TODO: Implement game creation with Discord bot if needed
-    // client.emit('gameCreate', game, guild, client);
+    // Trigger Discord bot integration for game creation
+    try {
+      console.log('Triggering Discord bot for game creation');
+      const client = BotClient.getInstance();
+      const guild = client.guilds.cache.get(guildId);
+      
+      if (guild) {
+        await ChatGamingService.createGameInDiscord(game, guild);
+      }
+    } catch (error) {
+      console.error('Error triggering Discord bot for game creation:', error);
+    }
 
     return c.json({ message: 'Game created successfully', game });
   } catch (error) {
@@ -96,7 +104,7 @@ games.post('/', async (c) => {
 games.get('/:id', async (c) => {
   try {
     const id = c.req.param('id');
-    const game = await GameService.getGameById(id);
+    const game = await ChatGamingService.getGameById(id);
     
     if (!game) {
       return c.json({ error: 'Game not found' }, 404);
@@ -115,7 +123,7 @@ games.put('/:id', async (c) => {
     const id = c.req.param('id');
     const updates = await c.req.json();
     
-    const game = await GameService.updateGame(id, updates);
+    const game = await ChatGamingService.updateGame(id, updates);
     
     if (!game) {
       return c.json({ error: 'Game not found' }, 404);
@@ -132,7 +140,7 @@ games.put('/:id', async (c) => {
 games.delete('/:id', async (c) => {
   try {
     const id = c.req.param('id');
-    const game = await GameService.deleteGame(id);
+    const game = await ChatGamingService.deleteGame(id);
     
     if (!game) {
       return c.json({ error: 'Game not found' }, 404);

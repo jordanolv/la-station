@@ -1,7 +1,7 @@
 import LevelingModel, { ILeveling } from './leveling.model';
 import { Message } from 'discord.js';
 import { BotClient } from '../../bot/client';
-import GuildUserModel, { IGuildUser } from '../../bot/models/guild-user.model';
+import GuildUserModel, { IGuildUser } from '../../features/user/models/guild-user.model';
 
 export class LevelingService {
   static xpCooldown: Record<string, number> = {};

@@ -6,50 +6,35 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('../views/HomeView.vue')
+      name: 'login',
+      component: () => import('../views/auth/LoginView.vue')
     },
+    {
+      path: '/servers',
+      name: 'servers',
+      component: () => import('../views/server/ServersView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/server/:id',
+      name: 'server-dashboard',
+      component: () => import('../views/server/ServerDashboardView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/server/:id/feature/:feature',
+      name: 'feature-management',
+      component: () => import('../views/server/features/FeatureManagementView.vue'),
+      meta: { requiresAuth: true }
+    },
+    // Redirect old routes
     {
       path: '/dashboard',
-      name: 'dashboard',
-      component: () => import('../views/DashboardView.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/leaderboard',
-      name: 'leaderboard',
-      component: () => import('../views/LeaderboardView.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/leveling',
-      name: 'leveling',
-      component: () => import('../views/LevelingView.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/voice-channels',
-      name: 'voice-channels',
-      component: () => import('../views/VoiceChannelsView.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/settings',
-      name: 'settings',
-      component: () => import('../views/SettingsView.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/games',
-      name: 'games',
-      component: () => import('../views/GamesView.vue'),
-      meta: { requiresAuth: true }
+      redirect: '/servers'
     },
     {
       path: '/guild/:id',
-      name: 'guild-features',
-      component: () => import('../views/GuildFeaturesView.vue'),
-      meta: { requiresAuth: true }
+      redirect: to => `/server/${to.params.id}`
     }
   ]
 })
@@ -59,6 +44,8 @@ router.beforeEach((to, from, next) => {
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/')
+  } else if (to.name === 'login' && authStore.isAuthenticated) {
+    next('/servers')
   } else {
     next()
   }

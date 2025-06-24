@@ -1,38 +1,15 @@
 <template>
-  <div class="app min-h-screen bg-[#23272A] text-white">
-    <Sidebar v-if="isAuthenticated" />
-    <div :class="{ 'pl-64': isAuthenticated }">
-      <AppHeader v-if="!isAuthenticated" />
-      <main class="flex flex-col flex-1">
-        <router-view />
-      </main>
-    </div>
+  <div class="app min-h-screen bg-gray-900 text-white">
+    <router-view />
   </div>
 </template>
 
 <script setup lang="ts">
-import AppHeader from './components/AppHeader.vue'
-import Sidebar from './components/Sidebar.vue'
-import { useAuthStore } from './stores/auth'
-import { computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-
-const authStore = useAuthStore()
-const router = useRouter()
-const isAuthenticated = computed(() => authStore.isAuthenticated)
-
-// Rediriger vers le dashboard si l'utilisateur est authentifié
-onMounted(() => {
-  if (isAuthenticated.value && router.currentRoute.value.path === '/') {
-    router.push('/dashboard')
-  }
-})
+// Clean App component - all routing logic is now in the router
 </script>
 
 <style>
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 

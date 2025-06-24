@@ -8,7 +8,7 @@ import { BotClient } from '../client';
  * @param featuresPath Le chemin vers le dossier des fonctionnalités
  */
 export async function loadFeatures(botClient: BotClient, featuresPath: string): Promise<void> {
-  try {
+  try {    
     // Lecture du dossier des fonctionnalités
     const features = fs.readdirSync(featuresPath, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory())

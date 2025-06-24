@@ -6,11 +6,9 @@ export interface IGame extends Document {
   image?: string;
   color?: string;
   guildId: string;
-  reactions?: Array<{
-    threadId: string;
-    emoji: string;
-    roleId: string;
-  }>;
+  threadId?: string;
+  messageId?: string;
+  roleId?: string;
 }
 
 const GameSchema = new Schema<IGame>({
@@ -19,11 +17,9 @@ const GameSchema = new Schema<IGame>({
   image: { type: String },
   color: { type: String },
   guildId: { type: String, required: true },
-  reactions: [{
-    threadId: { type: String },
-    emoji: { type: String },
-    roleId: { type: String }
-  }]
+  threadId: { type: String },
+  messageId: { type: String },
+  roleId: { type: String }
 }, {
   timestamps: true
 });

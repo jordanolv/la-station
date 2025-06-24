@@ -1,4 +1,4 @@
-import { IGuildUser } from '../../../bot/models/guild-user.model';
+import { IGuildUser } from '../../user/models/guild-user.model';
 import { BotClient } from '../../../bot/client';
 import { EmbedBuilder, Message, TextChannel } from 'discord.js';
 import { LevelingService } from '../leveling.service';
