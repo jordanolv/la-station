@@ -3,9 +3,8 @@ module.exports = {
   apps: [
     {
       name: "la-station-bot",
-      cwd: `${__dirname}/dist/bot`,
-      script: "app.js",
-      env_file: `${__dirname}/.env`,
+      script: "dist/index.js",
+      env_file: ".env",
       env: { NODE_ENV: "production"},
     },
     {
