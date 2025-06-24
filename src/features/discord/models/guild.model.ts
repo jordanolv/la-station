@@ -36,8 +36,8 @@ const GuildSchema = new Schema<IGuild>({
   collection: 'guilds'
 });
 
-// Vérifier si le modèle existe déjà pour éviter l'erreur OverwriteModelError
-const GuildModel = mongoose.models.Guild || mongoose.model<IGuild>('Guild', GuildSchema);
+// Utiliser un nom de modèle qui correspond à la collection pour éviter les conflits
+const GuildModel = mongoose.models.Guild_Model || mongoose.model<IGuild>('Guild_Model', GuildSchema);
 
 export default GuildModel;
 

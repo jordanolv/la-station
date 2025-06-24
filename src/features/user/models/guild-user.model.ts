@@ -56,7 +56,7 @@ const GuildUserSchema = new Schema<IGuildUser>({
 
 GuildUserSchema.index({ discordId: 1, guildId: 1 }, { unique: true });
 
-// Vérifier si le modèle existe déjà pour éviter l'erreur OverwriteModelError
-const GuildUserModel = mongoose.models.GuildUser || mongoose.model<IGuildUser>('GuildUser', GuildUserSchema);
+// Utiliser un nom de modèle qui correspond à la collection pour éviter les conflits
+const GuildUserModel = mongoose.models.Guild_User || mongoose.model<IGuildUser>('Guild_User', GuildUserSchema);
 
 export default GuildUserModel; 
