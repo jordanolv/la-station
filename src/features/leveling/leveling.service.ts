@@ -102,8 +102,9 @@ export class LevelingService {
 
     const neededXpToLevelUp = await this.getXpToLevelUp(user.profil.lvl);
     
-    if (user.profil.exp > neededXpToLevelUp) {
+    if (user.profil.exp >= neededXpToLevelUp) {
       user.profil.lvl++;
+      await user.save(); // IMPORTANT: Sauvegarder le nouveau niveau !
       client.emit('levelUp', user, message);
     }
     return user;
