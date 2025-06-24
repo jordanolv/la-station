@@ -6,20 +6,35 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('../views/HomeView.vue')
+      name: 'login',
+      component: () => import('../views/auth/LoginView.vue')
     },
     {
-      path: '/games',
-      name: 'games',
-      component: () => import('../views/GamesView.vue'),
+      path: '/servers',
+      name: 'servers',
+      component: () => import('../views/server/ServersView.vue'),
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/server/:id',
+      name: 'server-dashboard',
+      component: () => import('../views/server/ServerDashboardView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/server/:id/feature/:feature',
+      name: 'feature-management',
+      component: () => import('../views/server/features/FeatureManagementView.vue'),
+      meta: { requiresAuth: true }
+    },
+    // Redirect old routes
+    {
+      path: '/dashboard',
+      redirect: '/servers'
     },
     {
       path: '/guild/:id',
-      name: 'guild-features',
-      component: () => import('../views/GuildFeaturesView.vue'),
-      meta: { requiresAuth: true }
+      redirect: to => `/server/${to.params.id}`
     }
   ]
 })
@@ -29,6 +44,8 @@ router.beforeEach((to, from, next) => {
   
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/')
+  } else if (to.name === 'login' && authStore.isAuthenticated) {
+    next('/servers')
   } else {
     next()
   }

@@ -20,7 +20,7 @@
       "@database/*": ["src/database/*"],
     }
   },
-  "include": ["src/**/*", "types/**/*"],
+  "include": ["src/**/*", "types/**/*", "bot-todel/handlers"],
   "exclude": ["node_modules","src/frontend"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]

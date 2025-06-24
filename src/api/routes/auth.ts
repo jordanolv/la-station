@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { jwt } from 'hono/jwt';
 import { sign, verify } from 'jsonwebtoken';
-import { BotClient } from '../../bot/BotClient';
+import { BotClient } from '../../bot/client';
 import { JwtPayload } from 'jsonwebtoken';
 
 interface DiscordTokenResponse {
@@ -53,6 +53,13 @@ auth.get('/discord/callback', async (c) => {
     console.log(`JWT_SECRET défini: ${!!process.env.JWT_SECRET}`);
     console.log(`JWT_SECRET (premiers caractères): ${process.env.JWT_SECRET ? process.env.JWT_SECRET.substring(0, 3) + '...' : 'NON DÉFINI'}`);
     
+    // Log pour vérifier les paramètres d'authentification envoyés à Discord
+    console.log('📝 Paramètres envoyés à Discord:');
+    console.log(`- client_id: ${process.env.DISCORD_CLIENT_ID}`);
+    console.log(`- client_secret: ${process.env.DISCORD_CLIENT_SECRET ? '****' + process.env.DISCORD_CLIENT_SECRET.substring(process.env.DISCORD_CLIENT_SECRET.length - 4) : 'NON DÉFINI'}`);
+    console.log(`- redirect_uri: ${process.env.DISCORD_REDIRECT_URI}`);
+    console.log(`- code: ${code.substring(0, 10)}...`);
+    
     const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
       method: 'POST',
       headers: {
@@ -67,7 +74,20 @@ auth.get('/discord/callback', async (c) => {
       }),
     });
 
-    const tokenData = await tokenResponse.json() as DiscordTokenResponse;
+    // Log de la réponse brute de Discord
+    console.log(`Statut de réponse Discord: ${tokenResponse.status}`);
+    const responseText = await tokenResponse.text();
+    console.log(`Réponse brute de Discord: ${responseText}`);
+    
+    // Tentative de parser la réponse JSON
+    let tokenData;
+    try {
+      tokenData = JSON.parse(responseText) as DiscordTokenResponse;
+    } catch (parseError) {
+      console.error('❌ Erreur lors du parsing de la réponse Discord:', parseError);
+      return c.json({ error: 'Failed to parse Discord response', details: responseText }, 500);
+    }
+    
     console.log('✅ Token Discord obtenu:');
     console.log(`- access_token: ${tokenData.access_token ? tokenData.access_token.substring(0, 10) + '...' : 'NON PRÉSENT'}`);
     console.log(`- token_type: ${tokenData.token_type || 'NON PRÉSENT'}`);
@@ -75,7 +95,10 @@ auth.get('/discord/callback', async (c) => {
     
     if (!tokenData.access_token) {
       console.error('❌ Erreur: pas d\'access_token dans la réponse Discord');
-      return c.json({ error: 'No access token provided by Discord' }, 500);
+      return c.json({ 
+        error: 'No access token provided by Discord',
+        discord_response: tokenData
+      }, 500);
     }
 
     const userResponse = await fetch('https://discord.com/api/users/@me', {

@@ -1,0 +1,59 @@
+import { Events, Interaction } from 'discord.js';
+import { BotClient } from '../../../bot/client';
+
+export default {
+  name: Events.InteractionCreate,
+  once: false,
+
+  async execute(client: BotClient, interaction: Interaction) {
+    try {
+      // Gestion des commandes slash
+      if (interaction.isCommand && interaction.isCommand()) {
+        const command = client.slashCommands.get(interaction.commandName);
+        
+        if (!command) {
+          console.error(`Aucune commande correspondant à ${interaction.commandName} n'a été trouvée.`);
+          return;
+        }
+        
+        try {
+          await command.execute(client, interaction);
+        } catch (error) {
+          console.error(`Erreur lors de l'exécution de la commande ${interaction.commandName}:`, error);
+          
+          if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({ 
+              content: 'Une erreur est survenue lors de l\'exécution de cette commande.', 
+              ephemeral: true 
+            });
+          } else {
+            await interaction.reply({ 
+              content: 'Une erreur est survenue lors de l\'exécution de cette commande.', 
+              ephemeral: true 
+            });
+          }
+        }
+      }
+      
+      // Gestion des boutons
+      else if (interaction.isButton && interaction.isButton()) {
+        // Vous pourriez implémenter une gestion des boutons ici
+        console.log(`Bouton cliqué: ${interaction.customId}`);
+      }
+      
+      // Gestion des menus de sélection
+      else if (interaction.isStringSelectMenu && interaction.isStringSelectMenu()) {
+        // Vous pourriez implémenter une gestion des menus de sélection ici
+        console.log(`Menu de sélection: ${interaction.customId}, valeurs: ${interaction.values.join(', ')}`);
+      }
+      
+      // Gestion des modals
+      else if (interaction.isModalSubmit && interaction.isModalSubmit()) {
+        // Vous pourriez implémenter une gestion des modals ici
+        console.log(`Modal soumis: ${interaction.customId}`);
+      }
+    } catch (error) {
+      console.error('Erreur dans l\'événement interactionCreate:', error);
+    }
+  }
+}; 

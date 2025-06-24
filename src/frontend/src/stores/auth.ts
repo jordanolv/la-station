@@ -15,6 +15,8 @@ interface DiscordGuild {
   icon: string;
   owner: boolean;
   permissions: string;
+  botPresent?: boolean;
+  canManage?: boolean;
 }
 
 interface JwtPayload {
@@ -28,8 +30,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    // token: localStorage.getItem('token'),
-    token: null as string | null,
+    token: localStorage.getItem('token'),
     user: null as DiscordUser | null,
     guilds: [] as DiscordGuild[]
   }),
@@ -43,7 +44,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     setToken(token: string) {
       this.token = token
-      // localStorage.setItem('token', token)
+      localStorage.setItem('token', token)
       // Décoder le token pour obtenir les informations de l'utilisateur
       const decoded = jwtDecode<JwtPayload>(token)
       this.user = {
@@ -63,10 +64,41 @@ export const useAuthStore = defineStore('auth', {
             Authorization: `Bearer ${this.token}`
           }
         })
-        this.guilds = response.data
+        
+        // Enhance guild data with bot status
+        const guildsWithBotStatus = await Promise.all(
+          response.data.map(async (guild: DiscordGuild) => {
+            try {
+              const botStatusResponse = await axios.get(`${API_BASE_URL}/api/guilds/${guild.id}/bot-status`, {
+                headers: {
+                  Authorization: `Bearer ${this.token}`
+                }
+              })
+              return {
+                ...guild,
+                botPresent: botStatusResponse.data.botPresent,
+                canManage: this.hasManagePermissions(guild.permissions) || guild.owner
+              }
+            } catch (error) {
+              return {
+                ...guild,
+                botPresent: false,
+                canManage: this.hasManagePermissions(guild.permissions) || guild.owner
+              }
+            }
+          })
+        )
+        
+        this.guilds = guildsWithBotStatus
       } catch (error) {
         console.error('Failed to fetch user guilds:', error)
       }
+    },
+
+    hasManagePermissions(permissions: string): boolean {
+      const perms = parseInt(permissions)
+      // Check for MANAGE_GUILD (0x20) or ADMINISTRATOR (0x8) permissions
+      return !!(perms & 0x20) || !!(perms & 0x8)
     },
 
     async loginWithDiscord() {
@@ -82,7 +114,7 @@ export const useAuthStore = defineStore('auth', {
         this.token = null
         this.user = null
         this.guilds = []
-        // localStorage.removeItem('token')
+        localStorage.removeItem('token')
       }
     }
   }

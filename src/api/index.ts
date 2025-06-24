@@ -3,10 +3,11 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { secureHeaders } from 'hono/secure-headers'
 import { serveStatic } from '@hono/node-server/serve-static'
-import { BotClient } from '../bot/BotClient'
+import { BotClient } from '../bot/client'
 import { auth } from './routes/auth'
 import { games } from './routes/games'
 import { guilds } from './routes/guilds'
+import vocManager from './routes/voc-manager'
 
 import path from 'path'
 
@@ -36,6 +37,7 @@ export function createAPI(client: BotClient) {
   app.route('/api/auth', auth)
   app.route('/api/games', games)
   app.route('/api/guilds', guilds)
+  app.route('/api/voc-manager', vocManager)
   // Health check
   app.get('/health', (c) => {
     return c.json({ status: 'ok' })
