@@ -1,12 +1,12 @@
 import { ChatGamingService } from './chatGaming.service';
-import GameModel, { IGame } from './game.model';
+import ChatGameModel, { IGame } from './game.model';
 import ChatGamingModel, { IChatGaming } from './chatGaming.model';
 import enableChatGamingCommand from './commands/enableChatGaming';
 import setChatGamingChannelCommand from './commands/setChatGamingChannel';
 
 export {
   ChatGamingService,
-  GameModel,
+  ChatGameModel,
   IGame,
   ChatGamingModel,
   IChatGaming,
