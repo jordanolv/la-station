@@ -25,7 +25,6 @@ import { computed, onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import { useRouter } from 'vue-router'
 import GuildList from '../../components/guild/GuildList.vue'
-// FeaturesPanel import removed
 
 const authStore = useAuthStore()
 const router = useRouter()
