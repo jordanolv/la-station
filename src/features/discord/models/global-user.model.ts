@@ -13,6 +13,7 @@ const GlobalUserSchema = new Schema<IGlobalUser>({
   collection: 'global_users'
 });
 
-const GlobalUserModel = mongoose.model<IGlobalUser>('GlobalUser', GlobalUserSchema);
+// Vérifier si le modèle existe déjà pour éviter l'erreur OverwriteModelError
+const GlobalUserModel = mongoose.models.GlobalUser || mongoose.model<IGlobalUser>('GlobalUser', GlobalUserSchema);
 
 export default GlobalUserModel; 
