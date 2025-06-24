@@ -2,6 +2,7 @@ import { Events, MessageReaction, User } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { GuildService } from '../services/guild.service';
 import { ChatGamingService } from '../../chat-gaming/chatGaming.service';
+import { SuggestionsService } from '../../suggestions/suggestions.service';
 
 export default {
   name: Events.MessageReactionRemove,
@@ -35,6 +36,9 @@ export default {
     
     // Gérer les réactions pour les jeux (chat-gaming feature)
     await ChatGamingService.handleReactionRemove(reaction, user);
+    
+    // Gérer les réactions pour les suggestions
+    await SuggestionsService.handleReactionRemove(reaction, user);
     
     // Ici, vous pourriez ajouter du code pour d'autres systèmes:
     // 1. Fermer des tickets
