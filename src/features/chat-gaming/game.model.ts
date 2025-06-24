@@ -21,9 +21,11 @@ const GameSchema = new Schema<IGame>({
   messageId: { type: String },
   roleId: { type: String }
 }, {
-  timestamps: true
+  timestamps: true,
+  collection: 'games'
 });
 
-const GameModel = mongoose.model<IGame>('Game', GameSchema);
+// Utiliser un nom de modèle complètement différent pour éviter les conflits
+const ChatGameModel = mongoose.models.ChatGame || mongoose.model<IGame>('ChatGame', GameSchema);
 
-export default GameModel; 
+export default ChatGameModel; 
