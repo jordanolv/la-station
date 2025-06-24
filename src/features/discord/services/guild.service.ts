@@ -3,6 +3,7 @@ import GuildModel, { IGuild } from '../models/guild.model';
 import { LevelingService } from '../../leveling/leveling.service';
 import { VocManagerService } from '../../voc-manager/vocManager.service';
 import { ChatGamingService } from '../../chat-gaming/chatGaming.service';
+import { SuggestionsService } from '../../suggestions/suggestions.service';
 
 // Service pour les opérations liées aux guildes
 export class GuildService {
@@ -23,6 +24,9 @@ export class GuildService {
       
       // Initialisation du chat gaming
       await ChatGamingService.getOrCreateChatGaming(guildId, initEnabled);
+      
+      // Initialisation du système de suggestions
+      await SuggestionsService.getOrCreateSuggestionsConfig(guildId);
       
       // Ajoutez ici l'initialisation d'autres features au fur et à mesure de leur développement
       
