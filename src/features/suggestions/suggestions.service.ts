@@ -330,7 +330,7 @@ export class SuggestionsService {
   }
 
   static async updateSuggestionStatus(suggestionId: string, status: string, moderatorId?: string, note?: string): Promise<ISuggestion | null> {
-    return SuggestionModel.findByIdAndUpdate(
+    const updatedSuggestion = await SuggestionModel.findByIdAndUpdate(
       suggestionId,
       {
         status,
@@ -340,6 +340,55 @@ export class SuggestionsService {
       },
       { new: true }
     );
+
+    if (!updatedSuggestion) return null;
+
+    // Update the Discord embed if the suggestion has a messageId
+    if (updatedSuggestion.messageId) {
+      try {
+        const config = await this.getSuggestionsConfig(updatedSuggestion.guildId);
+        if (config) {
+          const client = BotClient.getInstance();
+          const guild = client.guilds.cache.get(updatedSuggestion.guildId);
+          
+          if (guild) {
+            const channel = guild.channels.cache.get(updatedSuggestion.channelId);
+            if (channel && channel.isTextBased()) {
+              try {
+                const message = await channel.messages.fetch(updatedSuggestion.messageId);
+                const updatedEmbed = this.createSuggestionEmbed(updatedSuggestion, config);
+                
+                // Add status information to the embed
+                const statusEmoji = this.getStatusEmoji(status);
+                const statusText = this.getStatusText(status);
+                updatedEmbed.addFields({
+                  name: '📊 Statut',
+                  value: `${statusEmoji} **${statusText}**`,
+                  inline: true
+                });
+
+                if (note) {
+                  updatedEmbed.addFields({
+                    name: '📝 Note de modération',
+                    value: note,
+                    inline: false
+                  });
+                }
+
+                await message.edit({ embeds: [updatedEmbed] });
+                console.log(`Embed Discord mis à jour pour la suggestion ${suggestionId} avec le statut ${status}`);
+              } catch (error) {
+                console.error('Erreur lors de la mise à jour de l\'embed Discord:', error);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données pour mettre à jour l\'embed:', error);
+      }
+    }
+
+    return updatedSuggestion;
   }
 
   // ===== CREATION EMBED SUGGESTION =====
@@ -395,6 +444,30 @@ export class SuggestionsService {
     };
     
     return colors[status as keyof typeof colors] || colors.pending;
+  }
+
+  private static getStatusEmoji(status: string): string {
+    const emojis = {
+      pending: '⏳',
+      approved: '✅',
+      rejected: '❌',
+      implemented: '🎉',
+      under_review: '👀'
+    };
+    
+    return emojis[status as keyof typeof emojis] || '❓';
+  }
+
+  private static getStatusText(status: string): string {
+    const texts = {
+      pending: 'En attente',
+      approved: 'Approuvée',
+      rejected: 'Rejetée',
+      implemented: 'Implémentée',
+      under_review: 'En révision'
+    };
+    
+    return texts[status as keyof typeof texts] || status;
   }
 
   // ===== GESTION DES REACTIONS =====
