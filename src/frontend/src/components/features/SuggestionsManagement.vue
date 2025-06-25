@@ -184,13 +184,27 @@
           <h3 class="text-lg font-medium text-white">Suggestions soumises</h3>
           <div class="flex items-center space-x-2">
             <select
+              v-model="suggestionChannelFilter"
+              class="bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-1 text-sm"
+            >
+              <option value="all">Tous les channels</option>
+              <option
+                v-for="channel in config?.channels || []"
+                :key="channel.channelId"
+                :value="channel.channelId"
+              >
+                # {{ getChannelName(channel.channelId) }}
+              </option>
+            </select>
+            <select
               v-model="suggestionFilter"
               class="bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-1 text-sm"
             >
-              <option value="all">Toutes</option>
+              <option value="all">Tous les statuts</option>
               <option value="pending">En attente</option>
               <option value="approved">Approuvées</option>
               <option value="rejected">Rejetées</option>
+              <option value="implemented">Implémentées</option>
             </select>
           </div>
         </div>
@@ -218,6 +232,9 @@
                   <span class="font-medium text-white">{{ suggestion.authorUsername }}</span>
                   <span class="text-xs text-gray-500">
                     {{ new Date(suggestion.createdAt).toLocaleDateString('fr-FR') }}
+                  </span>
+                  <span class="text-xs text-blue-400 bg-blue-900 px-2 py-1 rounded">
+                    # {{ getChannelName(suggestion.channelId) }}
                   </span>
                   <span
                     :class="[
@@ -271,7 +288,6 @@
                   <option value="approved">Approuvée</option>
                   <option value="rejected">Rejetée</option>
                   <option value="implemented">Implémentée</option>
-                  <option value="under_review">En révision</option>
                 </select>
               </div>
             </div>
@@ -389,8 +405,10 @@ const props = defineProps<{
 const config = ref<SuggestionsConfig | null>(null)
 const suggestions = ref<Suggestion[]>([])
 const loading = ref(true)
+const discordChannels = ref<Record<string, string>>({})
 const activeTab = ref('forms')
 const suggestionFilter = ref('all')
+const suggestionChannelFilter = ref('all')
 
 const showCreateFormModal = ref(false)
 const showAddChannelModal = ref(false)
@@ -404,8 +422,19 @@ const tabs = [
 ]
 
 const filteredSuggestions = computed(() => {
-  if (suggestionFilter.value === 'all') return suggestions.value
-  return suggestions.value.filter(s => s.status === suggestionFilter.value)
+  let filtered = suggestions.value
+  
+  // Filter by channel
+  if (suggestionChannelFilter.value !== 'all') {
+    filtered = filtered.filter(s => s.channelId === suggestionChannelFilter.value)
+  }
+  
+  // Filter by status
+  if (suggestionFilter.value !== 'all') {
+    filtered = filtered.filter(s => s.status === suggestionFilter.value)
+  }
+  
+  return filtered
 })
 
 async function loadConfig() {
@@ -428,6 +457,27 @@ async function loadSuggestions() {
     }
   } catch (error) {
     console.error('Erreur lors du chargement des suggestions:', error)
+  }
+}
+
+async function loadDiscordChannels() {
+  try {
+    const response = await fetch(`/api/guilds/${props.guildId}/channels`)
+    if (response.ok) {
+      const data = await response.json()
+      const channelMap: Record<string, string> = {}
+      
+      // Create a map of channel ID to channel name
+      if (data.textChannels) {
+        data.textChannels.forEach((channel: any) => {
+          channelMap[channel.id] = channel.name
+        })
+      }
+      
+      discordChannels.value = channelMap
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des channels Discord:', error)
   }
 }
 
@@ -575,8 +625,7 @@ function getStatusColor(status: string): string {
     pending: 'bg-blue-500 text-white',
     approved: 'bg-green-500 text-white',
     rejected: 'bg-red-500 text-white',
-    implemented: 'bg-purple-500 text-white',
-    under_review: 'bg-yellow-500 text-black'
+    implemented: 'bg-purple-500 text-white'
   }
   return colors[status as keyof typeof colors] || 'bg-gray-500 text-white'
 }
@@ -586,14 +635,29 @@ function getStatusLabel(status: string): string {
     pending: 'En attente',
     approved: 'Approuvée',
     rejected: 'Rejetée',
-    implemented: 'Implémentée',
-    under_review: 'En révision'
+    implemented: 'Implémentée'
   }
   return labels[status as keyof typeof labels] || status
 }
 
+function getChannelName(channelId: string): string {
+  // First try to get from config (stored channel names)
+  const channel = config.value?.channels.find(c => c.channelId === channelId)
+  if (channel?.channelName) {
+    return channel.channelName
+  }
+  
+  // Fallback to Discord channels data
+  if (discordChannels.value[channelId]) {
+    return discordChannels.value[channelId]
+  }
+  
+  // Last fallback
+  return `Channel ${channelId.slice(-4)}`
+}
+
 onMounted(async () => {
-  await Promise.all([loadConfig(), loadSuggestions()])
+  await Promise.all([loadConfig(), loadSuggestions(), loadDiscordChannels()])
   loading.value = false
 })
 </script>

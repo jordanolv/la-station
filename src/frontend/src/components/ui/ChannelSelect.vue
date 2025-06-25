@@ -164,8 +164,11 @@ const loadChannels = async () => {
       }
     })
     
-    channels.value = response.data.channels?.filter((ch: Channel) => ch.type !== 'category') || []
-    categories.value = response.data.categories || []
+    const data = response.data
+    
+    // Extract channels and categories from the response
+    channels.value = data.textChannels || data.channels?.filter((ch: Channel) => ch.type !== 'category') || []
+    categories.value = data.categories || []
   } catch (err) {
     console.error('Error loading channels:', err)
     error.value = 'Impossible de charger les canaux'
