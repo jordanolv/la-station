@@ -19,14 +19,12 @@ export default {
         const command = client.slashCommands.get(interaction.commandName);
         
         if (!command) {
-          console.error(`Aucune commande correspondant à ${interaction.commandName} n'a été trouvée.`);
           return;
         }
         
         try {
           await command.execute(client, interaction);
         } catch (error) {
-          console.error(`Erreur lors de l'exécution de la commande ${interaction.commandName}:`, error);
           
           if (interaction.replied || interaction.deferred) {
             await interaction.followUp({ 
@@ -47,13 +45,11 @@ export default {
         if (interaction.customId === 'create_suggestion') {
           await SuggestionsService.handleButtonInteraction(interaction);
         } else {
-          console.log(`Bouton cliqué: ${interaction.customId}`);
         }
       }
       
       // Gestion des menus de sélection
       else if (interaction.isStringSelectMenu && interaction.isStringSelectMenu()) {
-        console.log(`Menu de sélection: ${interaction.customId}, valeurs: ${interaction.values.join(', ')}`);
       }
       
       // Gestion des modals
@@ -61,11 +57,9 @@ export default {
         if (interaction.customId.startsWith('suggestion_modal_')) {
           await SuggestionsService.handleModalSubmit(interaction);
         } else {
-          console.log(`Modal soumis: ${interaction.customId}`);
         }
       }
     } catch (error) {
-      console.error('Erreur dans l\'événement interactionCreate:', error);
     }
   }
 };
