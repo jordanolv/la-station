@@ -8,7 +8,7 @@ import { auth } from './routes/auth'
 import { games } from './routes/games'
 import { guilds } from './routes/guilds'
 import vocManager from './routes/voc-manager'
-import suggestions from './routes/suggestions'
+import suggestions from '../features/suggestions/suggestions.route'
 
 import path from 'path'
 
