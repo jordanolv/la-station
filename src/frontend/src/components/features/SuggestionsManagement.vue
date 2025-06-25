@@ -278,7 +278,7 @@
                 </div>
               </div>
 
-              <div class="flex items-center space-x-2 ml-4">
+              <div class="flex flex-col space-y-2 ml-4">
                 <select
                   :value="suggestion.status"
                   @change="updateSuggestionStatus(suggestion._id, ($event.target as HTMLSelectElement).value)"
@@ -289,6 +289,26 @@
                   <option value="rejected">Rejetée</option>
                   <option value="implemented">Implémentée</option>
                 </select>
+                <div class="flex items-center space-x-2">
+                  <input
+                    v-model="moderationNotes[suggestion._id]"
+                    type="text"
+                    placeholder="Note de modération (optionnelle)"
+                    class="bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 text-xs flex-1"
+                    @keyup.enter="addModerationNote(suggestion._id)"
+                  >
+                  <button
+                    @click="addModerationNote(suggestion._id)"
+                    :disabled="!moderationNotes[suggestion._id]?.trim()"
+                    class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-2 py-1 rounded text-xs transition-colors"
+                    title="Ajouter la note"
+                  >
+                    ✓
+                  </button>
+                </div>
+                <div v-if="suggestion.moderatorNote" class="text-xs text-gray-400 bg-gray-800 p-2 rounded">
+                  <strong>Note:</strong> {{ suggestion.moderatorNote }}
+                </div>
               </div>
             </div>
           </div>
@@ -396,6 +416,9 @@ interface Suggestion {
   score: number
   createdAt: string
   messageId?: string
+  moderatorNote?: string
+  moderatorId?: string
+  moderatedAt?: string
 }
 
 const props = defineProps<{
@@ -409,6 +432,7 @@ const discordChannels = ref<Record<string, string>>({})
 const activeTab = ref('forms')
 const suggestionFilter = ref('all')
 const suggestionChannelFilter = ref('all')
+const moderationNotes = ref<Record<string, string>>({})
 
 const showCreateFormModal = ref(false)
 const showAddChannelModal = ref(false)
@@ -596,6 +620,33 @@ async function updateSuggestionStatus(suggestionId: string, status: string) {
     }
   } catch (error) {
     console.error('Erreur lors de la mise à jour du statut:', error)
+  }
+}
+
+async function addModerationNote(suggestionId: string) {
+  const note = moderationNotes.value[suggestionId]?.trim()
+  if (!note) return
+
+  try {
+    const suggestion = suggestions.value.find(s => s._id === suggestionId)
+    if (!suggestion) return
+
+    const response = await fetch(`/api/guilds/${props.guildId}/suggestions/${suggestionId}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        status: suggestion.status, // Keep current status
+        note: note 
+      })
+    })
+    
+    if (response.ok) {
+      // Clear the note input
+      moderationNotes.value[suggestionId] = ''
+      await loadSuggestions()
+    }
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout de la note:', error)
   }
 }
 
