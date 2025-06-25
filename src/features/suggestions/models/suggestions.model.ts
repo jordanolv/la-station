@@ -26,13 +26,14 @@ export interface ISuggestionForm {
 
 export interface ISuggestionChannel {
   channelId: string;
+  channelName?: string; // Nom du channel Discord
   enabled: boolean;
   formId: string; // ID du formulaire à utiliser
   readOnly: boolean; // Channel en lecture seule
   buttonMessageId?: string; // ID du message avec le bouton
   suggestionCount: number; // Compteur pour republier le bouton
   republishInterval: number; // Toutes les X suggestions (défaut: 4)
-  customReactions: string[]; // Emojis personnalisés, défaut: ['👍', '👎']
+  customReactions?: string[]; // Emojis personnalisés, défaut: ['👍', '👎']
   pinButton: boolean; // Épingler le bouton
 }
 
@@ -72,13 +73,14 @@ const SuggestionFormSchema = new Schema({
 
 const SuggestionChannelSchema = new Schema({
   channelId: { type: String, required: true },
+  channelName: { type: String },
   enabled: { type: Boolean, default: true },
   formId: { type: String, required: true },
   readOnly: { type: Boolean, default: true },
   buttonMessageId: { type: String },
   suggestionCount: { type: Number, default: 0 },
   republishInterval: { type: Number, default: 4 },
-  customReactions: [{ type: String }],
+  customReactions: { type: [String], default: ['👍', '👎'] },
   pinButton: { type: Boolean, default: false }
 });
 
