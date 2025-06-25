@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { BotClient } from '../../bot/client';
-import { SuggestionsService } from '../../features/suggestions/suggestions.service';
+import { SuggestionsService } from './suggestions.service';
 import { ChannelType } from 'discord.js';
 
 const suggestions = new Hono();
@@ -105,9 +105,9 @@ suggestions.post('/config/:guildId/forms', async (c) => {
 });
 
 // Update a form
-suggestions.put('/forms/:formId', async (c) => {
+suggestions.put('/config/:guildId/forms/:formId', async (c) => {
   try {
-    const guildId = process.env.GUILD_ID;
+    const guildId = c.req.param('guildId');
     if (!guildId) {
       return c.json({ error: 'Guild ID is required' }, 400);
     }
@@ -132,9 +132,9 @@ suggestions.put('/forms/:formId', async (c) => {
 });
 
 // Delete a form
-suggestions.delete('/forms/:formId', async (c) => {
+suggestions.delete('/config/:guildId/forms/:formId', async (c) => {
   try {
-    const guildId = process.env.GUILD_ID;
+    const guildId = c.req.param('guildId');
     if (!guildId) {
       return c.json({ error: 'Guild ID is required' }, 400);
     }
@@ -160,16 +160,25 @@ suggestions.delete('/forms/:formId', async (c) => {
 // ===== GESTION DES CHANNELS =====
 
 // Add a suggestion channel
-suggestions.post('/channels', async (c) => {
+suggestions.post('/config/:guildId/channels', async (c) => {
   try {
-    const guildId = process.env.GUILD_ID;
+    const guildId = c.req.param('guildId');
     if (!guildId) {
       return c.json({ error: 'Guild ID is required' }, 400);
     }
 
-    const { channelId, formId, readOnly = true, republishInterval = 4, customReactions, pinButton = false } = await c.req.json();
+    const requestBody = await c.req.json();
+    console.log('=== DEBUG: Request body received ===');
+    console.log(JSON.stringify(requestBody, null, 2));
+    
+    const { channelId, formId, readOnly = true, republishInterval = 4, customReactions, pinButton = false, channelName, enabled = true } = requestBody;
+
+    console.log('=== DEBUG: Extracted values ===');
+    console.log({ channelId, formId, readOnly, republishInterval, customReactions, pinButton, channelName, enabled });
 
     if (!channelId || !formId) {
+      console.log('=== DEBUG: Missing required fields ===');
+      console.log('channelId:', channelId, 'formId:', formId);
       return c.json({ error: 'Channel ID and form ID are required' }, 400);
     }
 
@@ -192,14 +201,15 @@ suggestions.post('/channels', async (c) => {
     // Add channel to config
     const config = await SuggestionsService.addSuggestionChannel(guildId, {
       channelId,
-      enabled: true,
+      channelName: channelName || channel.name,
+      enabled,
       formId,
       readOnly,
       republishInterval,
-      customReactions: customReactions || ['👍', '👎'],
+      customReactions: customReactions && customReactions.length > 0 ? customReactions : ['👍', '👎'],
       pinButton
     });
-
+    
     // Publish initial button
     const buttonMessageId = await SuggestionsService.publishSuggestionButton(guild, channelId);
     if (buttonMessageId) {
@@ -217,9 +227,9 @@ suggestions.post('/channels', async (c) => {
 });
 
 // Update channel configuration
-suggestions.put('/channels/:channelId', async (c) => {
+suggestions.put('/config/:guildId/channels/:channelId', async (c) => {
   try {
-    const guildId = process.env.GUILD_ID;
+    const guildId = c.req.param('guildId');
     if (!guildId) {
       return c.json({ error: 'Guild ID is required' }, 400);
     }
@@ -244,9 +254,9 @@ suggestions.put('/channels/:channelId', async (c) => {
 });
 
 // Remove a suggestion channel
-suggestions.delete('/channels/:channelId', async (c) => {
+suggestions.delete('/config/:guildId/channels/:channelId', async (c) => {
   try {
-    const guildId = process.env.GUILD_ID;
+    const guildId = c.req.param('guildId');
     if (!guildId) {
       return c.json({ error: 'Guild ID is required' }, 400);
     }
@@ -270,9 +280,9 @@ suggestions.delete('/channels/:channelId', async (c) => {
 });
 
 // Republish button manually
-suggestions.post('/channels/:channelId/republish-button', async (c) => {
+suggestions.post('/config/:guildId/channels/:channelId/republish-button', async (c) => {
   try {
-    const guildId = process.env.GUILD_ID;
+    const guildId = c.req.param('guildId');
     if (!guildId) {
       return c.json({ error: 'Guild ID is required' }, 400);
     }
@@ -308,9 +318,9 @@ suggestions.post('/channels/:channelId/republish-button', async (c) => {
 // ===== GESTION DES SUGGESTIONS =====
 
 // Get suggestions for guild
-suggestions.get('/list', async (c) => {
+suggestions.get('/:guildId/list', async (c) => {
   try {
-    const guildId = process.env.GUILD_ID;
+    const guildId = c.req.param('guildId');
     if (!guildId) {
       return c.json({ error: 'Guild ID is required' }, 400);
     }
@@ -386,8 +396,8 @@ suggestions.get('/suggestions/:suggestionId', async (c) => {
 
     return c.json({ suggestion });
   } catch (error) {
-    console.error('Error fetching suggestion:', error);
-    return c.json({ error: 'Failed to fetch suggestion' }, 500);
+    console.error('Error fetching suggestion details:', error);
+    return c.json({ error: 'Failed to fetch suggestion details' }, 500);
   }
 });
 
