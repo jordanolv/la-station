@@ -55,7 +55,6 @@ guilds.get('/:guildId/leaderboard', async (c) => {
 
     return c.json(formattedLeaderboard);
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
     if (error instanceof mongoose.Error.CastError) {
       c.status(400);
       return c.json({ message: 'Invalid Guild ID format.' });
@@ -78,7 +77,6 @@ guilds.get('/:id/bot-status', async (c) => {
       inviteUrl: guild ? null : `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=8&scope=bot&guild_id=${guildId}`
     });
   } catch (error) {
-    console.error('Error checking bot status:', error);
     return c.json({ 
       botPresent: false, 
       inviteUrl: `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=8&scope=bot&guild_id=${c.req.param('id')}`
@@ -141,7 +139,6 @@ guilds.get('/:id/features', async (c) => {
     
     return c.json({ features });
   } catch (error) {
-    console.error('Error fetching guild features:', error);
     return c.json({ error: 'Failed to fetch features' }, 500);
   }
 });
@@ -265,14 +262,12 @@ guilds.post('/:id/features/:featureId/toggle', async (c) => {
         return c.json({ error: 'Unknown feature' }, 400);
     }
     
-    console.log(`Feature ${featureId} ${enabled ? 'enabled' : 'disabled'} for guild ${guildId}`);
     
     return c.json({ 
       success: true, 
       message: `Feature ${featureId} ${enabled ? 'enabled' : 'disabled'}` 
     });
   } catch (error) {
-    console.error('Error toggling feature:', error);
     return c.json({ error: 'Failed to toggle feature' }, 500);
   }
 });
@@ -322,7 +317,6 @@ guilds.get('/:id/features/:featureId/settings', async (c) => {
     
     return c.json({ settings });
   } catch (error) {
-    console.error('Error fetching feature settings:', error);
     return c.json({ error: 'Failed to fetch feature settings' }, 500);
   }
 });
@@ -376,7 +370,6 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
         return c.json({ error: 'Unknown feature' }, 400);
     }
     
-    console.log(`Settings updated for feature ${featureId} in guild ${guildId}`);
     
     return c.json({ 
       success: true, 
@@ -384,7 +377,6 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
       settings: updatedSettings
     });
   } catch (error) {
-    console.error('Error updating feature settings:', error);
     return c.json({ error: 'Failed to update feature settings' }, 500);
   }
 });
@@ -401,11 +393,6 @@ guilds.get('/:id/channels', async (c) => {
       return c.json({ error: 'Guild not found or bot not present' }, 404);
     }
     
-    // Debug: Log all channel types
-    console.log('Channels in guild:', guild.name);
-    guild.channels.cache.forEach(channel => {
-      console.log(`Channel: ${channel.name}, Type: ${channel.type}`);
-    });
     
     // Get text, voice and forum channels
     const channels = guild.channels.cache
@@ -438,7 +425,6 @@ guilds.get('/:id/channels', async (c) => {
       categories 
     });
   } catch (error) {
-    console.error('Error fetching guild channels:', error);
     return c.json({ error: 'Failed to fetch channels' }, 500);
   }
 });
@@ -454,7 +440,6 @@ guilds.post('/:id/suggestions/forms', async (c) => {
     const config = await SuggestionsService.createForm(guildId, formData);
     return c.json(config);
   } catch (error) {
-    console.error('Error creating form:', error);
     return c.json({ error: 'Failed to create form' }, 500);
   }
 });
@@ -469,7 +454,6 @@ guilds.put('/:id/suggestions/forms/:formId', async (c) => {
     const config = await SuggestionsService.updateForm(guildId, formId, updates);
     return c.json(config);
   } catch (error) {
-    console.error('Error updating form:', error);
     return c.json({ error: 'Failed to update form' }, 500);
   }
 });
@@ -483,7 +467,6 @@ guilds.delete('/:id/suggestions/forms/:formId', async (c) => {
     const config = await SuggestionsService.deleteForm(guildId, formId);
     return c.json(config);
   } catch (error) {
-    console.error('Error deleting form:', error);
     return c.json({ error: 'Failed to delete form' }, 500);
   }
 });
@@ -497,7 +480,6 @@ guilds.post('/:id/suggestions/channels', async (c) => {
     const config = await SuggestionsService.addSuggestionChannel(guildId, channelData);
     return c.json(config);
   } catch (error) {
-    console.error('Error adding channel:', error);
     return c.json({ error: 'Failed to add channel' }, 500);
   }
 });
@@ -511,7 +493,6 @@ guilds.delete('/:id/suggestions/channels/:channelId', async (c) => {
     const config = await SuggestionsService.removeSuggestionChannel(guildId, channelId);
     return c.json(config);
   } catch (error) {
-    console.error('Error removing channel:', error);
     return c.json({ error: 'Failed to remove channel' }, 500);
   }
 });
@@ -526,7 +507,6 @@ guilds.get('/:id/suggestions', async (c) => {
     const suggestions = await SuggestionsService.getSuggestionsByGuild(guildId, limit, skip);
     return c.json(suggestions);
   } catch (error) {
-    console.error('Error fetching suggestions:', error);
     return c.json({ error: 'Failed to fetch suggestions' }, 500);
   }
 });
@@ -540,7 +520,6 @@ guilds.put('/:id/suggestions/:suggestionId/status', async (c) => {
     const suggestion = await SuggestionsService.updateSuggestionStatus(suggestionId, status, undefined, note);
     return c.json(suggestion);
   } catch (error) {
-    console.error('Error updating suggestion status:', error);
     return c.json({ error: 'Failed to update suggestion status' }, 500);
   }
 });
@@ -580,7 +559,6 @@ guilds.post('/:id/suggestions/channels/:channelId/publish-button', async (c) => 
       message: 'Bouton publié avec succès' 
     });
   } catch (error) {
-    console.error('Error publishing suggestion button:', error);
     return c.json({ error: 'Failed to publish suggestion button' }, 500);
   }
 });

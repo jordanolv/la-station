@@ -30,9 +30,7 @@ export class GuildService {
       
       // Ajoutez ici l'initialisation d'autres features au fur et à mesure de leur développement
       
-      console.log(`Toutes les features ont été initialisées pour la guilde ${guildId}`);
     } catch (error) {
-      console.error(`Erreur lors de l'initialisation des features pour la guilde ${guildId}:`, error);
     }
   }
 
