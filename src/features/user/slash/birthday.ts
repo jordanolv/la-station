@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction } from 'discord.js';
 import { UserService } from '../services/guildUser.service';
 import { formatDate } from '../../../shared/utils/date-format';
+import { emojis } from '../../../utils/emojis';
 
 export default {
   data: new SlashCommandBuilder()
@@ -52,7 +53,7 @@ export default {
       
       if (!match) {
         await interaction.reply({
-          content: '❌ Format de date invalide. Veuillez utiliser le format JJ/MM/AAAA (exemple: 01/01/1990).',
+          content: `${emojis.error} Format de date invalide. Veuillez utiliser le format JJ/MM/AAAA (exemple: 01/01/1990).`,
           ephemeral: true
         });
         return;

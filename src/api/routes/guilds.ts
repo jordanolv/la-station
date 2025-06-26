@@ -7,6 +7,8 @@ import LevelingModel from '../../features/leveling/leveling.model';
 import VocManagerModel from '../../features/voc-manager/vocManager.model';
 import BirthdayModel from '../../features/user/models/birthday.model';
 import GuildModel from '../../features/discord/models/guild.model';
+import SuggestionsConfigModel from '../../features/suggestions/models/suggestions.model';
+import { SuggestionsService } from '../../features/suggestions/suggestions.service';
 
 const guilds = new Hono();
 
@@ -53,7 +55,6 @@ guilds.get('/:guildId/leaderboard', async (c) => {
 
     return c.json(formattedLeaderboard);
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
     if (error instanceof mongoose.Error.CastError) {
       c.status(400);
       return c.json({ message: 'Invalid Guild ID format.' });
@@ -76,7 +77,6 @@ guilds.get('/:id/bot-status', async (c) => {
       inviteUrl: guild ? null : `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=8&scope=bot&guild_id=${guildId}`
     });
   } catch (error) {
-    console.error('Error checking bot status:', error);
     return c.json({ 
       botPresent: false, 
       inviteUrl: `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=8&scope=bot&guild_id=${c.req.param('id')}`
@@ -90,11 +90,12 @@ guilds.get('/:id/features', async (c) => {
     const guildId = c.req.param('id');
     
     // Get actual feature status from database for ALL features
-    const [chatGamingSettings, levelingSettings, vocManagerSettings, birthdaySettings] = await Promise.all([
+    const [chatGamingSettings, levelingSettings, vocManagerSettings, birthdaySettings, suggestionsSettings] = await Promise.all([
       ChatGamingModel.findOne({ guildId }),
       LevelingModel.findOne({ guildId }),
       VocManagerModel.findOne({ guildId }),
-      BirthdayModel.findOne({ guildId })
+      BirthdayModel.findOne({ guildId }),
+      SuggestionsConfigModel.findOne({ guildId })
     ]);
     
     // Define available features with actual status from database
@@ -126,12 +127,18 @@ guilds.get('/:id/features', async (c) => {
         description: 'Notifications d\'anniversaires automatiques',
         icon: '🎂',
         enabled: birthdaySettings?.enabled || false
+      },
+      {
+        id: 'suggestions',
+        name: 'Système de Suggestions',
+        description: 'Système de suggestions avec formulaires et votes',
+        icon: '💡',
+        enabled: suggestionsSettings?.enabled || false
       }
     ];
     
     return c.json({ features });
   } catch (error) {
-    console.error('Error fetching guild features:', error);
     return c.json({ error: 'Failed to fetch features' }, 500);
   }
 });
@@ -225,18 +232,42 @@ guilds.post('/:id/features/:featureId/toggle', async (c) => {
         );
         break;
         
+      case 'suggestions':
+        if (enabled) {
+          // If enabling, create config if not exists or just update enabled status
+          await SuggestionsConfigModel.findOneAndUpdate(
+            { guildId },
+            { 
+              $set: { enabled: true },
+              $setOnInsert: {
+                guildId,
+                channels: [],
+                forms: [],
+                defaultReactions: ['👍', '👎']
+              }
+            },
+            { upsert: true, new: true }
+          );
+        } else {
+          // If disabling, just update enabled status without touching other fields
+          await SuggestionsConfigModel.findOneAndUpdate(
+            { guildId },
+            { enabled: false },
+            { upsert: true, new: true }
+          );
+        }
+        break;
+        
       default:
         return c.json({ error: 'Unknown feature' }, 400);
     }
     
-    console.log(`Feature ${featureId} ${enabled ? 'enabled' : 'disabled'} for guild ${guildId}`);
     
     return c.json({ 
       success: true, 
       message: `Feature ${featureId} ${enabled ? 'enabled' : 'disabled'}` 
     });
   } catch (error) {
-    console.error('Error toggling feature:', error);
     return c.json({ error: 'Failed to toggle feature' }, 500);
   }
 });
@@ -262,17 +293,30 @@ guilds.get('/:id/features/:featureId/settings', async (c) => {
       case 'birthday':
         settings = await BirthdayModel.findOne({ guildId });
         break;
+      case 'suggestions':
+        settings = await SuggestionsConfigModel.findOne({ guildId });
+        break;
       default:
         return c.json({ error: 'Unknown feature' }, 400);
     }
     
     if (!settings) {
-      return c.json({ error: 'Feature settings not found' }, 404);
+      // For suggestions, create default config if not found
+      if (featureId === 'suggestions') {
+        settings = await SuggestionsConfigModel.create({
+          guildId,
+          enabled: false,
+          channels: [],
+          forms: [],
+          defaultReactions: ['👍', '👎']
+        });
+      } else {
+        return c.json({ error: 'Feature settings not found' }, 404);
+      }
     }
     
     return c.json({ settings });
   } catch (error) {
-    console.error('Error fetching feature settings:', error);
     return c.json({ error: 'Failed to fetch feature settings' }, 500);
   }
 });
@@ -315,11 +359,17 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
           { new: true, upsert: true }
         );
         break;
+      case 'suggestions':
+        updatedSettings = await SuggestionsConfigModel.findOneAndUpdate(
+          { guildId },
+          { ...updates, guildId },
+          { new: true, upsert: true }
+        );
+        break;
       default:
         return c.json({ error: 'Unknown feature' }, 400);
     }
     
-    console.log(`Settings updated for feature ${featureId} in guild ${guildId}`);
     
     return c.json({ 
       success: true, 
@@ -327,7 +377,6 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
       settings: updatedSettings
     });
   } catch (error) {
-    console.error('Error updating feature settings:', error);
     return c.json({ error: 'Failed to update feature settings' }, 500);
   }
 });
@@ -344,11 +393,6 @@ guilds.get('/:id/channels', async (c) => {
       return c.json({ error: 'Guild not found or bot not present' }, 404);
     }
     
-    // Debug: Log all channel types
-    console.log('Channels in guild:', guild.name);
-    guild.channels.cache.forEach(channel => {
-      console.log(`Channel: ${channel.name}, Type: ${channel.type}`);
-    });
     
     // Get text, voice and forum channels
     const channels = guild.channels.cache
@@ -381,8 +425,141 @@ guilds.get('/:id/channels', async (c) => {
       categories 
     });
   } catch (error) {
-    console.error('Error fetching guild channels:', error);
     return c.json({ error: 'Failed to fetch channels' }, 500);
+  }
+});
+
+// ===== SUGGESTIONS MANAGEMENT ROUTES =====
+
+// Create form
+guilds.post('/:id/suggestions/forms', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const formData = await c.req.json();
+    
+    const config = await SuggestionsService.createForm(guildId, formData);
+    return c.json(config);
+  } catch (error) {
+    return c.json({ error: 'Failed to create form' }, 500);
+  }
+});
+
+// Update form
+guilds.put('/:id/suggestions/forms/:formId', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const formId = c.req.param('formId');
+    const updates = await c.req.json();
+    
+    const config = await SuggestionsService.updateForm(guildId, formId, updates);
+    return c.json(config);
+  } catch (error) {
+    return c.json({ error: 'Failed to update form' }, 500);
+  }
+});
+
+// Delete form
+guilds.delete('/:id/suggestions/forms/:formId', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const formId = c.req.param('formId');
+    
+    const config = await SuggestionsService.deleteForm(guildId, formId);
+    return c.json(config);
+  } catch (error) {
+    return c.json({ error: 'Failed to delete form' }, 500);
+  }
+});
+
+// Add channel
+guilds.post('/:id/suggestions/channels', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const channelData = await c.req.json();
+    
+    const config = await SuggestionsService.addSuggestionChannel(guildId, channelData);
+    return c.json(config);
+  } catch (error) {
+    return c.json({ error: 'Failed to add channel' }, 500);
+  }
+});
+
+// Remove channel
+guilds.delete('/:id/suggestions/channels/:channelId', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const channelId = c.req.param('channelId');
+    
+    const config = await SuggestionsService.removeSuggestionChannel(guildId, channelId);
+    return c.json(config);
+  } catch (error) {
+    return c.json({ error: 'Failed to remove channel' }, 500);
+  }
+});
+
+// Get suggestions
+guilds.get('/:id/suggestions', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const limit = parseInt(c.req.query('limit') || '20');
+    const skip = parseInt(c.req.query('skip') || '0');
+    
+    const suggestions = await SuggestionsService.getSuggestionsByGuild(guildId, limit, skip);
+    return c.json(suggestions);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch suggestions' }, 500);
+  }
+});
+
+// Update suggestion status
+guilds.put('/:id/suggestions/:suggestionId/status', async (c) => {
+  try {
+    const suggestionId = c.req.param('suggestionId');
+    const { status, note } = await c.req.json();
+    
+    const suggestion = await SuggestionsService.updateSuggestionStatus(suggestionId, status, undefined, note);
+    return c.json(suggestion);
+  } catch (error) {
+    return c.json({ error: 'Failed to update suggestion status' }, 500);
+  }
+});
+
+// Publish suggestion button in a channel
+guilds.post('/:id/suggestions/channels/:channelId/publish-button', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const channelId = c.req.param('channelId');
+    
+    const client = BotClient.getInstance();
+    const guild = client.guilds.cache.get(guildId);
+    
+    if (!guild) {
+      return c.json({ error: 'Guild not found' }, 404);
+    }
+    
+    const messageId = await SuggestionsService.publishSuggestionButton(guild, channelId);
+    
+    if (!messageId) {
+      return c.json({ error: 'Failed to publish button' }, 500);
+    }
+    
+    // Update the channel config with the new button message ID
+    const config = await SuggestionsService.getSuggestionsConfig(guildId);
+    if (config) {
+      const channelConfig = config.channels.find(c => c.channelId === channelId);
+      if (channelConfig) {
+        channelConfig.buttonMessageId = messageId;
+        await config.save();
+      }
+    }
+    
+    return c.json({ 
+      success: true, 
+      messageId,
+      message: 'Bouton publié avec succès' 
+    });
+  } catch (error) {
+    return c.json({ error: 'Failed to publish suggestion button' }, 500);
   }
 });
 

@@ -2,6 +2,8 @@ import { Events, Message } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { StatsService } from '../../stats/stats.service';
 import { GuildService } from '../services/guild.service';
+import { SuggestionsService } from '../../suggestions/suggestions.service';
+import { LevelingService } from '@/features/leveling/leveling.service';
 
 export default {
   name: Events.MessageCreate,
@@ -40,6 +42,9 @@ export default {
         }
       }
       
+      // Vérifier si le message est dans un channel de suggestions
+      await SuggestionsService.handleChannelMessage(message);
+      
       // Mettre à jour les statistiques de l'utilisateur (messages)
       await StatsService.incrementMessageCount(
         message.author.id,
@@ -47,8 +52,9 @@ export default {
         message.author.username
       );
       
-      // Émettre un événement pour le système de leveling
-      client.emit('userMessage', message);
+      // Gérer le système de leveling
+      await LevelingService.giveXpToUser(client, message);
+
     } catch (error) {
       console.error('Erreur dans l\'événement messageCreate:', error);
     }

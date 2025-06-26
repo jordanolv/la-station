@@ -40,6 +40,7 @@
             <FeatureStatusCard featureName="Chat Gaming" :status="guild.features?.chatGaming?.enabled" :details="guild.features?.chatGaming?.channelId ?  `Forum: ${getChannelName(guild.features.chatGaming.channelId)}` : 'Canal non défini'" />
             <FeatureStatusCard featureName="Leveling" :status="guild.features?.leveling?.enabled" :details="guild.features?.leveling?.taux ? `Taux XP: x${guild.features.leveling.taux}` : ''" />
             <FeatureStatusCard featureName="Anniversaires" :status="!!guild.config?.channels?.birthday" :details="guild.config?.channels?.birthday ? `# ${getChannelName(guild.config.channels.birthday)}` : 'Canal non défini'" />
+            <FeatureStatusCard featureName="Suggestions" :status="guild.features?.suggestions?.enabled" :details="guild.features?.suggestions?.channelCount ? `${guild.features.suggestions.channelCount} channels configurés` : 'Aucun channel configuré'" />
           </div>
         </div>
 

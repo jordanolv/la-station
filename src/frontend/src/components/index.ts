@@ -23,7 +23,3 @@ export { default as GuildList } from './guild/GuildList.vue'
 export { default as GuildUserLeaderboard } from './guild/GuildUserLeaderboard.vue'
 export { default as FeaturesPanel } from './guild/FeaturesPanel.vue'
 
-// Common Components (remaining in components root)
-export { default as HelloWorld } from './HelloWorld.vue'
-export { default as TheWelcome } from './TheWelcome.vue'
-export { default as WelcomeItem } from './WelcomeItem.vue'

@@ -41,6 +41,11 @@
           <BirthdayManagement :guild-id="$route.params.id as string" />
         </div>
 
+        <!-- Suggestions Feature -->
+        <div v-else-if="$route.params.feature === 'suggestions'">
+          <SuggestionsManagement :guild-id="$route.params.id as string" />
+        </div>
+
         <!-- Unknown Feature -->
         <div v-else>
           <div class="text-center py-12">
@@ -67,6 +72,7 @@ import ChatGamingManagement from '../../../components/features/ChatGamingManagem
 import LevelingManagement from '../../../components/features/LevelingManagement.vue'
 import VocManagerManagement from '../../../components/features/VocManagerManagement.vue'
 import BirthdayManagement from '../../../components/features/BirthdayManagement.vue'
+import SuggestionsManagement from '../../../components/features/SuggestionsManagement.vue'
 
 const route = useRoute()
 
@@ -75,7 +81,8 @@ const featureName = computed(() => {
     'chat-gaming': 'Chat Gaming',
     'leveling': 'Système de niveaux',
     'voice-channels': 'Salons vocaux',
-    'birthday': 'Anniversaires'
+    'birthday': 'Anniversaires',
+    'suggestions': 'Système de Suggestions'
   }
   return featureMap[route.params.feature as string] || 'Fonctionnalité inconnue'
 })

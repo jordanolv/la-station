@@ -1,5 +1,7 @@
 import { Events, Interaction } from 'discord.js';
 import { BotClient } from '../../../bot/client';
+import { GuildService } from '../services/guild.service';
+import { SuggestionsService } from '../../suggestions/suggestions.service';
 
 export default {
   name: Events.InteractionCreate,
@@ -7,19 +9,22 @@ export default {
 
   async execute(client: BotClient, interaction: Interaction) {
     try {
+      // S'assurer que la guilde est en BDD
+      if (interaction.guild) {
+        await GuildService.getOrCreateGuild(interaction.guild.id, interaction.guild.name);
+      }
+
       // Gestion des commandes slash
       if (interaction.isCommand && interaction.isCommand()) {
         const command = client.slashCommands.get(interaction.commandName);
         
         if (!command) {
-          console.error(`Aucune commande correspondant à ${interaction.commandName} n'a été trouvée.`);
           return;
         }
         
         try {
           await command.execute(client, interaction);
         } catch (error) {
-          console.error(`Erreur lors de l'exécution de la commande ${interaction.commandName}:`, error);
           
           if (interaction.replied || interaction.deferred) {
             await interaction.followUp({ 
@@ -37,23 +42,24 @@ export default {
       
       // Gestion des boutons
       else if (interaction.isButton && interaction.isButton()) {
-        // Vous pourriez implémenter une gestion des boutons ici
-        console.log(`Bouton cliqué: ${interaction.customId}`);
+        if (interaction.customId === 'create_suggestion') {
+          await SuggestionsService.handleButtonInteraction(interaction);
+        } else {
+        }
       }
       
       // Gestion des menus de sélection
       else if (interaction.isStringSelectMenu && interaction.isStringSelectMenu()) {
-        // Vous pourriez implémenter une gestion des menus de sélection ici
-        console.log(`Menu de sélection: ${interaction.customId}, valeurs: ${interaction.values.join(', ')}`);
       }
       
       // Gestion des modals
       else if (interaction.isModalSubmit && interaction.isModalSubmit()) {
-        // Vous pourriez implémenter une gestion des modals ici
-        console.log(`Modal soumis: ${interaction.customId}`);
+        if (interaction.customId.startsWith('suggestion_modal_')) {
+          await SuggestionsService.handleModalSubmit(interaction);
+        } else {
+        }
       }
     } catch (error) {
-      console.error('Erreur dans l\'événement interactionCreate:', error);
     }
   }
-}; 
+};

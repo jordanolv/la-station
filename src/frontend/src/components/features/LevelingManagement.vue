@@ -40,36 +40,6 @@
         </div>
       </div>
 
-      <!-- Level Up Notifications -->
-      <div class="bg-gray-700 rounded-lg p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h3 class="text-lg font-medium text-white">Notifications de niveau</h3>
-            <p class="text-gray-400 text-sm">Envoyer une notification quand un membre monte de niveau</p>
-          </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input 
-              v-model="settings.notifLevelUp"
-              type="checkbox" 
-              class="sr-only peer"
-            >
-            <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-          </label>
-        </div>
-
-        <!-- Notification Channel (shown only if notifications are enabled) -->
-        <div v-if="settings.notifLevelUp" class="mt-4 pt-4 border-t border-gray-600">
-          <ChannelSelect
-            v-model="settings.channelNotif"
-            :guild-id="guildId"
-            channel-type="text"
-            label="Canal de notification (optionnel)"
-            placeholder="Aucun canal spécifique"
-            help-text="Laissez vide pour utiliser le canal où le membre a gagné l'XP"
-          />
-        </div>
-      </div>
-
       <!-- Save Button -->
       <div class="flex justify-end">
         <button 

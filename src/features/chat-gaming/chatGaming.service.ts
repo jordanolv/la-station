@@ -4,8 +4,8 @@ import GameModel, { IGame } from './game.model';
 import path from 'path';
 
 export class ChatGamingService {
-  // ===== GAME CRUD OPERATIONS =====
   
+  // ===== GAME CRUD OPERATIONS =====
   static async getGameById(id: string): Promise<IGame | null> {
     return GameModel.findById(id);
   }
@@ -52,7 +52,6 @@ export class ChatGamingService {
     return GameModel.findOne({ messageId });
   }
 
-  // ===== CHAT GAMING SETTINGS =====
   
   static async getChatGaming(guildId: string) {
     return ChatGamingModel.findOne({ guildId });
@@ -77,13 +76,11 @@ export class ChatGamingService {
     try {
       const chatGamingSettings = await ChatGamingModel.findOne({ guildId: guild.id });
       if (!chatGamingSettings?.enabled || !chatGamingSettings.channelId) {
-        console.log(`Chat gaming not enabled or channel not set for guild ${guild.id}`);
         return;
       }
 
       const channel = guild.channels.cache.get(chatGamingSettings.channelId);
       if (!channel || !(channel instanceof ForumChannel)) {
-        console.error(`Channel ${chatGamingSettings.channelId} not found or not a forum channel`);
         return;
       }
 
@@ -137,10 +134,8 @@ export class ChatGamingService {
         }
       );
 
-      console.log(`Game ${game.name} created with thread ${thread.id} and role ${gameRole.id}`);
 
     } catch (error) {
-      console.error('Error creating game in Discord:', error);
     }
   }
 
@@ -173,17 +168,22 @@ export class ChatGamingService {
 
       const role = guild.roles.cache.get(game.roleId);
       if (!role) {
-        console.error(`Role ${game.roleId} not found for game ${game.name}`);
         return;
       }
 
       if (!member.roles.cache.has(role.id)) {
         await member.roles.add(role);
+
+        if (reaction.message.channel.isThread()) {
+          const thread = reaction.message.channel as ThreadChannel;
+
+          await thread.members.add(user.id);
+        } 
+
         console.log(`Added role ${role.name} to ${member.user.tag} for game ${game.name}`);
       }
 
     } catch (error) {
-      console.error('Error handling game reaction add:', error);
     }
   }
 
@@ -216,17 +216,21 @@ export class ChatGamingService {
 
       const role = guild.roles.cache.get(game.roleId);
       if (!role) {
-        console.error(`Role ${game.roleId} not found for game ${game.name}`);
         return;
       }
 
       if (member.roles.cache.has(role.id)) {
         await member.roles.remove(role);
+
+        if (reaction.message.channel.isThread()) {
+          const thread = reaction.message.channel as ThreadChannel;
+
+          await thread.members.remove(user.id);
+        } 
         console.log(`Removed role ${role.name} from ${member.user.tag} for game ${game.name}`);
       }
 
     } catch (error) {
-      console.error('Error handling game reaction remove:', error);
     }
   }
 }
