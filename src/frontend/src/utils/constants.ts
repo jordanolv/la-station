@@ -22,6 +22,12 @@ export const FEATURE_CONFIG = {
     description: 'Notifications d\'anniversaires automatiques',
     icon: '🎂',
     color: 'pink'
+  },
+  'suggestions': {
+    name: 'Système de Suggestions',
+    description: 'Système de suggestions avec formulaires et votes',
+    icon: '💡',
+    color: 'indigo'
   }
 } as const
 

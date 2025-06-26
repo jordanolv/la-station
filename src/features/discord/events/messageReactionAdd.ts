@@ -2,6 +2,7 @@ import { Events, MessageReaction, User } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { GuildService } from '../services/guild.service';
 import { ChatGamingService } from '../../chat-gaming/chatGaming.service';
+import { SuggestionsService } from '../../suggestions/suggestions.service';
 
 export default {
   name: Events.MessageReactionAdd,
@@ -16,7 +17,6 @@ export default {
       try {
         await reaction.fetch();
       } catch (error) {
-        console.error('Erreur lors de la récupération de la réaction:', error);
         return;
       }
     }
@@ -30,11 +30,12 @@ export default {
       reaction.message.guild.name
     );
 
-    // Logging pour debug
-    console.log(`Réaction ${reaction.emoji.name} ajoutée par ${user.tag} sur le message ${reaction.message.id}`);
     
     // Gérer les réactions pour les jeux (chat-gaming feature)
     await ChatGamingService.handleReactionAdd(reaction, user);
+    
+    // Gérer les réactions pour les suggestions
+    await SuggestionsService.handleReactionAdd(reaction, user);
     
     // Ici, vous pourriez ajouter du code pour d'autres systèmes:
     // 1. Gérer les tickets
