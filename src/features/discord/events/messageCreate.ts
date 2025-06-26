@@ -2,6 +2,7 @@ import { Events, Message } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { StatsService } from '../../stats/stats.service';
 import { GuildService } from '../services/guild.service';
+import { LevelingService } from '@/features/leveling/leveling.service';
 
 export default {
   name: Events.MessageCreate,
@@ -47,8 +48,9 @@ export default {
         message.author.username
       );
       
-      // Émettre un événement pour le système de leveling
-      client.emit('userMessage', message);
+      // Gérer le système de leveling
+      await LevelingService.giveXpToUser(client, message);
+
     } catch (error) {
       console.error('Erreur dans l\'événement messageCreate:', error);
     }
