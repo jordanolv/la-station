@@ -225,7 +225,7 @@ export class SuggestionsService {
             const oldMessage = await channel.messages.fetch(channelConfig.buttonMessageId);
             await oldMessage.delete();
           } catch (error) {
-            console.log('Ancien message bouton introuvable');
+            // Ancien message bouton introuvable - pas grave
           }
         }
       }
@@ -376,7 +376,6 @@ export class SuggestionsService {
                 }
 
                 await message.edit({ embeds: [updatedEmbed] });
-                console.log(`Embed Discord mis à jour pour la suggestion ${suggestionId} avec le statut ${status}`);
               } catch (error) {
                 console.error('Erreur lors de la mise à jour de l\'embed Discord:', error);
               }
@@ -571,8 +570,6 @@ export class SuggestionsService {
         user.id
       );
 
-      console.log(`Réaction ${reaction.emoji.name} ajoutée par ${user.username} sur suggestion ${suggestion._id}`);
-
     } catch (error) {
       console.error('Erreur dans la gestion des réactions de suggestions:', error);
     }
@@ -594,8 +591,6 @@ export class SuggestionsService {
         reaction.emoji.name || reaction.emoji.id || '❓',
         user.id
       );
-
-      console.log(`Réaction ${reaction.emoji.name} retirée par ${user.username} sur suggestion ${suggestion._id}`);
 
     } catch (error) {
       console.error('Erreur dans la suppression des réactions de suggestions:', error);
@@ -725,7 +720,6 @@ export class SuggestionsService {
       if (channelConfig.readOnly) {
         try {
           await message.delete();
-          console.log(`Message supprimé dans le channel de suggestions read-only: ${message.channel.id}`);
           
           // Optionnel: envoyer un message éphémère pour informer l'utilisateur
           if (message.channel.isTextBased()) {
@@ -738,7 +732,7 @@ export class SuggestionsService {
               try {
                 await warningMessage.delete();
               } catch (error) {
-                console.log('Impossible de supprimer le message d\'avertissement');
+                // Pas grave si on ne peut pas supprimer le message d'avertissement
               }
             }, 5000);
           }
