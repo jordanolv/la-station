@@ -1,4 +1,4 @@
-import { Events } from 'discord.js';
+import { Events, ActivityType } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 
 export default {
@@ -6,7 +6,22 @@ export default {
   once: true,
 
   execute(client: BotClient) {
-    console.log(`✅ Feature Discord chargée avec succès!`);
-    console.log(`🔍 La feature Discord gère les événements de base comme voiceStateUpdate, messageCreate, etc.`);
+    const statuses = [
+      { name: 'Bienvenue sur La Station ! 👋', type: ActivityType.Playing },
+      { name: '/ask pour me poser une question 🤖', type: ActivityType.Watching },
+      { name: '/birthday pour votre anniversaire 🎂', type: ActivityType.Watching }
+    ];
+
+    let currentStatusIndex = 0;
+
+    const setStatus = () => {
+      const status = statuses[currentStatusIndex];
+      client.user?.setActivity(status.name, { type: status.type });
+      currentStatusIndex = (currentStatusIndex + 1) % statuses.length;
+    };
+
+    setStatus();
+
+    setInterval(setStatus, 8000);
   }
 }; 
