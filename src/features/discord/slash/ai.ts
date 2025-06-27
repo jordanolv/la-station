@@ -63,7 +63,7 @@ export default {
       }
 
       await interaction.editReply({
-        content: aiResponse
+        content: `⁉️ ${prompt}\n\n💬 ${aiResponse}`
       });
 
     } catch (error) {
