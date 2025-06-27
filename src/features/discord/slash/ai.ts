@@ -4,7 +4,7 @@ import { BotClient } from '../../../bot/client';
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('ai')
+    .setName('ask')
     .setDescription('Poser une question à l\'IA')
     .addStringOption(option =>
       option
