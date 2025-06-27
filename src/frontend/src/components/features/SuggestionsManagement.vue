@@ -352,6 +352,7 @@
 import { ref, computed, onMounted } from 'vue'
 import FormModal from './suggestions/FormModal.vue'
 import ChannelModal from './suggestions/ChannelModal.vue'
+import { useApi } from '../../composables/useApi'
 
 interface SuggestionForm {
   id: string
@@ -425,6 +426,7 @@ const props = defineProps<{
   guildId: string
 }>()
 
+const { get, post, put, delete: del } = useApi()
 const config = ref<SuggestionsConfig | null>(null)
 const suggestions = ref<Suggestion[]>([])
 const loading = ref(true)
@@ -463,11 +465,8 @@ const filteredSuggestions = computed(() => {
 
 async function loadConfig() {
   try {
-    const response = await fetch(`/api/guilds/${props.guildId}/features/suggestions/settings`)
-    if (response.ok) {
-      const data = await response.json()
-      config.value = data.settings
-    }
+    const data = await get<{ settings: SuggestionsConfig }>(`/api/guilds/${props.guildId}/features/suggestions/settings`)
+    config.value = data.settings
   } catch (error) {
     console.error('Erreur lors du chargement de la configuration:', error)
   }
@@ -475,10 +474,7 @@ async function loadConfig() {
 
 async function loadSuggestions() {
   try {
-    const response = await fetch(`/api/guilds/${props.guildId}/suggestions`)
-    if (response.ok) {
-      suggestions.value = await response.json()
-    }
+    suggestions.value = await get<Suggestion[]>(`/api/guilds/${props.guildId}/suggestions`)
   } catch (error) {
     console.error('Erreur lors du chargement des suggestions:', error)
   }
@@ -486,20 +482,17 @@ async function loadSuggestions() {
 
 async function loadDiscordChannels() {
   try {
-    const response = await fetch(`/api/guilds/${props.guildId}/channels`)
-    if (response.ok) {
-      const data = await response.json()
-      const channelMap: Record<string, string> = {}
-      
-      // Create a map of channel ID to channel name
-      if (data.textChannels) {
-        data.textChannels.forEach((channel: any) => {
-          channelMap[channel.id] = channel.name
-        })
-      }
-      
-      discordChannels.value = channelMap
+    const data = await get<{ textChannels?: Array<{ id: string, name: string }> }>(`/api/guilds/${props.guildId}/channels`)
+    const channelMap: Record<string, string> = {}
+    
+    // Create a map of channel ID to channel name
+    if (data.textChannels) {
+      data.textChannels.forEach((channel: any) => {
+        channelMap[channel.id] = channel.name
+      })
     }
+    
+    discordChannels.value = channelMap
   } catch (error) {
     console.error('Erreur lors du chargement des channels Discord:', error)
   }
@@ -508,16 +501,10 @@ async function loadDiscordChannels() {
 async function toggleFeature() {
   try {
     const newState = !config.value?.enabled
-    const response = await fetch(`/api/guilds/${props.guildId}/features/suggestions/toggle`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ enabled: newState })
-    })
+    await post(`/api/guilds/${props.guildId}/features/suggestions/toggle`, { enabled: newState })
     
-    if (response.ok) {
-      // Reload config after toggle
-      await loadConfig()
-    }
+    // Reload config after toggle
+    await loadConfig()
   } catch (error) {
     console.error('Erreur lors du toggle:', error)
   }
@@ -525,23 +512,15 @@ async function toggleFeature() {
 
 async function saveForm(formData: Omit<SuggestionForm, 'id' | 'createdAt' | 'updatedAt'>) {
   try {
-    const url = editingForm.value
-      ? `/api/guilds/${props.guildId}/suggestions/forms/${editingForm.value.id}`
-      : `/api/guilds/${props.guildId}/suggestions/forms`
-    
-    const method = editingForm.value ? 'PUT' : 'POST'
-    
-    const response = await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
-    })
-    
-    if (response.ok) {
-      await loadConfig()
-      showCreateFormModal.value = false
-      editingForm.value = null
+    if (editingForm.value) {
+      await put(`/api/guilds/${props.guildId}/suggestions/forms/${editingForm.value.id}`, formData)
+    } else {
+      await post(`/api/guilds/${props.guildId}/suggestions/forms`, formData)
     }
+    
+    await loadConfig()
+    showCreateFormModal.value = false
+    editingForm.value = null
   } catch (error) {
     console.error('Erreur lors de la sauvegarde du formulaire:', error)
   }
@@ -549,17 +528,11 @@ async function saveForm(formData: Omit<SuggestionForm, 'id' | 'createdAt' | 'upd
 
 async function saveChannel(channelData: Omit<SuggestionChannel, 'suggestionCount'>) {
   try {
-    const response = await fetch(`/api/guilds/${props.guildId}/suggestions/channels`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(channelData)
-    })
+    await post(`/api/guilds/${props.guildId}/suggestions/channels`, channelData)
     
-    if (response.ok) {
-      await loadConfig()
-      showAddChannelModal.value = false
-      editingChannel.value = null
-    }
+    await loadConfig()
+    showAddChannelModal.value = false
+    editingChannel.value = null
   } catch (error) {
     console.error('Erreur lors de la sauvegarde du channel:', error)
   }
@@ -579,13 +552,8 @@ async function deleteForm(formId: string) {
   if (!confirm('Êtes-vous sûr de vouloir supprimer ce formulaire ?')) return
   
   try {
-    const response = await fetch(`/api/guilds/${props.guildId}/suggestions/forms/${formId}`, {
-      method: 'DELETE'
-    })
-    
-    if (response.ok) {
-      await loadConfig()
-    }
+    await del(`/api/guilds/${props.guildId}/suggestions/forms/${formId}`)
+    await loadConfig()
   } catch (error) {
     console.error('Erreur lors de la suppression du formulaire:', error)
   }
@@ -595,13 +563,8 @@ async function removeChannel(channelId: string) {
   if (!confirm('Êtes-vous sûr de vouloir retirer ce channel ?')) return
   
   try {
-    const response = await fetch(`/api/guilds/${props.guildId}/suggestions/channels/${channelId}`, {
-      method: 'DELETE'
-    })
-    
-    if (response.ok) {
-      await loadConfig()
-    }
+    await del(`/api/guilds/${props.guildId}/suggestions/channels/${channelId}`)
+    await loadConfig()
   } catch (error) {
     console.error('Erreur lors de la suppression du channel:', error)
   }
@@ -609,15 +572,8 @@ async function removeChannel(channelId: string) {
 
 async function updateSuggestionStatus(suggestionId: string, status: string) {
   try {
-    const response = await fetch(`/api/guilds/${props.guildId}/suggestions/${suggestionId}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
-    })
-    
-    if (response.ok) {
-      await loadSuggestions()
-    }
+    await put(`/api/guilds/${props.guildId}/suggestions/${suggestionId}/status`, { status })
+    await loadSuggestions()
   } catch (error) {
     console.error('Erreur lors de la mise à jour du statut:', error)
   }
@@ -631,20 +587,14 @@ async function addModerationNote(suggestionId: string) {
     const suggestion = suggestions.value.find(s => s._id === suggestionId)
     if (!suggestion) return
 
-    const response = await fetch(`/api/guilds/${props.guildId}/suggestions/${suggestionId}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        status: suggestion.status, // Keep current status
-        note: note 
-      })
+    await put(`/api/guilds/${props.guildId}/suggestions/${suggestionId}/status`, { 
+      status: suggestion.status, // Keep current status
+      note: note 
     })
     
-    if (response.ok) {
-      // Clear the note input
-      moderationNotes.value[suggestionId] = ''
-      await loadSuggestions()
-    }
+    // Clear the note input
+    moderationNotes.value[suggestionId] = ''
+    await loadSuggestions()
   } catch (error) {
     console.error('Erreur lors de l\'ajout de la note:', error)
   }
@@ -652,22 +602,13 @@ async function addModerationNote(suggestionId: string) {
 
 async function publishButton(channelId: string) {
   try {
-    const response = await fetch(`/api/guilds/${props.guildId}/suggestions/channels/${channelId}/publish-button`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    
-    if (response.ok) {
-      const data = await response.json()
-      alert(`✅ ${data.message}`)
-      await loadConfig() // Reload to get updated button message ID
-    } else {
-      const error = await response.json()
-      alert(`❌ Erreur: ${error.error}`)
-    }
-  } catch (error) {
+    const data = await post<{ message: string }>(`/api/guilds/${props.guildId}/suggestions/channels/${channelId}/publish-button`)
+    alert(`✅ ${data.message}`)
+    await loadConfig() // Reload to get updated button message ID
+  } catch (error: any) {
     console.error('Erreur lors de la publication du bouton:', error)
-    alert('❌ Erreur lors de la publication du bouton')
+    const errorMessage = error.response?.data?.error || 'Erreur lors de la publication du bouton'
+    alert(`❌ Erreur: ${errorMessage}`)
   }
 }
 
