@@ -166,8 +166,23 @@ const loadChannels = async () => {
     
     const data = response.data
     
-    // Extract channels and categories from the response
-    channels.value = data.textChannels || data.channels?.filter((ch: Channel) => ch.type !== 'category') || []
+    // Extract channels based on the requested type
+    let extractedChannels = []
+    
+    if (props.channelType === 'text') {
+      extractedChannels = data.textChannels || []
+    } else if (props.channelType === 'voice') {
+      extractedChannels = data.voiceChannels || []
+    } else if (props.channelType === 'forum') {
+      extractedChannels = data.forumChannels || []
+    } else if (props.channelType === 'category') {
+      extractedChannels = data.categories || []
+    } else {
+      // 'all' or default - get all channels except categories
+      extractedChannels = data.channels?.filter((ch: Channel) => ch.type !== 'category') || []
+    }
+    
+    channels.value = extractedChannels
     categories.value = data.categories || []
   } catch (err) {
     console.error('Error loading channels:', err)

@@ -139,6 +139,7 @@ guilds.get('/:id/features', async (c) => {
     
     return c.json({ features });
   } catch (error) {
+    console.error('Error fetching guild features:', error);
     return c.json({ error: 'Failed to fetch features' }, 500);
   }
 });
