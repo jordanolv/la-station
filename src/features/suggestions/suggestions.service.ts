@@ -387,7 +387,70 @@ export class SuggestionsService {
       }
     }
 
+    // Envoyer un MP à l'auteur pour l'informer du changement de statut
+    try {
+      await this.sendStatusUpdateDM(updatedSuggestion, status, note);
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du MP à l\'auteur:', error);
+    }
+
     return updatedSuggestion;
+  }
+
+  // ===== ENVOI DE MP POUR CHANGEMENT DE STATUT =====
+
+  static async sendStatusUpdateDM(suggestion: ISuggestion, newStatus: string, note?: string): Promise<void> {
+    try {
+      const client = BotClient.getInstance();
+      if (!client) {
+        console.error('Bot client non disponible pour l\'envoi de MP');
+        return;
+      }
+
+      // Récupérer l'utilisateur par son ID
+      const user = await client.users.fetch(suggestion.authorId).catch(() => null);
+      if (!user) {
+        console.error('Utilisateur non trouvé pour l\'envoi de MP:', suggestion.authorId);
+        return;
+      }
+
+      // Récupérer le nom du serveur
+      const guild = client.guilds.cache.get(suggestion.guildId);
+      const guildName = guild?.name || 'Serveur Discord';
+
+      // Créer l'embed du MP
+      const embed = new EmbedBuilder()
+        .setColor(this.getStatusColor(newStatus))
+        .setTitle('📬 Mise à jour de votre suggestion')
+        .setDescription(`Votre suggestion sur **${guildName}** a été mise à jour !`)
+        .addFields([
+          {
+            name: '📊 Nouveau statut',
+            value: `${this.getStatusEmoji(newStatus)} **${this.getStatusText(newStatus)}**`,
+            inline: false
+          }
+        ])
+        .setTimestamp()
+        .setFooter({ text: `Serveur: ${guildName}` });
+
+      // Ajouter la note de modération si présente
+      if (note && note.trim()) {
+        embed.addFields({
+          name: '📝 Note de modération',
+          value: note,
+          inline: false
+        });
+      }
+
+      // Envoyer le MP
+      await user.send({ embeds: [embed] });
+      console.log(`MP envoyé à ${user.username} pour la suggestion ${suggestion._id}`);
+
+    } catch (error) {
+      // Si l'utilisateur a désactivé les MPs ou autre erreur
+      console.error('Erreur lors de l\'envoi du MP:', error);
+      // Ne pas faire planter le processus, juste logger l'erreur
+    }
   }
 
   // ===== CREATION EMBED SUGGESTION =====
