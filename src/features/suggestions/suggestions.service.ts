@@ -479,20 +479,7 @@ export class SuggestionsService {
         });
       }
     });
-    
-    // Ajouter les statistiques
-    if (suggestion.reactions.length > 0) {
-      const reactionText = suggestion.reactions
-        .map(r => `${r.emoji} ${r.count}`)
-        .join(' • ');
-      
-      embed.addFields({
-        name: '📊 Réactions',
-        value: reactionText,
-        inline: true
-      });
-    }
-    
+
     return embed;
   }
 
