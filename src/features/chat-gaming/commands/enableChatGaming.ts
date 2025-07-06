@@ -1,5 +1,5 @@
 import { Message } from 'discord.js';
-import ChatGamingModel from '../chatGaming.model';
+import ChatGamingModel from '../models/chatGaming.model';
 import { MESSAGE_DELETE_TIMEOUT } from '../../../shared/constants';
 
 export default {

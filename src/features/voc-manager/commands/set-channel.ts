@@ -1,5 +1,5 @@
 import { ChannelType, Message } from 'discord.js';
-import { VocManagerService } from '../vocManager.service';
+import { VocManagerService } from '../services/vocManager.service';
 
 export default {
   name: 'voc-set-channel',

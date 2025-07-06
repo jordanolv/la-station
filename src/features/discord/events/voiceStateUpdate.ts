@@ -1,7 +1,7 @@
 import { Events, VoiceState } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { VocManagerService } from '../../voc-manager/vocManager.service';
-import { StatsService } from '../../stats/stats.service';
+import { VocManagerService } from '../../voc-manager/services/vocManager.service';
+import { StatsService } from '../../stats/services/stats.service';
 
 export default {
   name: Events.VoiceStateUpdate,

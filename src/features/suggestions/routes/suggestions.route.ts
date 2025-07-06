@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { BotClient } from '../../bot/client';
-import { SuggestionsService } from './suggestions.service';
+import { BotClient } from '../../../bot/client';
+import { SuggestionsService } from '../services/suggestions.service';
 import { ChannelType } from 'discord.js';
 
 const suggestions = new Hono();

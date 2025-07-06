@@ -1,13 +1,18 @@
 import { ChannelType, VoiceState } from 'discord.js';
-import { BotClient } from '../../bot/client';
-import VocManagerModel, { IVocManager, IJoinChannel } from './vocManager.model';
+import { BotClient } from '../../../bot/client';
+import { VocManagerConfig, IJoinChannel } from '../models/vocManagerConfig.model';
+import GuildModel from '../../discord/models/guild.model';
+import { GuildService } from '../../discord/services/guild.service';
+
+type IVocManager = VocManagerConfig;
 
 export class VocManagerService {
   /**
    * Récupère la configuration VocManager pour une guilde
    */
   static async getVocManager(guildId: string): Promise<IVocManager | null> {
-    return VocManagerModel.findOne({ guildId });
+    const guild = await GuildModel.findOne({ guildId });
+    return guild?.features?.vocManager || null;
   }
 
   /**
@@ -17,14 +22,20 @@ export class VocManagerService {
     guildId: string, 
     enabled: boolean = false
   ): Promise<IVocManager> {
-    return VocManagerModel.create({
-      guildId,
+    const guild = await GuildService.getOrCreateGuild(guildId);
+
+    const vocManagerConfig: IVocManager = {
       enabled,
       joinChannels: [],
       createdChannels: [],
-      channelCount: 0,
-      channelStats: []
-    });
+      channelCount: 0
+    };
+
+    guild.features = guild.features || {};
+    guild.features.vocManager = vocManagerConfig;
+    await guild.save();
+
+    return vocManagerConfig;
   }
 
   /**
@@ -45,45 +56,40 @@ export class VocManagerService {
   /**
    * Ajoute un canal à la liste des canaux créés
    */
-  static async addChannel(guildId: string, channelId: string, createdBy?: string): Promise<IVocManager | null> {
-    const vocManagerData = await this.getVocManager(guildId);
-    if (!vocManagerData) return null;
+  static async addChannel(guildId: string, channelId: string): Promise<IVocManager | null> {
+    const guild = await GuildService.getOrCreateGuild(guildId);
 
-    vocManagerData.createdChannels.push(channelId);
-    vocManagerData.channelCount += 1;
-    
-    // Ajouter les statistiques du canal
-    if (createdBy) {
-      vocManagerData.channelStats.push({
-        channelId,
-        createdAt: new Date(),
-        createdBy,
-        totalUsers: 0,
-        sessionDuration: 0,
-        lastActivity: new Date()
-      });
+    if (!guild.features) guild.features = {};
+    if (!guild.features.vocManager) {
+      guild.features.vocManager = {
+        enabled: false,
+        joinChannels: [],
+        createdChannels: [],
+        channelCount: 0
+      };
     }
+
+    guild.features.vocManager.createdChannels.push(channelId);
+    guild.features.vocManager.channelCount += 1;
     
-    return vocManagerData.save();
+    await guild.save();
+    return guild.features.vocManager;
   }
 
   /**
    * Supprime un canal de la liste des canaux créés
    */
   static async removeChannel(guildId: string, channelId: string): Promise<IVocManager | null> {
-    const vocManagerData = await this.getVocManager(guildId);
-    if (!vocManagerData) return null;
+    const guild = await GuildService.getOrCreateGuild(guildId);
 
-    vocManagerData.createdChannels = vocManagerData.createdChannels.filter(
+    if (!guild.features?.vocManager) return null;
+
+    guild.features.vocManager.createdChannels = guild.features.vocManager.createdChannels.filter(
       (id: string) => id !== channelId
     );
     
-    // Supprimer aussi les stats du canal
-    vocManagerData.channelStats = vocManagerData.channelStats.filter(
-      (stat) => stat.channelId !== channelId
-    );
-    
-    return vocManagerData.save();
+    await guild.save();
+    return guild.features.vocManager;
   }
 
   /**
@@ -230,7 +236,7 @@ export class VocManagerService {
           }
           
           // Mettre à jour la base de données
-          await this.addChannel(guildId, newChannel.id, newState.member?.user.id);
+          await this.addChannel(guildId, newChannel.id);
           
           console.log(`[VocManager] Canal vocal créé: ${newChannel.name} pour ${username}`);
         } catch (error) {

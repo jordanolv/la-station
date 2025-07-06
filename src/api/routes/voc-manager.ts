@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { BotClient } from '../../bot/client';
-import { VocManagerService } from '../../features/voc-manager/vocManager.service';
+import { VocManagerService } from '../../features/voc-manager/services/vocManager.service';
 import { ChannelType } from 'discord.js';
 
 const vocManager = new Hono();

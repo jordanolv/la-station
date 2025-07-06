@@ -1,8 +1,9 @@
 import { Events, MessageReaction, User } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { GuildService } from '../services/guild.service';
-import { ChatGamingService } from '../../chat-gaming/chatGaming.service';
-import { SuggestionsService } from '../../suggestions/suggestions.service';
+import { ChatGamingService } from '../../chat-gaming/services/chatGaming.service';
+import { SuggestionsService } from '../../suggestions/services/suggestions.service';
+import { PartyService } from '../../party/services/party.service';
 
 export default {
   name: Events.MessageReactionRemove,
@@ -37,6 +38,11 @@ export default {
     // Gérer les réactions pour les suggestions
     await SuggestionsService.handleReactionRemove(reaction, user);
     
+    // Gérer les réactions pour les événements/soirées (party feature)
+    if (reaction.emoji.name === '🎉') {
+      await PartyService.handleReactionRemove(client, reaction.message.id, user.id);
+    }
+
     // Ici, vous pourriez ajouter du code pour d'autres systèmes:
     // 1. Fermer des tickets
     // 2. Autres systèmes de réaction

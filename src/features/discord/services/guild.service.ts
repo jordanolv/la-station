@@ -1,9 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import GuildModel, { IGuild } from '../models/guild.model';
-import { LevelingService } from '../../leveling/leveling.service';
-import { VocManagerService } from '../../voc-manager/vocManager.service';
-import { ChatGamingService } from '../../chat-gaming/chatGaming.service';
-import { SuggestionsService } from '../../suggestions/suggestions.service';
+import { LevelingService } from '../../leveling/services/leveling.service';
+import { VocManagerService } from '../../voc-manager/services/vocManager.service';
+import { ChatGamingService } from '../../chat-gaming/services/chatGaming.service';
+import { SuggestionsService } from '../../suggestions/services/suggestions.service';
 
 // Service pour les opérations liées aux guildes
 export class GuildService {
