@@ -1,7 +1,7 @@
 import { Events, Interaction } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { GuildService } from '../services/guild.service';
-import { SuggestionsService } from '../../suggestions/suggestions.service';
+import { SuggestionsService } from '../../suggestions/services/suggestions.service';
 
 export default {
   name: Events.InteractionCreate,

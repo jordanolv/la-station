@@ -1,9 +1,9 @@
 import { Events, Message } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { StatsService } from '../../stats/stats.service';
+import { StatsService } from '../../stats/services/stats.service';
 import { GuildService } from '../services/guild.service';
-import { SuggestionsService } from '../../suggestions/suggestions.service';
-import { LevelingService } from '@/features/leveling/leveling.service';
+import { SuggestionsService } from '../../suggestions/services/suggestions.service';
+import { LevelingService } from '@/features/leveling/services/leveling.service';
 
 export default {
   name: Events.MessageCreate,

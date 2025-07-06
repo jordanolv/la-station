@@ -1,44 +1,69 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
+import { ChatGamingConfig } from '../../chat-gaming/models/chatGamingConfig.model';
+import { LevelingConfig } from '../../leveling/models/levelingConfig.model';
+import { VocManagerConfig } from '../../voc-manager/models/vocManagerConfig.model';
+import { PartyConfig } from '../../party/models/partyConfig.model';
+import { SuggestionsConfig } from '../../suggestions/models/suggestionConfig.model';
+import { BirthdayConfig } from '../../user/models/birthdayConfig.model';
 
-export interface IGuild extends Document {
-  _id: Types.ObjectId;
-  guildId: string;
-  name: string;
-  registeredAt: Date;
-  config: {
-    prefix: string;
-    colors: {
-      primary: string;
-    };
-    channels?: {
-      birthday?: string;
-      logs?: string;
-    };
-  };
+class GuildConfig {
+  @prop({ default: '!' })
+  prefix!: string;
+
+  @prop({ 
+    default: () => ({ primary: '#dac1ff' })
+  })
+  colors!: Map<string, any>;
+
+  @prop({
+    default: () => ({})
+  })
+  channels?: Map<string, any>;
 }
 
-const GuildSchema = new Schema<IGuild>({
-  _id: { type: Schema.Types.ObjectId, auto: true },
-  guildId: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
-  registeredAt: { type: Date, default: Date.now },
-  config: {
-    prefix: { type: String, default: '!' },
-    colors: {
-      primary: { type: String, default: '#dac1ff' },
-    },
-    channels: {
-      birthday: { type: String },
-      logs: { type: String }
-    }
-  }
-}, {
-  collection: 'guilds'
+class GuildFeatures {
+  @prop({ type: () => ChatGamingConfig })
+  chatGaming?: ChatGamingConfig;
+
+  @prop({ type: () => LevelingConfig })
+  leveling?: LevelingConfig;
+
+  @prop({ type: () => VocManagerConfig })
+  vocManager?: VocManagerConfig;
+
+  @prop({ type: () => PartyConfig })
+  party?: PartyConfig;
+
+  @prop({ type: () => SuggestionsConfig })
+  suggestions?: SuggestionsConfig;
+
+  @prop({ type: () => BirthdayConfig })
+  birthday?: BirthdayConfig;
+}
+
+export class Guild {
+  @prop({ required: true, unique: true })
+  guildId!: string;
+
+  @prop({ required: true })
+  name!: string;
+
+  @prop({ default: () => new Date() })
+  registeredAt!: Date;
+
+  @prop({ type: () => GuildConfig, default: () => new GuildConfig() })
+  config!: GuildConfig;
+
+  @prop({ type: () => GuildFeatures, default: () => new GuildFeatures() })
+  features!: GuildFeatures;
+}
+
+// Types pour la compatibilité
+export type IGuild = DocumentType<Guild>;
+
+// Créer le modèle avec Typegoose
+const GuildModel = getModelForClass(Guild, {
+  schemaOptions: { collection: 'guilds' }
 });
 
-// Utiliser un nom de modèle qui correspond à la collection pour éviter les conflits
-const GuildModel = mongoose.models.Guild_Model || mongoose.model<IGuild>('Guild_Model', GuildSchema);
-
-export default GuildModel;
-
-GuildSchema.index({ id: 1 }, { unique: false }); 
+export default GuildModel; 

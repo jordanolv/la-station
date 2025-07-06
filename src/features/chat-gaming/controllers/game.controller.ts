@@ -1,6 +1,6 @@
 import { Context } from 'hono';
-import { ChatGamingService } from './chatGaming.service';
-import { saveGameImage } from './game.utils';
+import { ChatGamingService } from '../services/chatGaming.service';
+import { saveGameImage } from '../utils/game.utils';
 
 export class GameController {
   /**
