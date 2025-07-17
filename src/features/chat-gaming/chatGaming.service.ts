@@ -4,8 +4,8 @@ import GameModel, { IGame } from './game.model';
 import path from 'path';
 
 export class ChatGamingService {
-  // ===== GAME CRUD OPERATIONS =====
   
+  // ===== GAME CRUD OPERATIONS =====
   static async getGameById(id: string): Promise<IGame | null> {
     return GameModel.findById(id);
   }
@@ -52,7 +52,6 @@ export class ChatGamingService {
     return GameModel.findOne({ messageId });
   }
 
-  // ===== CHAT GAMING SETTINGS =====
   
   static async getChatGaming(guildId: string) {
     return ChatGamingModel.findOne({ guildId });
@@ -174,6 +173,14 @@ export class ChatGamingService {
 
       if (!member.roles.cache.has(role.id)) {
         await member.roles.add(role);
+
+        if (reaction.message.channel.isThread()) {
+          const thread = reaction.message.channel as ThreadChannel;
+
+          await thread.members.add(user.id);
+        } 
+
+        console.log(`Added role ${role.name} to ${member.user.tag} for game ${game.name}`);
       }
 
     } catch (error) {
@@ -214,6 +221,13 @@ export class ChatGamingService {
 
       if (member.roles.cache.has(role.id)) {
         await member.roles.remove(role);
+
+        if (reaction.message.channel.isThread()) {
+          const thread = reaction.message.channel as ThreadChannel;
+
+          await thread.members.remove(user.id);
+        } 
+        console.log(`Removed role ${role.name} from ${member.user.tag} for game ${game.name}`);
       }
 
     } catch (error) {

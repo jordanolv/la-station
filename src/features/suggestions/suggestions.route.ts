@@ -168,17 +168,9 @@ suggestions.post('/config/:guildId/channels', async (c) => {
     }
 
     const requestBody = await c.req.json();
-    console.log('=== DEBUG: Request body received ===');
-    console.log(JSON.stringify(requestBody, null, 2));
-    
     const { channelId, formId, readOnly = true, republishInterval = 4, customReactions, pinButton = false, channelName, enabled = true } = requestBody;
 
-    console.log('=== DEBUG: Extracted values ===');
-    console.log({ channelId, formId, readOnly, republishInterval, customReactions, pinButton, channelName, enabled });
-
     if (!channelId || !formId) {
-      console.log('=== DEBUG: Missing required fields ===');
-      console.log('channelId:', channelId, 'formId:', formId);
       return c.json({ error: 'Channel ID and form ID are required' }, 400);
     }
 
