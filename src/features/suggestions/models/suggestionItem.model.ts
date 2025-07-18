@@ -1,4 +1,4 @@
-import { prop, getModelForClass, index } from '@typegoose/typegoose';
+import { prop, getModelForClass, index, DocumentType } from '@typegoose/typegoose';
 
 export type SuggestionStatus = 'pending' | 'approved' | 'rejected' | 'implemented' | 'under_review';
 
@@ -31,6 +31,9 @@ export class SuggestionField {
 @index({ guildId: 1, status: 1, score: -1 })
 @index({ authorId: 1, guildId: 1 })
 export class SuggestionItem {
+  public _id!: any;
+  public createdAt!: Date;
+  public updatedAt!: Date;
   @prop({ required: true })
   guildId!: string;
 
@@ -111,4 +114,4 @@ export default SuggestionItemModel;
 // Garde les interfaces pour la compatibilité
 export type ISuggestionReaction = SuggestionReaction;
 export type ISuggestionField = SuggestionField;
-export type ISuggestionItem = SuggestionItem;
+export type ISuggestionItem = DocumentType<SuggestionItem>;

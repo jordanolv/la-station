@@ -1,4 +1,4 @@
-import { prop } from '@typegoose/typegoose';
+import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
 
 // Types pour les champs de formulaire
 export type FormFieldType = 'text' | 'textarea' | 'select' | 'number' | 'boolean';
@@ -98,8 +98,19 @@ export class SuggestionsConfig {
   defaultReactions!: string[];
 }
 
+// Créer le modèle
+export const SuggestionsConfigModel = getModelForClass(SuggestionsConfig, {
+  schemaOptions: {
+    timestamps: true,
+    collection: 'suggestions_config'
+  }
+});
+
+// Export par défaut pour compatibilité
+export default SuggestionsConfigModel;
+
 // Garde les interfaces pour la compatibilité
 export type IFormField = FormField;
 export type ISuggestionForm = SuggestionForm;
 export type ISuggestionChannel = SuggestionChannel;
-export type ISuggestionsConfig = SuggestionsConfig;
+export type ISuggestionsConfig = DocumentType<SuggestionsConfig>;

@@ -20,8 +20,8 @@ import SuggestionsConfigModel, {
   ISuggestionChannel, 
   ISuggestionForm,
   IFormField 
-} from './models/suggestions.model';
-import SuggestionModel, { ISuggestion, ISuggestionField } from './models/suggestion.model';
+} from '../models/suggestionConfig.model';
+import SuggestionItemModel, { ISuggestionItem, ISuggestionField } from '../models/suggestionItem.model';
 import { BotClient } from '../../../bot/client';
 
 export class SuggestionsService {
@@ -292,8 +292,8 @@ export class SuggestionsService {
     authorUsername: string,
     fields: ISuggestionField[],
     authorAvatar?: string
-  ): Promise<ISuggestion> {
-    return SuggestionModel.create({
+  ): Promise<ISuggestionItem> {
+    return SuggestionItemModel.create({
       guildId,
       channelId,
       formId,
@@ -308,29 +308,29 @@ export class SuggestionsService {
     });
   }
 
-  static async getSuggestion(suggestionId: string): Promise<ISuggestion | null> {
-    return SuggestionModel.findById(suggestionId);
+  static async getSuggestion(suggestionId: string): Promise<ISuggestionItem | null> {
+    return SuggestionItemModel.findById(suggestionId);
   }
 
-  static async getSuggestionByMessageId(messageId: string): Promise<ISuggestion | null> {
-    return SuggestionModel.findOne({ messageId });
+  static async getSuggestionByMessageId(messageId: string): Promise<ISuggestionItem | null> {
+    return SuggestionItemModel.findOne({ messageId });
   }
 
-  static async getSuggestionsByGuild(guildId: string, limit: number = 20, skip: number = 0): Promise<ISuggestion[]> {
-    return SuggestionModel.find({ guildId })
+  static async getSuggestionsByGuild(guildId: string, limit: number = 20, skip: number = 0): Promise<ISuggestionItem[]> {
+    return SuggestionItemModel.find({ guildId })
       .sort({ score: -1, createdAt: -1 })
       .limit(limit)
       .skip(skip);
   }
 
-  static async getSuggestionsByChannel(channelId: string, limit: number = 20): Promise<ISuggestion[]> {
-    return SuggestionModel.find({ channelId })
+  static async getSuggestionsByChannel(channelId: string, limit: number = 20): Promise<ISuggestionItem[]> {
+    return SuggestionItemModel.find({ channelId })
       .sort({ createdAt: -1 })
       .limit(limit);
   }
 
-  static async updateSuggestionStatus(suggestionId: string, status: string, moderatorId?: string, note?: string): Promise<ISuggestion | null> {
-    const updatedSuggestion = await SuggestionModel.findByIdAndUpdate(
+  static async updateSuggestionStatus(suggestionId: string, status: string, moderatorId?: string, note?: string): Promise<ISuggestionItem | null> {
+    const updatedSuggestion = await SuggestionItemModel.findByIdAndUpdate(
       suggestionId,
       {
         status,
@@ -392,7 +392,7 @@ export class SuggestionsService {
 
   // ===== CREATION EMBED SUGGESTION =====
   
-  static createSuggestionEmbed(suggestion: ISuggestion, config: ISuggestionsConfig): EmbedBuilder {
+  static createSuggestionEmbed(suggestion: ISuggestionItem, config: ISuggestionsConfig): EmbedBuilder {
     const embed = new EmbedBuilder()
       .setColor(this.getStatusColor(suggestion.status))
       .setAuthor({ 
@@ -471,8 +471,8 @@ export class SuggestionsService {
 
   // ===== GESTION DES REACTIONS =====
   
-  static async addReactionToSuggestion(suggestionId: string, emoji: string, userId: string): Promise<ISuggestion | null> {
-    const suggestion = await SuggestionModel.findById(suggestionId);
+  static async addReactionToSuggestion(suggestionId: string, emoji: string, userId: string): Promise<ISuggestionItem | null> {
+    const suggestion = await SuggestionItemModel.findById(suggestionId);
     if (!suggestion) return null;
     
     const reactionIndex = suggestion.reactions.findIndex(r => r.emoji === emoji);
@@ -499,8 +499,8 @@ export class SuggestionsService {
     return suggestion.save();
   }
 
-  static async removeReactionFromSuggestion(suggestionId: string, emoji: string, userId: string): Promise<ISuggestion | null> {
-    const suggestion = await SuggestionModel.findById(suggestionId);
+  static async removeReactionFromSuggestion(suggestionId: string, emoji: string, userId: string): Promise<ISuggestionItem | null> {
+    const suggestion = await SuggestionItemModel.findById(suggestionId);
     if (!suggestion) return null;
     
     const reactionIndex = suggestion.reactions.findIndex(r => r.emoji === emoji);

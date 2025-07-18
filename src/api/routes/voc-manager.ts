@@ -253,7 +253,7 @@ vocManager.post('/create-channel', async (c) => {
     });
 
     // Add to created channels (using 'web-interface' as creator since no specific user)
-    await VocManagerService.addChannel(guildId, newChannel.id, 'web-interface');
+    await VocManagerService.addChannel(guildId, newChannel.id);
 
     return c.json({ 
       message: 'Voice channel created successfully', 

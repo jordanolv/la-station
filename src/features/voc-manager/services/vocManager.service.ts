@@ -1,10 +1,8 @@
 import { ChannelType, VoiceState } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { VocManagerConfig, IJoinChannel } from '../models/vocManagerConfig.model';
+import { IVocManager, IVocManagerDoc, IJoinChannel } from '../models/vocManagerConfig.model';
 import GuildModel from '../../discord/models/guild.model';
 import { GuildService } from '../../discord/services/guild.service';
-
-type IVocManager = VocManagerConfig;
 
 export class VocManagerService {
   /**
@@ -101,8 +99,10 @@ export class VocManagerService {
     category: string,
     nameTemplate: string = '🎮 {username} #{count}'
   ): Promise<IVocManager | null> {
-    const vocManagerData = await this.getVocManager(guildId);
-    if (!vocManagerData) return null;
+    const guild = await GuildModel.findOne({ guildId });
+    if (!guild?.features?.vocManager) return null;
+
+    const vocManagerData = guild.features.vocManager;
 
     // Vérifier si ce canal existe déjà
     const existingIndex = vocManagerData.joinChannels.findIndex(channel => channel.id === channelId);
@@ -116,7 +116,6 @@ export class VocManagerService {
       };
     } else {
       // Ajouter un nouveau canal
-      // @ts-ignore - Le schéma nécessite 'category' mais l'interface ne le déclare pas
       vocManagerData.joinChannels.push({
         id: channelId,
         nameTemplate,
@@ -124,21 +123,25 @@ export class VocManagerService {
       });
     }
 
-    return vocManagerData.save();
+    await guild.save();
+    return vocManagerData;
   }
 
   /**
    * Supprime un canal de jointure
    */
   static async removeJoinChannel(guildId: string, channelId: string): Promise<IVocManager | null> {
-    const vocManagerData = await this.getVocManager(guildId);
-    if (!vocManagerData) return null;
+    const guild = await GuildModel.findOne({ guildId });
+    if (!guild?.features?.vocManager) return null;
+
+    const vocManagerData = guild.features.vocManager;
 
     vocManagerData.joinChannels = vocManagerData.joinChannels.filter(
       channel => channel.id !== channelId
     );
     
-    return vocManagerData.save();
+    await guild.save();
+    return vocManagerData;
   }
 
   /**
@@ -150,8 +153,10 @@ export class VocManagerService {
     nameTemplate?: string,
     category?: string
   ): Promise<IVocManager | null> {
-    const vocManagerData = await this.getVocManager(guildId);
-    if (!vocManagerData) return null;
+    const guild = await GuildModel.findOne({ guildId });
+    if (!guild?.features?.vocManager) return null;
+
+    const vocManagerData = guild.features.vocManager;
 
     const channelIndex = vocManagerData.joinChannels.findIndex(channel => channel.id === channelId);
     if (channelIndex === -1) return null;
@@ -161,22 +166,23 @@ export class VocManagerService {
     }
     
     if (category !== undefined) {
-      // @ts-ignore - Le schéma nécessite 'category' mais l'interface ne le déclare pas
       vocManagerData.joinChannels[channelIndex].category = category;
     }
 
-    return vocManagerData.save();
+    await guild.save();
+    return vocManagerData;
   }
 
   /**
    * Active ou désactive la fonctionnalité
    */
   static async toggleFeature(guildId: string, enabled: boolean): Promise<IVocManager | null> {
-    const vocManagerData = await this.getVocManager(guildId);
-    if (!vocManagerData) return null;
+    const guild = await GuildModel.findOne({ guildId });
+    if (!guild?.features?.vocManager) return null;
 
-    vocManagerData.enabled = enabled;
-    return vocManagerData.save();
+    guild.features.vocManager.enabled = enabled;
+    await guild.save();
+    return guild.features.vocManager;
   }
 
   /**

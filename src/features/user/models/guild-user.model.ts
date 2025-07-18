@@ -1,4 +1,4 @@
-import { prop, getModelForClass, index } from '@typegoose/typegoose';
+import { prop, getModelForClass, index, DocumentType } from '@typegoose/typegoose';
 
 class VoiceHistoryEntry {
   @prop({ default: () => new Date() })
@@ -72,5 +72,5 @@ const GuildUserModel = getModelForClass(GuildUser, {
   }
 });
 
-export type IGuildUser = GuildUser;
+export type IGuildUser = DocumentType<GuildUser>;
 export default GuildUserModel; 

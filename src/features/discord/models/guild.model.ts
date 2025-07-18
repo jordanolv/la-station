@@ -1,7 +1,7 @@
 import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
 import { ChatGamingConfig } from '../../chat-gaming/models/chatGamingConfig.model';
 import { LevelingConfig } from '../../leveling/models/levelingConfig.model';
-import { VocManagerConfig } from '../../voc-manager/models/vocManagerConfig.model';
+import { VocManagerConfig, IVocManager } from '../../voc-manager/models/vocManagerConfig.model';
 import { PartyConfig } from '../../party/models/partyConfig.model';
 import { SuggestionsConfig } from '../../suggestions/models/suggestionConfig.model';
 import { BirthdayConfig } from '../../user/models/birthdayConfig.model';
@@ -29,7 +29,7 @@ class GuildFeatures {
   leveling?: LevelingConfig;
 
   @prop({ type: () => VocManagerConfig })
-  vocManager?: VocManagerConfig;
+  vocManager?: IVocManager;
 
   @prop({ type: () => PartyConfig })
   party?: PartyConfig;

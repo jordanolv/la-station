@@ -1,4 +1,4 @@
-import { prop, getModelForClass } from '@typegoose/typegoose';
+import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
 
 // Classes pour les objets imbriqués
 export class JoinChannel {
@@ -39,4 +39,5 @@ export default VocManagerModel;
 
 // Garde les interfaces pour la compatibilité
 export type IJoinChannel = JoinChannel;
+export type IVocManagerDoc = DocumentType<VocManagerConfig>;
 export type IVocManager = VocManagerConfig; 
