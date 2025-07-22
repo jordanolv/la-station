@@ -116,12 +116,4 @@ export default SuggestionsConfigModel;
 export type IFormField = FormField;
 export type ISuggestionForm = SuggestionForm;
 export type ISuggestionChannel = SuggestionChannel;
-<<<<<<< Updated upstream
 export type ISuggestionsConfig = DocumentType<SuggestionsConfig>;
-=======
-export type ISuggestionsConfig = DocumentType<SuggestionsConfig>;
-
-// Créer et exporter le modèle
-const SuggestionsConfigModel = getModelForClass(SuggestionsConfig);
-export default SuggestionsConfigModel;
->>>>>>> Stashed changes

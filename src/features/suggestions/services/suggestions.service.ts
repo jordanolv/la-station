@@ -21,11 +21,7 @@ import SuggestionsConfigModel, {
   ISuggestionForm,
   IFormField 
 } from '../models/suggestionConfig.model';
-<<<<<<< Updated upstream
-import SuggestionItemModel, { ISuggestionItem, ISuggestionField } from '../models/suggestionItem.model';
-=======
 import SuggestionModel, { ISuggestionItem, ISuggestionField } from '../models/suggestionItem.model';
->>>>>>> Stashed changes
 import { BotClient } from '../../../bot/client';
 
 export class SuggestionsService {
@@ -297,11 +293,7 @@ export class SuggestionsService {
     fields: ISuggestionField[],
     authorAvatar?: string
   ): Promise<ISuggestionItem> {
-<<<<<<< Updated upstream
-    return SuggestionItemModel.create({
-=======
     return SuggestionModel.create({
->>>>>>> Stashed changes
       guildId,
       channelId,
       formId,
@@ -317,17 +309,6 @@ export class SuggestionsService {
   }
 
   static async getSuggestion(suggestionId: string): Promise<ISuggestionItem | null> {
-<<<<<<< Updated upstream
-    return SuggestionItemModel.findById(suggestionId);
-  }
-
-  static async getSuggestionByMessageId(messageId: string): Promise<ISuggestionItem | null> {
-    return SuggestionItemModel.findOne({ messageId });
-  }
-
-  static async getSuggestionsByGuild(guildId: string, limit: number = 20, skip: number = 0): Promise<ISuggestionItem[]> {
-    return SuggestionItemModel.find({ guildId })
-=======
     return SuggestionModel.findById(suggestionId);
   }
 
@@ -337,28 +318,19 @@ export class SuggestionsService {
 
   static async getSuggestionsByGuild(guildId: string, limit: number = 20, skip: number = 0): Promise<ISuggestionItem[]> {
     return SuggestionModel.find({ guildId })
->>>>>>> Stashed changes
       .sort({ score: -1, createdAt: -1 })
       .limit(limit)
       .skip(skip);
   }
 
   static async getSuggestionsByChannel(channelId: string, limit: number = 20): Promise<ISuggestionItem[]> {
-<<<<<<< Updated upstream
-    return SuggestionItemModel.find({ channelId })
-=======
     return SuggestionModel.find({ channelId })
->>>>>>> Stashed changes
       .sort({ createdAt: -1 })
       .limit(limit);
   }
 
   static async updateSuggestionStatus(suggestionId: string, status: string, moderatorId?: string, note?: string): Promise<ISuggestionItem | null> {
-<<<<<<< Updated upstream
-    const updatedSuggestion = await SuggestionItemModel.findByIdAndUpdate(
-=======
     const updatedSuggestion = await SuggestionModel.findByIdAndUpdate(
->>>>>>> Stashed changes
       suggestionId,
       {
         status,
@@ -500,11 +472,7 @@ export class SuggestionsService {
   // ===== GESTION DES REACTIONS =====
   
   static async addReactionToSuggestion(suggestionId: string, emoji: string, userId: string): Promise<ISuggestionItem | null> {
-<<<<<<< Updated upstream
-    const suggestion = await SuggestionItemModel.findById(suggestionId);
-=======
     const suggestion = await SuggestionModel.findById(suggestionId);
->>>>>>> Stashed changes
     if (!suggestion) return null;
     
     const reactionIndex = suggestion.reactions.findIndex(r => r.emoji === emoji);
@@ -532,11 +500,7 @@ export class SuggestionsService {
   }
 
   static async removeReactionFromSuggestion(suggestionId: string, emoji: string, userId: string): Promise<ISuggestionItem | null> {
-<<<<<<< Updated upstream
-    const suggestion = await SuggestionItemModel.findById(suggestionId);
-=======
     const suggestion = await SuggestionModel.findById(suggestionId);
->>>>>>> Stashed changes
     if (!suggestion) return null;
     
     const reactionIndex = suggestion.reactions.findIndex(r => r.emoji === emoji);
