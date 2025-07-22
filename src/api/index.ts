@@ -8,7 +8,7 @@ import { auth } from './routes/auth'
 import { games } from './routes/games'
 import { guilds } from './routes/guilds'
 import vocManager from './routes/voc-manager'
-import suggestions from '../features/suggestions/routes/suggestions.route'
+// import suggestions from '../features/suggestions/routes/suggestions.route' // Moved to guilds.ts
 import party from '../features/party/routes/party.route'
 
 import path from 'path'
@@ -41,7 +41,7 @@ export function createAPI(client: BotClient) {
   app.route('/api/games', games)
   app.route('/api/guilds', guilds)
   app.route('/api/voc-manager', vocManager)
-  app.route('/api/suggestions', suggestions)
+  // app.route('/api/suggestions', suggestions) // Routes moved to guilds.ts
   app.route('/api/party', party)
   // Health check
   app.get('/health', (c) => {

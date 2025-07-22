@@ -151,8 +151,13 @@ guilds.post('/:id/features/:featureId/toggle', async (c) => {
     const featureId = c.req.param('featureId');
     const { enabled } = await c.req.json();
     
+    // Get guild name from Discord if creating new guild
+    const client = BotClient.getInstance();
+    const discordGuild = client.guilds.cache.get(guildId);
+    const guildName = discordGuild?.name || `Guild ${guildId}`;
+    
     // Get or create guild
-    const guild = await GuildService.getOrCreateGuild(guildId);
+    const guild = await GuildService.getOrCreateGuild(guildId, guildName);
     
     // Initialize features object if not exists
     if (!guild.features) guild.features = {};
@@ -249,7 +254,12 @@ guilds.get('/:id/features/:featureId/settings', async (c) => {
     const guildId = c.req.param('id');
     const featureId = c.req.param('featureId');
     
-    const guild = await GuildService.getOrCreateGuild(guildId);
+    // Get guild name from Discord if creating new guild
+    const client = BotClient.getInstance();
+    const discordGuild = client.guilds.cache.get(guildId);
+    const guildName = discordGuild?.name || `Guild ${guildId}`;
+    
+    const guild = await GuildService.getOrCreateGuild(guildId, guildName);
     let settings: any;
     
     switch (featureId) {
@@ -295,7 +305,12 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
     const featureId = c.req.param('featureId');
     const updates = await c.req.json();
     
-    const guild = await GuildService.getOrCreateGuild(guildId);
+    // Get guild name from Discord if creating new guild
+    const client = BotClient.getInstance();
+    const discordGuild = client.guilds.cache.get(guildId);
+    const guildName = discordGuild?.name || `Guild ${guildId}`;
+    
+    const guild = await GuildService.getOrCreateGuild(guildId, guildName);
     if (!guild.features) guild.features = {};
 
     let updatedSettings: any;

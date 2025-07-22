@@ -23,39 +23,58 @@ import SuggestionsConfigModel, {
 } from '../models/suggestionConfig.model';
 import SuggestionModel, { ISuggestionItem, ISuggestionField } from '../models/suggestionItem.model';
 import { BotClient } from '../../../bot/client';
+import { GuildService } from '../../discord/services/guild.service';
 
 export class SuggestionsService {
+  // ===== HELPER METHODS =====
+  
+  /**
+   * Helper method to get Guild with suggestions config
+   */
+  private static async getGuildWithSuggestions(guildId: string) {
+    const client = BotClient.getInstance();
+    const discordGuild = client.guilds.cache.get(guildId);
+    const guildName = discordGuild?.name || `Guild ${guildId}`;
+    
+    const guild = await GuildService.getOrCreateGuild(guildId, guildName);
+    
+    // Initialize suggestions config if it doesn't exist
+    if (!guild.features.suggestions) {
+      guild.features.suggestions = {
+        guildId,
+        enabled: false,
+        channels: [],
+        forms: [],
+        defaultReactions: ['👍', '👎']
+      };
+    }
+    
+    return guild;
+  }
+
   // ===== CONFIGURATION =====
   
-  static async getSuggestionsConfig(guildId: string): Promise<ISuggestionsConfig | null> {
-    return SuggestionsConfigModel.findOne({ guildId });
+  static async getSuggestionsConfig(guildId: string): Promise<any | null> {
+    const guild = await this.getGuildWithSuggestions(guildId);
+    return guild.features.suggestions;
   }
 
-  static async getOrCreateSuggestionsConfig(guildId: string): Promise<ISuggestionsConfig> {
-    const config = await this.getSuggestionsConfig(guildId);
-    if (config) return config;
-    
-    return SuggestionsConfigModel.create({
-      guildId,
-      enabled: false,
-      channels: [],
-      forms: [],
-      defaultReactions: ['👍', '👎']
-    });
+  static async getOrCreateSuggestionsConfig(guildId: string): Promise<any> {
+    const guild = await this.getGuildWithSuggestions(guildId);
+    return guild.features.suggestions;
   }
 
-  static async toggleFeature(guildId: string, enabled: boolean): Promise<ISuggestionsConfig | null> {
-    return SuggestionsConfigModel.findOneAndUpdate(
-      { guildId },
-      { enabled },
-      { new: true, upsert: true }
-    );
+  static async toggleFeature(guildId: string, enabled: boolean): Promise<any | null> {
+    const guild = await this.getGuildWithSuggestions(guildId);
+    guild.features.suggestions.enabled = enabled;
+    await guild.save();
+    return guild.features.suggestions;
   }
 
   // ===== GESTION DES FORMULAIRES =====
   
-  static async createForm(guildId: string, formData: Omit<ISuggestionForm, 'id' | 'createdAt' | 'updatedAt'>): Promise<ISuggestionsConfig | null> {
-    const config = await this.getOrCreateSuggestionsConfig(guildId);
+  static async createForm(guildId: string, formData: Omit<ISuggestionForm, 'id' | 'createdAt' | 'updatedAt'>): Promise<any | null> {
+    const guild = await this.getGuildWithSuggestions(guildId);
     
     const newForm: ISuggestionForm = {
       id: `form_${Date.now()}`,
@@ -64,12 +83,14 @@ export class SuggestionsService {
       updatedAt: new Date()
     };
     
-    config.forms.push(newForm);
-    return config.save();
+    guild.features.suggestions.forms.push(newForm);
+    await guild.save();
+    return guild.features.suggestions;
   }
 
-  static async updateForm(guildId: string, formId: string, updates: Partial<ISuggestionForm>): Promise<ISuggestionsConfig | null> {
-    const config = await this.getSuggestionsConfig(guildId);
+  static async updateForm(guildId: string, formId: string, updates: Partial<ISuggestionForm>): Promise<any | null> {
+    const guild = await this.getGuildWithSuggestions(guildId);
+    const config = guild.features.suggestions;
     if (!config) return null;
     
     const formIndex = config.forms.findIndex(f => f.id === formId);
@@ -81,24 +102,27 @@ export class SuggestionsService {
       updatedAt: new Date()
     };
     
-    return config.save();
+    await guild.save();
+    return config;
   }
 
-  static async deleteForm(guildId: string, formId: string): Promise<ISuggestionsConfig | null> {
-    const config = await this.getSuggestionsConfig(guildId);
+  static async deleteForm(guildId: string, formId: string): Promise<any | null> {
+    const guild = await this.getGuildWithSuggestions(guildId);
+    const config = guild.features.suggestions;
     if (!config) return null;
     
     config.forms = config.forms.filter(f => f.id !== formId);
-    return config.save();
+    await guild.save();
+    return config;
   }
 
   // ===== GESTION DES CHANNELS =====
   
-  static async addSuggestionChannel(guildId: string, channelData: Omit<ISuggestionChannel, 'suggestionCount'>): Promise<ISuggestionsConfig | null> {
-    const config = await this.getOrCreateSuggestionsConfig(guildId);
+  static async addSuggestionChannel(guildId: string, channelData: Omit<ISuggestionChannel, 'suggestionCount'>): Promise<any | null> {
+    const guild = await this.getGuildWithSuggestions(guildId);
     
     // Vérifier si le channel existe déjà
-    const existingIndex = config.channels.findIndex(c => c.channelId === channelData.channelId);
+    const existingIndex = guild.features.suggestions.channels.findIndex(c => c.channelId === channelData.channelId);
     
     const newChannelData: ISuggestionChannel = {
       ...channelData,
@@ -106,35 +130,35 @@ export class SuggestionsService {
     };
     
     if (existingIndex !== -1) {
-      config.channels[existingIndex] = newChannelData;
+      guild.features.suggestions.channels[existingIndex] = newChannelData;
     } else {
-      config.channels.push(newChannelData);
+      guild.features.suggestions.channels.push(newChannelData);
     }
     
-    return config.save();
+    await guild.save();
+    return guild.features.suggestions;
   }
 
-  static async removeSuggestionChannel(guildId: string, channelId: string): Promise<ISuggestionsConfig | null> {
-    const config = await this.getSuggestionsConfig(guildId);
-    if (!config) return null;
-    
-    config.channels = config.channels.filter(c => c.channelId !== channelId);
-    return config.save();
+  static async removeSuggestionChannel(guildId: string, channelId: string): Promise<any | null> {
+    const guild = await this.getGuildWithSuggestions(guildId);
+    guild.features.suggestions.channels = guild.features.suggestions.channels.filter(c => c.channelId !== channelId);
+    await guild.save();
+    return guild.features.suggestions;
   }
 
-  static async updateChannelConfig(guildId: string, channelId: string, updates: Partial<ISuggestionChannel>): Promise<ISuggestionsConfig | null> {
-    const config = await this.getSuggestionsConfig(guildId);
-    if (!config) return null;
+  static async updateChannelConfig(guildId: string, channelId: string, updates: Partial<ISuggestionChannel>): Promise<any | null> {
+    const guild = await this.getGuildWithSuggestions(guildId);
     
-    const channelIndex = config.channels.findIndex(c => c.channelId === channelId);
+    const channelIndex = guild.features.suggestions.channels.findIndex(c => c.channelId === channelId);
     if (channelIndex === -1) return null;
     
-    config.channels[channelIndex] = {
-      ...config.channels[channelIndex],
+    guild.features.suggestions.channels[channelIndex] = {
+      ...guild.features.suggestions.channels[channelIndex],
       ...updates
     };
     
-    return config.save();
+    await guild.save();
+    return guild.features.suggestions;
   }
 
   // ===== GESTION DES PERMISSIONS CHANNEL =====
@@ -203,10 +227,9 @@ export class SuggestionsService {
   }
 
   static async republishButtonIfNeeded(guildId: string, channelId: string): Promise<void> {
-    const config = await this.getSuggestionsConfig(guildId);
-    if (!config) return;
+    const guild = await this.getGuildWithSuggestions(guildId);
     
-    const channelConfig = config.channels.find(c => c.channelId === channelId);
+    const channelConfig = guild.features.suggestions.channels.find(c => c.channelId === channelId);
     if (!channelConfig) return;
     
     // Incrémenter le compteur de suggestions
@@ -214,12 +237,12 @@ export class SuggestionsService {
     
     // Republier le bouton si nécessaire
     if (channelConfig.suggestionCount % channelConfig.republishInterval === 0) {
-      const guild = BotClient.getInstance().guilds.cache.get(guildId);
-      if (!guild) return;
+      const discordGuild = BotClient.getInstance().guilds.cache.get(guildId);
+      if (!discordGuild) return;
       
       // Supprimer l'ancien bouton
       if (channelConfig.buttonMessageId) {
-        const channel = guild.channels.cache.get(channelId) as TextChannel;
+        const channel = discordGuild.channels.cache.get(channelId) as TextChannel;
         if (channel) {
           try {
             const oldMessage = await channel.messages.fetch(channelConfig.buttonMessageId);
@@ -231,13 +254,13 @@ export class SuggestionsService {
       }
       
       // Publier le nouveau bouton
-      const newMessageId = await this.publishSuggestionButton(guild, channelId);
+      const newMessageId = await this.publishSuggestionButton(discordGuild, channelId);
       if (newMessageId) {
         channelConfig.buttonMessageId = newMessageId;
         
         // Épingler si demandé
         if (channelConfig.pinButton) {
-          const channel = guild.channels.cache.get(channelId) as TextChannel;
+          const channel = discordGuild.channels.cache.get(channelId) as TextChannel;
           if (channel) {
             try {
               const message = await channel.messages.fetch(newMessageId);
@@ -250,7 +273,7 @@ export class SuggestionsService {
       }
     }
     
-    await config.save();
+    await guild.save();
   }
 
   // ===== CREATION DE MODAL =====
@@ -346,17 +369,17 @@ export class SuggestionsService {
     // Update the Discord embed if the suggestion has a messageId
     if (updatedSuggestion.messageId) {
       try {
-        const config = await this.getSuggestionsConfig(updatedSuggestion.guildId);
-        if (config) {
+        const guild = await this.getGuildWithSuggestions(updatedSuggestion.guildId);
+        if (guild.features.suggestions) {
           const client = BotClient.getInstance();
-          const guild = client.guilds.cache.get(updatedSuggestion.guildId);
+          const discordGuild = client.guilds.cache.get(updatedSuggestion.guildId);
           
-          if (guild) {
-            const channel = guild.channels.cache.get(updatedSuggestion.channelId);
+          if (discordGuild) {
+            const channel = discordGuild.channels.cache.get(updatedSuggestion.channelId);
             if (channel && channel.isTextBased()) {
               try {
                 const message = await channel.messages.fetch(updatedSuggestion.messageId);
-                const updatedEmbed = this.createSuggestionEmbed(updatedSuggestion, config);
+                const updatedEmbed = this.createSuggestionEmbed(updatedSuggestion, guild.features.suggestions);
                 
                 // Add status information to the embed
                 const statusEmoji = this.getStatusEmoji(status);
@@ -392,7 +415,7 @@ export class SuggestionsService {
 
   // ===== CREATION EMBED SUGGESTION =====
   
-  static createSuggestionEmbed(suggestion: ISuggestionItem, config: ISuggestionsConfig): EmbedBuilder {
+  static createSuggestionEmbed(suggestion: ISuggestionItem, config: any): EmbedBuilder {
     const embed = new EmbedBuilder()
       .setColor(this.getStatusColor(suggestion.status))
       .setAuthor({ 
@@ -555,10 +578,10 @@ export class SuggestionsService {
   
   static async handleReactionAdd(reaction: MessageReaction, user: User): Promise<void> {
     try {
-      const config = await this.getSuggestionsConfig(reaction.message.guild!.id);
-      if (!config?.enabled) return;
+      const guild = await this.getGuildWithSuggestions(reaction.message.guild!.id);
+      if (!guild.features.suggestions?.enabled) return;
 
-      const channelConfig = config.channels.find(c => c.channelId === reaction.message.channel.id);
+      const channelConfig = guild.features.suggestions.channels.find(c => c.channelId === reaction.message.channel.id);
       if (!channelConfig) return;
 
       const suggestion = await this.getSuggestionByMessageId(reaction.message.id);
@@ -577,10 +600,10 @@ export class SuggestionsService {
 
   static async handleReactionRemove(reaction: MessageReaction, user: User): Promise<void> {
     try {
-      const config = await this.getSuggestionsConfig(reaction.message.guild!.id);
-      if (!config?.enabled) return;
+      const guild = await this.getGuildWithSuggestions(reaction.message.guild!.id);
+      if (!guild.features.suggestions?.enabled) return;
 
-      const channelConfig = config.channels.find(c => c.channelId === reaction.message.channel.id);
+      const channelConfig = guild.features.suggestions.channels.find(c => c.channelId === reaction.message.channel.id);
       if (!channelConfig) return;
 
       const suggestion = await this.getSuggestionByMessageId(reaction.message.id);
@@ -599,10 +622,10 @@ export class SuggestionsService {
 
   static async handleButtonInteraction(interaction: ButtonInteraction): Promise<void> {
     try {
-      const config = await this.getSuggestionsConfig(interaction.guild!.id);
-      if (!config?.enabled) return;
+      const guild = await this.getGuildWithSuggestions(interaction.guild!.id);
+      if (!guild.features.suggestions?.enabled) return;
 
-      const channelConfig = config.channels.find(c => c.channelId === interaction.channel?.id);
+      const channelConfig = guild.features.suggestions.channels.find(c => c.channelId === interaction.channel?.id);
       if (!channelConfig) {
         await interaction.reply({
           content: '❌ Ce channel n\'est pas configuré pour les suggestions.',
@@ -611,7 +634,7 @@ export class SuggestionsService {
         return;
       }
 
-      const form = config.forms.find(f => f.id === channelConfig.formId);
+      const form = guild.features.suggestions.forms.find(f => f.id === channelConfig.formId);
       if (!form) {
         await interaction.reply({
           content: '❌ Formulaire de suggestion introuvable. Contactez un administrateur.',
@@ -636,10 +659,10 @@ export class SuggestionsService {
     try {
       const formId = interaction.customId.replace('suggestion_modal_', '');
       
-      const config = await this.getSuggestionsConfig(interaction.guild!.id);
-      if (!config) return;
+      const guild = await this.getGuildWithSuggestions(interaction.guild!.id);
+      if (!guild.features.suggestions) return;
 
-      const form = config.forms.find(f => f.id === formId);
+      const form = guild.features.suggestions.forms.find(f => f.id === formId);
       if (!form) {
         await interaction.reply({
           content: '❌ Formulaire introuvable.',
@@ -670,7 +693,7 @@ export class SuggestionsService {
         interaction.user.displayAvatarURL()
       );
 
-      const embed = this.createSuggestionEmbed(suggestion, config);
+      const embed = this.createSuggestionEmbed(suggestion, guild.features.suggestions);
 
       const suggestionMessage = await interaction.channel!.send({
         embeds: [embed]
@@ -679,8 +702,8 @@ export class SuggestionsService {
       suggestion.messageId = suggestionMessage.id;
       await suggestion.save();
 
-      const channelConfig = config.channels.find(c => c.channelId === interaction.channel!.id);
-      const reactions = channelConfig?.customReactions || config.defaultReactions;
+      const channelConfig = guild.features.suggestions.channels.find(c => c.channelId === interaction.channel!.id);
+      const reactions = channelConfig?.customReactions || guild.features.suggestions.defaultReactions;
       
       for (const reaction of reactions) {
         try {
@@ -709,11 +732,11 @@ export class SuggestionsService {
   static async handleChannelMessage(message: any): Promise<void> {
     try {
       // Vérifier si les suggestions sont activées pour cette guilde
-      const config = await this.getSuggestionsConfig(message.guild!.id);
-      if (!config?.enabled) return;
+      const guild = await this.getGuildWithSuggestions(message.guild!.id);
+      if (!guild.features.suggestions?.enabled) return;
 
       // Vérifier si c'est dans un channel de suggestions configuré
-      const channelConfig = config.channels.find(c => c.channelId === message.channel.id);
+      const channelConfig = guild.features.suggestions.channels.find(c => c.channelId === message.channel.id);
       if (!channelConfig) return;
 
       // Si le channel est en lecture seule, supprimer le message utilisateur
