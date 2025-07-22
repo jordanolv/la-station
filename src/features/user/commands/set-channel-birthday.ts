@@ -1,6 +1,6 @@
 import { Message, TextChannel } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import BirthdayModel from '../models/birthday.model';
+import GuildModel from '../../discord/models/guild.model';
 
 export default {
   name: 'set-channel-birthday',
@@ -38,23 +38,30 @@ export default {
 
       try {
         // Récupérer ou créer la configuration d'anniversaire pour cette guilde
-        let birthdayConfig = await BirthdayModel.findOne({ guildId: message.guild.id });
+        let guild = await GuildModel.findOne({ guildId: message.guild.id });
         
-        if (!birthdayConfig) {
-          birthdayConfig = new BirthdayModel({
+        if (!guild) {
+          guild = new GuildModel({
             guildId: message.guild.id,
-            enabled: true,
-            channel: channel.id
+            name: message.guild.name,
+            features: {
+              birthday: {
+                enabled: true,
+                channel: channel.id
+              }
+            }
           });
         } else {
-          birthdayConfig.channel = channel.id;
-          if (!birthdayConfig.enabled) {
-            birthdayConfig.enabled = true;
-          }
+          // Mettre à jour la configuration existante
+          guild.features = guild.features || {};
+          guild.features.birthday = {
+            channel: channel.id,
+            enabled: true
+          };
         }
         
         // Enregistrer la mise à jour
-        await birthdayConfig.save();
+        await guild.save();
         
         console.log(`[User] Canal d'anniversaire défini à ${channel.name} (${channel.id}) pour le serveur ${message.guild.name}`);
         

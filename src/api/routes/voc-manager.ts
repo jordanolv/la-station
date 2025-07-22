@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { BotClient } from '../../bot/client';
-import { VocManagerService } from '../../features/voc-manager/vocManager.service';
+import { VocManagerService } from '../../features/voc-manager/services/vocManager.service';
 import { ChannelType } from 'discord.js';
 
 const vocManager = new Hono();
@@ -252,8 +252,8 @@ vocManager.post('/create-channel', async (c) => {
       reason: 'Channel created via web interface'
     });
 
-    // Add to created channels (using 'web-interface' as creator since no specific user)
-    await VocManagerService.addChannel(guildId, newChannel.id, 'web-interface');
+    // Add to created channels
+    await VocManagerService.addChannel(guildId, newChannel.id);
 
     return c.json({ 
       message: 'Voice channel created successfully', 

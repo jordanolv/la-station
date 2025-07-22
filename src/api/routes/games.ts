@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { BotClient } from '../../bot/client';
-import { ChatGamingService } from '../../features/chat-gaming/chatGaming.service';
+import { ChatGamingService } from '../../features/chat-gaming/services/chatGaming.service';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
