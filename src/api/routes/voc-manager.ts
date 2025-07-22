@@ -252,7 +252,11 @@ vocManager.post('/create-channel', async (c) => {
       reason: 'Channel created via web interface'
     });
 
+<<<<<<< Updated upstream
     // Add to created channels (using 'web-interface' as creator since no specific user)
+=======
+    // Add to created channels
+>>>>>>> Stashed changes
     await VocManagerService.addChannel(guildId, newChannel.id);
 
     return c.json({ 

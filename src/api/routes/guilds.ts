@@ -216,6 +216,7 @@ guilds.post('/:id/features/:featureId/toggle', async (c) => {
       case 'suggestions':
         if (!guild.features.suggestions) {
           guild.features.suggestions = {
+            guildId: guildId,
             enabled: false,
             channels: [],
             forms: [],
@@ -269,6 +270,7 @@ guilds.get('/:id/features/:featureId/settings', async (c) => {
         break;
       case 'suggestions':
         settings = guild.features?.suggestions || { 
+          guildId: guildId,
           enabled: false, 
           channels: [], 
           forms: [], 

@@ -53,6 +53,7 @@
     "nodemon": "^3.0.1",
     "tsc-alias": "^1.8.15",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^6.2.4"
   }
 }

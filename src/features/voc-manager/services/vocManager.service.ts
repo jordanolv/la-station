@@ -99,24 +99,42 @@ export class VocManagerService {
     category: string,
     nameTemplate: string = '🎮 {username} #{count}'
   ): Promise<IVocManager | null> {
+<<<<<<< Updated upstream
     const guild = await GuildModel.findOne({ guildId });
     if (!guild?.features?.vocManager) return null;
 
     const vocManagerData = guild.features.vocManager;
+=======
+    const guild = await GuildService.getOrCreateGuild(guildId);
+    
+    if (!guild.features) guild.features = {};
+    if (!guild.features.vocManager) {
+      guild.features.vocManager = {
+        enabled: false,
+        joinChannels: [],
+        createdChannels: [],
+        channelCount: 0
+      };
+    }
+>>>>>>> Stashed changes
 
     // Vérifier si ce canal existe déjà
-    const existingIndex = vocManagerData.joinChannels.findIndex(channel => channel.id === channelId);
+    const existingIndex = guild.features.vocManager.joinChannels.findIndex(channel => channel.id === channelId);
     
     if (existingIndex !== -1) {
       // Mettre à jour le canal existant
-      vocManagerData.joinChannels[existingIndex] = {
+      guild.features.vocManager.joinChannels[existingIndex] = {
         id: channelId,
         nameTemplate,
         category,
       };
     } else {
       // Ajouter un nouveau canal
+<<<<<<< Updated upstream
       vocManagerData.joinChannels.push({
+=======
+      guild.features.vocManager.joinChannels.push({
+>>>>>>> Stashed changes
         id: channelId,
         nameTemplate,
         category,
@@ -124,24 +142,38 @@ export class VocManagerService {
     }
 
     await guild.save();
+<<<<<<< Updated upstream
     return vocManagerData;
+=======
+    return guild.features.vocManager;
+>>>>>>> Stashed changes
   }
 
   /**
    * Supprime un canal de jointure
    */
   static async removeJoinChannel(guildId: string, channelId: string): Promise<IVocManager | null> {
+<<<<<<< Updated upstream
     const guild = await GuildModel.findOne({ guildId });
     if (!guild?.features?.vocManager) return null;
 
     const vocManagerData = guild.features.vocManager;
+=======
+    const guild = await GuildService.getOrCreateGuild(guildId);
+    
+    if (!guild.features?.vocManager) return null;
+>>>>>>> Stashed changes
 
-    vocManagerData.joinChannels = vocManagerData.joinChannels.filter(
+    guild.features.vocManager.joinChannels = guild.features.vocManager.joinChannels.filter(
       channel => channel.id !== channelId
     );
     
     await guild.save();
+<<<<<<< Updated upstream
     return vocManagerData;
+=======
+    return guild.features.vocManager;
+>>>>>>> Stashed changes
   }
 
   /**
@@ -153,32 +185,60 @@ export class VocManagerService {
     nameTemplate?: string,
     category?: string
   ): Promise<IVocManager | null> {
+<<<<<<< Updated upstream
     const guild = await GuildModel.findOne({ guildId });
     if (!guild?.features?.vocManager) return null;
 
     const vocManagerData = guild.features.vocManager;
+=======
+    const guild = await GuildService.getOrCreateGuild(guildId);
+    
+    if (!guild.features?.vocManager) return null;
+>>>>>>> Stashed changes
 
-    const channelIndex = vocManagerData.joinChannels.findIndex(channel => channel.id === channelId);
+    const channelIndex = guild.features.vocManager.joinChannels.findIndex(channel => channel.id === channelId);
     if (channelIndex === -1) return null;
 
     if (nameTemplate !== undefined) {
-      vocManagerData.joinChannels[channelIndex].nameTemplate = nameTemplate;
+      guild.features.vocManager.joinChannels[channelIndex].nameTemplate = nameTemplate;
     }
     
     if (category !== undefined) {
+<<<<<<< Updated upstream
       vocManagerData.joinChannels[channelIndex].category = category;
     }
 
     await guild.save();
     return vocManagerData;
+=======
+      guild.features.vocManager.joinChannels[channelIndex].category = category;
+    }
+
+    await guild.save();
+    return guild.features.vocManager;
+>>>>>>> Stashed changes
   }
 
   /**
    * Active ou désactive la fonctionnalité
    */
   static async toggleFeature(guildId: string, enabled: boolean): Promise<IVocManager | null> {
+<<<<<<< Updated upstream
     const guild = await GuildModel.findOne({ guildId });
     if (!guild?.features?.vocManager) return null;
+=======
+    const guild = await GuildService.getOrCreateGuild(guildId);
+    
+    if (!guild.features) guild.features = {};
+    if (!guild.features.vocManager) {
+      guild.features.vocManager = {
+        enabled: false,
+        joinChannels: [],
+        createdChannels: [],
+        channelCount: 0
+      };
+    }
+>>>>>>> Stashed changes
 
     guild.features.vocManager.enabled = enabled;
     await guild.save();

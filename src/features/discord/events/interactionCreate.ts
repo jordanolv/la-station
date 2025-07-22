@@ -9,7 +9,6 @@ export default {
 
   async execute(client: BotClient, interaction: Interaction) {
     try {
-      // S'assurer que la guilde est en BDD
       if (interaction.guild) {
         await GuildService.getOrCreateGuild(interaction.guild.id, interaction.guild.name);
       }
