@@ -31,9 +31,16 @@ export function createAPI(client: BotClient) {
   
   app.use('*', secureHeaders())
 
-  // Serve static files from uploads directory at project root
+  // Serve static files from uploads directory
+  const projectRoot = path.resolve(__dirname, '../../..');
+  const srcPath = path.resolve(__dirname, '..');
+  console.log('__dirname:', __dirname);
+  console.log('Project root:', projectRoot);
+  console.log('Src path:', srcPath);
+  console.log('Uploads path expected:', path.join(srcPath, 'uploads'));
+  
   app.use('/uploads/*', serveStatic({
-    root: path.resolve(__dirname, '../..')
+    root: srcPath
   }) as any)
 
   // Routes

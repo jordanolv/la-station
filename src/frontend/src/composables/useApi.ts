@@ -43,6 +43,8 @@ export function useApi() {
       loading.value = true
       error.value = null
       
+      console.log(`[USE_API] ${method.toUpperCase()} ${API_BASE_URL}${url}`)
+      
       const response = await api.request({
         method,
         url,
@@ -50,8 +52,10 @@ export function useApi() {
         ...config
       })
       
+      console.log(`[USE_API] Response:`, response.data)
       return response.data
     } catch (err: any) {
+      console.error(`[USE_API] Error for ${method.toUpperCase()} ${url}:`, err)
       error.value = err.response?.data?.message || err.message || 'An error occurred'
       throw err
     } finally {
