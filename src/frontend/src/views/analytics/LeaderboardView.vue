@@ -93,7 +93,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 
 // Données du leaderboard (simulées)
 const leaderboardUsers = [

@@ -2,7 +2,7 @@ import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 
 export class ImageUploadService {
-  private static readonly UPLOADS_DIR = path.resolve(__dirname, '../../../uploads')
+  private static readonly UPLOADS_DIR = path.resolve(__dirname, '../../../../uploads')
   private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
   private static readonly ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 

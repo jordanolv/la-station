@@ -43,9 +43,9 @@
               class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
             >
               <option value="custom">🎮 Autre jeu (personnalisé)</option>
-              <optgroup v-if="party.chatGamingGames.length > 0" label="Jeux disponibles">
+              <optgroup v-if="party.chatGamingGames.value.length > 0" label="Jeux disponibles">
                 <option 
-                  v-for="game in party.chatGamingGames" 
+                  v-for="game in party.chatGamingGames.value" 
                   :key="game.id" 
                   :value="game.id"
                 >
@@ -201,7 +201,7 @@
           />
           <button
             type="button"
-            @click="removeImage"
+            @click="removeImage(imageInput)"
             class="text-red-400 hover:text-red-300 transition-colors"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,6 +236,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useParty } from '../../../composables/useParty'
+import { useImageUrl } from '../../../composables/useImageUrl'
+import { useImageUpload } from '../../../composables/useImageUpload'
 import ChannelSelect from '../../ui/ChannelSelect.vue'
 import type { Event, ChatGamingGame } from '../../../stores/party'
 
@@ -250,6 +252,8 @@ const emit = defineEmits<{
 }>()
 
 const party = useParty(props.guildId)
+const { getImageUrl } = useImageUrl()
+const { imagePreview, handleImageChange, removeImage, setImagePreview, appendImageToFormData } = useImageUpload()
 
 const form = ref({
   name: '',
@@ -266,8 +270,6 @@ const form = ref({
 // Plus besoin de gérer les jeux localement, c'est dans le store
 
 const imageInput = ref<HTMLInputElement>()
-const imageFile = ref<File | null>(null)
-const imagePreview = ref<string>('')
 
 const minDate = computed(() => {
   return new Date().toISOString().split('T')[0]
@@ -298,26 +300,7 @@ const isFormValid = computed(() => {
 // Plus besoin de loadChatGamingGames(), c'est géré par le store
 
 
-function handleImageChange(event: any) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (file) {
-    imageFile.value = file
-    
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      imagePreview.value = e.target?.result as string
-    }
-    reader.readAsDataURL(file)
-  }
-}
-
-function removeImage() {
-  imageFile.value = null
-  imagePreview.value = ''
-  if (imageInput.value) {
-    imageInput.value.value = ''
-  }
-}
+// Les fonctions handleImageChange et removeImage sont maintenant dans le composable useImageUpload
 
 function handleSubmit() {
   if (!isFormValid.value) return
@@ -337,9 +320,7 @@ function handleSubmit() {
   })
   
   // Ajouter l'image si présente
-  if (imageFile.value) {
-    formData.append('image', imageFile.value)
-  }
+  appendImageToFormData(formData)
   
   emit('save', formData)
 }
@@ -360,7 +341,7 @@ watch(() => props.event, (event) => {
     }
     
     if (event.image) {
-      imagePreview.value = event.image
+      setImagePreview(getImageUrl(event.image) || event.image)
     }
   }
 }, { immediate: true })

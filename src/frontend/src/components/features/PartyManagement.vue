@@ -20,17 +20,36 @@
         </button>
       </div>
       
-      <div class="text-sm text-gray-400">
-        {{ party.events.length }} événement(s) programmé(s)
+      <div class="flex items-center justify-between gap-4">
+        <!-- Compteur d'événements avec icône -->
+        <div class="flex items-center space-x-2">
+          <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span class="text-sm font-medium text-gray-300">
+            <span class="text-pink-400">{{ filteredEvents.length }}</span> affiché(s) / <span class="text-gray-400">{{ party.events.value.length }}</span> total
+          </span>
+        </div>
+        
+        <!-- Événements terminés cliquable avec style pill -->
+        <button 
+          @click="showCompletedEvents = !showCompletedEvents"
+          class="px-3 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 hover:scale-105"
+          :class="showCompletedEvents 
+            ? 'bg-pink-600/20 border-pink-500/50 text-pink-400 shadow-sm shadow-pink-500/20' 
+            : 'bg-gray-700/50 border-gray-600/50 text-gray-400 hover:bg-gray-600/50 hover:border-gray-500/50 hover:text-gray-300'"
+        >
+          ✓ Événements terminés
+        </button>
       </div>
     </div>
 
     <!-- Events List -->
-    <div v-if="party.loading" class="text-center py-8">
+    <div v-if="party.loading.value" class="text-center py-8">
       <div class="text-gray-400">Chargement des événements...</div>
     </div>
 
-    <div v-else-if="party.events.length === 0" class="text-center py-12 bg-gray-800 rounded-lg">
+    <div v-else-if="filteredEvents.length === 0 && party.events.value.length === 0" class="text-center py-12 bg-gray-800 rounded-lg">
       <div class="text-4xl mb-4">🎉</div>
       <h3 class="text-lg font-medium text-white mb-2">Aucun événement programmé</h3>
       <p class="text-gray-400 mb-4">Créez votre premier événement pour rassembler votre communauté</p>
@@ -42,15 +61,22 @@
       </button>
     </div>
 
+    <!-- Message si tous les événements sont terminés mais la checkbox n'est pas cochée -->
+    <div v-else-if="filteredEvents.length === 0 && party.events.value.length > 0" class="text-center py-12 bg-gray-800 rounded-lg">
+      <div class="text-4xl mb-4">✅</div>
+      <h3 class="text-lg font-medium text-white mb-2">Tous les événements sont terminés</h3>
+      <p class="text-gray-400 mb-4">Cochez "Afficher les événements terminés" pour les voir ou créez un nouvel événement</p>
+    </div>
+
     <div v-else class="grid gap-4">
       <!-- Message d'erreur si il y en a une -->
-      <div v-if="party.error" class="bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded mb-4">
-        {{ party.error }}
+      <div v-if="party.error.value" class="bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded mb-4">
+        {{ party.error.value }}
         <button @click="party.clearError()" class="ml-2 text-red-400 hover:text-red-200">×</button>
       </div>
       
       <div
-        v-for="event in party.events"
+        v-for="event in filteredEvents"
         :key="event._id"
         class="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors"
       >
@@ -82,16 +108,63 @@
                 <span>{{ event.time }}</span>
               </div>
               
-              <div class="flex items-center space-x-2 text-gray-400">
+              <button 
+                @click="toggleParticipantsDisplay(event._id)"
+                class="flex items-center space-x-2 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer"
+              >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <span>{{ event.currentSlots }}/{{ event.maxSlots }} participants</span>
-              </div>
+                <svg 
+                  class="w-3 h-3 transition-transform duration-200" 
+                  :class="expandedParticipants.has(event._id) ? 'rotate-180' : ''"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
             </div>
 
             <!-- Description -->
             <p v-if="event.description" class="text-gray-300 mb-4">{{ event.description }}</p>
+
+            <!-- Liste des participants (affichage conditionnel) -->
+            <div v-if="expandedParticipants.has(event._id) && event.participants.length > 0" class="mb-4">
+              <div class="bg-gray-700/50 rounded-lg p-3 border border-gray-600/50">
+                <h4 class="text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                  <span>Participants inscrits</span>
+                </h4>
+                
+                <!-- Affichage des participants -->
+                <div v-if="eventParticipants[event._id]?.length > 0" class="flex flex-wrap gap-2">
+                  <div
+                    v-for="participant in eventParticipants[event._id]"
+                    :key="participant.id"
+                    class="px-2 py-1 bg-gray-600/50 rounded text-xs text-gray-300 border border-gray-500/50"
+                  >
+                    {{ participant.displayName || participant.name }}
+                  </div>
+                </div>
+                
+                <!-- Message si les participants n'ont pas pu être chargés -->
+                <div v-else class="text-xs text-gray-400">
+                  Chargement des participants...
+                </div>
+              </div>
+            </div>
+            
+            <!-- Message si aucun participant -->
+            <div v-else-if="expandedParticipants.has(event._id) && event.participants.length === 0" class="mb-4">
+              <div class="bg-gray-700/50 rounded-lg p-3 border border-gray-600/50 text-center">
+                <p class="text-xs text-gray-400">Aucun participant inscrit pour le moment</p>
+              </div>
+            </div>
 
             <!-- Participants Progress -->
             <div class="mb-4">
@@ -322,8 +395,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useParty } from '../../composables/useParty'
+import { useImageUrl } from '../../composables/useImageUrl'
 import { useAuthStore } from '../../stores/auth'
 import EventModal from './party/EventModal.vue'
 import type { Event, ParticipantInfo } from '../../stores/party'
@@ -333,6 +407,7 @@ const props = defineProps<{
 }>()
 
 const authStore = useAuthStore()
+const { getImageUrl } = useImageUrl()
 
 // Récupération du composable party
 const party = useParty(props.guildId)
@@ -340,6 +415,23 @@ const party = useParty(props.guildId)
 // État local pour les modals
 const showCreateModal = ref(false)
 const editingEvent = ref<Event | null>(null)
+
+// État pour le filtre des événements terminés
+const showCompletedEvents = ref(false)
+
+// État pour l'affichage des participants
+const expandedParticipants = ref<Set<string>>(new Set())
+const eventParticipants = ref<Record<string, ParticipantInfo[]>>({})
+
+// Événements filtrés selon l'état de la checkbox
+const filteredEvents = computed(() => {
+  if (showCompletedEvents.value) {
+    return party.events.value // Afficher tous les événements
+  } else {
+    // Afficher seulement les événements non terminés (status !== 'ended')
+    return party.events.value.filter(event => event.status !== 'ended')
+  }
+})
 
 // Gestion du cycle de vie des soirées
 const showEndModal = ref(false)
@@ -482,9 +574,29 @@ function toggleParticipant(participantId: string) {
   }
 }
 
+// Toggle l'affichage des participants d'un événement
+function toggleParticipantsDisplay(eventId: string) {
+  if (expandedParticipants.value.has(eventId)) {
+    expandedParticipants.value.delete(eventId)
+  } else {
+    expandedParticipants.value.add(eventId)
+    // Charger les informations des participants si pas déjà fait
+    loadEventParticipants(eventId)
+  }
+}
+
+// Charger les participants d'un événement
+async function loadEventParticipants(eventId: string) {
+  const result = await party.loadParticipants(eventId)
+  if (result.success) {
+    eventParticipants.value[eventId] = result.participants
+  } else {
+    console.error('Erreur lors de la récupération des participants:', result.error)
+  }
+}
+
 
 onMounted(async () => {
-  console.log('[PARTY_MANAGEMENT] onMounted avec guildId:', props.guildId)
   if (props.guildId) {
     await party.initialize()
   } else {

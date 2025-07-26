@@ -44,20 +44,15 @@ export interface ChatGamingGame {
 }
 
 export const usePartyStore = defineStore('party', () => {
-  const { get, post, put, delete: del } = useApi()
+  const { get, post, delete: del } = useApi()
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051'
 
   // État réactif
   const events = ref<Event[]>([])
   const chatGamingGames = ref<ChatGamingGame[]>([])
-  const participantsCache = ref<Map<string, ParticipantInfo[]>>(new Map())
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  // Cache timestamps pour invalidation intelligente
-  const eventsLastFetch = ref<number>(0)
-  const gamesLastFetch = ref<number>(0)
-  const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
   // Computed properties
   const eventsByStatus = computed(() => ({
@@ -78,26 +73,23 @@ export const usePartyStore = defineStore('party', () => {
     error.value = null
   }
 
-  // Actions pour les événements
-  const loadEvents = async (guildId: string, force = false) => {
-    const now = Date.now()
-    if (!force && now - eventsLastFetch.value < CACHE_DURATION) {
-      console.log(`[PARTY_STORE] Utilisation du cache pour guildId: ${guildId}`)
-      return // Utiliser le cache
-    }
+  const forceStopLoading = () => {
+    loading.value = false
+  }
 
+  // Actions pour les événements
+  const loadEvents = async (guildId: string) => {
     try {
       loading.value = true
       clearError()
       
-      console.log(`[PARTY_STORE] Chargement des événements pour guildId: ${guildId}`)
       const data = await get<{ events: Event[] }>(`/api/party?guildId=${guildId}`)
-      console.log(`[PARTY_STORE] Événements reçus:`, data.events)
-      events.value = data.events
-      eventsLastFetch.value = now
+      events.value = data.events || []
     } catch (err: any) {
-      console.error(`[PARTY_STORE] Erreur lors du chargement pour guildId ${guildId}:`, err)
       handleError(err, 'chargement des événements')
+      if (events.value.length === 0) {
+        events.value = []
+      }
     } finally {
       loading.value = false
     }
@@ -197,7 +189,7 @@ export const usePartyStore = defineStore('party', () => {
       loading.value = true
       clearError()
 
-      const result = await post(`/api/party/${eventId}/start`)
+      const result = await post<{ event: Event }>(`/api/party/${eventId}/start`)
       
       // Mise à jour optimiste du cache
       const index = events.value.findIndex(e => e._id === eventId)
@@ -219,7 +211,7 @@ export const usePartyStore = defineStore('party', () => {
       loading.value = true
       clearError()
 
-      const result = await post(`/api/party/${eventId}/end`, endData)
+      const result = await post<{ event: Event }>(`/api/party/${eventId}/end`, endData)
       
       // Mise à jour optimiste du cache
       const index = events.value.findIndex(e => e._id === eventId)
@@ -237,30 +229,19 @@ export const usePartyStore = defineStore('party', () => {
   }
 
   // Actions pour les jeux chat-gaming
-  const loadChatGamingGames = async (guildId: string, force = false) => {
-    const now = Date.now()
-    if (!force && now - gamesLastFetch.value < CACHE_DURATION) {
-      return // Utiliser le cache
-    }
-
+  const loadChatGamingGames = async (guildId: string) => {
     try {
       const data = await get<{ games: ChatGamingGame[] }>(`/api/party/games?guildId=${guildId}`)
       chatGamingGames.value = data.games
-      gamesLastFetch.value = now
     } catch (err: any) {
       handleError(err, 'chargement des jeux')
     }
   }
 
   // Actions pour les participants
-  const loadParticipants = async (eventId: string, force = false) => {
-    if (!force && participantsCache.value.has(eventId)) {
-      return participantsCache.value.get(eventId)!
-    }
-
+  const loadParticipants = async (eventId: string) => {
     try {
       const data = await get<{ participants: ParticipantInfo[] }>(`/api/party/${eventId}/participants`)
-      participantsCache.value.set(eventId, data.participants)
       return data.participants
     } catch (err: any) {
       handleError(err, 'chargement des participants')
@@ -273,20 +254,11 @@ export const usePartyStore = defineStore('party', () => {
     return events.value.find(e => e._id === eventId)
   }
 
-  const invalidateCache = () => {
-    eventsLastFetch.value = 0
-    gamesLastFetch.value = 0
-    participantsCache.value.clear()
-  }
-
   const reset = () => {
     events.value = []
     chatGamingGames.value = []
-    participantsCache.value.clear()
     loading.value = false
     error.value = null
-    eventsLastFetch.value = 0
-    gamesLastFetch.value = 0
   }
 
   return {
@@ -312,9 +284,9 @@ export const usePartyStore = defineStore('party', () => {
     
     // Utilitaires
     getEventById,
-    invalidateCache,
     reset,
-    clearError
+    clearError,
+    forceStopLoading
   }
 })
 

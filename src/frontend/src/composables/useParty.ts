@@ -1,5 +1,5 @@
 import { computed, watch } from 'vue'
-import { usePartyStore, type Event, type ParticipantInfo, type ChatGamingGame } from '../stores/party'
+import { usePartyStore, type Event } from '../stores/party'
 
 /**
  * Composable unifié pour la gestion des soirées
@@ -10,16 +10,15 @@ export function useParty(guildId: string) {
 
   // État réactif du store
   const events = computed(() => {
-    console.log(`[USE_PARTY] events computed - store.events.value:`, store.events.value)
-    return store.events.value || []
+    return store.events || []
   })
-  const chatGamingGames = computed(() => store.chatGamingGames.value || [])
-  const loading = computed(() => store.loading.value)
-  const error = computed(() => store.error.value)
+  const chatGamingGames = computed(() => store.chatGamingGames || [])
+  const loading = computed(() => store.loading)
+  const error = computed(() => store.error)
 
-  // Computed properties utiles
-  const eventsByStatus = computed(() => store.eventsByStatus.value)
-  const eventCount = computed(() => store.eventCount.value)
+  // Computed properties utiles  
+  const eventsByStatus = computed(() => store.eventsByStatus)
+  const eventCount = computed(() => store.eventCount)
 
   // Filtres utiles
   const upcomingEvents = computed(() => 
@@ -38,24 +37,20 @@ export function useParty(guildId: string) {
   )
 
   // Actions simplifiées avec gestion d'erreur automatique
-  const loadEvents = async (force = false) => {
-    console.log(`[USE_PARTY] loadEvents - guildId: ${guildId}, force: ${force}`)
+  const loadEvents = async () => {
     if (!guildId) {
       console.error('[USE_PARTY] Pas de guildId fourni')
       return
     }
-    const result = await store.loadEvents(guildId, force)
-    console.log(`[USE_PARTY] loadEvents terminé - events count: ${events.value?.length || 0}`)
-    return result
+    return await store.loadEvents(guildId)
   }
 
-  const loadGames = async (force = false) => {
-    console.log(`[USE_PARTY] loadGames - guildId: ${guildId}, force: ${force}`)
+  const loadGames = async () => {
     if (!guildId) {
       console.error('[USE_PARTY] Pas de guildId fourni')
       return
     }
-    return store.loadChatGamingGames(guildId, force)
+    return store.loadChatGamingGames(guildId)
   }
 
   const createEvent = async (eventData: FormData) => {
@@ -107,9 +102,9 @@ export function useParty(guildId: string) {
     }
   }
 
-  const loadParticipants = async (eventId: string, force = false) => {
+  const loadParticipants = async (eventId: string) => {
     try {
-      const participants = await store.loadParticipants(eventId, force)
+      const participants = await store.loadParticipants(eventId)
       return { success: true, participants }
     } catch (error: any) {
       return { success: false, error: error.message, participants: [] }
@@ -169,31 +164,24 @@ export function useParty(guildId: string) {
   }
 
   const canStartEvent = (event: Event): boolean => {
-    return event.status === 'pending' && new Date(`${event.date}T${event.time}`) <= new Date()
+    return event.status === 'pending'
   }
 
   const canEndEvent = (event: Event): boolean => {
     return event.status === 'started'
   }
 
-  // Auto-chargement initial avec cache intelligent
+  // Auto-chargement initial
   const initialize = async () => {
-    // Vérifier si déjà chargé pour éviter les doublons
-    if (store.loading) {
-      console.log('[USE_PARTY] Déjà en cours de chargement, skip')
-      return
-    }
-    
-    console.log('[USE_PARTY] Initialisation pour guildId:', guildId)
-    
     try {
       await Promise.all([
         loadEvents(),
         loadGames()
       ])
-      console.log('[USE_PARTY] Initialisation terminée')
     } catch (error) {
       console.error('[USE_PARTY] Erreur d\'initialisation:', error)
+      // S'assurer que loading est remis à false en cas d'erreur
+      store.forceStopLoading()
     }
   }
 
@@ -206,7 +194,6 @@ export function useParty(guildId: string) {
 
   // Méthodes de gestion d'erreur
   const clearError = () => store.clearError()
-  const refreshCache = () => store.invalidateCache()
 
   return {
     // État - computed refs pour la réactivité  
@@ -242,8 +229,7 @@ export function useParty(guildId: string) {
     
     // Lifecycle
     initialize,
-    clearError,
-    refreshCache
+    clearError
   }
 }
 
