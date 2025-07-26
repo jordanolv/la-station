@@ -108,7 +108,6 @@ const attemptToFindGuild = () => {
   loading.value = false
 }
 
-const goHome = () => { router.push('/') }
 
 const formatDate = (dateString: string | Date) => {
   if (!dateString) return 'N/A';

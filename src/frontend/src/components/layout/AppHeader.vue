@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '../stores/auth'
+import { useAuthStore } from '../../stores/auth'
 import { computed } from 'vue'
-import router from '../router'
+import router from '../../router'
 
 const authStore = useAuthStore()
 const isAuthenticated = computed(() => authStore.isAuthenticated)

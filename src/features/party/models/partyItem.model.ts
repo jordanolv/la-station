@@ -52,6 +52,27 @@ export class PartyItem {
 
   @prop({ required: true })
   createdBy!: string;
+
+  @prop()
+  chatGamingGameId?: string; // ID du jeu chat-gaming associé (optionnel)
+
+  @prop({ enum: ['pending', 'started', 'ended'], default: 'pending' })
+  status!: 'pending' | 'started' | 'ended';
+
+  @prop({ type: () => [String], default: [] })
+  attendedParticipants!: string[]; // Participants effectivement présents à la soirée
+
+  @prop()
+  rewardAmount?: number; // Montant d'argent distribué aux participants
+
+  @prop()
+  xpAmount?: number; // Montant d'XP distribué aux participants
+
+  @prop()
+  startedAt?: Date; // Date de début de la soirée
+
+  @prop()
+  endedAt?: Date; // Date de fin de la soirée
 }
 
 // Créer le modèle

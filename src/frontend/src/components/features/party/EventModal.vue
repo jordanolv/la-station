@@ -36,14 +36,46 @@
             <label class="block text-sm font-medium text-gray-300 mb-2">
               Jeu *
             </label>
+            
+            <!-- Select pour choisir le jeu -->
+            <select
+              v-model="form.gameId"
+              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            >
+              <option value="custom">🎮 Autre jeu (personnalisé)</option>
+              <optgroup v-if="party.chatGamingGames.value.length > 0" label="Jeux disponibles">
+                <option 
+                  v-for="game in party.chatGamingGames.value" 
+                  :key="game.id" 
+                  :value="game.id"
+                >
+                  {{ game.name }}
+                </option>
+              </optgroup>
+            </select>
+            
+            <!-- Champ texte pour jeu custom (affiché seulement si "Autre" est sélectionné) -->
             <input
+              v-if="isCustomGame"
               v-model="form.game"
               type="text"
               required
               maxlength="100"
-              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-              placeholder="Among Us"
+              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent mt-2"
+              placeholder="Nom du jeu personnalisé"
             />
+            
+            <!-- Affichage du jeu sélectionné -->
+            <div v-if="!isCustomGame && selectedGame" class="mt-2 text-sm text-gray-400">
+              <div class="flex items-center space-x-2">
+                <div 
+                  class="w-3 h-3 rounded-full"
+                  :style="{ backgroundColor: selectedGame.color }"
+                ></div>
+                <span>{{ selectedGame.name }}</span>
+                <span class="text-gray-500">• Rôle existant utilisé</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -112,9 +144,10 @@
             <ChannelSelect
               v-model="form.channelId"
               :guild-id="guildId"
-              label="Channel Discord *"
-              placeholder="Sélectionner un channel"
-              help-text="Le channel où l'événement sera publié (forum pour créer un post, texte pour un embed)"
+              channel-type="forum"
+              label="Forum Discord *"
+              placeholder="Sélectionner un forum"
+              help-text="Le forum où l'événement sera publié comme un nouveau post"
               :group-by-category="true"
             />
           </div>
@@ -125,18 +158,21 @@
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">
               Couleur
+              <span v-if="!isCustomGame" class="text-xs text-gray-500">(couleur du jeu sélectionné)</span>
             </label>
             <div class="flex items-center space-x-3">
               <input
                 v-model="form.color"
                 type="color"
-                class="w-12 h-10 bg-gray-700 border border-gray-600 rounded cursor-pointer"
+                :disabled="!isCustomGame"
+                class="w-12 h-10 bg-gray-700 border border-gray-600 rounded cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               />
               <input
                 v-model="form.color"
                 type="text"
                 pattern="^#[0-9A-Fa-f]{6}$"
-                class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                :disabled="!isCustomGame"
+                class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="#FF6B6B"
               />
             </div>
@@ -150,7 +186,7 @@
               ref="imageInput"
               type="file"
               accept="image/*"
-              @change="handleImageChange"
+              @change="handleImageChange($event)"
               class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-600 file:text-white hover:file:bg-pink-700 file:cursor-pointer"
             />
           </div>
@@ -165,7 +201,7 @@
           />
           <button
             type="button"
-            @click="removeImage"
+            @click="removeImage(imageInput)"
             class="text-red-400 hover:text-red-300 transition-colors"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,22 +235,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useApi } from '../../../composables/useApi'
+import { useParty } from '../../../composables/useParty'
+import { useImageUrl } from '../../../composables/useImageUrl'
+import { useImageUpload } from '../../../composables/useImageUpload'
 import ChannelSelect from '../../ui/ChannelSelect.vue'
-
-interface Event {
-  _id: string
-  name: string
-  game: string
-  description?: string
-  date: string
-  time: string
-  maxSlots: number
-  currentSlots: number
-  image?: string
-  color: string
-  channelId: string
-}
+import type { Event, ChatGamingGame } from '../../../stores/party'
 
 const props = defineProps<{
   event?: Event | null
@@ -226,9 +251,14 @@ const emit = defineEmits<{
   save: [FormData]
 }>()
 
+const party = useParty(props.guildId)
+const { getImageUrl } = useImageUrl()
+const { imagePreview, handleImageChange, removeImage, setImagePreview, appendImageToFormData } = useImageUpload()
+
 const form = ref({
   name: '',
   game: '',
+  gameId: 'custom', // 'custom' ou l'ID d'un jeu chat-gaming
   description: '',
   date: '',
   time: '',
@@ -237,17 +267,28 @@ const form = ref({
   color: '#FF6B6B'
 })
 
+// Plus besoin de gérer les jeux localement, c'est dans le store
+
 const imageInput = ref<HTMLInputElement>()
-const imageFile = ref<File | null>(null)
-const imagePreview = ref<string>('')
 
 const minDate = computed(() => {
   return new Date().toISOString().split('T')[0]
 })
 
+const isCustomGame = computed(() => {
+  return form.value.gameId === 'custom'
+})
+
+const selectedGame = computed(() => {
+  if (isCustomGame.value) return null
+  return party.chatGamingGames.value.find((game: ChatGamingGame) => game.id === form.value.gameId)
+})
+
 const isFormValid = computed(() => {
+  const gameValid = isCustomGame.value ? form.value.game.trim() : form.value.gameId
+  
   return form.value.name.trim() && 
-         form.value.game.trim() && 
+         gameValid && 
          form.value.date && 
          form.value.time && 
          form.value.maxSlots >= 1 && 
@@ -256,27 +297,10 @@ const isFormValid = computed(() => {
          /^#[0-9A-Fa-f]{6}$/.test(form.value.color)
 })
 
+// Plus besoin de loadChatGamingGames(), c'est géré par le store
 
-function handleImageChange(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (file) {
-    imageFile.value = file
-    
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      imagePreview.value = e.target?.result as string
-    }
-    reader.readAsDataURL(file)
-  }
-}
 
-function removeImage() {
-  imageFile.value = null
-  imagePreview.value = ''
-  if (imageInput.value) {
-    imageInput.value.value = ''
-  }
-}
+// Les fonctions handleImageChange et removeImage sont maintenant dans le composable useImageUpload
 
 function handleSubmit() {
   if (!isFormValid.value) return
@@ -286,14 +310,17 @@ function handleSubmit() {
   // Ajouter tous les champs du formulaire
   Object.entries(form.value).forEach(([key, value]) => {
     if (value !== null && value !== undefined) {
-      formData.append(key, value.toString())
+      // Pour les jeux chat-gaming, on envoie le nom du jeu sélectionné
+      if (key === 'game' && !isCustomGame.value && selectedGame.value) {
+        formData.append(key, selectedGame.value.name)
+      } else {
+        formData.append(key, value.toString())
+      }
     }
   })
   
   // Ajouter l'image si présente
-  if (imageFile.value) {
-    formData.append('image', imageFile.value)
-  }
+  appendImageToFormData(formData)
   
   emit('save', formData)
 }
@@ -304,6 +331,7 @@ watch(() => props.event, (event) => {
     form.value = {
       name: event.name,
       game: event.game,
+      gameId: 'custom', // Par défaut en mode édition, on considère que c'est un jeu custom
       description: event.description || '',
       date: event.date.split('T')[0], // Format YYYY-MM-DD
       time: event.time,
@@ -313,9 +341,24 @@ watch(() => props.event, (event) => {
     }
     
     if (event.image) {
-      imagePreview.value = event.image
+      setImagePreview(getImageUrl(event.image) || event.image)
     }
   }
 }, { immediate: true })
+
+// Mettre à jour la couleur automatiquement quand on sélectionne un jeu chat-gaming
+watch(() => form.value.gameId, (newGameId) => {
+  if (newGameId !== 'custom') {
+    const selectedGame = party.chatGamingGames.value.find((game: ChatGamingGame) => game.id === newGameId)
+    if (selectedGame) {
+      form.value.color = selectedGame.color
+    }
+  }
+})
+
+// Charger les jeux chat-gaming au montage
+onMounted(async () => {
+  await party.loadGames()
+})
 
 </script>

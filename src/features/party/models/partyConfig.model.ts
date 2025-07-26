@@ -6,6 +6,9 @@ export class PartyConfig {
 
   @prop({ default: '' })
   channelId!: string;
+
+  @prop()
+  defaultRoleId?: string; // Rôle par défaut pour les jeux custom
 }
 
 // Garde l'interface pour la compatibilité
