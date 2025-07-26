@@ -445,8 +445,15 @@ const xpAmount = ref<number>(0)
 
 async function saveEvent(eventData: FormData) {
   try {
+    console.log('Sauvegarde événement:', {
+      isEditing: !!editingEvent.value,
+      eventId: editingEvent.value?._id,
+      formData: Object.fromEntries(eventData.entries())
+    })
+    
     if (editingEvent.value) {
       const result = await party.updateEvent(editingEvent.value._id, eventData)
+      console.log('Résultat update:', result)
       if (!result.success) {
         console.error('Erreur lors de la modification:', result.error)
         return
@@ -454,6 +461,7 @@ async function saveEvent(eventData: FormData) {
     } else {
       eventData.append('createdBy', authStore.user?.id || 'unknown-user')
       const result = await party.createEvent(eventData)
+      console.log('Résultat create:', result)
       if (!result.success) {
         console.error('Erreur lors de la création:', result.error)
         return

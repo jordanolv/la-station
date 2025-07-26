@@ -99,8 +99,16 @@ export class PartyService {
         embed.setDescription(description);
       }
 
+    // Ajouter l'image à l'embed si présente
     if (event.eventInfo.image) {
-      embed.setImage('attachment://image.png');
+      if (event.eventInfo.image.startsWith('http')) {
+        // URL complète
+        embed.setImage(event.eventInfo.image);
+      } else if (event.eventInfo.image.startsWith('/uploads/')) {
+        // URL relative - convertir en URL absolue
+        const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3051';
+        embed.setImage(`${API_BASE_URL}${event.eventInfo.image}`);
+      }
     }
 
     return embed;
@@ -142,19 +150,8 @@ export class PartyService {
 
   // Publier le message d'événement (forum uniquement)
   private static async publishEventMessage(channel: ForumChannel, event: IEvent, embed: EmbedBuilder): Promise<string> {
-    // Créer l'attachment si une image est présente
-    let attachment: AttachmentBuilder | undefined;
-    if (event.eventInfo.image) {
-      const imagePath = event.eventInfo.image.startsWith('/uploads/') 
-        ? path.join(process.cwd(), 'src', event.eventInfo.image.substring(1))
-        : event.eventInfo.image;
-      
-      attachment = new AttachmentBuilder(imagePath).setName('image.png');
-    }
-
     const messageOptions = {
-      embeds: [embed],
-      files: attachment ? [attachment] : []
+      embeds: [embed]
     };
 
     const thread = await channel.threads.create({
