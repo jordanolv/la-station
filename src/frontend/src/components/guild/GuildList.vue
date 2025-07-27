@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import GuildCard from './GuildCard.vue'
-import { useAuthStore } from '../stores/auth'
+import { useAuthStore } from '../../stores/auth'
 import axios from 'axios'
 
 const emit = defineEmits(['access'])

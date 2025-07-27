@@ -72,7 +72,6 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../../stores/auth'
-import ChannelSelect from '../ui/ChannelSelect.vue'
 
 interface Props {
   guildId: string

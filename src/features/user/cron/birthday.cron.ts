@@ -2,8 +2,7 @@ import { CronJob } from 'cron';
 import { Client, EmbedBuilder, TextChannel, ChannelType, PermissionsBitField } from 'discord.js';
 import { toZonedTime } from 'date-fns-tz';
 import GuildUserModel from '../models/guild-user.model';
-import BirthdayModel from '../models/birthday.model';
-import { GuildService } from '../../discord/services/guild.service';
+import GuildModel from '../../discord/models/guild.model';
 import { LogService } from '../../../shared/logs/logs.service';
 
 export class BirthdayCron {
@@ -44,7 +43,7 @@ export class BirthdayCron {
       // Récupérer toutes les guildes où le bot est présent
       const guilds = this.client.guilds.cache;
       
-      for (const [guildId, guild] of guilds) {
+      for (const [guildId, discordGuild] of guilds) {
         try {
           // Vérifier les logs pour chaque guilde
           const logConfig = await LogService.getLog(guildId);
@@ -60,7 +59,8 @@ export class BirthdayCron {
           });
 
           // Récupérer la configuration d'anniversaire pour cette guilde
-          const birthdayConfig = await BirthdayModel.findOne({ guildId });
+          const guildDoc = await GuildModel.findOne({ guildId });
+          const birthdayConfig = guildDoc?.features?.birthday;
           
           // Vérifier si la fonctionnalité est activée
           if (!birthdayConfig?.enabled) {
@@ -80,7 +80,7 @@ export class BirthdayCron {
           });
 
           // Récupérer le canal d'anniversaire configuré
-          const birthdayChannelId = birthdayConfig.channel || guild.systemChannelId;
+          const birthdayChannelId = birthdayConfig?.channel || discordGuild.systemChannelId;
           if (!birthdayChannelId) {
             await LogService.warning(guildId, `Aucun canal d'anniversaire configuré`, {
               feature: 'birthday',

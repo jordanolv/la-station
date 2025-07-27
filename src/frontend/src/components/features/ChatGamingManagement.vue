@@ -106,7 +106,7 @@
               <p v-if="game.description" class="text-gray-400 text-sm mt-1">{{ game.description }}</p>
             </div>
             <div v-if="game.image" class="ml-3">
-              <img :src="game.image" :alt="game.name" class="w-12 h-12 rounded-lg object-cover">
+              <img :src="getImageUrl(game.image)" :alt="game.name" class="w-12 h-12 rounded-lg object-cover">
             </div>
           </div>
           
@@ -214,6 +214,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../../stores/auth'
+import { useImageUrl } from '../../composables/useImageUrl'
 import ChannelSelect from '../ui/ChannelSelect.vue'
 
 interface Props {
@@ -222,6 +223,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const authStore = useAuthStore()
+const { getImageUrl } = useImageUrl()
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051'
 

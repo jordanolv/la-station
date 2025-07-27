@@ -1,7 +1,7 @@
 import { Message, EmbedBuilder, TextChannel } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import GuildUserModel from '../models/guild-user.model';
-import BirthdayModel from '../models/birthday.model';
+import GuildModel from '../../discord/models/guild.model';
 import { toZonedTime } from 'date-fns-tz';
 
 export default {
@@ -30,7 +30,8 @@ export default {
       const month = today.getMonth() + 1;
       
       // Vérifier la configuration des anniversaires
-      const birthdayConfig = await BirthdayModel.findOne({ guildId: message.guild.id });
+      const guild = await GuildModel.findOne({ guildId: message.guild.id });
+      const birthdayConfig = guild?.features?.birthday;
       
       if (!birthdayConfig || !birthdayConfig.enabled) {
         return message.reply({

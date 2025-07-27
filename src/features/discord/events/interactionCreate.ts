@@ -1,7 +1,7 @@
 import { Events, Interaction } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { GuildService } from '../services/guild.service';
-import { SuggestionsService } from '../../suggestions/suggestions.service';
+import { SuggestionsService } from '../../suggestions/services/suggestions.service';
 
 export default {
   name: Events.InteractionCreate,
@@ -9,7 +9,6 @@ export default {
 
   async execute(client: BotClient, interaction: Interaction) {
     try {
-      // S'assurer que la guilde est en BDD
       if (interaction.guild) {
         await GuildService.getOrCreateGuild(interaction.guild.id, interaction.guild.name);
       }

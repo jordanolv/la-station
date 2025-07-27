@@ -1,14 +1,10 @@
 import { Hono } from 'hono';
-import GuildUserModel from '../../features/user/models/guild-user.model'; // Adjust path as needed
+import GuildUserModel from '../../features/user/models/guild-user.model';
 import mongoose from 'mongoose';
 import { BotClient } from '../../bot/client';
-import ChatGamingModel from '../../features/chat-gaming/chatGaming.model';
-import LevelingModel from '../../features/leveling/leveling.model';
-import VocManagerModel from '../../features/voc-manager/vocManager.model';
-import BirthdayModel from '../../features/user/models/birthday.model';
 import GuildModel from '../../features/discord/models/guild.model';
-import SuggestionsConfigModel from '../../features/suggestions/models/suggestions.model';
-import { SuggestionsService } from '../../features/suggestions/suggestions.service';
+import { SuggestionsService } from '../../features/suggestions/services/suggestions.service';
+import { GuildService } from '../../features/discord/services/guild.service';
 
 const guilds = new Hono();
 
@@ -89,55 +85,59 @@ guilds.get('/:id/features', async (c) => {
   try {
     const guildId = c.req.param('id');
     
-    // Get actual feature status from database for ALL features
-    const [chatGamingSettings, levelingSettings, vocManagerSettings, birthdaySettings, suggestionsSettings] = await Promise.all([
-      ChatGamingModel.findOne({ guildId }),
-      LevelingModel.findOne({ guildId }),
-      VocManagerModel.findOne({ guildId }),
-      BirthdayModel.findOne({ guildId }),
-      SuggestionsConfigModel.findOne({ guildId })
-    ]);
+    // Get guild with all features from centralized model
+    const guild = await GuildModel.findOne({ guildId });
+    const features = guild?.features || {};
+
+    // Suggestions maintenant dans guild.features
     
     // Define available features with actual status from database
-    const features = [
+    const featureList = [
       {
         id: 'chat-gaming',
         name: 'Chat Gaming',
         description: 'Créez des jeux communautaires avec des rôles automatiques',
         icon: '🎮',
-        enabled: chatGamingSettings?.enabled || false
+        enabled: features.chatGaming?.enabled || false
       },
       {
         id: 'leveling',
         name: 'Système de niveaux',
         description: 'Système de niveaux et d\'expérience pour les membres',
         icon: '📈',
-        enabled: levelingSettings?.enabled || false
+        enabled: features.leveling?.enabled || false
       },
       {
         id: 'voice-channels',
         name: 'Salons vocaux',
         description: 'Gestion automatique des salons vocaux',
         icon: '🔊',
-        enabled: vocManagerSettings?.enabled || false
+        enabled: features.vocManager?.enabled || false
       },
       {
         id: 'birthday',
         name: 'Anniversaires',
         description: 'Notifications d\'anniversaires automatiques',
         icon: '🎂',
-        enabled: birthdaySettings?.enabled || false
+        enabled: features.birthday?.enabled || false
       },
       {
         id: 'suggestions',
         name: 'Système de Suggestions',
         description: 'Système de suggestions avec formulaires et votes',
         icon: '💡',
-        enabled: suggestionsSettings?.enabled || false
+        enabled: features.suggestions?.enabled || false
+      },
+      {
+        id: 'party',
+        name: 'Gestion des Soirées',
+        description: 'Organisez des événements et soirées gaming pour votre communauté',
+        icon: '🎉',
+        enabled: features.party?.enabled || false
       }
     ];
     
-    return c.json({ features });
+    return c.json({ features: featureList });
   } catch (error) {
     console.error('Error fetching guild features:', error);
     return c.json({ error: 'Failed to fetch features' }, 500);
@@ -151,124 +151,99 @@ guilds.post('/:id/features/:featureId/toggle', async (c) => {
     const featureId = c.req.param('featureId');
     const { enabled } = await c.req.json();
     
-    // Ensure guild exists in database before updating features
-    await GuildModel.findOneAndUpdate(
-      { guildId },
-      { 
-        guildId,
-        name: 'Unknown Guild', // Will be updated when bot joins
-        $setOnInsert: {
-          registeredAt: new Date(),
-          config: {
-            prefix: '!',
-            colors: { primary: '#dac1ff' }
-          }
-        }
-      },
-      { upsert: true, new: true }
-    );
+    // Get guild name from Discord if creating new guild
+    const client = BotClient.getInstance();
+    const discordGuild = client.guilds.cache.get(guildId);
+    const guildName = discordGuild?.name || `Guild ${guildId}`;
     
-    // Update feature status in database based on featureId
-    // Each feature manages its own guild entry
+    // Get or create guild
+    const guild = await GuildService.getOrCreateGuild(guildId, guildName);
+    
+    // Initialize features object if not exists
+    if (!guild.features) guild.features = {};
+
+    // Update feature status based on featureId
     switch (featureId) {
       case 'chat-gaming':
-        if (enabled) {
-          // Create/enable chat-gaming for this guild
-          await ChatGamingModel.findOneAndUpdate(
-            { guildId },
-            { 
-              guildId,
-              enabled: true,
-              channelId: '' // Will be set later via commands
-            },
-            { upsert: true, new: true }
-          );
-        } else {
-          // Disable chat-gaming for this guild
-          await ChatGamingModel.findOneAndUpdate(
-            { guildId },
-            { enabled: false },
-            { upsert: true, new: true }
-          );
+        if (!guild.features.chatGaming) {
+          guild.features.chatGaming = {
+            enabled: false,
+            channelId: ''
+          };
         }
+        guild.features.chatGaming.enabled = enabled;
         break;
         
       case 'leveling':
-        await LevelingModel.findOneAndUpdate(
-          { guildId },
-          { 
-            guildId,
-            enabled,
-            taux: 1, // Default XP rate
-            notifLevelUp: true, // Default notification enabled
-            channelNotif: null // No specific channel by default
-          },
-          { upsert: true, new: true }
-        );
+        if (!guild.features.leveling) {
+          guild.features.leveling = {
+            enabled: false,
+            taux: 1,
+            notifLevelUp: true,
+            channelNotif: null
+          };
+        }
+        guild.features.leveling.enabled = enabled;
         break;
         
       case 'voice-channels':
-        await VocManagerModel.findOneAndUpdate(
-          { guildId },
-          { 
-            guildId,
-            enabled,
-            joinChannels: [], // Empty join channels array
-            createdChannels: [], // Empty created channels array
-            channelCount: 0 // Reset channel count
-          },
-          { upsert: true, new: true }
-        );
+        if (!guild.features.vocManager) {
+          guild.features.vocManager = {
+            enabled: false,
+            joinChannels: [],
+            createdChannels: [],
+            channelCount: 0
+          };
+        }
+        guild.features.vocManager.enabled = enabled;
         break;
         
       case 'birthday':
-        await BirthdayModel.findOneAndUpdate(
-          { guildId },
-          { 
-            guildId,
-            enabled,
-            channel: '' // No specific channel by default
-          },
-          { upsert: true, new: true }
-        );
+        if (!guild.features.birthday) {
+          guild.features.birthday = {
+            enabled: false,
+            channel: ''
+          };
+        }
+        guild.features.birthday.enabled = enabled;
+        break;
+
+      case 'party':
+        if (!guild.features.party) {
+          guild.features.party = {
+            enabled: false,
+            channelId: ''
+          };
+        }
+        guild.features.party.enabled = enabled;
         break;
         
       case 'suggestions':
-        if (enabled) {
-          // If enabling, create config if not exists or just update enabled status
-          await SuggestionsConfigModel.findOneAndUpdate(
-            { guildId },
-            { 
-              $set: { enabled: true },
-              $setOnInsert: {
-                guildId,
-                channels: [],
-                forms: [],
-                defaultReactions: ['👍', '👎']
-              }
-            },
-            { upsert: true, new: true }
-          );
-        } else {
-          // If disabling, just update enabled status without touching other fields
-          await SuggestionsConfigModel.findOneAndUpdate(
-            { guildId },
-            { enabled: false },
-            { upsert: true, new: true }
-          );
+        if (!guild.features.suggestions) {
+          guild.features.suggestions = {
+            guildId: guildId,
+            enabled: false,
+            channels: [],
+            forms: [],
+            defaultReactions: ['👍', '👎']
+          };
         }
+        guild.features.suggestions.enabled = enabled;
         break;
-        
+
       default:
         return c.json({ error: 'Unknown feature' }, 400);
     }
     
+    // Save guild with updated features
+    await guild.save();
     
     return c.json({ 
       success: true, 
       message: `Feature ${featureId} ${enabled ? 'enabled' : 'disabled'}` 
     });
   } catch (error) {
+    console.error('Error toggling feature:', error);
     return c.json({ error: 'Failed to toggle feature' }, 500);
   }
 });
@@ -279,45 +254,46 @@ guilds.get('/:id/features/:featureId/settings', async (c) => {
     const guildId = c.req.param('id');
     const featureId = c.req.param('featureId');
     
+    // Get guild name from Discord if creating new guild
+    const client = BotClient.getInstance();
+    const discordGuild = client.guilds.cache.get(guildId);
+    const guildName = discordGuild?.name || `Guild ${guildId}`;
+    
+    const guild = await GuildService.getOrCreateGuild(guildId, guildName);
     let settings: any;
     
     switch (featureId) {
       case 'chat-gaming':
-        settings = await ChatGamingModel.findOne({ guildId });
+        settings = guild.features?.chatGaming || { enabled: false, channelId: '' };
         break;
       case 'leveling':
-        settings = await LevelingModel.findOne({ guildId });
+        settings = guild.features?.leveling || { enabled: false, taux: 1, notifLevelUp: true, channelNotif: null };
         break;
       case 'voice-channels':
-        settings = await VocManagerModel.findOne({ guildId });
+        settings = guild.features?.vocManager || { enabled: false, joinChannels: [], createdChannels: [], channelCount: 0 };
         break;
       case 'birthday':
-        settings = await BirthdayModel.findOne({ guildId });
+        settings = guild.features?.birthday || { enabled: false, channel: '' };
+        break;
+      case 'party':
+        settings = guild.features?.party || { enabled: false, channelId: '' };
         break;
       case 'suggestions':
-        settings = await SuggestionsConfigModel.findOne({ guildId });
+        settings = guild.features?.suggestions || { 
+          guildId: guildId,
+          enabled: false, 
+          channels: [], 
+          forms: [], 
+          defaultReactions: ['👍', '👎'] 
+        };
         break;
       default:
         return c.json({ error: 'Unknown feature' }, 400);
     }
     
-    if (!settings) {
-      // For suggestions, create default config if not found
-      if (featureId === 'suggestions') {
-        settings = await SuggestionsConfigModel.create({
-          guildId,
-          enabled: false,
-          channels: [],
-          forms: [],
-          defaultReactions: ['👍', '👎']
-        });
-      } else {
-        return c.json({ error: 'Feature settings not found' }, 404);
-      }
-    }
-    
     return c.json({ settings });
   } catch (error) {
+    console.error('Error fetching feature settings:', error);
     return c.json({ error: 'Failed to fetch feature settings' }, 500);
   }
 });
@@ -329,48 +305,46 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
     const featureId = c.req.param('featureId');
     const updates = await c.req.json();
     
+    // Get guild name from Discord if creating new guild
+    const client = BotClient.getInstance();
+    const discordGuild = client.guilds.cache.get(guildId);
+    const guildName = discordGuild?.name || `Guild ${guildId}`;
+    
+    const guild = await GuildService.getOrCreateGuild(guildId, guildName);
+    if (!guild.features) guild.features = {};
+
     let updatedSettings: any;
     
     switch (featureId) {
       case 'chat-gaming':
-        updatedSettings = await ChatGamingModel.findOneAndUpdate(
-          { guildId },
-          { ...updates, guildId },
-          { new: true, upsert: true }
-        );
+        guild.features.chatGaming = { ...guild.features.chatGaming, ...updates };
+        updatedSettings = guild.features.chatGaming;
         break;
       case 'leveling':
-        updatedSettings = await LevelingModel.findOneAndUpdate(
-          { guildId },
-          { ...updates, guildId },
-          { new: true, upsert: true }
-        );
+        guild.features.leveling = { ...guild.features.leveling, ...updates };
+        updatedSettings = guild.features.leveling;
         break;
       case 'voice-channels':
-        updatedSettings = await VocManagerModel.findOneAndUpdate(
-          { guildId },
-          { ...updates, guildId },
-          { new: true, upsert: true }
-        );
+        guild.features.vocManager = { ...guild.features.vocManager, ...updates };
+        updatedSettings = guild.features.vocManager;
         break;
       case 'birthday':
-        updatedSettings = await BirthdayModel.findOneAndUpdate(
-          { guildId },
-          { ...updates, guildId },
-          { new: true, upsert: true }
-        );
+        guild.features.birthday = { ...guild.features.birthday, ...updates };
+        updatedSettings = guild.features.birthday;
+        break;
+      case 'party':
+        guild.features.party = { ...guild.features.party, ...updates };
+        updatedSettings = guild.features.party;
         break;
       case 'suggestions':
-        updatedSettings = await SuggestionsConfigModel.findOneAndUpdate(
-          { guildId },
-          { ...updates, guildId },
-          { new: true, upsert: true }
-        );
+        guild.features.suggestions = { ...guild.features.suggestions, ...updates };
+        updatedSettings = guild.features.suggestions;
         break;
       default:
         return c.json({ error: 'Unknown feature' }, 400);
     }
     
+    await guild.save();
     
     return c.json({ 
       success: true, 
@@ -378,6 +352,7 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
       settings: updatedSettings
     });
   } catch (error) {
+    console.error('Error updating feature settings:', error);
     return c.json({ error: 'Failed to update feature settings' }, 500);
   }
 });
@@ -545,12 +520,12 @@ guilds.post('/:id/suggestions/channels/:channelId/publish-button', async (c) => 
     }
     
     // Update the channel config with the new button message ID
-    const config = await SuggestionsService.getSuggestionsConfig(guildId);
-    if (config) {
-      const channelConfig = config.channels.find(c => c.channelId === channelId);
+    const guildDoc = await GuildModel.findOne({ guildId });
+    if (guildDoc?.features?.suggestions?.channels) {
+      const channelConfig = guildDoc.features.suggestions.channels.find(ch => ch.channelId === channelId);
       if (channelConfig) {
         channelConfig.buttonMessageId = messageId;
-        await config.save();
+        await guildDoc.save();
       }
     }
     

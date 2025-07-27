@@ -1,62 +1,76 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { prop, getModelForClass, index, DocumentType } from '@typegoose/typegoose';
 
-export interface IGuildUser extends Document {
-  discordId: string;
-  name: string;
-  guildId: string;
-  guild?: any;
-  profil: {
-    money: number;
-    exp: number;
-    lvl: number;
-  };
-  bio: string;
-  stats: {
-    totalMsg: number;
-    voiceTime: number;
-    voiceHistory: Array<{
-      date: Date;
-      time: number;
-    }>;
-  };
-  infos: {
-    birthDate: Date;
-    registeredAt: Date;
-    updatedAt: Date;
-  };
+class VoiceHistoryEntry {
+  @prop({ default: () => new Date() })
+  date!: Date;
+
+  @prop({ default: 0 })
+  time!: number;
 }
 
-const GuildUserSchema = new Schema<IGuildUser>({
-  discordId: { type: String, required: true },
-  name: { type: String, required: true },
-  guildId: { type: String, required: true },
-  profil: {
-    money: { type: Number, default: 500 },
-    exp: { type: Number, default: 0 },
-    lvl: { type: Number, default: 1 }
-  },
-  bio: { type: String },
-  stats: {
-    totalMsg: { type: Number, default: 0 },
-    voiceTime: { type: Number, default: 0 },
-    voiceHistory: [{
-      date: { type: Date, default: Date.now },
-      time: { type: Number, default: 0 }
-    }]
-  },
-  infos: {
-    registeredAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
-    birthDate: { type: Date }
+class GuildUserProfil {
+  @prop({ default: 500 })
+  money!: number;
+
+  @prop({ default: 0 })
+  exp!: number;
+
+  @prop({ default: 1 })
+  lvl!: number;
+}
+
+class GuildUserStats {
+  @prop({ default: 0 })
+  totalMsg!: number;
+
+  @prop({ default: 0 })
+  voiceTime!: number;
+
+  @prop({ type: () => [VoiceHistoryEntry], default: [] })
+  voiceHistory!: VoiceHistoryEntry[];
+}
+
+class GuildUserInfos {
+  @prop({ default: () => new Date() })
+  registeredAt!: Date;
+
+  @prop({ default: () => new Date() })
+  updatedAt!: Date;
+
+  @prop()
+  birthDate?: Date;
+}
+
+@index({ discordId: 1, guildId: 1 }, { unique: true })
+export class GuildUser {
+  @prop({ required: true })
+  discordId!: string;
+
+  @prop({ required: true })
+  name!: string;
+
+  @prop({ required: true })
+  guildId!: string;
+
+  @prop({ type: () => GuildUserProfil, default: () => ({}) })
+  profil!: GuildUserProfil;
+
+  @prop()
+  bio?: string;
+
+  @prop({ type: () => GuildUserStats, default: () => ({}) })
+  stats!: GuildUserStats;
+
+  @prop({ type: () => GuildUserInfos, default: () => ({}) })
+  infos!: GuildUserInfos;
+}
+
+const GuildUserModel = getModelForClass(GuildUser, {
+  schemaOptions: {
+    timestamps: true,
+    collection: 'guild_users'
   }
-}, {
-  timestamps: true,
-  collection: 'guild_users'
 });
 
-GuildUserSchema.index({ discordId: 1, guildId: 1 }, { unique: true });
-
-// Utiliser un nom de modèle qui correspond à la collection pour éviter les conflits
-const GuildUserModel = mongoose.models.Guild_User || mongoose.model<IGuildUser>('Guild_User', GuildUserSchema);
-
+export type IGuildUser = DocumentType<GuildUser>;
 export default GuildUserModel; 

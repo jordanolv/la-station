@@ -1,6 +1,6 @@
 import { VoiceState } from 'discord.js';
-import GuildUserModel from '../user/models/guild-user.model';
-import { LogService } from '../../shared/logs/logs.service';
+import GuildUserModel from '../../user/models/guild-user.model';
+import { LogService } from '../../../shared/logs/logs.service';
 
 // Stockage temporaire des états vocaux
 const voiceStates: Map<string, { joinTime: number }> = new Map();

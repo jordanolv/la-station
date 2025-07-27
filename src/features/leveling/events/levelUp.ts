@@ -1,7 +1,7 @@
 import { IGuildUser } from '../../user/models/guild-user.model';
 import { BotClient } from '../../../bot/client';
 import { EmbedBuilder, Message, TextChannel } from 'discord.js';
-import { LevelingService } from '../leveling.service';
+import { LevelingService } from '../services/leveling.service';
 import { emojis } from '../../../utils/emojis';
 
 export default {

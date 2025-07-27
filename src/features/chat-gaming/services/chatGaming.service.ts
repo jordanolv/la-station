@@ -1,17 +1,18 @@
 import { Guild, ChannelType, EmbedBuilder, ThreadAutoArchiveDuration, TextChannel, MessageReaction, User, ForumChannel, ThreadChannel, AttachmentBuilder } from 'discord.js';
-import ChatGamingModel from './chatGaming.model';
-import GameModel, { IGame } from './game.model';
+import GuildModel from '../../discord/models/guild.model';
+import { IChatGamingConfig } from '../models/chatGamingConfig.model';
+import ChatGamingItemModel, { IChatGamingItem } from '../models/chatGamingItem.model';
 import path from 'path';
 
 export class ChatGamingService {
   
   // ===== GAME CRUD OPERATIONS =====
-  static async getGameById(id: string): Promise<IGame | null> {
-    return GameModel.findById(id);
+  static async getGameById(id: string): Promise<IChatGamingItem | null> {
+    return ChatGamingItemModel.findById(id);
   }
 
-  static async getGamesByGuild(guildId: string): Promise<IGame[]> {
-    return GameModel.find({ guildId });
+  static async getGamesByGuild(guildId: string): Promise<IChatGamingItem[]> {
+    return ChatGamingItemModel.find({ guildId });
   }
 
   static async createGame(
@@ -25,56 +26,65 @@ export class ChatGamingService {
       messageId?: string,
       roleId?: string
     }
-  ): Promise<IGame> {
-    return GameModel.create(gameData);
+  ): Promise<IChatGamingItem> {
+    return ChatGamingItemModel.create(gameData);
   }
 
   static async updateGame(
     id: string,
-    updates: Partial<IGame>
-  ): Promise<IGame | null> {
-    return GameModel.findByIdAndUpdate(
+    updates: Partial<IChatGamingItem>
+  ): Promise<IChatGamingItem | null> {
+    return ChatGamingItemModel.findByIdAndUpdate(
       id,
       { $set: updates },
       { new: true }
     );
   }
 
-  static async deleteGame(id: string): Promise<IGame | null> {
-    return GameModel.findByIdAndDelete(id);
+  static async deleteGame(id: string): Promise<IChatGamingItem | null> {
+    return ChatGamingItemModel.findByIdAndDelete(id);
   }
 
-  static async findByThreadId(threadId: string): Promise<IGame | null> {
-    return GameModel.findOne({ threadId });
+  static async findByThreadId(threadId: string): Promise<IChatGamingItem | null> {
+    return ChatGamingItemModel.findOne({ threadId });
   }
 
-  static async findByMessageId(messageId: string): Promise<IGame | null> {
-    return GameModel.findOne({ messageId });
+  static async findByMessageId(messageId: string): Promise<IChatGamingItem | null> {
+    return ChatGamingItemModel.findOne({ messageId });
   }
 
   
   static async getChatGaming(guildId: string) {
-    return ChatGamingModel.findOne({ guildId });
+    const guild = await GuildModel.findOne({ guildId });
+    return guild?.features?.chatGaming || null;
   }
 
   static async getOrCreateChatGaming(guildId: string, enabled: boolean = false) {
-    const existing = await this.getChatGaming(guildId);
-    if (existing) return existing;
-    
-    return ChatGamingModel.create({
-      guildId,
-      enabled,
-      channelId: null
-    });
+    let guild = await GuildModel.findOne({ guildId });
+    if (!guild || !guild.features?.chatGaming) {
+      guild = await GuildModel.findOneAndUpdate(
+        { guildId },
+        {
+          $set: {
+            'features.chatGaming': {
+              enabled,
+              channelId: ''
+            }
+          }
+        },
+        { new: true, upsert: true }
+      );
+    }
+    return guild.features.chatGaming!;
   }
 
   // ===== DISCORD INTEGRATION =====
   /**
    * Crée un jeu avec thread et rôle Discord
    */
-  static async createGameInDiscord(game: IGame, guild: Guild): Promise<void> {
+  static async createGameInDiscord(game: IChatGamingItem, guild: Guild): Promise<void> {
     try {
-      const chatGamingSettings = await ChatGamingModel.findOne({ guildId: guild.id });
+      const chatGamingSettings = await this.getChatGaming(guild.id);
       if (!chatGamingSettings?.enabled || !chatGamingSettings.channelId) {
         return;
       }
@@ -155,7 +165,7 @@ export class ChatGamingService {
       const guild = reaction.message.guild;
       const guildId = guild.id;
 
-      const chatGamingSettings = await ChatGamingModel.findOne({ guildId });
+      const chatGamingSettings = await this.getChatGaming(guildId);
       if (!chatGamingSettings?.enabled) return;
 
       if (reaction.emoji.name !== '🔔') return;
@@ -203,7 +213,7 @@ export class ChatGamingService {
       const guild = reaction.message.guild;
       const guildId = guild.id;
 
-      const chatGamingSettings = await ChatGamingModel.findOne({ guildId });
+      const chatGamingSettings = await this.getChatGaming(guildId);
       if (!chatGamingSettings?.enabled) return;
 
       if (reaction.emoji.name !== '🔔') return;

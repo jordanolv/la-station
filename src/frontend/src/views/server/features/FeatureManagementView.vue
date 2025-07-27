@@ -46,6 +46,11 @@
           <SuggestionsManagement :guild-id="$route.params.id as string" />
         </div>
 
+        <!-- Party Feature -->
+        <div v-else-if="$route.params.feature === 'party'">
+          <PartyManagement :guild-id="$route.params.id as string" />
+        </div>
+
         <!-- Unknown Feature -->
         <div v-else>
           <div class="text-center py-12">
@@ -73,6 +78,7 @@ import LevelingManagement from '../../../components/features/LevelingManagement.
 import VocManagerManagement from '../../../components/features/VocManagerManagement.vue'
 import BirthdayManagement from '../../../components/features/BirthdayManagement.vue'
 import SuggestionsManagement from '../../../components/features/SuggestionsManagement.vue'
+import PartyManagement from '../../../components/features/PartyManagement.vue'
 
 const route = useRoute()
 
@@ -82,7 +88,8 @@ const featureName = computed(() => {
     'leveling': 'Système de niveaux',
     'voice-channels': 'Salons vocaux',
     'birthday': 'Anniversaires',
-    'suggestions': 'Système de Suggestions'
+    'suggestions': 'Système de Suggestions',
+    'party': 'Gestion des Soirées'
   }
   return featureMap[route.params.feature as string] || 'Fonctionnalité inconnue'
 })
