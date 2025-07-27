@@ -164,7 +164,7 @@ export class PartyService {
   }
 
   // Publier le message d'événement (forum uniquement)
-  private static async publishEventMessage(channel: ForumChannel, event: IEvent, embed: EmbedBuilder): Promise<string> {
+  private static async publishEventMessage(channel: ForumChannel, event: IEvent, embed: EmbedBuilder, roleId?: string): Promise<string> {
     const messageOptions = {
       embeds: [embed]
     };
@@ -180,6 +180,23 @@ export class PartyService {
     // Ajouter la réaction par défaut
     if (messageToReact) {
       await messageToReact.react('🎉').catch(() => {});
+    }
+
+    // Envoyer un message séparé pour notifier le rôle (si roleId présent)
+    if (roleId) {
+      try {
+        const notificationMessage = await thread.send(`<@&${roleId}>`);
+        // Supprimer le message de notification après 1 seconde
+        setTimeout(async () => {
+          try {
+            await notificationMessage.delete();
+          } catch (error) {
+            console.error('[PARTY] Erreur suppression message de notification:', error);
+          }
+        }, 1000);
+      } catch (error) {
+        console.error('[PARTY] Erreur envoi notification rôle:', error);
+      }
     }
 
     return messageId;
@@ -287,7 +304,7 @@ export class PartyService {
 
     // Publier l'événement dans le forum
     const embed = this.createEventEmbed(event, roleId);
-    const messageId = await this.publishEventMessage(channel as ForumChannel, event, embed);
+    const messageId = await this.publishEventMessage(channel as ForumChannel, event, embed, roleId);
 
     // Mettre à jour avec les IDs Discord
     const updateData: any = { 'discord.messageId': messageId };
