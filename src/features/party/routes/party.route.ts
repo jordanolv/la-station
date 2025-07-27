@@ -53,6 +53,7 @@ party.post('/', async (c) => {
     const color = formData.get('color') as string || '#FF6B6B';
     const eventImage = formData.get('image') as File;
     const createdBy = formData.get('createdBy') as string;
+    const announcementChannelId = formData.get('announcementChannelId') as string;
     
     const guildId = validateGuildId(getGuildId(c));
 
@@ -125,7 +126,7 @@ party.post('/', async (c) => {
       }
     };
 
-    const createdEvent = await PartyService.createEventInDiscord(client, finalEventData);
+    const createdEvent = await PartyService.createEventInDiscord(client, finalEventData, announcementChannelId);
     
     return c.json({ 
       success: true, 

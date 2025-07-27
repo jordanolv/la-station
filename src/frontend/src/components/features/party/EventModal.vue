@@ -210,6 +210,20 @@
           </button>
         </div>
 
+        <!-- Channel d'annonce (optionnel) -->
+        <div>
+          <ChannelSelect
+            v-model="form.announcementChannelId"
+            :guild-id="guildId"
+            channel-type="text"
+            label="Channel d'annonce (optionnel)"
+            placeholder="Choisir un channel pour annoncer la soirée"
+            help-text="Le channel où un message d'annonce sera envoyé avec un lien vers l'événement"
+            :group-by-category="true"
+            :required="false"
+          />
+        </div>
+
         <!-- Actions -->
         <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-700">
           <button
@@ -264,7 +278,8 @@ const form = ref({
   time: '',
   maxSlots: 10,
   channelId: '',
-  color: '#FF6B6B'
+  color: '#FF6B6B',
+  announcementChannelId: ''
 })
 
 // Plus besoin de gérer les jeux localement, c'est dans le store
