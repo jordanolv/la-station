@@ -182,24 +182,38 @@ export class PartyService {
       await messageToReact.react('🎉').catch(() => {});
     }
 
-    // Envoyer un message séparé pour notifier le rôle (si roleId présent)
-    if (roleId) {
-      try {
-        const notificationMessage = await thread.send(`<@&${roleId}>`);
-        // Supprimer le message de notification après 1 seconde
-        setTimeout(async () => {
-          try {
-            await notificationMessage.delete();
-          } catch (error) {
-            console.error('[PARTY] Erreur suppression message de notification:', error);
-          }
-        }, 1000);
-      } catch (error) {
-        console.error('[PARTY] Erreur envoi notification rôle:', error);
-      }
-    }
 
     return messageId;
+  }
+
+  // Envoyer le message d'annonce dans un channel spécifique
+  private static async sendAnnouncementMessage(client: BotClient, event: IEvent, announcementChannelId: string, threadUrl: string, roleId?: string): Promise<void> {
+    try {
+      const { guild } = await this.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
+      const announcementChannel = await guild.channels.fetch(announcementChannelId);
+      
+      if (!announcementChannel?.isTextBased()) {
+        console.error('[PARTY] Le channel d\'annonce n\'est pas un channel textuel');
+        return;
+      }
+
+      const dateStr = new Date(event.eventInfo.dateTime).toLocaleDateString('fr-FR');
+      const timeStr = new Date(event.eventInfo.dateTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      
+      let message = `🎉 **Nouvelle soirée organisée !**\n`;
+      message += `🎮 **${event.eventInfo.name}** - ${event.eventInfo.game}\n`;
+      message += `📅 ${dateStr} à ${timeStr}\n\n`;
+      message += `[Rejoindre l'événement](${threadUrl})`;
+
+      if (roleId) {
+        message += `\n<@&${roleId}>`;
+      }
+
+      await announcementChannel.send(message);
+      console.log(`[PARTY] Message d'annonce envoyé dans ${announcementChannel.name}`);
+    } catch (error) {
+      console.error('[PARTY] Erreur envoi message d\'annonce:', error);
+    }
   }
 
   // Vérifier si un channel est un party channel actif
@@ -287,7 +301,7 @@ export class PartyService {
   }
 
   // Intégration Discord
-  static async createEventInDiscord(client: BotClient, eventData: Partial<IEvent>): Promise<any> {
+  static async createEventInDiscord(client: BotClient, eventData: Partial<IEvent>, announcementChannelId?: string): Promise<any> {
     const event = await this.createEvent(eventData);
     const { channel } = await this.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
 
@@ -311,6 +325,23 @@ export class PartyService {
     if (roleId) updateData['discord.roleId'] = roleId;
     
     const updatedEvent = await PartyItemModel.findByIdAndUpdate(event._id.toString(), updateData, { new: true });
+
+    // Envoyer le message d'annonce si un channel est spécifié
+    if (announcementChannelId && messageId) {
+      try {
+        // Récupérer le thread pour construire l'URL
+        const forumChannel = channel as ForumChannel;
+        const eventThread = await this.findEventThread(forumChannel, event.eventInfo.name, messageId);
+        
+        if (eventThread) {
+          const threadUrl = `https://discord.com/channels/${event.discord.guildId}/${eventThread.id}`;
+          await this.sendAnnouncementMessage(client, updatedEvent!, announcementChannelId, threadUrl, roleId);
+        }
+      } catch (error) {
+        console.error('[PARTY] Erreur lors de l\'envoi de l\'annonce:', error);
+      }
+    }
+
     return this.formatEventForFrontend(updatedEvent!);
   }
 

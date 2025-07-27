@@ -539,4 +539,39 @@ guilds.post('/:id/suggestions/channels/:channelId/publish-button', async (c) => 
   }
 });
 
+// Get roles for a guild
+guilds.get('/:id/roles', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const { BotClient } = require('../../bot/client');
+    
+    const client = BotClient.getInstance();
+    if (!client) {
+      return c.json({ error: 'Bot client not available' }, 500);
+    }
+
+    const guild = await client.guilds.fetch(guildId);
+    if (!guild) {
+      return c.json({ error: 'Guild not found' }, 404);
+    }
+
+    // Récupérer les rôles (exclure @everyone et les rôles bot)
+    const roles = guild.roles.cache
+      .filter(role => role.name !== '@everyone' && !role.managed)
+      .map(role => ({
+        id: role.id,
+        name: role.name,
+        color: role.hexColor,
+        position: role.position,
+        mentionable: role.mentionable
+      }))
+      .sort((a, b) => b.position - a.position); // Trier par position (rôles les plus hauts en premier)
+
+    return c.json({ roles });
+  } catch (error) {
+    console.error('Error fetching guild roles:', error);
+    return c.json({ error: 'Failed to fetch roles' }, 500);
+  }
+});
+
 export { guilds }; 

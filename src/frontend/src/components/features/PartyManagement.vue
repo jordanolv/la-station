@@ -6,6 +6,28 @@
       <p class="text-gray-400">Organisez des événements et soirées gaming pour votre communauté</p>
     </div>
 
+    <!-- Configuration -->
+    <div class="bg-gray-800 rounded-lg p-6">
+      <h3 class="text-lg font-medium text-white mb-4 flex items-center space-x-2">
+        <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span>Configuration</span>
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <RoleSelect
+          v-model="defaultRoleId"
+          :guild-id="guildId"
+          label="Rôle par défaut pour les jeux personnalisés"
+          placeholder="Aucun rôle sélectionné"
+          help-text="Ce rôle sera tagué lors de la création d'événements avec des jeux personnalisés"
+          @update:model-value="updateDefaultRole"
+        />
+      </div>
+    </div>
+
     <!-- Create Event Button -->
     <div class="flex justify-between items-center">
       <div class="flex items-center space-x-4">
@@ -399,7 +421,9 @@ import { ref, onMounted, computed } from 'vue'
 import { useParty } from '../../composables/useParty'
 import { useImageUrl } from '../../composables/useImageUrl'
 import { useAuthStore } from '../../stores/auth'
+import { useApi } from '../../composables/useApi'
 import EventModal from './party/EventModal.vue'
+import RoleSelect from '../ui/RoleSelect.vue'
 import type { Event, ParticipantInfo } from '../../stores/party'
 
 const props = defineProps<{
@@ -408,9 +432,13 @@ const props = defineProps<{
 
 const authStore = useAuthStore()
 const { getImageUrl } = useImageUrl()
+const { get, put } = useApi()
 
 // Récupération du composable party
 const party = useParty(props.guildId)
+
+// Configuration du rôle par défaut
+const defaultRoleId = ref('')
 
 // État local pour les modals
 const showCreateModal = ref(false)
@@ -603,10 +631,34 @@ async function loadEventParticipants(eventId: string) {
   }
 }
 
+// Charger la configuration du rôle par défaut
+async function loadDefaultRole() {
+  try {
+    const response = await get(`/api/guilds/${props.guildId}/features/party/settings`)
+    if (response.settings?.defaultRoleId) {
+      defaultRoleId.value = response.settings.defaultRoleId
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement de la config party:', error)
+  }
+}
+
+// Mettre à jour le rôle par défaut
+async function updateDefaultRole(roleId: string) {
+  try {
+    await put(`/api/guilds/${props.guildId}/features/party/settings`, {
+      defaultRoleId: roleId
+    })
+    console.log('Rôle par défaut mis à jour:', roleId)
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du rôle:', error)
+  }
+}
 
 onMounted(async () => {
   if (props.guildId) {
     await party.initialize()
+    await loadDefaultRole()
   } else {
     console.error('[PARTY_MANAGEMENT] Pas de guildId fourni')
   }
