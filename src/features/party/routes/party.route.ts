@@ -180,27 +180,62 @@ party.put('/:id', async (c) => {
     const eventId = c.req.param('id');
     const formData = await c.req.formData();
     
-    const updates: any = {};
+    console.log('[PARTY UPDATE] EventId:', eventId);
+    console.log('[PARTY UPDATE] FormData entries:', Object.fromEntries(formData.entries()));
     
-    // Récupérer tous les champs possibles
-    const fields = ['name', 'game', 'description', 'date', 'time', 'maxSlots', 'channelId', 'color'];
-    fields.forEach(field => {
-      const value = formData.get(field);
-      if (value !== null) {
-        if (field === 'date') {
-          updates[field] = new Date(value as string);
-        } else if (field === 'maxSlots') {
-          updates[field] = parseInt(value as string);
-        } else {
-          updates[field] = value;
-        }
+    // Récupérer les valeurs du formulaire
+    const name = formData.get('name') as string;
+    const game = formData.get('game') as string;
+    const gameId = formData.get('gameId') as string;
+    const description = formData.get('description') as string;
+    const date = formData.get('date') as string;
+    const time = formData.get('time') as string;
+    const maxSlots = formData.get('maxSlots') as string;
+    const channelId = formData.get('channelId') as string;
+    const color = formData.get('color') as string;
+    const eventImage = formData.get('image') as File;
+
+    // Récupérer les infos du jeu chat-gaming si un gameId est fourni
+    let chatGamingGame = null;
+    if (gameId && gameId !== 'custom') {
+      try {
+        chatGamingGame = await ChatGamingService.getGameById(gameId);
+      } catch (error) {
+        console.error('Error fetching chat-gaming game:', error);
       }
-    });
+    }
+
+    // Utiliser les données du jeu chat-gaming si disponible, sinon les données custom
+    const finalColor = chatGamingGame?.color || color;
+    const finalGame = chatGamingGame?.name || game;
+
+    // Construire l'objet de mise à jour
+    const updates: any = {};
+
+    // Mettre à jour les champs de eventInfo si fournis
+    if (name) updates['eventInfo.name'] = name;
+    if (finalGame) updates['eventInfo.game'] = finalGame;
+    if (description !== null) updates['eventInfo.description'] = description;
+    if (maxSlots) updates['eventInfo.maxSlots'] = parseInt(maxSlots);
+    if (finalColor) updates['eventInfo.color'] = finalColor;
+
+    // Combiner date et time en dateTime si fournis
+    if (date && time) {
+      updates['eventInfo.dateTime'] = new Date(`${date}T${time}`);
+    }
+
+    // Mettre à jour les champs Discord si fournis
+    if (channelId) updates['discord.channelId'] = channelId;
+
+    // Mettre à jour l'ID du jeu chat-gaming
+    if (gameId) {
+      updates['chatGamingGameId'] = gameId === 'custom' ? undefined : chatGamingGame?._id?.toString();
+    }
 
     // Gestion de l'image
-    const imageUrl = await handleImageUpload(formData.get('image') as File);
+    const imageUrl = await handleImageUpload(eventImage);
     if (imageUrl) {
-      updates.image = imageUrl;
+      updates['eventInfo.image'] = imageUrl;
     }
 
     const event = await PartyService.updateEvent(eventId, updates);

@@ -326,12 +326,21 @@ function handleSubmit() {
 }
 
 // Initialiser le formulaire si on édite un événement
-watch(() => props.event, (event) => {
+watch(() => props.event, async (event) => {
   if (event) {
+    // S'assurer que les jeux sont chargés avant de faire la détection
+    await party.loadGames()
+    
+    // Détecter si l'événement utilise un jeu du chat gaming existant
+    const existingGame = party.chatGamingGames.value.find((game) => game.name === event.game)
+    console.log('Événement en édition:', event)
+    console.log('Jeux disponibles:', party.chatGamingGames.value)
+    console.log('Jeu trouvé:', existingGame)
+    
     form.value = {
       name: event.name,
       game: event.game,
-      gameId: 'custom', // Par défaut en mode édition, on considère que c'est un jeu custom
+      gameId: existingGame ? existingGame.id : 'custom', // Détecter automatiquement
       description: event.description || '',
       date: event.date.split('T')[0], // Format YYYY-MM-DD
       time: event.time,

@@ -1,17 +1,36 @@
-import { writeFile, mkdir } from 'fs/promises'
+import { v2 as cloudinary } from 'cloudinary'
 import path from 'path'
 
 export class ImageUploadService {
-  private static readonly UPLOADS_DIR = path.resolve(__dirname, '../../../../uploads')
   private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
   private static readonly ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+  
+  // Configuration Cloudinary
+  static {
+    console.log('[CLOUDINARY] Variables d\'environnement:', {
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET ? 'SET' : 'NOT_SET'
+    })
+    
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET
+    })
+  }
 
   /**
-   * Initialise le répertoire d'upload s'il n'existe pas
+   * Génère un public_id unique pour Cloudinary
    */
-  private static async ensureUploadsDir(): Promise<string> {
-    await mkdir(this.UPLOADS_DIR, { recursive: true })
-    return this.UPLOADS_DIR
+  private static generatePublicId(originalName: string): string {
+    const timestamp = Date.now()
+    const random = Math.random().toString(36).substring(2, 8)
+    const baseName = path.basename(originalName, path.extname(originalName))
+      .replace(/[^a-zA-Z0-9]/g, '_')
+      .substring(0, 20)
+    
+    return `${timestamp}_${random}_${baseName}`
   }
 
   /**
@@ -46,7 +65,7 @@ export class ImageUploadService {
   }
 
   /**
-   * Upload une image et retourne l'URL relative
+   * Upload une image vers Cloudinary et retourne l'URL publique
    */
   static async uploadImage(file: File | null): Promise<string | undefined> {
     if (!file || file.size === 0) {
@@ -54,21 +73,47 @@ export class ImageUploadService {
     }
 
     try {
+      // Force la reconfiguration de Cloudinary à chaque upload
+      cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+      })
+
+      console.log('[IMAGE_UPLOAD] Config Cloudinary:', {
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET ? 'SET' : 'NOT_SET'
+      })
+
       // Validation
       this.validateImage(file)
 
-      // Préparation des chemins
-      const uploadsDir = await this.ensureUploadsDir()
-      const fileName = this.generateFileName(file.name)
-      const filePath = path.join(uploadsDir, fileName)
-
-      // Conversion et sauvegarde
+      // Conversion en buffer
       const arrayBuffer = await file.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
-      await writeFile(filePath, buffer)
 
-      // Retour de l'URL relative
-      return `/uploads/${fileName}`
+      // Génération du public_id
+      const publicId = this.generatePublicId(file.name)
+
+      console.log(`[IMAGE_UPLOAD] Upload vers Cloudinary: ${publicId}`)
+
+      // Upload vers Cloudinary
+      const result = await cloudinary.uploader.upload(`data:${file.type};base64,${buffer.toString('base64')}`, {
+        public_id: publicId,
+        resource_type: 'image',
+        folder: 'the-ridge/party',
+        overwrite: true,
+        transformation: [
+          { quality: 'auto:good' }, // Optimisation automatique
+          { fetch_format: 'auto' }  // Format optimal selon le navigateur
+        ]
+      })
+
+      console.log(`[IMAGE_UPLOAD] Fichier uploadé avec succès: ${result.public_id}`)
+
+      // Retour de l'URL publique sécurisée
+      return result.secure_url
     } catch (error) {
       console.error('[IMAGE_UPLOAD] Erreur:', error)
       throw error
