@@ -1,5 +1,5 @@
 import { Message, ChannelType } from 'discord.js';
-import ChatGamingModel from '../models/chatGaming.model';
+import ChatGamingConfigModel from '../models/chatGamingConfig.model';
 import { MESSAGE_DELETE_TIMEOUT } from '../../../shared/constants';
 
 export default {
@@ -29,7 +29,7 @@ export default {
         });
       }
 
-      await ChatGamingModel.findOneAndUpdate(
+      await ChatGamingConfigModel.findOneAndUpdate(
         { guildId: message.guild?.id },
         { 
           guildId: message.guild?.id,

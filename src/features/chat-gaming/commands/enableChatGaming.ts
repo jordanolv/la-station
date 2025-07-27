@@ -1,4 +1,5 @@
 import { ChatGamingConfig } from './../models/chatGamingConfig.model';
+import ChatGamingConfigModel from '../models/chatGamingConfig.model';
 import { Message } from 'discord.js';
 import { MESSAGE_DELETE_TIMEOUT } from '../../../shared/constants';
 
@@ -26,7 +27,7 @@ export default {
 
       const isEnabled = enableValue === 'true';
 
-      await ChatGamingModel.findOneAndUpdate(
+      await ChatGamingConfigModel.findOneAndUpdate(
         { guildId: message.guild?.id },
         { 
           guildId: message.guild?.id,
