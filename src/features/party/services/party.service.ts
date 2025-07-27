@@ -24,8 +24,10 @@ export class PartyService {
   // Helper pour convertir les chemins d'images en URLs complètes
   private static getFullImageUrl(imagePath?: string): string | undefined {
     if (!imagePath) return undefined;
+    // Si c'est déjà une URL complète (Hetzner Object Storage), la retourner telle quelle
     if (imagePath.startsWith('http')) return imagePath;
     
+    // Sinon, construire l'URL avec le serveur local (pour compatibilité avec les anciennes images)
     const baseUrl = process.env.API_BASE_URL || 'http://localhost:3051';
     return `${baseUrl}${imagePath}`;
   }
@@ -100,15 +102,12 @@ export class PartyService {
       }
 
     // Ajouter l'image à l'embed si présente
-    if (event.eventInfo.image) {
-      if (event.eventInfo.image.startsWith('http')) {
-        // URL complète
-        embed.setImage(event.eventInfo.image);
-      } else if (event.eventInfo.image.startsWith('/uploads/')) {
-        // URL relative - convertir en URL absolue
-        const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3051';
-        embed.setImage(`${API_BASE_URL}${event.eventInfo.image}`);
-      }
+    const imageUrl = this.getFullImageUrl(event.eventInfo.image);
+    if (imageUrl) {
+      console.log(`[PARTY] Ajout image à l'embed: ${imageUrl}`);
+      embed.setImage(imageUrl);
+    } else {
+      console.log(`[PARTY] Pas d'image pour l'embed. Image originale: ${event.eventInfo.image}`);
     }
 
     return embed;
@@ -117,32 +116,48 @@ export class PartyService {
 
   // Helper pour trouver le thread d'un événement dans un forum
   private static async findEventThread(forumChannel: ForumChannel, eventName: string, messageId: string): Promise<any> {
-    // Chercher dans les threads actifs
-    const threads = await forumChannel.threads.fetchActive();
-    let eventThread = threads.threads.find(thread => 
+    // Fonction helper pour vérifier si un thread correspond au messageId
+    const checkThread = async (thread: any) => {
+      try {
+        const starterMessage = await thread.fetchStarterMessage();
+        return starterMessage?.id === messageId;
+      } catch (error) {
+        console.error(`[PARTY] Erreur vérification starter message pour thread ${thread.id}:`, error);
+        return false;
+      }
+    };
+
+    // Chercher dans les threads actifs en priorité par messageId
+    const activeThreads = await forumChannel.threads.fetchActive();
+    for (const thread of activeThreads.threads.values()) {
+      if (await checkThread(thread)) {
+        return thread;
+      }
+    }
+
+    // Si pas trouvé dans les threads actifs, chercher dans les archivés
+    const archivedThreads = await forumChannel.threads.fetchArchived();
+    for (const thread of archivedThreads.threads.values()) {
+      if (await checkThread(thread)) {
+        return thread;
+      }
+    }
+
+    // Fallback : chercher par nom si messageId ne fonctionne pas (pour compatibilité)
+    console.log(`[PARTY] Thread non trouvé par messageId ${messageId}, tentative par nom: ${eventName}`);
+    
+    let eventThread = activeThreads.threads.find(thread => 
       thread.name.includes(eventName)
     );
 
-    // Si pas trouvé dans les threads actifs, chercher dans les archivés
     if (!eventThread) {
-      const archivedThreads = await forumChannel.threads.fetchArchived();
       eventThread = archivedThreads.threads.find(thread => 
         thread.name.includes(eventName)
       );
     }
 
-    // Vérifier que c'est bien le bon thread en comparant le messageId du starter
     if (eventThread) {
-      try {
-        const starterMessage = await eventThread.fetchStarterMessage();
-        if (starterMessage?.id !== messageId) {
-          console.log(`[PARTY] MessageId mismatch: attendu ${messageId}, trouvé ${starterMessage?.id}`);
-          return null;
-        }
-      } catch (error) {
-        console.error(`[PARTY] Erreur vérification starter message:`, error);
-        return null;
-      }
+      console.log(`[PARTY] Thread trouvé par nom: ${eventThread.name}`);
     }
 
     return eventThread;
@@ -343,7 +358,14 @@ export class PartyService {
       const message = await this.getDiscordMessage(client, event);
       
       if (message) {
-        await message.edit({ embeds: [embed] }).catch(() => {});
+        // Nettoyer complètement le message : supprime tous les fichiers/attachments et ne garde que l'embed
+        await message.edit({ 
+          embeds: [embed],
+          files: [], // Supprime tous les fichiers attachés
+          content: null // Supprime le contenu texte s'il y en a
+        }).catch((error) => {
+          console.error('[PARTY] Erreur lors de la mise à jour de l\'embed:', error);
+        });
       }
     } catch (error) {
       console.error('[PARTY] Erreur mise à jour embed:', error);
