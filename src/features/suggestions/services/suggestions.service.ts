@@ -699,6 +699,22 @@ export class SuggestionsService {
         embeds: [embed]
       });
 
+      // Créer un thread pour la discussion de la suggestion
+      try {
+        const thread = await suggestionMessage.startThread({
+          name: `💬 Discussion: ${fields[0]?.value.substring(0, 80) || 'Suggestion'}`,
+          autoArchiveDuration: 1440, // 24 heures
+          reason: 'Thread automatique pour discussion de suggestion'
+        });
+        
+        // Message d'accueil dans le thread
+        await thread.send({
+          content: `🗣️ **Discussion ouverte pour cette suggestion !**\n\nVous pouvez débattre, poser des questions ou donner votre avis ici.\n\n*Auteur de la suggestion: <@${interaction.user.id}>*`
+        });
+      } catch (error) {
+        console.error('Erreur lors de la création du thread:', error);
+      }
+
       suggestion.messageId = suggestionMessage.id;
       await suggestion.save();
 
