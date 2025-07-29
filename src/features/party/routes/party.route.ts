@@ -3,7 +3,7 @@ import { BotClient } from '../../../bot/client';
 import { PartyService } from '../services/party.service';
 import { PartyUtils } from '../utils/party.utils';
 import { ChatGamingService } from '../../chat-gaming/services/chatGaming.service';
-import { ImageUploadService } from '../services/imageUpload.service';
+import { ImageUploadService } from '../../../shared/services/ImageUploadService';
 
 const party = new Hono();
 
@@ -18,7 +18,7 @@ const validateGuildId = (guildId: string | null) => {
 };
 
 const handleImageUpload = async (imageFile: File | null): Promise<string | undefined> => {
-  return ImageUploadService.uploadImage(imageFile);
+  return ImageUploadService.uploadPartyImage(imageFile);
 };
 
 const handleError = (error: any, operation: string) => {
