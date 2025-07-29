@@ -5,6 +5,7 @@ import { BotClient } from '../../bot/client';
 import GuildModel from '../../features/discord/models/guild.model';
 import { SuggestionsService } from '../../features/suggestions/services/suggestions.service';
 import { GuildService } from '../../features/discord/services/guild.service';
+import { welcomeRoute } from '../../features/welcome/routes/welcome.route';
 
 const guilds = new Hono();
 
@@ -134,6 +135,13 @@ guilds.get('/:id/features', async (c) => {
         description: 'Organisez des événements et soirées gaming pour votre communauté',
         icon: '🎉',
         enabled: features.party?.enabled || false
+      },
+      {
+        id: 'welcome',
+        name: 'Messages de bienvenue',
+        description: 'Messages automatiques et attribution de rôles pour nouveaux membres',
+        icon: '👋',
+        enabled: features.welcome?.enabled || false
       }
     ];
     
@@ -231,6 +239,24 @@ guilds.post('/:id/features/:featureId/toggle', async (c) => {
         guild.features.suggestions.enabled = enabled;
         break;
 
+      case 'welcome':
+        if (!guild.features.welcome) {
+          guild.features.welcome = {
+            enabled: false,
+            welcomeEnabled: false,
+            goodbyeEnabled: false,
+            welcomeChannelId: null,
+            goodbyeChannelId: null,
+            welcomeMessage: 'Bienvenue {user} sur le serveur!',
+            goodbyeMessage: 'Au revoir {user}!',
+            generateWelcomeImage: false,
+            generateGoodbyeImage: false,
+            autoRoles: []
+          };
+        }
+        guild.features.welcome.enabled = enabled;
+        break;
+
       default:
         return c.json({ error: 'Unknown feature' }, 400);
     }
@@ -287,6 +313,20 @@ guilds.get('/:id/features/:featureId/settings', async (c) => {
           defaultReactions: ['👍', '👎'] 
         };
         break;
+      case 'welcome':
+        settings = guild.features?.welcome || {
+          enabled: false,
+          welcomeEnabled: false,
+          goodbyeEnabled: false,
+          welcomeChannelId: null,
+          goodbyeChannelId: null,
+          welcomeMessage: 'Bienvenue {user} sur le serveur!',
+          goodbyeMessage: 'Au revoir {user}!',
+          generateWelcomeImage: false,
+          generateGoodbyeImage: false,
+          autoRoles: []
+        };
+        break;
       default:
         return c.json({ error: 'Unknown feature' }, 400);
     }
@@ -339,6 +379,10 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
       case 'suggestions':
         guild.features.suggestions = { ...guild.features.suggestions, ...updates };
         updatedSettings = guild.features.suggestions;
+        break;
+      case 'welcome':
+        guild.features.welcome = { ...guild.features.welcome, ...updates };
+        updatedSettings = guild.features.welcome;
         break;
       default:
         return c.json({ error: 'Unknown feature' }, 400);
@@ -573,5 +617,8 @@ guilds.get('/:id/roles', async (c) => {
     return c.json({ error: 'Failed to fetch roles' }, 500);
   }
 });
+
+// Mount welcome routes
+guilds.route('/:guildId/features/welcome', welcomeRoute);
 
 export { guilds }; 
