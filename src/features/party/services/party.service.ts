@@ -331,8 +331,20 @@ export class PartyService {
 
     for (const participantId of attendedParticipants) {
       try {
-        const user = await GuildUserModel.findOne({ discordId: participantId, guildId: event.discord.guildId });
-        if (!user) continue;
+        let user = await GuildUserModel.findOne({ discordId: participantId, guildId: event.discord.guildId });
+        
+        // Créer l'utilisateur s'il n'existe pas
+        if (!user) {
+          try {
+            const guild = await client.guilds.fetch(event.discord.guildId);
+            const discordUser = await client.users.fetch(participantId);
+            const { UserService } = require('../../user/services/guildUser.service');
+            user = await UserService.createGuildUser(discordUser, guild);
+          } catch (createError) {
+            console.error(`[PARTY] Impossible de créer l'utilisateur ${participantId}:`, createError);
+            continue;
+          }
+        }
 
         if (moneyPerParticipant > 0) user.profil.money += moneyPerParticipant;
         if (xpPerParticipant > 0) user.profil.exp += xpPerParticipant;
