@@ -340,7 +340,11 @@ export class PartyService {
         await user.save();
 
         if (xpPerParticipant > 0) {
-          const mockMessage = { guild: { id: event.discord.guildId }, author: { id: participantId } };
+          const mockMessage = { 
+            guild: { id: event.discord.guildId }, 
+            author: { id: participantId },
+            react: () => Promise.resolve() // Mock react method pour éviter les erreurs
+          };
           await LevelingService.checkLevelUp(client, user, mockMessage as any);
         }
       } catch (error) {
