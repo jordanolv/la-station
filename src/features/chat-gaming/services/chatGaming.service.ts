@@ -1,8 +1,7 @@
-import { Guild, ChannelType, EmbedBuilder, ThreadAutoArchiveDuration, TextChannel, MessageReaction, User, ForumChannel, ThreadChannel, AttachmentBuilder } from 'discord.js';
+import { Guild, ChannelType, EmbedBuilder, ThreadAutoArchiveDuration, TextChannel, MessageReaction, User, ForumChannel, ThreadChannel } from 'discord.js';
 import GuildModel from '../../discord/models/guild.model';
 import { IChatGamingConfig } from '../models/chatGamingConfig.model';
 import ChatGamingItemModel, { IChatGamingItem } from '../models/chatGamingItem.model';
-import path from 'path';
 
 export class ChatGamingService {
   
@@ -113,22 +112,14 @@ export class ChatGamingService {
         })
         .setTimestamp();
 
-      let attachment: AttachmentBuilder | undefined;
-      if (game.image) {
-        const imagePath = game.image.startsWith('/uploads/') 
-          ? path.join(process.cwd(), game.image.replace('/uploads/', 'uploads/'))
-          : game.image;
-        attachment = new AttachmentBuilder(imagePath)
-          .setName('image.png');
-        embed.setImage('attachment://image.png');
+      // Ajouter l'image si présente (URL Cloudinary directement)
+      if (game.image && game.image.startsWith('http')) {
+        embed.setImage(game.image);
       }
 
       const thread = await channel?.threads.create({
         name: `🎮 ${game.name}`,
-        message: { 
-          embeds: [embed], 
-          files: attachment ? [attachment] : []
-        },
+        message: { embeds: [embed] },
         reason: `Thread created for game: ${game.name}`
       });
 
