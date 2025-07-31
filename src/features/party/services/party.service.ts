@@ -1,311 +1,131 @@
-import { ChannelType, EmbedBuilder, ForumChannel, AttachmentBuilder } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import PartyItemModel, { IEvent } from '../models/partyItem.model';
+import { PartyRepository } from './party.repository';
+import { DiscordPartyService } from './discord.party.service';
+import { PartyValidator } from './party.validator';
+import { ImageUploadService } from '../../../shared/services/ImageUploadService';
 import GuildModel from '../../discord/models/guild.model';
 import { IParty } from '../models/partyConfig.model';
-import path from 'path';
+import { PartyEvent } from '../models/partyEvent.model';
+import {
+  CreateEventDTO,
+  UpdateEventDTO,
+  EventResponseDTO,
+  ParticipantInfoDTO,
+  EndEventDTO,
+  ValidationError,
+  NotFoundError
+} from './party.types';
 
 export class PartyService {
-  // Helper pour récupérer guild et channel Discord
-  private static async getGuildAndChannel(client: BotClient, guildId: string, channelId: string) {
-    const guild = await client.guilds.fetch(guildId);
-    const channel = await guild.channels.fetch(channelId);
-    return { guild, channel };
+  private repository: PartyRepository;
+
+  constructor() {
+    this.repository = new PartyRepository();
   }
 
-  // Helper pour récupérer un message Discord (forum uniquement)
-  private static async getDiscordMessage(client: BotClient, event: IEvent) {
-    const { channel } = await this.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
-    const forumChannel = channel as ForumChannel;
-    const eventThread = await this.findEventThread(forumChannel, event.eventInfo.name, event.discord.messageId!);
-    return eventThread ? await eventThread.fetchStarterMessage() : null;
+  // Méthodes pour les event listeners
+  static async handleReactionAdd(client: BotClient, messageId: string, userId: string): Promise<void> {
+    const service = new PartyService();
+    const event = await service.repository.findByMessageId(messageId);
+
+    if (!event || event.status === 'ended' || 
+        event.participants.length >= event.eventInfo.maxSlots || 
+        event.participants.includes(userId)) {
+      return;
+    }
+
+    try {
+      await DiscordPartyService.addUserToThread(client, event, userId);
+      const updatedEvent = await service.repository.addParticipant(event._id.toString(), userId);
+      const embed = DiscordPartyService.createEventEmbed(updatedEvent, updatedEvent.discord.roleId);
+      await DiscordPartyService.updateEventMessage(client, updatedEvent, embed);
+    } catch (error) {
+      console.error('[PARTY] Erreur réaction add:', error);
+    }
   }
 
-  // Helper pour convertir les chemins d'images en URLs complètes
-  private static getFullImageUrl(imagePath?: string): string | undefined {
-    if (!imagePath) return undefined;
-    // Si c'est déjà une URL complète (Hetzner Object Storage), la retourner telle quelle
-    if (imagePath.startsWith('http')) return imagePath;
-    
-    // Sinon, construire l'URL avec le serveur local (pour compatibilité avec les anciennes images)
-    const baseUrl = process.env.API_BASE_URL || 'http://localhost:3051';
-    return `${baseUrl}${imagePath}`;
+  static async handleReactionRemove(client: BotClient, messageId: string, userId: string): Promise<void> {
+    const service = new PartyService();
+    const event = await service.repository.findByMessageId(messageId);
+
+    if (!event || event.status === 'ended' || !event.participants.includes(userId)) {
+      return;
+    }
+
+    try {
+      await DiscordPartyService.removeUserFromThread(client, event, userId);
+      const updatedEvent = await service.repository.removeParticipant(event._id.toString(), userId);
+      const embed = DiscordPartyService.createEventEmbed(updatedEvent, updatedEvent.discord.roleId);
+      await DiscordPartyService.updateEventMessage(client, updatedEvent, embed);
+    } catch (error) {
+      console.error('[PARTY] Erreur réaction remove:', error);
+    }
   }
 
-  // Helper pour formater les événements pour le frontend
-  private static formatEventForFrontend(event: IEvent): any {
+
+  private formatEventForFrontend(event: PartyEvent): EventResponseDTO {
     const eventDate = new Date(event.eventInfo.dateTime);
     
     return {
-      _id: event._id,
+      _id: event._id.toString(),
       name: event.eventInfo.name,
       game: event.eventInfo.game,
       description: event.eventInfo.description,
-      date: eventDate.toISOString().split('T')[0], // Format YYYY-MM-DD
-      time: eventDate.toTimeString().slice(0, 5), // Format HH:MM
+      date: eventDate.toISOString().split('T')[0],
+      time: eventDate.toTimeString().slice(0, 5),
       maxSlots: event.eventInfo.maxSlots,
       currentSlots: event.participants.length,
-      image: this.getFullImageUrl(event.eventInfo.image),
+      image: event.eventInfo.image,
       color: event.eventInfo.color,
       guildId: event.discord.guildId,
       channelId: event.discord.channelId,
       messageId: event.discord.messageId,
+      threadId: event.discord.threadId,
       roleId: event.discord.roleId,
       participants: event.participants,
       createdBy: event.createdBy,
-      // Nouveaux champs pour la gestion du cycle de vie
-      status: event.status || 'pending',
-      attendedParticipants: event.attendedParticipants || [],
+      status: event.status,
+      attendedParticipants: event.attendedParticipants,
       rewardAmount: event.rewardAmount,
+      xpAmount: event.xpAmount,
       startedAt: event.startedAt,
       endedAt: event.endedAt
     };
   }
 
-  // Helper pour formater les participants
-  private static formatParticipants(participants: string[], maxSlots: number): { count: string; list: string } {
-    const count = `${participants.length}/${maxSlots}`;
-    const list = participants.length > 0 
-      ? participants.map(userId => `<@${userId}>`).join('\n')
-      : 'Aucun participant pour le moment';
-    
-    return { count, list };
-  }
+  // Méthodes d'instance
+  async createEvent(client: BotClient, data: CreateEventDTO): Promise<EventResponseDTO> {
+    // Validation
+    const validation = PartyValidator.validateCreateEvent(data);
+    PartyValidator.throwIfInvalid(validation);
 
-  // Créer l'embed pour un événement
-  private static createEventEmbed(event: IEvent, roleId?: string): EmbedBuilder {
-    const participantInfo = this.formatParticipants(event.participants, event.eventInfo.maxSlots);
-    
-    const embed = new EmbedBuilder()
-      .setTitle(`🎉 ${event.eventInfo.name}`)
-      .addFields([
-        { name: '🎮 Jeu', value: event.eventInfo.game, inline: true },
-        { name: '📅 Date', value: new Date(event.eventInfo.dateTime).toLocaleDateString('fr-FR'), inline: true },
-        { name: '⏰ Heure', value: new Date(event.eventInfo.dateTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }), inline: true },
-        { name: `👥 Participants (${participantInfo.count})`, value: participantInfo.list, inline: false }
-      ])
-      .setColor(event.eventInfo.color ? parseInt(event.eventInfo.color.replace('#', ''), 16) : 0xFF6B6B)
-      .setFooter({ text: 'Réagissez avec 🎉 pour participer à cet événement !' })
-      .setTimestamp();
+    // Upload d'image si nécessaire
+    const imageUrl = data.image ? await ImageUploadService.uploadPartyImage(data.image as any) : undefined;
 
-      // Construire la description avec mention du rôle si disponible
-      let description = '';
-      if (roleId) {
-        description += `🎭 <@&${roleId}>\n\n`;
-      }
-      if (event.eventInfo.description) {
-        description += event.eventInfo.description;
-      }
-      
-      if (description) {
-        embed.setDescription(description);
-      }
-
-    // Ajouter l'image à l'embed si présente
-    const imageUrl = this.getFullImageUrl(event.eventInfo.image);
-    if (imageUrl) {
-      console.log(`[PARTY] Ajout image à l'embed: ${imageUrl}`);
-      embed.setImage(imageUrl);
-    } else {
-      console.log(`[PARTY] Pas d'image pour l'embed. Image originale: ${event.eventInfo.image}`);
-    }
-
-    return embed;
-  }
-
-
-  // Helper pour trouver le thread d'un événement dans un forum
-  private static async findEventThread(forumChannel: ForumChannel, eventName: string, messageId: string): Promise<any> {
-    // Fonction helper pour vérifier si un thread correspond au messageId
-    const checkThread = async (thread: any) => {
-      try {
-        const starterMessage = await thread.fetchStarterMessage();
-        return starterMessage?.id === messageId;
-      } catch (error) {
-        console.error(`[PARTY] Erreur vérification starter message pour thread ${thread.id}:`, error);
-        return false;
-      }
+    // Créer l'événement en base
+    const eventData = {
+      eventInfo: {
+        name: data.name,
+        game: data.game,
+        description: data.description,
+        dateTime: data.dateTime,
+        maxSlots: data.maxSlots,
+        image: imageUrl,
+        color: data.color || '#FF6B6B'
+      },
+      discord: {
+        guildId: data.guildId,
+        channelId: data.channelId
+      },
+      participants: [],
+      createdBy: data.createdBy,
+      chatGamingGameId: data.chatGamingGameId,
+      status: 'pending' as const
     };
 
-    // Chercher dans les threads actifs en priorité par messageId
-    const activeThreads = await forumChannel.threads.fetchActive();
-    for (const thread of activeThreads.threads.values()) {
-      if (await checkThread(thread)) {
-        return thread;
-      }
-    }
+    const event = await this.repository.create(eventData);
 
-    // Si pas trouvé dans les threads actifs, chercher dans les archivés
-    const archivedThreads = await forumChannel.threads.fetchArchived();
-    for (const thread of archivedThreads.threads.values()) {
-      if (await checkThread(thread)) {
-        return thread;
-      }
-    }
-
-    // Fallback : chercher par nom si messageId ne fonctionne pas (pour compatibilité)
-    console.log(`[PARTY] Thread non trouvé par messageId ${messageId}, tentative par nom: ${eventName}`);
-    
-    let eventThread = activeThreads.threads.find(thread => 
-      thread.name.includes(eventName)
-    );
-
-    if (!eventThread) {
-      eventThread = archivedThreads.threads.find(thread => 
-        thread.name.includes(eventName)
-      );
-    }
-
-    if (eventThread) {
-      console.log(`[PARTY] Thread trouvé par nom: ${eventThread.name}`);
-    }
-
-    return eventThread;
-  }
-
-  // Publier le message d'événement (forum uniquement)
-  private static async publishEventMessage(channel: ForumChannel, event: IEvent, embed: EmbedBuilder, roleId?: string): Promise<string> {
-    const messageOptions = {
-      embeds: [embed]
-    };
-
-    const thread = await channel.threads.create({
-      name: `🎉 ${event.eventInfo.name} - ${new Date(event.eventInfo.dateTime).toLocaleDateString('fr-FR')}`,
-      message: messageOptions
-    });
-    
-    const messageToReact = await thread.fetchStarterMessage();
-    const messageId = messageToReact?.id || thread.lastMessageId!;
-
-    // Ajouter la réaction par défaut
-    if (messageToReact) {
-      await messageToReact.react('🎉').catch(() => {});
-    }
-
-
-    return messageId;
-  }
-
-  // Envoyer le message d'annonce dans un channel spécifique
-  private static async sendAnnouncementMessage(client: BotClient, event: IEvent, announcementChannelId: string, threadUrl: string, roleId?: string): Promise<void> {
-    try {
-      const { guild } = await this.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
-      const announcementChannel = await guild.channels.fetch(announcementChannelId);
-      
-      if (!announcementChannel?.isTextBased()) {
-        console.error('[PARTY] Le channel d\'annonce n\'est pas un channel textuel');
-        return;
-      }
-
-      const dateStr = new Date(event.eventInfo.dateTime).toLocaleDateString('fr-FR');
-      const timeStr = new Date(event.eventInfo.dateTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-      
-      let message = `🎉 **Nouvelle soirée organisée !**\n`;
-      message += `🎮 **${event.eventInfo.name}** - ${event.eventInfo.game}\n`;
-      message += `📅 ${dateStr} à ${timeStr}\n\n`;
-      message += `[Rejoindre l'événement](${threadUrl})`;
-
-      if (roleId) {
-        message += `\n<@&${roleId}>`;
-      }
-
-      await announcementChannel.send(message);
-      console.log(`[PARTY] Message d'annonce envoyé dans ${announcementChannel.name}`);
-    } catch (error) {
-      console.error('[PARTY] Erreur envoi message d\'annonce:', error);
-    }
-  }
-
-  // Vérifier si un channel est un party channel actif
-  static async isPartyChannel(channelId: string): Promise<{ isParty: boolean; event?: IEvent }> {
-    const event = await PartyItemModel.findOne({ 'discord.channelId': channelId });
-    return { isParty: !!event, event: event || undefined };
-  }
-
-
-  // Configuration des soirées par serveur
-  static async getPartyConfig(guildId: string): Promise<IParty | null> {
-    const guild = await GuildModel.findOne({ guildId });
-    return guild?.features?.party || null;
-  }
-
-  // CRUD des événements
-  static async getEventById(eventId: string): Promise<IEvent | null> {
-    return PartyItemModel.findById(eventId);
-  }
-
-  // Version formatée pour le frontend
-  static async getEventByIdFormatted(eventId: string): Promise<any | null> {
-    const event = await PartyItemModel.findById(eventId);
-    return event ? this.formatEventForFrontend(event) : null;
-  }
-
-  static async getEventsByGuild(guildId: string): Promise<any[]> {
-    const events = await PartyItemModel.find({ 'discord.guildId': guildId }).sort({ 'eventInfo.dateTime': 1 });
-    
-    // Formater les événements pour le frontend
-    return events.map(event => this.formatEventForFrontend(event));
-  }
-
-  static async createEvent(eventData: Partial<IEvent>): Promise<IEvent> {
-    return PartyItemModel.create(eventData);
-  }
-
-  static async updateEvent(eventId: string, updates: Partial<IEvent>): Promise<IEvent | null> {
-    return PartyItemModel.findByIdAndUpdate(eventId, updates, { new: true });
-  }
-
-  // Méthode atomique pour ajouter un participant (évite les races)
-  static async addParticipant(eventId: string, userId: string): Promise<IEvent | null> {
-    return PartyItemModel.findByIdAndUpdate(
-      eventId,
-      { $addToSet: { participants: userId } }, // $addToSet évite les doublons
-      { new: true }
-    );
-  }
-
-  // Méthode atomique pour retirer un participant
-  static async removeParticipant(eventId: string, userId: string): Promise<IEvent | null> {
-    return PartyItemModel.findByIdAndUpdate(
-      eventId,
-      { $pull: { participants: userId } },
-      { new: true }
-    );
-  }
-
-  // Version formatée pour le frontend
-  static async updateEventFormatted(eventId: string, updates: Partial<IEvent>): Promise<any | null> {
-    const event = await PartyItemModel.findByIdAndUpdate(eventId, updates, { new: true });
-    return event ? this.formatEventForFrontend(event) : null;
-  }
-
-  static async deleteEvent(eventId: string): Promise<boolean> {
-    const result = await PartyItemModel.findByIdAndDelete(eventId);
-    return !!result;
-  }
-
-  static async findByMessageId(messageId: string): Promise<IEvent | null> {
-    return PartyItemModel.findOne({ 'discord.messageId': messageId });
-  }
-
-  // Protection contre les doubles créations
-  static async findRecentDuplicate(guildId: string, eventName: string, createdBy: string): Promise<IEvent | null> {
-    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000);
-    
-    return PartyItemModel.findOne({
-      'discord.guildId': guildId,
-      'eventInfo.name': eventName,
-      'createdBy': createdBy,
-      'createdAt': { $gte: thirtySecondsAgo }
-    });
-  }
-
-  // Intégration Discord
-  static async createEventInDiscord(client: BotClient, eventData: Partial<IEvent>, announcementChannelId?: string): Promise<any> {
-    const event = await this.createEvent(eventData);
-    const { channel } = await this.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
-
-    // Déterminer le rôle à utiliser
+    // Déterminer le rôle
     let roleId: string | undefined;
     if (event.chatGamingGameId) {
       const { ChatGamingService } = require('../../chat-gaming/services/chatGaming.service');
@@ -316,139 +136,191 @@ export class PartyService {
       roleId = partyConfig?.defaultRoleId;
     }
 
-    // Publier l'événement dans le forum
-    const embed = this.createEventEmbed(event, roleId);
-    const messageId = await this.publishEventMessage(channel as ForumChannel, event, embed, roleId);
+    // Publier sur Discord
+    const { channel } = await DiscordPartyService.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
+    const embed = DiscordPartyService.createEventEmbed(event, roleId);
+    const { messageId, threadId } = await DiscordPartyService.publishEventMessage(channel as any, event, embed);
 
     // Mettre à jour avec les IDs Discord
-    const updateData: any = { 'discord.messageId': messageId };
-    if (roleId) updateData['discord.roleId'] = roleId;
-    
-    const updatedEvent = await PartyItemModel.findByIdAndUpdate(event._id.toString(), updateData, { new: true });
+    const updatedEvent = await this.repository.updateDiscordInfo(event._id.toString(), messageId, threadId, roleId);
 
-    // Envoyer le message d'annonce si un channel est spécifié
-    if (announcementChannelId && messageId) {
-      try {
-        // Récupérer le thread pour construire l'URL
-        const forumChannel = channel as ForumChannel;
-        const eventThread = await this.findEventThread(forumChannel, event.eventInfo.name, messageId);
-        
-        if (eventThread) {
-          const threadUrl = `https://discord.com/channels/${event.discord.guildId}/${eventThread.id}`;
-          await this.sendAnnouncementMessage(client, updatedEvent!, announcementChannelId, threadUrl, roleId);
-        }
-      } catch (error) {
-        console.error('[PARTY] Erreur lors de l\'envoi de l\'annonce:', error);
-      }
-    }
-
-    return this.formatEventForFrontend(updatedEvent!);
-  }
-
-  // Gestion des réactions
-  static async handleReactionAdd(client: BotClient, messageId: string, userId: string): Promise<void> {
-    try {
-      const event = await this.findByMessageId(messageId);
-      if (!event || event.status === 'ended' || event.participants.length >= event.eventInfo.maxSlots || event.participants.includes(userId)) {
-        return;
-      }
-
-      const { guild, channel } = await this.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
-
-      // Ajouter au thread du forum
-      const eventThread = await this.findEventThread(channel as ForumChannel, event.eventInfo.name, messageId);
-      if (eventThread) {
-        await eventThread.members.add(userId).catch(() => {});
-      }
-
-      // Ajouter le participant et mettre à jour l'embed
-      const updatedEvent = await this.addParticipant(event._id.toString(), userId);
-      if (updatedEvent) {
-        await this.updateEventEmbed(client, updatedEvent);
-      }
-    } catch (error) {
-      console.error('[PARTY] Erreur réaction add:', error);
-    }
-  }
-
-  static async handleReactionRemove(client: BotClient, messageId: string, userId: string): Promise<void> {
-    try {
-      const event = await this.findByMessageId(messageId);
-      if (!event || event.status === 'ended' || !event.participants.includes(userId)) {
-        return;
-      }
-
-      const { channel } = await this.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
-
-      // Retirer du thread du forum
-      const eventThread = await this.findEventThread(channel as ForumChannel, event.eventInfo.name, messageId);
-      if (eventThread) {
-        await eventThread.members.remove(userId).catch(() => {});
-      }
-
-      // Retirer le participant et mettre à jour l'embed
-      const updatedEvent = await this.removeParticipant(event._id.toString(), userId);
-      if (updatedEvent) {
-        await this.updateEventEmbed(client, updatedEvent);
-      }
-    } catch (error) {
-      console.error('[PARTY] Erreur réaction remove:', error);
-    }
-  }
-
-  // Mettre à jour l'embed de l'événement
-  static async updateEventEmbed(client: BotClient, event: IEvent): Promise<void> {
-    try {
-      const updatedEvent = await this.getEventById(event._id.toString());
-      if (!updatedEvent) return;
-
-      const embed = this.createEventEmbed(updatedEvent, updatedEvent.discord.roleId);
-      const message = await this.getDiscordMessage(client, event);
+    // Envoyer l'annonce si nécessaire
+    if (data.announcementChannelId) {
+      const threadUrl = `https://discord.com/channels/${event.discord.guildId}/${threadId}`;
       
-      if (message) {
-        // Nettoyer complètement le message : supprime tous les fichiers/attachments et ne garde que l'embed
-        await message.edit({ 
-          embeds: [embed],
-          files: [], // Supprime tous les fichiers attachés
-          content: null // Supprime le contenu texte s'il y en a
-        }).catch((error) => {
-          console.error('[PARTY] Erreur lors de la mise à jour de l\'embed:', error);
-        });
+      // Récupérer l'image du jeu si disponible
+      let gameImageUrl: string | undefined;
+      if (event.chatGamingGameId) {
+        try {
+          const { ChatGamingService } = require('../../chat-gaming/services/chatGaming.service');
+          const chatGamingGame = await ChatGamingService.getGameById(event.chatGamingGameId);
+          gameImageUrl = chatGamingGame?.image;
+        } catch (error) {
+          console.error('Erreur récupération image jeu:', error);
+        }
       }
+      
+      await DiscordPartyService.sendAnnouncementMessage(client, updatedEvent, data.announcementChannelId, threadUrl, roleId, gameImageUrl);
+    }
+
+    return this.formatEventForFrontend(updatedEvent);
+  }
+
+  async updateEvent(eventId: string, updates: UpdateEventDTO): Promise<EventResponseDTO> {
+    const validation = PartyValidator.validateUpdateEvent(updates);
+    PartyValidator.throwIfInvalid(validation);
+
+    const updateData: any = {};
+    
+    if (updates.name) updateData['eventInfo.name'] = updates.name;
+    if (updates.game) updateData['eventInfo.game'] = updates.game;
+    if (updates.description !== undefined) updateData['eventInfo.description'] = updates.description;
+    if (updates.dateTime) updateData['eventInfo.dateTime'] = updates.dateTime;
+    if (updates.maxSlots) updateData['eventInfo.maxSlots'] = updates.maxSlots;
+    if (updates.color) updateData['eventInfo.color'] = updates.color;
+    if (updates.channelId) updateData['discord.channelId'] = updates.channelId;
+    if (updates.chatGamingGameId !== undefined) updateData['chatGamingGameId'] = updates.chatGamingGameId;
+    
+    if (updates.image) {
+      const imageUrl = await ImageUploadService.uploadPartyImage(updates.image as any);
+      updateData['eventInfo.image'] = imageUrl;
+    }
+
+    const updatedEvent = await this.repository.update(eventId, updateData);
+    return this.formatEventForFrontend(updatedEvent);
+  }
+
+  async getEventById(eventId: string): Promise<EventResponseDTO> {
+    const event = await this.repository.findById(eventId);
+    if (!event) {
+      throw new NotFoundError('Événement non trouvé');
+    }
+    return this.formatEventForFrontend(event);
+  }
+
+  async getEventsByGuild(guildId: string): Promise<EventResponseDTO[]> {
+    const events = await this.repository.findByGuild(guildId);
+    return events.map(event => this.formatEventForFrontend(event));
+  }
+
+  async deleteEvent(eventId: string): Promise<void> {
+    const success = await this.repository.delete(eventId);
+    if (!success) {
+      throw new NotFoundError('Événement non trouvé');
+    }
+  }
+
+  async startEvent(eventId: string): Promise<EventResponseDTO> {
+    const event = await this.repository.findById(eventId);
+    if (!event) {
+      throw new NotFoundError('Événement non trouvé');
+    }
+    if (event.status !== 'pending') {
+      throw new ValidationError('Événement déjà démarré ou terminé');
+    }
+
+    const updatedEvent = await this.repository.update(eventId, { 
+      status: 'started', 
+      startedAt: new Date() 
+    });
+    return this.formatEventForFrontend(updatedEvent);
+  }
+
+  async endEvent(eventId: string, data: EndEventDTO): Promise<EventResponseDTO> {
+    const event = await this.repository.findById(eventId);
+    if (!event) {
+      throw new NotFoundError('Événement non trouvé');
+    }
+    if (event.status !== 'started') {
+      throw new ValidationError('Événement doit être démarré avant d\'\u00eatre terminé');
+    }
+
+    // Validation des participants présents
+    const invalidParticipants = data.attendedParticipants.filter(id => 
+      !event.participants.includes(id)
+    );
+    if (invalidParticipants.length > 0) {
+      throw new ValidationError('Certains participants présents ne sont pas dans la liste originale');
+    }
+
+    const validation = PartyValidator.validateRewards(data.rewardAmount, data.xpAmount);
+    PartyValidator.throwIfInvalid(validation);
+
+    const updatedEvent = await this.repository.update(eventId, {
+      status: 'ended',
+      endedAt: new Date(),
+      attendedParticipants: data.attendedParticipants,
+      rewardAmount: data.rewardAmount || 0,
+      xpAmount: data.xpAmount || 0
+    });
+
+    return this.formatEventForFrontend(updatedEvent);
+  }
+
+  async getParticipantsInfo(client: BotClient, eventId: string): Promise<ParticipantInfoDTO[]> {
+    const event = await this.repository.findById(eventId);
+    if (!event) {
+      throw new NotFoundError('Événement non trouvé');
+    }
+
+    const participantsInfo: ParticipantInfoDTO[] = [];
+    const guild = await client.guilds.fetch(event.discord.guildId);
+
+    for (const participantId of event.participants) {
+      try {
+        const member = await guild.members.fetch(participantId);
+        participantsInfo.push({
+          id: participantId,
+          name: member.user.username,
+          displayName: member.displayName || member.user.displayName
+        });
+      } catch (error) {
+        console.error(`Erreur récupération utilisateur ${participantId}:`, error);
+      }
+    }
+
+    return participantsInfo;
+  }
+
+  static async isPartyChannel(channelId: string): Promise<{ isParty: boolean; event?: PartyEvent }> {
+    const repository = new PartyRepository();
+    const event = await repository.findByChannel(channelId);
+    return { isParty: !!event, event: event || undefined };
+  }
+
+  async getPartyConfig(guildId: string): Promise<IParty | null> {
+    const guild = await GuildModel.findOne({ guildId });
+    return guild?.features?.party || null;
+  }
+
+  private async _updateEventEmbed(client: BotClient, event: PartyEvent): Promise<void> {
+    try {
+      const embed = DiscordPartyService.createEventEmbed(event, event.discord.roleId);
+      await DiscordPartyService.updateEventMessage(client, event, embed);
     } catch (error) {
       console.error('[PARTY] Erreur mise à jour embed:', error);
     }
   }
 
-  // Supprimer toutes les réactions d'un événement terminé
-  static async removeEventReactions(client: BotClient, event: IEvent): Promise<void> {
-    try {
-      const message = await this.getDiscordMessage(client, event);
-      if (message) {
-        await message.reactions.removeAll().catch(() => {});
-      }
-    } catch (error) {
-      console.error('[PARTY] Erreur suppression réactions:', error);
+  async finishEventWithRewards(client: BotClient, eventId: string, data: EndEventDTO): Promise<EventResponseDTO> {
+    const result = await this.endEvent(eventId, data);
+    const event = await this.repository.findById(eventId);
+    
+    if (!event) return result;
+
+    // Actions Discord
+    await DiscordPartyService.removeAllReactions(client, event);
+    await DiscordPartyService.archiveThread(client, event);
+
+    // Distribution des récompenses
+    if (data.attendedParticipants.length > 0 && (data.rewardAmount! > 0 || data.xpAmount! > 0)) {
+      await this.distributeRewards(client, event, data.attendedParticipants, data.rewardAmount || 0, data.xpAmount || 0);
     }
+
+    return result;
   }
 
-  // Renommer le thread avec [END] devant le nom
-  static async renameEventThreadAsEnded(client: BotClient, event: IEvent): Promise<void> {
-    try {
-      const { channel } = await this.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
-      const eventThread = await this.findEventThread(channel as ForumChannel, event.eventInfo.name, event.discord.messageId!);
-      
-      if (eventThread && !eventThread.name.startsWith('[END]')) {
-        await eventThread.setName(`[END] ${eventThread.name}`).catch(() => {});
-        await eventThread.setArchived(true, 'Événement terminé').catch(() => {});
-      }
-    } catch (error) {
-      console.error('[PARTY] Erreur renommage thread:', error);
-    }
-  }
-
-  // Distribuer les récompenses aux participants présents
-  static async distributeRewards(client: BotClient, event: IEvent, attendedParticipants: string[], rewardAmount: number, xpAmount: number): Promise<void> {
+  private async distributeRewards(client: BotClient, event: PartyEvent, attendedParticipants: string[], rewardAmount: number, xpAmount: number): Promise<void> {
     if (attendedParticipants.length === 0 || (rewardAmount <= 0 && xpAmount <= 0)) return;
 
     const moneyPerParticipant = rewardAmount > 0 ? Math.floor(rewardAmount / attendedParticipants.length) : 0;
@@ -475,5 +347,168 @@ export class PartyService {
         console.error(`[PARTY] Erreur distribution ${participantId}:`, error);
       }
     }
+
+    // Envoyer l'embed de rewards dans le thread
+    await this.sendRewardsEmbed(client, event, attendedParticipants, moneyPerParticipant, xpPerParticipant, rewardAmount, xpAmount);
   }
+
+  private async sendRewardsEmbed(client: BotClient, event: PartyEvent, attendedParticipants: string[], moneyPerParticipant: number, xpPerParticipant: number, totalMoney: number, totalXp: number): Promise<void> {
+    try {
+      const { EmbedBuilder } = require('discord.js');
+      
+      if (!event.discord.threadId) return;
+
+      const thread = await client.channels.fetch(event.discord.threadId);
+      if (!thread || !thread.isThread()) return;
+
+      const participantMentions = attendedParticipants.map(id => `<@${id}>`);
+      
+      const embed = new EmbedBuilder()
+        .setTitle('🎉 Merci d\'avoir participé !')
+        .setDescription(`La soirée **${event.eventInfo.name}** est terminée !`)
+        .setColor(event.eventInfo.color || '#FF6B6B')
+        .addFields(
+          {
+            name: '👥 Participants présents',
+            value: participantMentions.join(', ') || 'Aucun',
+            inline: false
+          }
+        )
+        .setTimestamp()
+        .setFooter({ text: 'Système de récompenses' });
+
+      if (totalMoney > 0) {
+        embed.addFields({
+          name: '💰 Argent distribué',
+          value: `**${moneyPerParticipant}** 💰 par personne\n(Total: ${totalMoney} 💰)`,
+          inline: true
+        });
+      }
+
+      if (totalXp > 0) {
+        embed.addFields({
+          name: '⭐ XP distribué',
+          value: `**${xpPerParticipant}** XP par personne\n(Total: ${totalXp} XP)`,
+          inline: true
+        });
+      }
+
+      await thread.send({ embeds: [embed] });
+      
+    } catch (error) {
+      console.error('[PARTY] Erreur envoi embed rewards:', error);
+    }
+  }
+
+  // Méthodes statiques pour anciennes routes
+  static async getEventById(eventId: string): Promise<PartyEvent | null> {
+    const repository = new PartyRepository();
+    return repository.findById(eventId);
+  }
+
+  static async getEventByIdFormatted(eventId: string): Promise<EventResponseDTO | null> {
+    try {
+      const service = new PartyService();
+      return await service.getEventById(eventId);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  static async getEventsByGuild(guildId: string): Promise<EventResponseDTO[]> {
+    const service = new PartyService();
+    return service.getEventsByGuild(guildId);
+  }
+
+  static async findByMessageId(messageId: string): Promise<PartyEvent | null> {
+    const repository = new PartyRepository();
+    return repository.findByMessageId(messageId);
+  }
+
+
+  static async addParticipant(eventId: string, userId: string): Promise<PartyEvent | null> {
+    try {
+      const repository = new PartyRepository();
+      return await repository.addParticipant(eventId, userId);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  static async removeParticipant(eventId: string, userId: string): Promise<PartyEvent | null> {
+    try {
+      const repository = new PartyRepository();
+      return await repository.removeParticipant(eventId, userId);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  static async updateEvent(eventId: string, updates: any): Promise<PartyEvent | null> {
+    try {
+      const repository = new PartyRepository();
+      return await repository.update(eventId, updates);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  static async updateEventFormatted(eventId: string, updates: any): Promise<EventResponseDTO | null> {
+    try {
+      const service = new PartyService();
+      await service.updateEvent(eventId, updates);
+      return await service.getEventById(eventId);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  static async deleteEvent(eventId: string): Promise<boolean> {
+    try {
+      const service = new PartyService();
+      await service.deleteEvent(eventId);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  static async createEventInDiscord(client: BotClient, eventData: any, announcementChannelId?: string): Promise<EventResponseDTO> {
+    const service = new PartyService();
+    const createData: CreateEventDTO = {
+      name: eventData.eventInfo.name,
+      game: eventData.eventInfo.game,
+      description: eventData.eventInfo.description,
+      dateTime: eventData.eventInfo.dateTime,
+      maxSlots: eventData.eventInfo.maxSlots,
+      image: eventData.eventInfo.image,
+      color: eventData.eventInfo.color,
+      guildId: eventData.discord.guildId,
+      channelId: eventData.discord.channelId,
+      createdBy: eventData.createdBy,
+      chatGamingGameId: eventData.chatGamingGameId,
+      announcementChannelId
+    };
+    
+    return service.createEvent(client, createData);
+  }
+
+  static async updateEventEmbed(client: BotClient, event: PartyEvent): Promise<void> {
+    const embed = DiscordPartyService.createEventEmbed(event, event.discord.roleId);
+    await DiscordPartyService.updateEventMessage(client, event, embed);
+  }
+
+  static async removeEventReactions(client: BotClient, event: PartyEvent): Promise<void> {
+    await DiscordPartyService.removeAllReactions(client, event);
+  }
+
+  static async renameEventThreadAsEnded(client: BotClient, event: PartyEvent): Promise<void> {
+    await DiscordPartyService.archiveThread(client, event);
+  }
+
+  static async distributeRewards(client: BotClient, event: PartyEvent, attendedParticipants: string[], rewardAmount: number, xpAmount: number): Promise<void> {
+    const service = new PartyService();
+    await service.distributeRewards(client, event, attendedParticipants, rewardAmount, xpAmount);
+  }
+
 }

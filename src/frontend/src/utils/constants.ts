@@ -34,7 +34,7 @@ export const FEATURE_CONFIG = {
 export const API_ENDPOINTS = {
   AUTH: '/api/auth',
   GUILDS: '/api/guilds',
-  GAMES: '/api/games'
+  GAMES: '/api/chat-gaming'
 } as const
 
 export const ROUTES = {

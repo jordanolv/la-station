@@ -295,7 +295,7 @@ const saveSettings = async () => {
 const loadGames = async () => {
   try {
     isLoadingGames.value = true
-    const response = await axios.get(`${API_BASE_URL}/api/games`, {
+    const response = await axios.get(`${API_BASE_URL}/api/chat-gaming`, {
       headers: {
         Authorization: `Bearer ${authStore.token}`
       }
@@ -321,7 +321,7 @@ const createGame = async () => {
       formData.append('gameimage', newGame.value.image)
     }
 
-    await axios.post(`${API_BASE_URL}/api/games`, formData, {
+    await axios.post(`${API_BASE_URL}/api/chat-gaming`, formData, {
       headers: {
         Authorization: `Bearer ${authStore.token}`,
         'Content-Type': 'multipart/form-data'
@@ -343,7 +343,7 @@ const deleteGame = async (game: any) => {
   }
 
   try {
-    await axios.delete(`${API_BASE_URL}/api/games/${game._id}`, {
+    await axios.delete(`${API_BASE_URL}/api/chat-gaming/${game._id}`, {
       headers: {
         Authorization: `Bearer ${authStore.token}`
       }
