@@ -25,7 +25,9 @@ export default {
       const levelingData = await LevelingService.getLeveling(guildId);
       if (!levelingData || !levelingData.enabled || !levelingData) return;
 
-      message.react(emojis.levelUp).catch(console.error);
+      if(message)  {
+        message.react(emojis.levelUp).catch(console.error);
+      }
 
     } catch (error) {
       console.error('Erreur dans l\'événement levelUp:', error);
