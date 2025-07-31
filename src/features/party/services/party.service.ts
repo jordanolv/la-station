@@ -347,6 +347,57 @@ export class PartyService {
         console.error(`[PARTY] Erreur distribution ${participantId}:`, error);
       }
     }
+
+    // Envoyer l'embed de rewards dans le thread
+    await this.sendRewardsEmbed(client, event, attendedParticipants, moneyPerParticipant, xpPerParticipant, rewardAmount, xpAmount);
+  }
+
+  private async sendRewardsEmbed(client: BotClient, event: PartyEvent, attendedParticipants: string[], moneyPerParticipant: number, xpPerParticipant: number, totalMoney: number, totalXp: number): Promise<void> {
+    try {
+      const { EmbedBuilder } = require('discord.js');
+      
+      if (!event.discord.threadId) return;
+
+      const thread = await client.channels.fetch(event.discord.threadId);
+      if (!thread || !thread.isThread()) return;
+
+      const participantMentions = attendedParticipants.map(id => `<@${id}>`);
+      
+      const embed = new EmbedBuilder()
+        .setTitle('🎉 Merci d\'avoir participé !')
+        .setDescription(`La soirée **${event.eventInfo.name}** est terminée !`)
+        .setColor(event.eventInfo.color || '#FF6B6B')
+        .addFields(
+          {
+            name: '👥 Participants présents',
+            value: participantMentions.join(', ') || 'Aucun',
+            inline: false
+          }
+        )
+        .setTimestamp()
+        .setFooter({ text: 'Système de récompenses' });
+
+      if (totalMoney > 0) {
+        embed.addFields({
+          name: '💰 Argent distribué',
+          value: `**${moneyPerParticipant}** 💰 par personne\n(Total: ${totalMoney} 💰)`,
+          inline: true
+        });
+      }
+
+      if (totalXp > 0) {
+        embed.addFields({
+          name: '⭐ XP distribué',
+          value: `**${xpPerParticipant}** XP par personne\n(Total: ${totalXp} XP)`,
+          inline: true
+        });
+      }
+
+      await thread.send({ embeds: [embed] });
+      
+    } catch (error) {
+      console.error('[PARTY] Erreur envoi embed rewards:', error);
+    }
   }
 
   // Méthodes statiques pour anciennes routes
