@@ -314,8 +314,18 @@ export class PartyService {
     await DiscordPartyService.archiveThread(client, event);
 
     // Distribution des récompenses
+    console.log('[PARTY] Vérification rewards:', {
+      attendedParticipants: data.attendedParticipants.length,
+      rewardAmount: data.rewardAmount,
+      xpAmount: data.xpAmount,
+      shouldDistribute: data.attendedParticipants.length > 0 && (data.rewardAmount! > 0 || data.xpAmount! > 0)
+    });
+    
     if (data.attendedParticipants.length > 0 && (data.rewardAmount! > 0 || data.xpAmount! > 0)) {
+      console.log('[PARTY] Distribution des rewards en cours...');
       await this.distributeRewards(client, event, data.attendedParticipants, data.rewardAmount || 0, data.xpAmount || 0);
+    } else {
+      console.log('[PARTY] Aucune distribution de rewards (conditions non remplies)');
     }
 
     return result;
