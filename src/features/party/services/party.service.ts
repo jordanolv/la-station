@@ -6,6 +6,7 @@ import { ImageUploadService } from '../../../shared/services/ImageUploadService'
 import GuildModel from '../../discord/models/guild.model';
 import { IParty } from '../models/partyConfig.model';
 import { PartyEvent } from '../models/partyEvent.model';
+import { EmbedBuilder } from 'discord.js';
 import {
   CreateEventDTO,
   UpdateEventDTO,
@@ -232,7 +233,7 @@ export class PartyService {
       throw new NotFoundError('Événement non trouvé');
     }
     if (event.status !== 'started') {
-      throw new ValidationError('Événement doit être démarré avant d\'\u00eatre terminé');
+      throw new ValidationError('Événement doit être démarré avant d\'être terminé');
     }
 
     // Validation des participants présents
@@ -370,8 +371,6 @@ export class PartyService {
 
   private async sendRewardsEmbed(client: BotClient, event: PartyEvent, attendedParticipants: string[], moneyPerParticipant: number, xpPerParticipant: number, totalMoney: number, totalXp: number): Promise<void> {
     try {
-      const { EmbedBuilder } = require('discord.js');
-      
       if (!event.discord.threadId) return;
 
       const thread = await client.channels.fetch(event.discord.threadId);
@@ -382,7 +381,7 @@ export class PartyService {
       const embed = new EmbedBuilder()
         .setTitle('🎉 Merci d\'avoir participé !')
         .setDescription(`La soirée **${event.eventInfo.name}** est terminée !`)
-        .setColor(event.eventInfo.color || '#FF6B6B')
+        .setColor((event.eventInfo.color as any) || '#FF6B6B')
         .addFields(
           {
             name: '👥 Participants présents',
