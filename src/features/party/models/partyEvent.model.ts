@@ -35,10 +35,13 @@ export class DiscordInfo {
   messageId?: string;
 
   @prop()
+  threadId?: string; // 🆕 NOUVEAU - résout le problème principal
+
+  @prop()
   roleId?: string;
 }
 
-export class PartyItem {
+export class PartyEvent {
   _id!: Types.ObjectId;
 
   @prop({ type: () => EventInfo, required: true })
@@ -54,40 +57,32 @@ export class PartyItem {
   createdBy!: string;
 
   @prop()
-  chatGamingGameId?: string; // ID du jeu chat-gaming associé (optionnel)
+  chatGamingGameId?: string;
 
   @prop({ enum: ['pending', 'started', 'ended'], default: 'pending' })
   status!: 'pending' | 'started' | 'ended';
 
   @prop({ type: () => [String], default: [] })
-  attendedParticipants!: string[]; // Participants effectivement présents à la soirée
+  attendedParticipants!: string[];
 
   @prop()
-  rewardAmount?: number; // Montant d'argent distribué aux participants
+  rewardAmount?: number;
 
   @prop()
-  xpAmount?: number; // Montant d'XP distribué aux participants
+  xpAmount?: number;
 
   @prop()
-  startedAt?: Date; // Date de début de la soirée
+  startedAt?: Date;
 
   @prop()
-  endedAt?: Date; // Date de fin de la soirée
+  endedAt?: Date;
 }
 
-// Créer le modèle
-export const PartyItemModel = getModelForClass(PartyItem, {
+export const PartyEventModel = getModelForClass(PartyEvent, {
   schemaOptions: {
     timestamps: true,
     collection: 'party_items'
   }
 });
 
-// Export par défaut pour compatibilité
-export default PartyItemModel;
-
-// Garde les interfaces pour la compatibilité
-export type IEventInfo = EventInfo;
-export type IDiscordInfo = DiscordInfo;
-export type IPartyItem = PartyItem;
-export type IEvent = PartyItem; // Pour compatibilité avec l'ancien nom
+export default PartyEventModel;

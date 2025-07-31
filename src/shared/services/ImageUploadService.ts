@@ -128,6 +128,13 @@ export class ImageUploadService {
   }
 
   /**
+  * Upload spécifique pour les images de Chat Gaming
+  */
+  static async uploadGameImage(file: File | null): Promise<string | undefined> {
+    return this.uploadImage(file, 'games')
+  }
+
+  /**
    * Upload spécifique pour les avatars
    */
   static async uploadAvatarImage(file: File | null): Promise<string | undefined> {

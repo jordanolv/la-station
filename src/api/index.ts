@@ -5,11 +5,11 @@ import { secureHeaders } from 'hono/secure-headers'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { BotClient } from '../bot/client'
 import { auth } from './routes/auth'
-import { games } from './routes/games'
 import { guilds } from './routes/guilds'
 import vocManager from './routes/voc-manager'
 // import suggestions from '../features/suggestions/routes/suggestions.route' // Moved to guilds.ts
-import party from '../features/party/routes/party.route'
+import party from '../features/party/routes/party.routes'
+import chatGaming from '../features/chat-gaming/routes/chat-gaming.routes'
 
 import path from 'path'
 
@@ -88,11 +88,11 @@ export function createAPI(client: BotClient) {
 
   // Routes
   app.route('/api/auth', auth)
-  app.route('/api/games', games)
   app.route('/api/guilds', guilds)
   app.route('/api/voc-manager', vocManager)
   // app.route('/api/suggestions', suggestions) // Routes moved to guilds.ts
   app.route('/api/party', party)
+  app.route('/api/chat-gaming', chatGaming)
   // Health check
   app.get('/health', (c) => {
     return c.json({ status: 'ok' })
