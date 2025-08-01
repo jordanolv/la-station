@@ -235,7 +235,7 @@ export class PartyService {
       throw new NotFoundError('Événement non trouvé');
     }
     if (event.status !== 'started') {
-      throw new ValidationError('Événement doit être démarré avant d\'\u00eatre terminé');
+      throw new ValidationError('Événement doit être démarré avant d\'être terminé');
     }
 
     // Validation des participants présents
@@ -316,7 +316,10 @@ export class PartyService {
     await DiscordPartyService.archiveThread(client, event);
     
     if (data.attendedParticipants.length > 0 && (data.rewardAmount! > 0 || data.xpAmount! > 0)) {
+      console.log('[PARTY] Distribution des rewards en cours...');
       await this.distributeRewards(client, event, data.attendedParticipants, data.rewardAmount || 0, data.xpAmount || 0);
+    } else {
+      console.log('[PARTY] Aucune distribution de rewards (conditions non remplies)');
     }
 
     return result;
@@ -330,8 +333,20 @@ export class PartyService {
 
     for (const participantId of attendedParticipants) {
       try {
-        const user = await GuildUserModel.findOne({ discordId: participantId, guildId: event.discord.guildId });
-        if (!user) continue;
+        let user = await GuildUserModel.findOne({ discordId: participantId, guildId: event.discord.guildId });
+        
+        // Créer l'utilisateur s'il n'existe pas
+        if (!user) {
+          try {
+            const guild = await client.guilds.fetch(event.discord.guildId);
+            const discordUser = await client.users.fetch(participantId);
+            const { UserService } = require('../../user/services/guildUser.service');
+            user = await UserService.createGuildUser(discordUser, guild);
+          } catch (createError) {
+            console.error(`[PARTY] Impossible de créer l'utilisateur ${participantId}:`, createError);
+            continue;
+          }
+        }
 
         if (moneyPerParticipant > 0) user.profil.money += moneyPerParticipant;
         if (xpPerParticipant > 0) user.profil.exp += xpPerParticipant;
@@ -339,7 +354,11 @@ export class PartyService {
         await user.save();
 
         if (xpPerParticipant > 0) {
-          const mockMessage = { guild: { id: event.discord.guildId }, author: { id: participantId } };
+          const mockMessage = { 
+            guild: { id: event.discord.guildId }, 
+            author: { id: participantId },
+            react: () => Promise.resolve() // Mock react method pour éviter les erreurs
+          };
           await LevelingService.checkLevelUp(client, user, mockMessage as any);
         }
       } catch (error) {
@@ -353,8 +372,6 @@ export class PartyService {
 
   private async sendRewardsEmbed(client: BotClient, event: PartyEvent, attendedParticipants: string[], moneyPerParticipant: number, xpPerParticipant: number, totalMoney: number, totalXp: number): Promise<void> {
     try {
-      const { EmbedBuilder } = require('discord.js');
-      
       if (!event.discord.threadId) return;
 
       const thread = await client.channels.fetch(event.discord.threadId);
@@ -365,7 +382,7 @@ export class PartyService {
       const embed = new EmbedBuilder()
         .setTitle('🎉 Merci d\'avoir participé !')
         .setDescription(`La soirée **${event.eventInfo.name}** est terminée !`)
-        .setColor(event.eventInfo.color || '#FF6B6B')
+        .setColor((event.eventInfo.color as any) || '#FF6B6B')
         .addFields(
           {
             name: '👥 Participants présents',
