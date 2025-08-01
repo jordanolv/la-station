@@ -267,7 +267,7 @@ export class ChatGamingService {
       if (Date.now() - lastReminder < GAMING_ROLE_REMINDER_COOLDOWN) return;
 
       // Envoyer le rappel et le supprimer après 10 secondes
-      const reminderMessage = await message.reply("👋 N'oublie pas de récupérer le rôle de ce jeu avec la 🔔 plus hauta !");
+      const reminderMessage = await message.reply("👋 Si tu possèdes le jeu, n'oublie pas de récupérer le rôle avec la 🔔 plus haut !");
       
       // Supprimer le message après 10 secondes
       setTimeout(async () => {
