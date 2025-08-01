@@ -4,6 +4,7 @@ import { StatsService } from '../../stats/services/stats.service';
 import { GuildService } from '../services/guild.service';
 import { SuggestionsService } from '../../suggestions/services/suggestions.service';
 import { LevelingService } from '@/features/leveling/services/leveling.service';
+import { ChatGamingService } from '../../chat-gaming/services/chatGaming.service';
 
 export default {
   name: Events.MessageCreate,
@@ -54,6 +55,9 @@ export default {
       
       // Gérer le système de leveling
       await LevelingService.giveXpToUser(client, message);
+      
+      // Vérifier et rappeler le rôle gaming si nécessaire
+      await ChatGamingService.checkAndRemindGamingRole(message);
 
     } catch (error) {
       console.error('Erreur dans l\'événement messageCreate:', error);
