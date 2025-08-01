@@ -22,7 +22,7 @@ export default {
         }
         
         try {
-          await command.execute(client, interaction);
+          await command.execute(interaction, client);
         } catch (error) {
           
           if (interaction.replied || interaction.deferred) {
