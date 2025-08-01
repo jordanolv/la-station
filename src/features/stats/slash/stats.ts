@@ -110,7 +110,7 @@ export default {
         .setRequired(false)
     ),
     
-  async execute(client: BotClient, interaction: ChatInputCommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction, client: BotClient) {
     try {
       // Récupérer l'utilisateur cible (l'auteur de la commande par défaut)
       const targetUser = interaction.options.getUser('utilisateur') || interaction.user;

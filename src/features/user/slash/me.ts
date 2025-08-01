@@ -29,7 +29,7 @@ export default {
   data: new SlashCommandBuilder()
     .setName('me')
     .setDescription('Afficher vos informations personnelles'),
-    async execute(client: BotClient, interaction: ChatInputCommandInteraction) {
+    async execute(interaction: ChatInputCommandInteraction, client: BotClient) {
       try {
       if (!interaction.guildId) {
         await interaction.reply({

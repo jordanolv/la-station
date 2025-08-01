@@ -14,7 +14,7 @@ export default {
         .setMaxLength(2000)
     ),
 
-  async execute(client: BotClient, interaction: ChatInputCommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction, client: BotClient) {
     try {
       const prompt = interaction.options.getString('prompt', true);
 
