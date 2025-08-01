@@ -3,9 +3,11 @@ import { PartyRepository } from './party.repository';
 import { DiscordPartyService } from './discord.party.service';
 import { PartyValidator } from './party.validator';
 import { ImageUploadService } from '../../../shared/services/ImageUploadService';
-import GuildModel from '../../discord/models/guild.model';
 import { IParty } from '../models/partyConfig.model';
 import { PartyEvent } from '../models/partyEvent.model';
+import { LevelingService } from '../../leveling/services/leveling.service';
+import { ChatGamingService } from '../../chat-gaming/services/chatGaming.service';
+import { EmbedBuilder } from 'discord.js';
 import {
   CreateEventDTO,
   UpdateEventDTO,
@@ -15,10 +17,12 @@ import {
   ValidationError,
   NotFoundError
 } from './party.types';
+import GuildUserModel from '../../user/models/guild-user.model';
+import GuildModel from '../../discord/models/guild.model';
 
 export class PartyService {
   private repository: PartyRepository;
-
+  
   constructor() {
     this.repository = new PartyRepository();
   }
@@ -128,7 +132,6 @@ export class PartyService {
     // Déterminer le rôle
     let roleId: string | undefined;
     if (event.chatGamingGameId) {
-      const { ChatGamingService } = require('../../chat-gaming/services/chatGaming.service');
       const chatGamingGame = await ChatGamingService.getGameById(event.chatGamingGameId);
       roleId = chatGamingGame?.roleId;
     } else {
@@ -311,8 +314,7 @@ export class PartyService {
     // Actions Discord
     await DiscordPartyService.removeAllReactions(client, event);
     await DiscordPartyService.archiveThread(client, event);
-
-    // Distribution des récompenses
+    
     if (data.attendedParticipants.length > 0 && (data.rewardAmount! > 0 || data.xpAmount! > 0)) {
       await this.distributeRewards(client, event, data.attendedParticipants, data.rewardAmount || 0, data.xpAmount || 0);
     }
@@ -325,9 +327,6 @@ export class PartyService {
 
     const moneyPerParticipant = rewardAmount > 0 ? Math.floor(rewardAmount / attendedParticipants.length) : 0;
     const xpPerParticipant = xpAmount > 0 ? Math.floor(xpAmount / attendedParticipants.length) : 0;
-
-    const { LevelingService } = require('../../leveling/services/leveling.service');
-    const GuildUserModel = require('../../user/models/guild-user.model').default;
 
     for (const participantId of attendedParticipants) {
       try {
