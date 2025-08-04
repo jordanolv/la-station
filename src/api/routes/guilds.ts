@@ -413,7 +413,8 @@ guilds.post('/:id/suggestions/forms', async (c) => {
     const guildId = c.req.param('id');
     const formData = await c.req.json();
     
-    const config = await SuggestionsService.createForm(guildId, formData);
+    const service = new SuggestionsService();
+    const config = await service.createForm(guildId, formData);
     return c.json(config);
   } catch (error) {
     return c.json({ error: 'Failed to create form' }, 500);
@@ -427,10 +428,14 @@ guilds.put('/:id/suggestions/forms/:formId', async (c) => {
     const formId = c.req.param('formId');
     const updates = await c.req.json();
     
-    const config = await SuggestionsService.updateForm(guildId, formId, updates);
+    console.log('Updating form:', { guildId, formId, updates });
+    
+    const service = new SuggestionsService();
+    const config = await service.updateForm(guildId, formId, updates);
     return c.json(config);
   } catch (error) {
-    return c.json({ error: 'Failed to update form' }, 500);
+    console.error('Error updating form:', error);
+    return c.json({ error: 'Failed to update form', details: error instanceof Error ? error.message : 'Unknown error' }, 500);
   }
 });
 
@@ -440,7 +445,8 @@ guilds.delete('/:id/suggestions/forms/:formId', async (c) => {
     const guildId = c.req.param('id');
     const formId = c.req.param('formId');
     
-    const config = await SuggestionsService.deleteForm(guildId, formId);
+    const service = new SuggestionsService();
+    const config = await service.deleteForm(guildId, formId);
     return c.json(config);
   } catch (error) {
     return c.json({ error: 'Failed to delete form' }, 500);
@@ -453,7 +459,8 @@ guilds.post('/:id/suggestions/channels', async (c) => {
     const guildId = c.req.param('id');
     const channelData = await c.req.json();
     
-    const config = await SuggestionsService.addSuggestionChannel(guildId, channelData);
+    const service = new SuggestionsService();
+    const config = await service.addSuggestionChannel(guildId, channelData);
     return c.json(config);
   } catch (error) {
     return c.json({ error: 'Failed to add channel' }, 500);
@@ -466,7 +473,8 @@ guilds.delete('/:id/suggestions/channels/:channelId', async (c) => {
     const guildId = c.req.param('id');
     const channelId = c.req.param('channelId');
     
-    const config = await SuggestionsService.removeSuggestionChannel(guildId, channelId);
+    const service = new SuggestionsService();
+    const config = await service.removeSuggestionChannel(guildId, channelId);
     return c.json(config);
   } catch (error) {
     return c.json({ error: 'Failed to remove channel' }, 500);
@@ -480,7 +488,8 @@ guilds.get('/:id/suggestions', async (c) => {
     const limit = parseInt(c.req.query('limit') || '20');
     const skip = parseInt(c.req.query('skip') || '0');
     
-    const suggestions = await SuggestionsService.getSuggestionsByGuild(guildId, limit, skip);
+    const service = new SuggestionsService();
+    const suggestions = await service.getSuggestionsByGuild(guildId, limit, skip);
     return c.json(suggestions);
   } catch (error) {
     return c.json({ error: 'Failed to fetch suggestions' }, 500);
@@ -493,7 +502,8 @@ guilds.put('/:id/suggestions/:suggestionId/status', async (c) => {
     const suggestionId = c.req.param('suggestionId');
     const { status, note } = await c.req.json();
     
-    const suggestion = await SuggestionsService.updateSuggestionStatus(suggestionId, status, undefined, note);
+    const service = new SuggestionsService();
+    const suggestion = await service.updateSuggestionStatus(suggestionId, status, undefined, note);
     return c.json(suggestion);
   } catch (error) {
     return c.json({ error: 'Failed to update suggestion status' }, 500);
@@ -513,7 +523,8 @@ guilds.post('/:id/suggestions/channels/:channelId/publish-button', async (c) => 
       return c.json({ error: 'Guild not found' }, 404);
     }
     
-    const messageId = await SuggestionsService.publishSuggestionButton(guild, channelId);
+    const service = new SuggestionsService();
+    const messageId = await service.publishSuggestionButton(guild, channelId);
     
     if (!messageId) {
       return c.json({ error: 'Failed to publish button' }, 500);

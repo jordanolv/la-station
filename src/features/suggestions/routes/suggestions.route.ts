@@ -15,7 +15,8 @@ suggestions.get('/config/:guildId', async (c) => {
       return c.json({ error: 'Guild ID is required' }, 400);
     }
 
-    const config = await SuggestionsService.getSuggestionsConfig(guildId);
+    const service = new SuggestionsService();
+    const config = await service.getSuggestionsConfig(guildId);
     return c.json(config);
   } catch (error) {
     console.error('Error fetching suggestions config:', error);
@@ -37,7 +38,8 @@ suggestions.put('/config/:guildId/toggle', async (c) => {
       return c.json({ error: 'Enabled must be a boolean' }, 400);
     }
 
-    const config = await SuggestionsService.toggleFeature(guildId, enabled);
+    const service = new SuggestionsService();
+    const config = await service.toggleFeature(guildId, enabled);
     return c.json(config);
   } catch (error) {
     console.error('Error toggling suggestions feature:', error);
@@ -93,7 +95,8 @@ suggestions.post('/config/:guildId/forms', async (c) => {
       return c.json({ error: 'Form name and fields are required' }, 400);
     }
 
-    const config = await SuggestionsService.createForm(guildId, formData);
+    const service = new SuggestionsService();
+    const config = await service.createForm(guildId, formData);
     return c.json({ 
       message: 'Form created successfully', 
       config 
@@ -115,7 +118,8 @@ suggestions.put('/config/:guildId/forms/:formId', async (c) => {
     const formId = c.req.param('formId');
     const updates = await c.req.json();
 
-    const config = await SuggestionsService.updateForm(guildId, formId, updates);
+    const service = new SuggestionsService();
+    const config = await service.updateForm(guildId, formId, updates);
     
     if (!config) {
       return c.json({ error: 'Form not found' }, 404);
@@ -141,7 +145,8 @@ suggestions.delete('/config/:guildId/forms/:formId', async (c) => {
 
     const formId = c.req.param('formId');
 
-    const config = await SuggestionsService.deleteForm(guildId, formId);
+    const service = new SuggestionsService();
+    const config = await service.deleteForm(guildId, formId);
     
     if (!config) {
       return c.json({ error: 'Form not found' }, 404);
@@ -187,11 +192,13 @@ suggestions.post('/config/:guildId/channels', async (c) => {
       return c.json({ error: 'Channel not found or is not a text channel' }, 400);
     }
 
+    const service = new SuggestionsService();
+    
     // Setup channel permissions
-    await SuggestionsService.setupChannelPermissions(guild, channelId, readOnly);
+    await service.setupChannelPermissions(guild, channelId, readOnly);
 
     // Add channel to config
-    const config = await SuggestionsService.addSuggestionChannel(guildId, {
+    const config = await service.addSuggestionChannel(guildId, {
       channelId,
       channelName: channelName || channel.name,
       enabled,
@@ -203,9 +210,9 @@ suggestions.post('/config/:guildId/channels', async (c) => {
     });
     
     // Publish initial button
-    const buttonMessageId = await SuggestionsService.publishSuggestionButton(guild, channelId);
+    const buttonMessageId = await service.publishSuggestionButton(guild, channelId);
     if (buttonMessageId) {
-      await SuggestionsService.updateChannelConfig(guildId, channelId, { buttonMessageId });
+      await service.updateChannelConfig(guildId, channelId, { buttonMessageId });
     }
 
     return c.json({ 
@@ -229,7 +236,8 @@ suggestions.put('/config/:guildId/channels/:channelId', async (c) => {
     const channelId = c.req.param('channelId');
     const updates = await c.req.json();
 
-    const config = await SuggestionsService.updateChannelConfig(guildId, channelId, updates);
+    const service = new SuggestionsService();
+    const config = await service.updateChannelConfig(guildId, channelId, updates);
     
     if (!config) {
       return c.json({ error: 'Channel configuration not found' }, 404);
@@ -255,7 +263,8 @@ suggestions.delete('/config/:guildId/channels/:channelId', async (c) => {
 
     const channelId = c.req.param('channelId');
 
-    const config = await SuggestionsService.removeSuggestionChannel(guildId, channelId);
+    const service = new SuggestionsService();
+    const config = await service.removeSuggestionChannel(guildId, channelId);
     
     if (!config) {
       return c.json({ error: 'Channel configuration not found' }, 404);
@@ -288,14 +297,15 @@ suggestions.post('/config/:guildId/channels/:channelId/republish-button', async 
       return c.json({ error: 'Guild not found' }, 404);
     }
 
-    const buttonMessageId = await SuggestionsService.publishSuggestionButton(guild, channelId);
+    const service = new SuggestionsService();
+    const buttonMessageId = await service.publishSuggestionButton(guild, channelId);
     
     if (!buttonMessageId) {
       return c.json({ error: 'Failed to publish button' }, 500);
     }
 
     // Update config with new button message ID
-    await SuggestionsService.updateChannelConfig(guildId, channelId, { buttonMessageId });
+    await service.updateChannelConfig(guildId, channelId, { buttonMessageId });
 
     return c.json({ 
       message: 'Button republished successfully',
@@ -321,7 +331,8 @@ suggestions.get('/:guildId/list', async (c) => {
     const limit = parseInt(c.req.query('limit') || '20');
     const skip = (page - 1) * limit;
 
-    const suggestionsList = await SuggestionsService.getSuggestionsByGuild(guildId, limit, skip);
+    const service = new SuggestionsService();
+    const suggestionsList = await service.getSuggestionsByGuild(guildId, limit, skip);
     
     return c.json({ 
       suggestions: suggestionsList,
@@ -340,7 +351,8 @@ suggestions.get('/channels/:channelId/suggestions', async (c) => {
     const channelId = c.req.param('channelId');
     const limit = parseInt(c.req.query('limit') || '20');
 
-    const suggestionsList = await SuggestionsService.getSuggestionsByChannel(channelId, limit);
+    const service = new SuggestionsService();
+    const suggestionsList = await service.getSuggestionsByChannel(channelId, limit);
     
     return c.json({ suggestions: suggestionsList });
   } catch (error) {
@@ -359,7 +371,8 @@ suggestions.put('/suggestions/:suggestionId/status', async (c) => {
       return c.json({ error: 'Status is required' }, 400);
     }
 
-    const suggestion = await SuggestionsService.updateSuggestionStatus(suggestionId, status, moderatorId, note);
+    const service = new SuggestionsService();
+    const suggestion = await service.updateSuggestionStatus(suggestionId, status, moderatorId, note);
     
     if (!suggestion) {
       return c.json({ error: 'Suggestion not found' }, 404);
@@ -380,7 +393,8 @@ suggestions.get('/suggestions/:suggestionId', async (c) => {
   try {
     const suggestionId = c.req.param('suggestionId');
 
-    const suggestion = await SuggestionsService.getSuggestion(suggestionId);
+    const service = new SuggestionsService();
+    const suggestion = await service.getSuggestion(suggestionId);
     
     if (!suggestion) {
       return c.json({ error: 'Suggestion not found' }, 404);

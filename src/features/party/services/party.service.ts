@@ -3,11 +3,13 @@ import { PartyRepository } from './party.repository';
 import { DiscordPartyService } from './discord.party.service';
 import { PartyValidator } from './party.validator';
 import { ImageUploadService } from '../../../shared/services/ImageUploadService';
-import { IParty } from '../models/partyConfig.model';
+import { PartyConfig } from '../models/partyConfig.model';
 import { PartyEvent } from '../models/partyEvent.model';
 import { LevelingService } from '../../leveling/services/leveling.service';
 import { ChatGamingService } from '../../chat-gaming/services/chatGaming.service';
+import { UserService } from '../../user/services/guildUser.service';
 import { EmbedBuilder } from 'discord.js';
+import { LogService } from '../../../shared/logs/logs.service';
 import {
   CreateEventDTO,
   UpdateEventDTO,
@@ -166,6 +168,15 @@ export class PartyService {
       await DiscordPartyService.sendAnnouncementMessage(client, updatedEvent, data.announcementChannelId, threadUrl, roleId, gameImageUrl);
     }
 
+    // Logger la création de l'événement
+    const logMessage = `**${updatedEvent.eventInfo.name}** - ${updatedEvent.eventInfo.game}\n\n` +
+      `👤 **Créateur:** <@${data.createdBy}>\n` +
+      `📅 **Date:** <t:${Math.floor(data.dateTime.getTime() / 1000)}:F>\n` +
+      `👥 **Places:** ${data.maxSlots}\n` +
+      `📍 **Channel:** <#${data.channelId}>`;
+
+    await LogService.success(client, data.guildId, logMessage, { feature: 'party', title: 'Une soirée a été créée' });
+
     return this.formatEventForFrontend(updatedEvent);
   }
 
@@ -291,7 +302,7 @@ export class PartyService {
     return { isParty: !!event, event: event || undefined };
   }
 
-  async getPartyConfig(guildId: string): Promise<IParty | null> {
+  async getPartyConfig(guildId: string): Promise<PartyConfig | null> {
     const guild = await GuildModel.findOne({ guildId });
     return guild?.features?.party || null;
   }
@@ -340,7 +351,6 @@ export class PartyService {
           try {
             const guild = await client.guilds.fetch(event.discord.guildId);
             const discordUser = await client.users.fetch(participantId);
-            const { UserService } = require('../../user/services/guildUser.service');
             user = await UserService.createGuildUser(discordUser, guild);
           } catch (createError) {
             console.error(`[PARTY] Impossible de créer l'utilisateur ${participantId}:`, createError);
@@ -348,10 +358,10 @@ export class PartyService {
           }
         }
 
-        if (moneyPerParticipant > 0) user.profil.money += moneyPerParticipant;
-        if (xpPerParticipant > 0) user.profil.exp += xpPerParticipant;
-        
-        await user.save();
+        if (moneyPerParticipant > 0) {
+          user.profil.money += moneyPerParticipant;
+          await user.save();
+        }
 
         if (xpPerParticipant > 0) {
           const mockMessage = { 
@@ -359,7 +369,11 @@ export class PartyService {
             author: { id: participantId },
             react: () => Promise.resolve() // Mock react method pour éviter les erreurs
           };
-          await LevelingService.checkLevelUp(client, user, mockMessage as any);
+          // Utiliser la nouvelle méthode qui gère XP + level up
+          await LevelingService.giveXpToUser(client, mockMessage as any, xpPerParticipant);
+        } else if (moneyPerParticipant === 0) {
+          // Sauvegarder si seulement de l'argent mais pas d'XP
+          await user.save();
         }
       } catch (error) {
         console.error(`[PARTY] Erreur distribution ${participantId}:`, error);

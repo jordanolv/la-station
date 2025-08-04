@@ -1,6 +1,6 @@
 import { Events, Message } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { LogsService } from '../../admin/services/logs.service';
+import { LogService } from '../../../shared/logs/logs.service';
 
 export default {
   name: Events.MessageDelete,
@@ -18,7 +18,7 @@ export default {
       if (!message.content && message.attachments.size === 0) return;
 
       // Logger la suppression
-      await LogsService.logMessageDelete(
+      await LogService.logMessageDelete(
         client,
         message.guild.id,
         message.author?.id || null,

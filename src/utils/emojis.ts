@@ -38,5 +38,12 @@ export const emojis = {
   suggestion: '💡',
   form: '📝',
   channel: '#️⃣',
-  category: '📁'
+  category: '📁',
+  
+  // User profile
+  party: '🎉',
+  user: '👤',
+  level: '⭐',
+  exp: '✨',
+  money: '💰'
 };

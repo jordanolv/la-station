@@ -1,7 +1,7 @@
 import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
 
 // Types pour les champs de formulaire
-export type FormFieldType = 'text' | 'textarea' | 'select' | 'number' | 'boolean';
+export type FormFieldType = 'text' | 'textarea';
 
 export class FormField {
   @prop({ required: true })
@@ -10,7 +10,7 @@ export class FormField {
   @prop({ required: true })
   label!: string;
 
-  @prop({ required: true, enum: ['text', 'textarea', 'select', 'number', 'boolean'] })
+  @prop({ required: true, enum: ['text', 'textarea'] })
   type!: FormFieldType;
 
   @prop({ default: false })

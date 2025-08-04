@@ -1,6 +1,6 @@
 import { Events, Message } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { LogsService } from '../../admin/services/logs.service';
+import { LogService } from '../../../shared/logs/logs.service';
 
 export default {
   name: Events.MessageUpdate,
@@ -18,7 +18,7 @@ export default {
       if (oldMessage.content === newMessage.content) return;
 
       // Logger la modification
-      await LogsService.logMessageEdit(
+      await LogService.logMessageEdit(
         client,
         oldMessage.guild.id,
         oldMessage.author.id,

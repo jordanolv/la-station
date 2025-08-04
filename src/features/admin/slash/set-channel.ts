@@ -1,7 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, ChannelType } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { LogsService } from '../services/logs.service';
-import { GuildService } from '../../discord/services/guild.service';
+import { AdminService } from '../services/admin.service';
 
 export default {
   data: new SlashCommandBuilder()
@@ -34,29 +33,17 @@ export default {
 
       const feature = interaction.options.getString('feature', true);
       const channel = interaction.options.getChannel('channel', true);
+      
+      const adminService = new AdminService();
+      let result: { success: boolean; message: string };
 
       switch (feature) {
         case 'logs':
-          await LogsService.setLogsChannel(interaction.guild.id, channel.id);
-          await interaction.reply({
-            content: `✅ Le channel ${channel} a été configuré pour les **logs** !`,
-            flags: [64] // MessageFlags.Ephemeral
-          });
+          result = await adminService.setLogsChannel(client, interaction.guild.id, channel.id);
           break;
 
         case 'birthday':
-          // Exemple pour les anniversaires (à implémenter si nécessaire)
-          const guild = await GuildService.getOrCreateGuild(interaction.guild.id, interaction.guild.name);
-          if (!guild.config.channels) {
-            guild.config.channels = new Map();
-          }
-          guild.config.channels.set('birthdayChannel', channel.id);
-          await guild.save();
-          
-          await interaction.reply({
-            content: `✅ Le channel ${channel} a été configuré pour les **anniversaires** !`,
-            flags: [64] // MessageFlags.Ephemeral
-          });
+          result = await adminService.setBirthdayChannel(client, interaction.guild.id, channel.id);
           break;
 
         default:
@@ -64,7 +51,13 @@ export default {
             content: '❌ Fonctionnalité non reconnue.',
             flags: [64] // MessageFlags.Ephemeral
           });
+          return;
       }
+
+      await interaction.reply({
+        content: result.message,
+        flags: [64] // MessageFlags.Ephemeral
+      });
 
     } catch (error) {
       console.error('Erreur dans la commande set-channel:', error);
