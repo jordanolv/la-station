@@ -1,98 +1,78 @@
-import { TextChannel } from 'discord.js';
+import { TextChannel, EmbedBuilder } from 'discord.js';
 import { BotClient } from '../../bot/client';
-import { EmbedUtils } from '../../bot/utils/EmbedUtils';
-import LogsModel, { ILogs } from './logs.model';
+import { GuildService } from '../../features/discord/services/guild.service';
 
-export type LogType = 'info' | 'warning' | 'error' | 'success' | 'debug';
-export type LogFeature = 'birthday' | 'welcome' | 'moderation' | 'games' | 'system' | string;
-
-interface LogOptions {
-  feature?: LogFeature;
-  title?: string;
-  timestamp?: boolean;
-  footer?: string;
-  file?: string;
-  line?: number;
+class LogEmbed extends EmbedBuilder {
+  constructor(type: 'info' | 'success' | 'warning' | 'error', message: string, options?: { feature?: string, title?: string }) {
+    super();
+    
+    const configs = {
+      info: { defaultTitle: 'ℹ️ Information', color: 0x3498db },
+      success: { defaultTitle: '✅ Succès', color: 0x27ae60 },
+      warning: { defaultTitle: '⚠️ Avertissement', color: 0xf39c12 },
+      error: { defaultTitle: '❌ Erreur', color: 0xe74c3c }
+    };
+    
+    const config = configs[type];
+    this.setTitle(options?.title || config.defaultTitle)
+        .setDescription(message)
+        .setColor(config.color)
+        .setTimestamp();
+        
+    if (options?.feature) {
+      this.setFooter({ text: `Feature: ${options.feature}` });
+    }
+  }
 }
 
 export class LogService {
-  private static readonly TITLES: Record<LogType, string> = {
-    info: 'Information',
-    warning: 'Avertissement',
-    error: 'Erreur',
-    success: 'Succès',
-    debug: 'Debug'
-  };
 
-  private static readonly COLORS: Record<LogType, number> = {
-    info: EmbedUtils.Colors.INFO,
-    warning: EmbedUtils.Colors.WARNING,
-    error: EmbedUtils.Colors.ERROR,
-    success: EmbedUtils.Colors.SUCCESS,
-    debug: EmbedUtils.Colors.DEBUG
-  };
-  
   /**
-   * Récupère les paramètres de logs pour une guilde
+   * Configure le channel de logs
    */
-  static async getLog(guildId: string): Promise<ILogs | null> {
-    return LogsModel.findOne({ guildId });
+  static async setLogsChannel(guildId: string, channelId: string): Promise<void> {
+    const guild = await GuildService.getOrCreateGuild(guildId);
+    
+    if (!guild.config.channels) {
+      guild.config.channels = new Map();
+    }
+    guild.config.channels.set('logs', channelId);
+    
+    await guild.save();
   }
 
   /**
-   * Crée une configuration de logs pour une guilde
+   * Récupère le channel de logs configuré
    */
-  static async createLog(guildId: string, enabled: boolean = false, channel: string = ''): Promise<ILogs> {
-    return LogsModel.create({
-      guildId,
-      enabled,
-      channel
-    });
-  }
-
-  /**
-   * Récupère ou crée une configuration de logs pour une guilde
-   */
-  static async getOrCreateLog(guildId: string, enabled: boolean = false, channel: string = ''): Promise<ILogs> {
-    const log = await this.getLog(guildId);
-    if (log) {
-      return log;
+  static async getLogsChannelId(guildId: string): Promise<string | null> {
+    const guild = await GuildService.getOrCreateGuild(guildId);
+    
+    // Gestion du cas où channels est un objet au lieu d'une Map
+    let logsChannelId: string | null = null;
+    if (guild.config.channels) {
+      if (guild.config.channels instanceof Map) {
+        logsChannelId = guild.config.channels.get('logs') || null;
+      } else if (typeof guild.config.channels === 'object') {
+        logsChannelId = (guild.config.channels as any).logs || null;
+      }
     }
     
-    return this.createLog(guildId, enabled, channel);
+    return logsChannelId;
   }
 
   /**
-   * Envoie un log dans le canal de logs de la guilde
+   * Envoie un embed dans le canal de logs
    */
-  static async sendLog(
-    guildId: string,
-    content: string,
-    type: LogType = 'info',
-    options: LogOptions = {}
-  ): Promise<void> {
+  static async sendEmbed(client: BotClient, guildId: string, embed: EmbedBuilder): Promise<void> {
     try {
-      const { feature, title, timestamp = true, footer, file, line } = options;
+      const channelId = await this.getLogsChannelId(guildId);
+      if (!channelId) return;
 
-      // Vérification rapide des logs activés
-      const logData = await this.getLog(guildId);
+      const guild = client.guilds.cache.get(guildId);
+      if (!guild) return;
 
-      if (!this.isLoggingEnabled(logData)) {
-        return;
-      }
-
-      // Récupération du canal de logs
-      const logChannel = await this.getLogChannel(guildId, logData?.channel || '');
-      
+      const logChannel = guild.channels.cache.get(channelId) as TextChannel;
       if (!logChannel) return;
-
-      const embed = EmbedUtils.createLogEmbed(type, content, {
-        feature,
-        file,
-        line,
-        timestamp,
-        footer: footer || title
-      });
 
       await logChannel.send({ embeds: [embed] });
     } catch (error) {
@@ -101,40 +81,88 @@ export class LogService {
   }
 
   /**
-   * Méthodes utilitaires pour les types de logs courants
+   * Log un message d'information
    */
-  static async info(guildId: string, content: string, options?: LogOptions): Promise<void> {
-    await this.sendLog(guildId, content, 'info', options);
-  }
-
-  static async warning(guildId: string, content: string, options?: LogOptions): Promise<void> {
-    await this.sendLog(guildId, content, 'warning', options);
-  }
-
-  static async error(guildId: string, content: string, options?: LogOptions): Promise<void> {
-    await this.sendLog(guildId, content, 'error', options);
-  }
-
-  static async success(guildId: string, content: string, options?: LogOptions): Promise<void> {
-    await this.sendLog(guildId, content, 'success', options);
-  }
-
-  static async debug(guildId: string, content: string, options?: LogOptions): Promise<void> {
-    await this.sendLog(guildId, content, 'debug', options);
+  static async info(client: BotClient, guildId: string, message: string, options?: { feature?: string, title?: string }): Promise<void> {
+    const embed = new LogEmbed('info', message, options);
+    await this.sendEmbed(client, guildId, embed);
   }
 
   /**
-   * Méthodes privées utilitaires
+   * Log un message de succès
    */
-  private static isLoggingEnabled(logData: ILogs | null): boolean {
-    return logData?.enabled && !!logData?.channel;
+  static async success(client: BotClient, guildId: string, message: string, options?: { feature?: string, title?: string }): Promise<void> {
+    const embed = new LogEmbed('success', message, options);
+    await this.sendEmbed(client, guildId, embed);
   }
 
-  private static async getLogChannel(guildId: string, channelId: string): Promise<TextChannel | null> {
-    const guild = BotClient.getInstance().guilds.cache.get(guildId);
-    if (!guild) return null;
+  /**
+   * Log un message d'avertissement
+   */
+  static async warning(client: BotClient, guildId: string, message: string, options?: { feature?: string, title?: string }): Promise<void> {
+    const embed = new LogEmbed('warning', message, options);
+    await this.sendEmbed(client, guildId, embed);
+  }
 
-    const channel = guild.channels.cache.get(channelId) as TextChannel;
-    return channel || null;
+  /**
+   * Log un message d'erreur
+   */
+  static async error(client: BotClient, guildId: string, message: string, options?: { feature?: string, title?: string }): Promise<void> {
+    const embed = new LogEmbed('error', message, options);
+    await this.sendEmbed(client, guildId, embed);
+  }
+
+  /**
+   * Log un message modifié sur Discord
+   */
+  static async logMessageEdit(
+    client: BotClient,
+    guildId: string,
+    userId: string,
+    username: string,
+    channelId: string,
+    messageId: string,
+    oldContent: string,
+    newContent: string
+  ): Promise<void> {
+    const embed = new EmbedBuilder()
+      .setTitle('📝 Message modifié')
+      .setColor(0xf39c12)
+      .addFields(
+        { name: 'Utilisateur', value: `<@${userId}> (${username})`, inline: true },
+        { name: 'Channel', value: `<#${channelId}>`, inline: true },
+        { name: 'Message ID', value: messageId, inline: true },
+        { name: 'Ancien contenu', value: oldContent.slice(0, 1024) || '_Aucun contenu_', inline: false },
+        { name: 'Nouveau contenu', value: newContent.slice(0, 1024) || '_Aucun contenu_', inline: false }
+      )
+      .setTimestamp();
+
+    await this.sendEmbed(client, guildId, embed);
+  }
+
+  /**
+   * Log un message supprimé sur Discord
+   */
+  static async logMessageDelete(
+    client: BotClient,
+    guildId: string,
+    userId: string | null,
+    username: string | null,
+    channelId: string,
+    messageId: string,
+    content: string
+  ): Promise<void> {
+    const embed = new EmbedBuilder()
+      .setTitle('🗑️ Message supprimé')
+      .setColor(0xe74c3c)
+      .addFields(
+        { name: 'Utilisateur', value: userId ? `<@${userId}> (${username})` : 'Inconnu', inline: true },
+        { name: 'Channel', value: `<#${channelId}>`, inline: true },
+        { name: 'Message ID', value: messageId, inline: true },
+        { name: 'Contenu', value: content.slice(0, 1024) || '_Aucun contenu_', inline: false }
+      )
+      .setTimestamp();
+
+    await this.sendEmbed(client, guildId, embed);
   }
 } 

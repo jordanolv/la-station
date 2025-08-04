@@ -21,7 +21,7 @@ export default {
       if (isJoining) {
         StatsService.handleUserJoinVoice(oldState, newState);
       } else if (isLeaving) {
-        await StatsService.handleUserLeaveVoice(oldState, newState);
+        await StatsService.handleUserLeaveVoice(client, oldState, newState);
       }
       
       // 2. Gestion des canaux vocaux dynamiques

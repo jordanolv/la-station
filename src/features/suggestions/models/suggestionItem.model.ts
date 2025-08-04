@@ -24,7 +24,7 @@ export class SuggestionField {
   value!: string;
 
   @prop({ required: true })
-  type!: string;
+  type!: 'text' | 'textarea';
 }
 
 @index({ guildId: 1, channelId: 1, createdAt: -1 })

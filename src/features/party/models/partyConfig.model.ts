@@ -10,6 +10,3 @@ export class PartyConfig {
   @prop()
   defaultRoleId?: string; // Rôle par défaut pour les jeux custom
 }
-
-// Garde l'interface pour la compatibilité
-export type IParty = PartyConfig;

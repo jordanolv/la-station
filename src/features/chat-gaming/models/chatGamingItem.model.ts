@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 
 export class ChatGamingItem {
   _id!: Types.ObjectId;
+  
   @prop({ required: true })
   name!: string;
 
@@ -26,6 +27,10 @@ export class ChatGamingItem {
 
   @prop()
   roleId?: string;
+
+  // Timestamps ajoutés automatiquement par Mongoose
+  createdAt!: Date;
+  updatedAt!: Date;
 }
 
 // Créer le modèle

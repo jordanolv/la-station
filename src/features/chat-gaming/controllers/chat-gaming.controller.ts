@@ -1,10 +1,18 @@
 import { Context } from 'hono';
 import { ChatGamingService } from '../services/chatGaming.service';
-import { ImageUploadService } from '../../../shared/services/ImageUploadService';
 import { BotClient } from '../../../bot/client';
+import { ChatGamingError } from '../services/chatGaming.types';
 
 export class ChatGamingController {
   
+  private static handleError(error: any) {
+    if (error instanceof ChatGamingError) {
+      return { error: error.message, statusCode: error.statusCode as any };
+    }
+    console.error('[CHAT-GAMING CONTROLLER] Erreur:', error);
+    return { error: 'Erreur interne du serveur', statusCode: 500 as any };
+  }
+
   static async getAllGames(c: Context) {
     try {
       const guildId = process.env.GUILD_ID;
@@ -12,11 +20,12 @@ export class ChatGamingController {
         return c.json({ error: 'Guild ID is required' }, 400);
       }
 
-      const games = await ChatGamingService.getGamesByGuild(guildId);
+      const service = new ChatGamingService();
+      const games = await service.getGamesByGuild(guildId);
       return c.json({ games });
-    } catch (error) {
-      console.error('Error fetching games:', error);
-      return c.json({ error: 'Failed to fetch games' }, 500);
+    } catch (error: any) {
+      const { error: message, statusCode } = this.handleError(error);
+      return c.json({ error: message }, statusCode);
     }
   }
 
@@ -33,54 +42,40 @@ export class ChatGamingController {
         return c.json({ error: 'Guild ID is required' }, 400);
       }
 
-      if (!name) {
-        return c.json({ error: 'Game name is required' }, 400);
+      const client = BotClient.getInstance();
+      if (!client) {
+        return c.json({ error: 'Bot client non disponible' }, 500);
       }
 
-      // Upload image vers Cloudinary si présente
-      const imageUrl = gameImage ? await ImageUploadService.uploadGameImage(gameImage) : undefined;
-      console.log('[CHAT-GAMING] Image URL from Cloudinary:', imageUrl);
-
-      const game = await ChatGamingService.createGame({
-        name: name.toString(),
+      const service = new ChatGamingService();
+      const game = await service.createGame(client, {
+        name: name?.toString() || '',
         description: description?.toString(),
-        image: imageUrl,
+        image: gameImage,
         color: color.toString(),
         guildId
       });
 
-      // Intégration Discord
-      try {
-        const client = BotClient.getInstance();
-        const guild = client.guilds.cache.get(guildId);
-        
-        if (guild) {
-          await ChatGamingService.createGameInDiscord(game, guild);
-        }
-      } catch (error) {
-        console.error('Error creating game in Discord:', error);
-      }
-
-      return c.json({ message: 'Game created successfully', game });
-    } catch (error) {
-      console.error('Error creating game:', error);
-      return c.json({ error: 'Failed to create game' }, 500);
+      return c.json({
+        success: true,
+        message: 'Jeu créé avec succès',
+        game
+      });
+    } catch (error: any) {
+      const { error: message, statusCode } = this.handleError(error);
+      return c.json({ error: message }, statusCode);
     }
   }
 
   static async getGameById(c: Context) {
     try {
       const id = c.req.param('id');
-      const game = await ChatGamingService.getGameById(id);
-      
-      if (!game) {
-        return c.json({ error: 'Game not found' }, 404);
-      }
-
+      const service = new ChatGamingService();
+      const game = await service.getGameById(id);
       return c.json({ game });
-    } catch (error) {
-      console.error('Error fetching game:', error);
-      return c.json({ error: 'Failed to fetch game' }, 500);
+    } catch (error: any) {
+      const { error: message, statusCode } = this.handleError(error);
+      return c.json({ error: message }, statusCode);
     }
   }
 
@@ -89,32 +84,38 @@ export class ChatGamingController {
       const id = c.req.param('id');
       const updates = await c.req.json();
       
-      const game = await ChatGamingService.updateGame(id, updates);
-      
-      if (!game) {
-        return c.json({ error: 'Game not found' }, 404);
-      }
+      const service = new ChatGamingService();
+      const game = await service.updateGame(id, updates);
 
-      return c.json({ message: 'Game updated successfully', game });
-    } catch (error) {
-      console.error('Error updating game:', error);
-      return c.json({ error: 'Failed to update game' }, 500);
+      return c.json({
+        success: true,
+        message: 'Jeu mis à jour avec succès',
+        game
+      });
+    } catch (error: any) {
+      const { error: message, statusCode } = this.handleError(error);
+      return c.json({ error: message }, statusCode);
     }
   }
 
   static async deleteGame(c: Context) {
     try {
       const id = c.req.param('id');
-      const game = await ChatGamingService.deleteGame(id);
-      
-      if (!game) {
-        return c.json({ error: 'Game not found' }, 404);
+      const client = BotClient.getInstance();
+      if (!client) {
+        return c.json({ error: 'Bot client non disponible' }, 500);
       }
 
-      return c.json({ message: 'Game deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting game:', error);
-      return c.json({ error: 'Failed to delete game' }, 500);
+      const service = new ChatGamingService();
+      await service.deleteGame(client, id);
+
+      return c.json({
+        success: true,
+        message: 'Jeu supprimé avec succès'
+      });
+    } catch (error: any) {
+      const { error: message, statusCode } = this.handleError(error);
+      return c.json({ error: message }, statusCode);
     }
   }
 }

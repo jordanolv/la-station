@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import { BotClient } from '../../../bot/client';
+import { AdminService } from '../services/admin.service';
 
 export default {
   name: 'enable-logs',
@@ -29,27 +30,17 @@ export default {
 
       const enableLogs = args[0].toLowerCase() === 'true';
       
-      try {
-        // Note: Ceci est un exemple. Vous devrez adapter cette partie à votre système de stockage
-        // Vous pourriez avoir un modèle GuildModel ou utiliser une autre méthode de stockage
-        // Pour l'instant, nous simulons la mise à jour
-        
-        console.log(`[Admin] Logs ${enableLogs ? 'activés' : 'désactivés'} pour le serveur ${message.guild.name}`);
-        
-        const reply = await message.reply({
-          content: `✅ Les logs ont été ${enableLogs ? 'activés' : 'désactivés'} avec succès!`
-        });
+      const adminService = new AdminService();
+      const result = await adminService.toggleLogs(message.guild.id, enableLogs);
+      
+      const reply = await message.reply({
+        content: result.message
+      });
 
-        setTimeout(() => {
-          reply.delete().catch(console.error);
-          message.delete().catch(console.error);
-        }, 5000);
-      } catch (error) {
-        console.error('Erreur lors de la mise à jour des paramètres de la guild:', error);
-        await message.reply({
-          content: '❌ Une erreur est survenue lors de la mise à jour des paramètres du serveur.'
-        });
-      }
+      setTimeout(() => {
+        reply.delete().catch(console.error);
+        message.delete().catch(console.error);
+      }, 5000);
     } catch (error) {
       console.error('Erreur dans la commande enable-logs:', error);
       await message.reply({

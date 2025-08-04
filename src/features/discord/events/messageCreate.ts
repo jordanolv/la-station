@@ -48,6 +48,7 @@ export default {
       
       // Mettre à jour les statistiques de l'utilisateur (messages)
       await StatsService.incrementMessageCount(
+        client,
         message.author.id,
         message.guild.id,
         message.author.username

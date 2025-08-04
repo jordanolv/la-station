@@ -45,17 +45,14 @@ export class BirthdayCron {
       
       for (const [guildId, discordGuild] of guilds) {
         try {
-          // Vérifier les logs pour chaque guilde
-          const logConfig = await LogService.getLog(guildId);
-          if (!logConfig?.enabled || !logConfig?.channel) {
+          // Vérifier si le channel de logs est configuré
+          const logChannelId = await LogService.getLogsChannelId(guildId);
+          if (!logChannelId) {
             continue;
           }
 
-          await LogService.info(guildId, `Vérification des anniversaires pour ${dayToday}/${monthToday} (Paris)`, {
-            feature: 'birthday',
-            footer: 'BirthdayCron',
-            file: 'birthday.cron.ts',
-            line: 45
+          await LogService.info(this.client as any, guildId, `Vérification des anniversaires pour ${dayToday}/${monthToday} (Paris)`, {
+            feature: 'birthday'
           });
 
           // Récupérer la configuration d'anniversaire pour cette guilde
@@ -64,11 +61,8 @@ export class BirthdayCron {
           
           // Vérifier si la fonctionnalité est activée
           if (!birthdayConfig?.enabled) {
-            await LogService.info(guildId, `Fonctionnalité d'anniversaire désactivée pour cette guilde`, {
-              feature: 'birthday',
-              footer: 'BirthdayCron',
-              file: 'birthday.cron.ts',
-              line: 55
+            await LogService.info(this.client as any, guildId, `Fonctionnalité d'anniversaire désactivée pour cette guilde`, {
+              feature: 'birthday'
             });
             continue;
           }
@@ -82,11 +76,8 @@ export class BirthdayCron {
           // Récupérer le canal d'anniversaire configuré
           const birthdayChannelId = birthdayConfig?.channel || discordGuild.systemChannelId;
           if (!birthdayChannelId) {
-            await LogService.warning(guildId, `Aucun canal d'anniversaire configuré`, {
-              feature: 'birthday',
-              footer: 'BirthdayCron',
-              file: 'birthday.cron.ts',
-              line: 70
+            await LogService.warning(this.client as any, guildId, `Aucun canal d'anniversaire configuré`, {
+              feature: 'birthday'
             });
             continue;
           }
@@ -104,11 +95,8 @@ export class BirthdayCron {
 
             const chan = await this.client.channels.fetch(birthdayChannelId).catch(() => null);
             if (!chan || chan.type !== ChannelType.GuildText) {
-              await LogService.error(guildId, `Canal ${birthdayChannelId} non trouvé ou n'est pas un canal texte`, {
-                feature: 'birthday',
-                footer: 'BirthdayCron',
-                file: 'birthday.cron.ts',
-                line: 90
+              await LogService.error(this.client as any, guildId, `Canal ${birthdayChannelId} non trouvé ou n'est pas un canal texte`, {
+                feature: 'birthday'
               });
               continue;
             }
@@ -120,11 +108,8 @@ export class BirthdayCron {
               !me ||
               !textChannel.permissionsFor(me).has(PermissionsBitField.Flags.SendMessages)
             ) {
-              await LogService.error(guildId, `Permission d'envoi manquante dans le canal ${birthdayChannelId}`, {
-                feature: 'birthday',
-                footer: 'BirthdayCron',
-                file: 'birthday.cron.ts',
-                line: 100
+              await LogService.error(this.client as any, guildId, `Permission d'envoi manquante dans le canal ${birthdayChannelId}`, {
+                feature: 'birthday'
               });
               continue;
             }
@@ -142,11 +127,8 @@ export class BirthdayCron {
               .setTimestamp(nowParis);
 
             await textChannel.send({ embeds: [embed] });
-            await LogService.success(guildId, `Message d'anniversaire envoyé pour ${user.name}`, {
-              feature: 'birthday',
-              footer: 'BirthdayCron',
-              file: 'birthday.cron.ts',
-              line: 120
+            await LogService.success(this.client as any, guildId, `Message d'anniversaire envoyé pour ${user.name}`, {
+              feature: 'birthday'
             });
           }
         } catch (guildError) {
@@ -158,11 +140,8 @@ export class BirthdayCron {
       // Log l'erreur dans toutes les guildes où le bot est présent
       for (const [guildId] of this.client.guilds.cache) {
         try {
-          await LogService.error(guildId, `Erreur lors de la vérification des anniversaires: ${err.message}`, {
-            feature: 'birthday',
-            footer: 'BirthdayCron',
-            file: 'birthday.cron.ts',
-            line: 135
+          await LogService.error(this.client as any, guildId, `Erreur lors de la vérification des anniversaires: ${err.message}`, {
+            feature: 'birthday'
           });
         } catch (logError) {
           console.error(`Error logging to guild ${guildId}:`, logError);

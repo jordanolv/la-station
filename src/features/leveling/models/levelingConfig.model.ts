@@ -12,7 +12,4 @@ export class LevelingConfig {
 
   @prop({ default: null })
   channelNotif!: string | null;
-}
-
-// Garde l'interface pour la compatibilité
-export type ILeveling = LevelingConfig; 
+} 
