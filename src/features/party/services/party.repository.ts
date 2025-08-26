@@ -25,8 +25,6 @@ export class PartyRepository {
     return PartyEventModel.findOne({ 'discord.threadId': threadId });
   }
 
-
-
   async create(eventData: Partial<PartyEvent>): Promise<PartyEvent> {
     return PartyEventModel.create(eventData);
   }

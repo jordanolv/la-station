@@ -29,7 +29,6 @@ export class PartyService {
     this.repository = new PartyRepository();
   }
 
-  // Méthodes pour les event listeners
   static async handleReactionAdd(client: BotClient, messageId: string, userId: string): Promise<void> {
     const service = new PartyService();
     const event = await service.repository.findByMessageId(messageId);
@@ -68,7 +67,6 @@ export class PartyService {
     }
   }
 
-
   private formatEventForFrontend(event: PartyEvent): EventResponseDTO {
     const eventDate = new Date(event.eventInfo.dateTime);
     
@@ -99,7 +97,6 @@ export class PartyService {
     };
   }
 
-  // Méthodes d'instance
   async createEvent(client: BotClient, data: CreateEventDTO): Promise<EventResponseDTO> {
     // Validation
     const validation = PartyValidator.validateCreateEvent(data);
@@ -240,7 +237,7 @@ export class PartyService {
     return this.formatEventForFrontend(updatedEvent);
   }
 
-  async endEvent(eventId: string, data: EndEventDTO): Promise<EventResponseDTO> {
+  async endEvent(client: BotClient, eventId: string, data: EndEventDTO): Promise<EventResponseDTO> {
     const event = await this.repository.findById(eventId);
     if (!event) {
       throw new NotFoundError('Événement non trouvé');
@@ -260,6 +257,7 @@ export class PartyService {
     const validation = PartyValidator.validateRewards(data.rewardAmount, data.xpAmount);
     PartyValidator.throwIfInvalid(validation);
 
+    // Mise à jour en base
     const updatedEvent = await this.repository.update(eventId, {
       status: 'ended',
       endedAt: new Date(),
@@ -267,6 +265,18 @@ export class PartyService {
       rewardAmount: data.rewardAmount || 0,
       xpAmount: data.xpAmount || 0
     });
+
+    // Distribution des rewards AVANT l'archivage
+    if (data.attendedParticipants.length > 0 && (data.rewardAmount! > 0 || data.xpAmount! > 0)) {
+      console.log('[PARTY] Distribution des rewards en cours...');
+      await this.distributeRewards(client, updatedEvent, data.attendedParticipants, data.rewardAmount || 0, data.xpAmount || 0);
+    } else {
+      console.log('[PARTY] Aucune distribution de rewards (conditions non remplies)');
+    }
+
+    // Actions Discord APRÈS les rewards
+    await DiscordPartyService.removeAllReactions(client, updatedEvent);
+    await DiscordPartyService.archiveThread(client, updatedEvent);
 
     return this.formatEventForFrontend(updatedEvent);
   }
@@ -307,34 +317,6 @@ export class PartyService {
     return guild?.features?.party || null;
   }
 
-  private async _updateEventEmbed(client: BotClient, event: PartyEvent): Promise<void> {
-    try {
-      const embed = DiscordPartyService.createEventEmbed(event, event.discord.roleId);
-      await DiscordPartyService.updateEventMessage(client, event, embed);
-    } catch (error) {
-      console.error('[PARTY] Erreur mise à jour embed:', error);
-    }
-  }
-
-  async finishEventWithRewards(client: BotClient, eventId: string, data: EndEventDTO): Promise<EventResponseDTO> {
-    const result = await this.endEvent(eventId, data);
-    const event = await this.repository.findById(eventId);
-    
-    if (!event) return result;
-
-    // Actions Discord
-    await DiscordPartyService.removeAllReactions(client, event);
-    await DiscordPartyService.archiveThread(client, event);
-    
-    if (data.attendedParticipants.length > 0 && (data.rewardAmount! > 0 || data.xpAmount! > 0)) {
-      console.log('[PARTY] Distribution des rewards en cours...');
-      await this.distributeRewards(client, event, data.attendedParticipants, data.rewardAmount || 0, data.xpAmount || 0);
-    } else {
-      console.log('[PARTY] Aucune distribution de rewards (conditions non remplies)');
-    }
-
-    return result;
-  }
 
   private async distributeRewards(client: BotClient, event: PartyEvent, attendedParticipants: string[], rewardAmount: number, xpAmount: number): Promise<void> {
     if (attendedParticipants.length === 0 || (rewardAmount <= 0 && xpAmount <= 0)) return;
@@ -430,115 +412,7 @@ export class PartyService {
     }
   }
 
-  // Méthodes statiques pour anciennes routes
-  static async getEventById(eventId: string): Promise<PartyEvent | null> {
-    const repository = new PartyRepository();
-    return repository.findById(eventId);
-  }
-
-  static async getEventByIdFormatted(eventId: string): Promise<EventResponseDTO | null> {
-    try {
-      const service = new PartyService();
-      return await service.getEventById(eventId);
-    } catch (error) {
-      return null;
-    }
-  }
-
-  static async getEventsByGuild(guildId: string): Promise<EventResponseDTO[]> {
-    const service = new PartyService();
-    return service.getEventsByGuild(guildId);
-  }
-
-  static async findByMessageId(messageId: string): Promise<PartyEvent | null> {
-    const repository = new PartyRepository();
-    return repository.findByMessageId(messageId);
-  }
-
-
-  static async addParticipant(eventId: string, userId: string): Promise<PartyEvent | null> {
-    try {
-      const repository = new PartyRepository();
-      return await repository.addParticipant(eventId, userId);
-    } catch (error) {
-      return null;
-    }
-  }
-
-  static async removeParticipant(eventId: string, userId: string): Promise<PartyEvent | null> {
-    try {
-      const repository = new PartyRepository();
-      return await repository.removeParticipant(eventId, userId);
-    } catch (error) {
-      return null;
-    }
-  }
-
-  static async updateEvent(eventId: string, updates: any): Promise<PartyEvent | null> {
-    try {
-      const repository = new PartyRepository();
-      return await repository.update(eventId, updates);
-    } catch (error) {
-      return null;
-    }
-  }
-
-  static async updateEventFormatted(eventId: string, updates: any): Promise<EventResponseDTO | null> {
-    try {
-      const service = new PartyService();
-      await service.updateEvent(eventId, updates);
-      return await service.getEventById(eventId);
-    } catch (error) {
-      return null;
-    }
-  }
-
-  static async deleteEvent(eventId: string): Promise<boolean> {
-    try {
-      const service = new PartyService();
-      await service.deleteEvent(eventId);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  static async createEventInDiscord(client: BotClient, eventData: any, announcementChannelId?: string): Promise<EventResponseDTO> {
-    const service = new PartyService();
-    const createData: CreateEventDTO = {
-      name: eventData.eventInfo.name,
-      game: eventData.eventInfo.game,
-      description: eventData.eventInfo.description,
-      dateTime: eventData.eventInfo.dateTime,
-      maxSlots: eventData.eventInfo.maxSlots,
-      image: eventData.eventInfo.image,
-      color: eventData.eventInfo.color,
-      guildId: eventData.discord.guildId,
-      channelId: eventData.discord.channelId,
-      createdBy: eventData.createdBy,
-      chatGamingGameId: eventData.chatGamingGameId,
-      announcementChannelId
-    };
-    
-    return service.createEvent(client, createData);
-  }
-
-  static async updateEventEmbed(client: BotClient, event: PartyEvent): Promise<void> {
-    const embed = DiscordPartyService.createEventEmbed(event, event.discord.roleId);
-    await DiscordPartyService.updateEventMessage(client, event, embed);
-  }
-
   static async removeEventReactions(client: BotClient, event: PartyEvent): Promise<void> {
     await DiscordPartyService.removeAllReactions(client, event);
   }
-
-  static async renameEventThreadAsEnded(client: BotClient, event: PartyEvent): Promise<void> {
-    await DiscordPartyService.archiveThread(client, event);
-  }
-
-  static async distributeRewards(client: BotClient, event: PartyEvent, attendedParticipants: string[], rewardAmount: number, xpAmount: number): Promise<void> {
-    const service = new PartyService();
-    await service.distributeRewards(client, event, attendedParticipants, rewardAmount, xpAmount);
-  }
-
 }
