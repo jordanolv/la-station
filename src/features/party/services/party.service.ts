@@ -321,8 +321,8 @@ export class PartyService {
   private async distributeRewards(client: BotClient, event: PartyEvent, attendedParticipants: string[], rewardAmount: number, xpAmount: number): Promise<void> {
     if (attendedParticipants.length === 0 || (rewardAmount <= 0 && xpAmount <= 0)) return;
 
-    const moneyPerParticipant = rewardAmount > 0 ? Math.floor(rewardAmount / attendedParticipants.length) : 0;
-    const xpPerParticipant = xpAmount > 0 ? Math.floor(xpAmount / attendedParticipants.length) : 0;
+    const moneyPerParticipant = rewardAmount;
+    const xpPerParticipant = xpAmount;
 
     for (const participantId of attendedParticipants) {
       try {
@@ -363,7 +363,9 @@ export class PartyService {
     }
 
     // Envoyer l'embed de rewards dans le thread
-    await this.sendRewardsEmbed(client, event, attendedParticipants, moneyPerParticipant, xpPerParticipant, rewardAmount, xpAmount);
+    const totalMoney = moneyPerParticipant * attendedParticipants.length;
+    const totalXp = xpPerParticipant * attendedParticipants.length;
+    await this.sendRewardsEmbed(client, event, attendedParticipants, moneyPerParticipant, xpPerParticipant, totalMoney, totalXp);
   }
 
   private async sendRewardsEmbed(client: BotClient, event: PartyEvent, attendedParticipants: string[], moneyPerParticipant: number, xpPerParticipant: number, totalMoney: number, totalXp: number): Promise<void> {
