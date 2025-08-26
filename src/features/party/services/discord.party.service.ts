@@ -53,8 +53,11 @@ export class DiscordPartyService {
 
   static async publishEventMessage(channel: ForumChannel, event: PartyEvent, embed: EmbedBuilder): Promise<{ messageId: string; threadId: string }> {
     try {
+      const eventDate = new Date(event.eventInfo.dateTime);
+      const formattedDate = eventDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+      
       const thread = await channel.threads.create({
-        name: `🎉 ${event.eventInfo.name} - ${new Date(event.eventInfo.dateTime).toLocaleDateString('fr-FR')}`,
+        name: `[${formattedDate}] ${event.eventInfo.name}`,
         message: { embeds: [embed] }
       });
       
