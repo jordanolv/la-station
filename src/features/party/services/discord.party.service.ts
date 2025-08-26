@@ -15,9 +15,6 @@ export class DiscordPartyService {
     }
   }
 
-
-
-
   static createEventEmbed(event: PartyEvent, roleId?: string): EmbedBuilder {
     const participantInfo = this.formatParticipants(event.participants, event.eventInfo.maxSlots);
     

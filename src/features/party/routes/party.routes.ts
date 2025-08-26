@@ -3,6 +3,8 @@ import { BotClient } from '../../../bot/client';
 import { PartyService } from '../services/party.service';
 import { ChatGamingService } from '../../chat-gaming/services/chatGaming.service';
 import { PartyError, ValidationError, NotFoundError } from '../services/party.types';
+import { DiscordPartyService } from '../services/discord.party.service';
+import { PartyRepository } from '../services/party.repository';
 
 const party = new Hono();
 
@@ -185,10 +187,11 @@ party.put('/:id', async (c) => {
     // Mettre à jour l'embed Discord
     const client = BotClient.getInstance();
     if (client) {
-      const repository = new (await import('../services/party.repository')).PartyRepository();
+      const repository = new PartyRepository();
       const fullEvent = await repository.findById(eventId);
       if (fullEvent) {
-        await PartyService.updateEventEmbed(client, fullEvent);
+        const embed = DiscordPartyService.createEventEmbed(fullEvent, fullEvent.discord.roleId);
+        await DiscordPartyService.updateEventMessage(client, fullEvent, embed);
       }
     }
 
@@ -257,7 +260,7 @@ party.post('/:id/end', async (c) => {
     }
 
     const service = new PartyService();
-    const event = await service.finishEventWithRewards(client, eventId, {
+    const event = await service.endEvent(client, eventId, {
       attendedParticipants: attendedParticipants || [],
       rewardAmount: rewardAmount || 0,
       xpAmount: xpAmount || 0
