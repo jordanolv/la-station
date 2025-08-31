@@ -37,24 +37,29 @@ export default {
 
   async autocomplete(interaction: AutocompleteInteraction) {
     try {
-      const dataDir = path.join(__dirname, '../data');
+      const srcDataDir = path.resolve(process.cwd(), 'src', 'features', 'admin', 'data');
+      const distDataDir = path.resolve(process.cwd(), 'dist', 'features', 'admin', 'data');
+      
+      let dataDir = '';
       
       try {
-        await fs.access(dataDir);
+        await fs.access(srcDataDir);
+        dataDir = srcDataDir;
       } catch {
-        await interaction.respond([
-          { name: 'Embeds Data (défaut)', value: 'embeds-data.json' }
-        ]);
-        return;
+        try {
+          await fs.access(distDataDir);
+          dataDir = distDataDir;
+        } catch {
+          await interaction.respond([{ name: 'Infos (défaut)', value: 'infos.json' }]);
+          return;
+        }
       }
 
       const files = await fs.readdir(dataDir);
       const jsonFiles = files.filter(file => file.endsWith('.json'));
       
       if (jsonFiles.length === 0) {
-        await interaction.respond([
-          { name: 'Aucun fichier JSON trouvé', value: 'embeds-data.json' }
-        ]);
+        await interaction.respond([{ name: 'Aucun fichier JSON trouvé', value: 'infos.json' }]);
         return;
       }
 
@@ -70,10 +75,7 @@ export default {
         }))
       );
     } catch (error) {
-      console.error('Erreur lors de l\'autocomplétion:', error);
-      await interaction.respond([
-        { name: 'Erreur - Utiliser par défaut', value: 'embeds-data.json' }
-      ]);
+      await interaction.respond([{ name: 'Erreur - Utiliser par défaut', value: 'infos.json' }]);
     }
   },
 
@@ -97,30 +99,21 @@ export default {
 
       // Charger les données JSON
       const selectedJson = interaction.options.getString('json') || 'infos.json';
+      const srcPath = path.resolve(process.cwd(), 'src', 'features', 'admin', 'data', selectedJson);
+      const distPath = path.resolve(process.cwd(), 'dist', 'features', 'admin', 'data', selectedJson);
       
-      // Utiliser la même approche que le système de chargement
-      const jsonPath = path.resolve(process.cwd(), 'src', 'features', 'admin', 'data', selectedJson);
-      console.log(`[SEND-EMBEDS] Tentative de chargement: ${jsonPath}`);
       let embedsData: EmbedsConfig;
 
       try {
-        const jsonContent = await fs.readFile(jsonPath, 'utf-8');
+        const jsonContent = await fs.readFile(srcPath, 'utf-8');
         embedsData = JSON.parse(jsonContent);
-        console.log(`[SEND-EMBEDS] Fichier JSON chargé avec succès`);
       } catch (error) {
-        // Essayer avec le dossier dist si en production
-        const distPath = path.resolve(process.cwd(), 'dist', 'features', 'admin', 'data', selectedJson);
-        console.log(`[SEND-EMBEDS] Tentative avec dist: ${distPath}`);
-        
         try {
           const jsonContent = await fs.readFile(distPath, 'utf-8');
           embedsData = JSON.parse(jsonContent);
-          console.log(`[SEND-EMBEDS] Fichier JSON chargé depuis dist`);
         } catch (distError) {
-          console.error('[SEND-EMBEDS] Erreur lors du chargement du JSON:', error);
-          console.error('[SEND-EMBEDS] Erreur dist:', distError);
           return interaction.reply({
-            content: `❌ Impossible de charger le fichier: ${selectedJson}\nChemins testés:\n- ${jsonPath}\n- ${distPath}`,
+            content: `❌ Impossible de charger le fichier: ${selectedJson}`,
             flags: [64] 
           });
         }
