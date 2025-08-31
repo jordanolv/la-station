@@ -13,8 +13,23 @@ export default {
         await GuildService.getOrCreateGuild(interaction.guild.id, interaction.guild.name);
       }
 
+      // Gestion de l'autocomplétion
+      if (interaction.isAutocomplete()) {
+        const command = client.slashCommands.get(interaction.commandName);
+        
+        if (!command || !command.autocomplete) {
+          return;
+        }
+        
+        try {
+          await command.autocomplete(interaction);
+        } catch (error) {
+          console.error('Erreur lors de l\'autocomplétion:', error);
+        }
+      }
+      
       // Gestion des commandes slash
-      if (interaction.isCommand && interaction.isCommand()) {
+      else if (interaction.isCommand && interaction.isCommand()) {
         const command = client.slashCommands.get(interaction.commandName);
         
         if (!command) {

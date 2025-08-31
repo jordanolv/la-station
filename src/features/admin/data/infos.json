@@ -1,0 +1,61 @@
+{
+  "embeds": [
+    {
+      "banniere": "Bienvenue sur The Ridge",
+      "titre": "🌄 The Ridge",
+      "description": "Bienvenue dans notre communauté gaming ! Ici on joue, on chill et on partage des bons moments entre potes.\n\nInstalle-toi confortablement, lis les infos ci-dessous et profite de l'aventure avec nous 🚀.",
+      "color": "#8AD3F4",
+      "image": "https://jordanolivier.dev/upload/WELCOMEBANNER.png",
+      "separateImage": true
+    },
+    {
+      "banniere": "Les règles",
+      "titre": "📜 Règlement",
+      "description": "✔️ Reste respectueux et bienveillant envers tout le monde.\n\n🚫 Pas de spam, flood ou pub sauvage.\n\n🎤 Le vocal est fait pour rigoler, mais garde une bonne ambiance.\n\n🛡️ Suis les indications des modérateurs si besoin.\n\n👉 Bref : fun + respect = tout le monde passe un bon moment ✨",
+      "color": "#8AD3F4",
+      "image": "https://jordanolivier.dev/upload/RULESBANNER.png",
+      "separateImage": true
+    },
+    {
+      "banniere": "Système de rôles",
+      "titre": "🏷️ Les rôles du serveur",
+      "description": "<@&1162292073282687037> - Nos héros ! Ils nous aident vraiment en boostant le serveur, alors on leur offre une couleur personnalisée et un icône custom.\n\n<@&1160996634528862309> - Ceux qui passent +15h en vocal dans le mois. Respect pour votre présence !\n\n<@&1161572857256615977> - La communauté active du serveur.\n\n❓ <@&1221811337735307437> - Ceux qu'on ne connaît pas encore...",
+      "color": "#8AD3F4",
+      "image": "https://jordanolivier.dev/upload/ROLESBANNER.png",
+      "separateImage": true
+    },
+    {
+      "banniere": "Choisis tes jeux",
+      "titre": "🎮 Coin Gaming",
+      "description": "Chaque jeu a son propre post dans le channel forum <#1162122644603277312>.\n\n🔔 Clique sur la cloche d'un post pour recevoir les notifs du jeu qui t'intéresse.\n\n💬 Tu veux discuter d'un autre jeu qui n'a pas encore son post ? Utilise <#1358238093424984116>.\n\n👉 Comme ça, tu suis uniquement ce qui t'intéresse sans être spammé par le reste.",
+      "color": "#8AD3F4",
+      "image": "https://jordanolivier.dev/upload/GAMINGBANNER.png",
+      "separateImage": true
+    },
+    {
+      "banniere": "Les events",
+      "titre": "🎉 Soirées & Événements",
+      "description": "On organise régulièrement (à l'avenir):\n\n🏆 Tournois fun\n\n🎲 Soirées fun & tryhard\n\n👉 Reste connecté, tout sera annoncé ici <#1178697861295251487> !",
+      "color": "#8AD3F4",
+      "image": "https://jordanolivier.dev/upload/PARTYBANNER.png",
+      "separateImage": true
+    },
+    {
+      "banniere": "Liens utiles",
+      "image": "https://jordanolivier.dev/upload/LINKBANNER.png",
+      "separateImage": false,
+      "buttons": [
+        {
+          "label": "YouTube",
+          "url": "https://www.youtube.com/@theridgee",
+          "emoji": "<:YT:1411738732649775196>"
+        },
+        {
+          "label": "Discord",
+          "url": "https://discord.gg/ypNNyxRKhR",
+          "emoji": "<:DISCORD:1411738729458040953>"
+        }
+      ]
+    }
+  ]
+}
