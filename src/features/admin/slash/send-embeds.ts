@@ -96,19 +96,34 @@ export default {
       }
 
       // Charger les données JSON
-      const selectedJson = interaction.options.getString('json') || 'embeds-data.json';
-      const jsonPath = path.join(__dirname, '../data', selectedJson);
+      const selectedJson = interaction.options.getString('json') || 'infos.json';
+      
+      // Utiliser la même approche que le système de chargement
+      const jsonPath = path.resolve(process.cwd(), 'src', 'features', 'admin', 'data', selectedJson);
+      console.log(`[SEND-EMBEDS] Tentative de chargement: ${jsonPath}`);
       let embedsData: EmbedsConfig;
 
       try {
         const jsonContent = await fs.readFile(jsonPath, 'utf-8');
         embedsData = JSON.parse(jsonContent);
+        console.log(`[SEND-EMBEDS] Fichier JSON chargé avec succès`);
       } catch (error) {
-        console.error('Erreur lors du chargement du JSON:', error);
-        return interaction.reply({
-          content: `❌ Impossible de charger le fichier de configuration des embeds: ${selectedJson}`,
-          flags: [64] 
-        });
+        // Essayer avec le dossier dist si en production
+        const distPath = path.resolve(process.cwd(), 'dist', 'features', 'admin', 'data', selectedJson);
+        console.log(`[SEND-EMBEDS] Tentative avec dist: ${distPath}`);
+        
+        try {
+          const jsonContent = await fs.readFile(distPath, 'utf-8');
+          embedsData = JSON.parse(jsonContent);
+          console.log(`[SEND-EMBEDS] Fichier JSON chargé depuis dist`);
+        } catch (distError) {
+          console.error('[SEND-EMBEDS] Erreur lors du chargement du JSON:', error);
+          console.error('[SEND-EMBEDS] Erreur dist:', distError);
+          return interaction.reply({
+            content: `❌ Impossible de charger le fichier: ${selectedJson}\nChemins testés:\n- ${jsonPath}\n- ${distPath}`,
+            flags: [64] 
+          });
+        }
       }
 
       // Validation des données
