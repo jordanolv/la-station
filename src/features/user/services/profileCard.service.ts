@@ -1,8 +1,8 @@
-import { createCanvas, loadImage, GlobalFonts } from '@napi-rs/canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 import type { SKRSContext2D } from '@napi-rs/canvas';
-import path from 'path';
 import { IGuildUser } from '../models/guild-user.model';
 import layoutConfig from './profileCard.layout.json';
+import path from 'path';
 
 type ProfileCardView = 'info' | 'stats';
 
@@ -111,14 +111,7 @@ function resolveBackgroundPath(custom?: string): string | undefined {
 }
 
 function registerFontOnce() {
-  if (GlobalFonts.has('Montserrat')) return;
-
-  try {
-    const fontPath = path.resolve(process.cwd(), 'src/assets/fonts/Montserrat-SemiBold.ttf');
-    GlobalFonts.registerFromPath(fontPath, 'Montserrat');
-  } catch {
-    // Font optional; canvas will fallback to system fonts.
-  }
+  // Utilisation de polices système uniquement pour la stabilité
 }
 
 function getContext(guildUser: IGuildUser | (IGuildUser & { toObject?: () => IGuildUser })): IGuildUser {
@@ -154,7 +147,7 @@ function drawText(
   y: number,
   options: { size?: number; color?: string; align?: CanvasAlign; fontWeight?: string; fontFamily?: string } = {}
 ): void {
-  const { size = 32, color = '#FFFFFF', align = 'left', fontWeight = '600', fontFamily = 'Montserrat, "Segoe UI", sans-serif' } = options;
+  const { size = 32, color = '#FFFFFF', align = 'left', fontWeight = '600', fontFamily = 'system-ui, -apple-system, "Segoe UI", Arial, sans-serif' } = options;
   ctx.save();
   ctx.fillStyle = color;
   ctx.textBaseline = 'middle';
