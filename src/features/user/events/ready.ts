@@ -7,6 +7,6 @@ export default {
 
   execute(client: BotClient) {
     console.log(`✅ Feature User chargée avec succès!`);
-    console.log(`🔍 La feature User contient les commandes slash "/me", "/bio" et "/birthday"`);
+    console.log(`🔍 La feature User contient les commandes slash "/me" et "/profil"`);
   }
 }; 

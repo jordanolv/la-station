@@ -2,6 +2,9 @@ import { Events, Interaction } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { GuildService } from '../services/guild.service';
 import { SuggestionsService } from '../../suggestions/services/suggestions.service';
+import meCommand from '../../user/slash/me';
+
+const PROFILE_MODAL_ID = 'profile-config-modal';
 
 export default {
   name: Events.InteractionCreate,
@@ -70,6 +73,11 @@ export default {
       else if (interaction.isModalSubmit && interaction.isModalSubmit()) {
         if (interaction.customId.startsWith('suggestion_modal_')) {
           await SuggestionsService.handleModalSubmit(interaction);
+        } else if (interaction.customId === PROFILE_MODAL_ID) {
+          const profileCommand = client.slashCommands.get('profil');
+          if (profileCommand && typeof profileCommand.handleModal === 'function') {
+            await profileCommand.handleModal(interaction);
+          }
         } else {
         }
       }

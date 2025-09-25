@@ -1,5 +1,6 @@
 import { Events, ActivityType } from 'discord.js';
 import { BotClient } from '../../../bot/client';
+import { StatsService } from '../../stats/services/stats.service';
 
 export default {
   name: Events.ClientReady,
@@ -23,5 +24,8 @@ export default {
     setStatus();
 
     setInterval(setStatus, 8000);
+
+    // Réhydrate les sessions vocales actives au démarrage
+    StatsService.rehydrateActiveSessions(client);
   }
-}; 
+};

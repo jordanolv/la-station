@@ -1,0 +1,18 @@
+{
+  "avatar": { "x": 1033, "y": 157, "radius": 77 },
+  "voiceChart": { "x": 140, "y": 400, "width": 640, "height": 260 },
+  "xpBar": { "x": 200, "y": 215, "width": 520, "height": 42, "radius": 24, "backgroundColor": "rgba(20, 28, 45, 0.6)", "fillColor": "#4C5FD7" },
+  "info": [
+    { "key": "xpPercent", "x": 140, "y": 175, "fontSize": 24, "fontWeight": "500", "color": "#FFFFFF", "align": "left" },
+    { "key": "xpValue", "x": 330, "y": 235, "fontSize": 48, "fontWeight": "700", "color": "#FFFFFF", "align": "left" },
+    { "key": "username", "x": 1033, "y": 65, "fontSize": 26, "fontWeight": "600", "color": "#FFFFFF", "align": "center" },
+    { "key": "bio", "x": 1033, "y": 260, "fontSize": 22, "fontWeight": "400", "color": "#FFFFFF", "align": "center" },
+    { "key": "voiceChartLegend", "x": 140, "y": 680, "fontSize": 22, "fontWeight": "500", "color": "#C8D6FF", "align": "left" },
+    { "key": "ridgecoinValue", "x": 895, "y": 365, "fontSize": 30, "fontWeight": "700", "color": "#FFFFFF", "align": "left" },
+    { "key": "levelValue", "x": 1125, "y": 365, "fontSize": 30, "fontWeight": "700", "color": "#FFFFFF", "align": "left" },
+    { "key": "birthdayValue", "x": 895, "y": 455, "fontSize": 24, "fontWeight": "600", "color": "#FFFFFF", "align": "left" },
+    { "key": "joinedValue", "x": 1125, "y": 455, "fontSize": 24, "fontWeight": "600", "color": "#FFFFFF", "align": "left" },
+    { "key": "messagesValue", "x": 895, "y": 548, "fontSize": 26, "fontWeight": "600", "color": "#FFFFFF", "align": "left" },
+    { "key": "voiceValue", "x": 895, "y": 648, "fontSize": 26, "fontWeight": "600", "color": "#FFFFFF", "align": "left" }
+  ]
+}
