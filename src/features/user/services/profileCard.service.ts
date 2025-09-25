@@ -20,6 +20,7 @@ type ProfileCardOptions = {
 const CARD_WIDTH = 1280;
 const CARD_HEIGHT = 720;
 const DEFAULT_BACKGROUND_PATH = path.resolve(process.cwd(), 'canva/template.png');
+const DEFAULT_FONT_PATH = path.resolve(process.cwd(), 'src/assets/fonts/HelveticaNeueLTStd-Bd.otf');
 
 type CanvasAlign = 'left' | 'right' | 'center' | 'start' | 'end';
 
@@ -113,6 +114,14 @@ function resolveBackgroundPath(custom?: string): string | undefined {
 function registerFontOnce() {
   if (GlobalFonts.has('Inter')) return;
 
+  // 0) Project default font path (user-defined)
+  try {
+    GlobalFonts.registerFromPath(DEFAULT_FONT_PATH, 'Inter');
+    return;
+  } catch {
+    // ignore and try next sources
+  }
+
   // 1) Environment override (supports multiple fonts per env without code changes)
   const envPath = process.env.PROFILE_CARD_FONT_PATH && process.env.PROFILE_CARD_FONT_PATH.trim().length > 0
     ? process.env.PROFILE_CARD_FONT_PATH.trim()
@@ -139,6 +148,31 @@ function registerFontOnce() {
   try {
     const distFontPath = path.resolve(process.cwd(), 'dist/assets/Inter-SemiBold.ttf');
     GlobalFonts.registerFromPath(distFontPath, 'Inter');
+    return;
+  } catch {
+    // ignore
+  }
+
+  try {
+    const distFontsDirPath = path.resolve(process.cwd(), 'dist/assets/fonts/Inter-SemiBold.ttf');
+    GlobalFonts.registerFromPath(distFontsDirPath, 'Inter');
+    return;
+  } catch {
+    // ignore
+  }
+
+  // 3b) Dist fallbacks for Helvetica default
+  try {
+    const distHelv = path.resolve(process.cwd(), 'dist/assets/HelveticaNeueLTStd-Bd.otf');
+    GlobalFonts.registerFromPath(distHelv, 'Inter');
+    return;
+  } catch {
+    // ignore
+  }
+
+  try {
+    const distHelvDir = path.resolve(process.cwd(), 'dist/assets/fonts/HelveticaNeueLTStd-Bd.otf');
+    GlobalFonts.registerFromPath(distHelvDir, 'Inter');
     return;
   } catch {
     // ignore
