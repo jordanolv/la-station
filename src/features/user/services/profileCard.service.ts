@@ -1,4 +1,4 @@
-import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { createCanvas, loadImage, GlobalFonts } from '@napi-rs/canvas';
 import type { SKRSContext2D } from '@napi-rs/canvas';
 import { IGuildUser } from '../models/guild-user.model';
 import layoutConfig from './profileCard.layout.json';
@@ -111,7 +111,14 @@ function resolveBackgroundPath(custom?: string): string | undefined {
 }
 
 function registerFontOnce() {
-  // Utilisation de polices système uniquement pour la stabilité
+  if (GlobalFonts.has('Inter')) return;
+
+  try {
+    const fontPath = path.resolve(process.cwd(), 'src/assets/fonts/Inter-SemiBold.ttf');
+    GlobalFonts.registerFromPath(fontPath, 'Inter');
+  } catch {
+    // Fallback to system fonts if Inter not found
+  }
 }
 
 function getContext(guildUser: IGuildUser | (IGuildUser & { toObject?: () => IGuildUser })): IGuildUser {
