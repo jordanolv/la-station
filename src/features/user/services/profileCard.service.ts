@@ -391,11 +391,19 @@ async function drawAvatarCircle(ctx: SKRSContext2D, url: string, centerX: number
 }
 
 function calculateXpProgress(level: number, experience: number): { current: number; required: number; percent: number } {
-  const xpForCurrentLevel = 5 * (level ** 2) + 110 * level + 100;
-  const xpForPreviousLevel = level > 1 ? 5 * ((level - 1) ** 2) + 110 * (level - 1) + 100 : 0;
-  const current = Math.max(0, experience - xpForPreviousLevel);
-  const required = Math.max(1, xpForCurrentLevel - xpForPreviousLevel);
-  const percent = Math.min(1, current / required);
+  // XP needed to go from the given level to the next one
+  const xpToLevelUp = (lvl: number): number => 5 * (lvl ** 2) + 110 * lvl + 100;
+
+  // Total cumulative XP required to reach the start of the given level (sum of previous steps)
+  let cumulativeBeforeLevel = 0;
+  for (let i = 1; i < level; i += 1) {
+    cumulativeBeforeLevel += xpToLevelUp(i);
+  }
+
+  const required = Math.max(1, xpToLevelUp(level));
+  const rawCurrent = experience - cumulativeBeforeLevel;
+  const current = Math.max(0, Math.min(required, rawCurrent));
+  const percent = Math.max(0, Math.min(1, current / required));
   return { current, required, percent };
 }
 
