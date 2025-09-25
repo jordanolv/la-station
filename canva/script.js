@@ -424,7 +424,7 @@ function setupPlayground(layoutData) {
       const text = item.customText ?? item.getText(stateNow);
       ctx.save();
       ctx.fillStyle = item.color;
-      ctx.font = `${item.fontWeight} ${item.fontSize}px system-ui, -apple-system, "Segoe UI", Arial, sans-serif`;
+      ctx.font = `${item.fontWeight} ${item.fontSize}px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif`;
       ctx.textAlign = item.align;
       ctx.textBaseline = 'middle';
       ctx.fillText(text, item.x, item.y);

@@ -154,7 +154,7 @@ function drawText(
   y: number,
   options: { size?: number; color?: string; align?: CanvasAlign; fontWeight?: string; fontFamily?: string } = {}
 ): void {
-  const { size = 32, color = '#FFFFFF', align = 'left', fontWeight = '600', fontFamily = 'system-ui, -apple-system, "Segoe UI", Arial, sans-serif' } = options;
+  const { size = 32, color = '#FFFFFF', align = 'left', fontWeight = '600', fontFamily = 'Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif' } = options;
   ctx.save();
   ctx.fillStyle = color;
   ctx.textBaseline = 'middle';
