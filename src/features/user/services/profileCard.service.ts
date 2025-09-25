@@ -113,6 +113,38 @@ function resolveBackgroundPath(custom?: string): string | undefined {
 function registerFontOnce() {
   if (GlobalFonts.has('Inter')) return;
 
+  // 1) Environment override (supports multiple fonts per env without code changes)
+  const envPath = process.env.PROFILE_CARD_FONT_PATH && process.env.PROFILE_CARD_FONT_PATH.trim().length > 0
+    ? process.env.PROFILE_CARD_FONT_PATH.trim()
+    : undefined;
+  if (envPath) {
+    try {
+      GlobalFonts.registerFromPath(envPath, 'Inter');
+      return;
+    } catch {
+      // ignore and try next sources
+    }
+  }
+
+  // 2) Packaged font via @fontsource (no manual copy needed)
+  try {
+    const ttfPath = require.resolve('@fontsource/inter/files/inter-latin-600-normal.ttf');
+    GlobalFonts.registerFromPath(ttfPath, 'Inter');
+    return;
+  } catch {
+    // ignore and try fallbacks
+  }
+
+  // 3) Common deployment targets
+  try {
+    const distFontPath = path.resolve(process.cwd(), 'dist/assets/Inter-SemiBold.ttf');
+    GlobalFonts.registerFromPath(distFontPath, 'Inter');
+    return;
+  } catch {
+    // ignore
+  }
+
+  // 4) Local dev source
   try {
     const fontPath = path.resolve(process.cwd(), 'src/assets/fonts/Inter-SemiBold.ttf');
     GlobalFonts.registerFromPath(fontPath, 'Inter');
