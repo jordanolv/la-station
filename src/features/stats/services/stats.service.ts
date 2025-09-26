@@ -435,9 +435,9 @@ export class StatsService {
   private static normalizeDate(date: Date): Date {
     const local = new Date(date);
     return new Date(Date.UTC(
-      local.getFullYear(),
-      local.getMonth(),
-      local.getDate()
+      local.getUTCFullYear(),
+      local.getUTCMonth(),
+      local.getUTCDate()
     ));
   }
 
