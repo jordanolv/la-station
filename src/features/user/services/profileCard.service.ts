@@ -404,8 +404,7 @@ function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   if (hours >= 1) {
-    const rest = minutes % 60;
-    return rest > 0 ? `${hours}h ${rest}m` : `${hours}h`;
+    return `${hours}h`;
   }
   if (minutes >= 1) {
     const restSec = Math.floor(seconds % 60);
