@@ -404,6 +404,21 @@ function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   if (hours >= 1) {
+    const rest = minutes % 60;
+    return rest > 0 ? `${hours}h ${rest}m` : `${hours}h`;
+  }
+  if (minutes >= 1) {
+    const restSec = Math.floor(seconds % 60);
+    return restSec > 0 ? `${minutes}m ${restSec}s` : `${minutes}m`;
+  }
+  return `${Math.floor(seconds)}s`;
+}
+
+function formatDurationHoursOnly(seconds: number): string {
+  if (!seconds || seconds <= 0) return '0s';
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (hours >= 1) {
     return `${hours}h`;
   }
   if (minutes >= 1) {
@@ -448,7 +463,7 @@ function buildRenderData(
     level: String(level),
     joined: guildUser?.infos?.registeredAt ? formatDateFR(guildUser.infos.registeredAt) : '-',
     lastActive: guildUser?.infos?.updatedAt ? formatDateFR(guildUser.infos.updatedAt) : '-',
-    voiceTotal: formatDuration(voiceTime),
+    voiceTotal: formatDurationHoursOnly(voiceTime),
     voiceDailyTotals: computeVoiceDailyTotals(guildUser?.stats?.voiceHistory ?? []),
   };
 }
