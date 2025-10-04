@@ -5,6 +5,7 @@ import { VocManagerConfig, IVocManager } from '../../voc-manager/models/vocManag
 import { PartyConfig } from '../../party/models/partyConfig.model';
 import { SuggestionsConfig } from '../../suggestions/models/suggestionConfig.model';
 import { BirthdayConfig } from '../../user/models/birthdayConfig.model';
+import { ArcadeConfig } from '../../arcade/models/arcadeConfig.model';
 
 class GuildConfig {
   @prop({ default: '!' })
@@ -39,6 +40,9 @@ class GuildFeatures {
 
   @prop({ type: () => BirthdayConfig })
   birthday?: BirthdayConfig;
+
+  @prop({ type: () => ArcadeConfig })
+  arcade?: ArcadeConfig;
 }
 
 export class Guild {
