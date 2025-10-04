@@ -5,6 +5,7 @@ import { GuildService } from '../services/guild.service';
 import { SuggestionsService } from '../../suggestions/services/suggestions.service';
 import { LevelingService } from '@/features/leveling/services/leveling.service';
 import { ChatGamingService } from '../../chat-gaming/services/chatGaming.service';
+import { UserService } from '../../user/services/guildUser.service';
 
 export default {
   name: Events.MessageCreate,
@@ -53,10 +54,13 @@ export default {
         message.guild.id,
         message.author.username
       );
-      
+
+      // Mettre à jour la daily streak
+      await UserService.updateDailyStreak(message.author.id, message.guild.id);
+
       // Gérer le système de leveling
       await LevelingService.giveXpToUser(client, message);
-      
+
       // Vérifier et rappeler le rôle gaming si nécessaire
       await ChatGamingService.checkAndRemindGamingRole(message);
 

@@ -152,4 +152,65 @@ export class UserService {
     return user.stats.arcade;
   }
 
+  /**
+   * Met à jour la daily streak d'un utilisateur
+   * La streak s'incrémente si l'activité est le jour suivant
+   * La streak se reset si plus d'un jour d'inactivité
+   */
+  static async updateDailyStreak(discordId: string, guildId: string): Promise<IGuildUser | null> {
+    const user = await GuildUserModel.findOne({ discordId, guildId });
+    if (!user) return null;
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // Si lastActivityDate n'existe pas, c'est la première activité
+    if (!user.stats.lastActivityDate) {
+      return GuildUserModel.findOneAndUpdate(
+        { discordId, guildId },
+        {
+          $set: {
+            'stats.lastActivityDate': today,
+            'stats.dailyStreak': 1
+          }
+        },
+        { new: true }
+      );
+    }
+
+    const lastActivity = new Date(user.stats.lastActivityDate);
+    const lastActivityDay = new Date(lastActivity.getFullYear(), lastActivity.getMonth(), lastActivity.getDate());
+
+    // Calculer la différence en jours
+    const diffTime = today.getTime() - lastActivityDay.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      // Même jour, pas de changement
+      return user;
+    } else if (diffDays === 1) {
+      // Jour suivant, incrémenter la streak
+      return GuildUserModel.findOneAndUpdate(
+        { discordId, guildId },
+        {
+          $set: { 'stats.lastActivityDate': today },
+          $inc: { 'stats.dailyStreak': 1 }
+        },
+        { new: true }
+      );
+    } else {
+      // Plus d'un jour d'écart, reset la streak
+      return GuildUserModel.findOneAndUpdate(
+        { discordId, guildId },
+        {
+          $set: {
+            'stats.lastActivityDate': today,
+            'stats.dailyStreak': 1
+          }
+        },
+        { new: true }
+      );
+    }
+  }
+
 } 

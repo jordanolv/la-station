@@ -53,6 +53,12 @@ class GuildUserStats {
 
   @prop({ type: () => ArcadeStats, default: () => ({}) })
   arcade!: ArcadeStats;
+
+  @prop({ default: 0 })
+  dailyStreak!: number;
+
+  @prop()
+  lastActivityDate?: Date;
 }
 
 class GuildUserInfos {
