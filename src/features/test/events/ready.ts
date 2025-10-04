@@ -6,7 +6,6 @@ export default {
   once: true,
 
   execute(client: BotClient) {
-    console.log(`✅ Feature de test chargée avec succès!`);
-    console.log(`🔍 La feature test contient une commande "ping" et une slash command "/hello"`);
+    // Feature ready - logs supprimés pour éviter le spam
   }
 }; 

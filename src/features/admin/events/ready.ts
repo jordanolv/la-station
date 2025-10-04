@@ -6,7 +6,6 @@ export default {
   once: true,
 
   execute(client: BotClient) {
-    console.log(`✅ Feature Admin chargée avec succès!`);
-    console.log(`🔍 La feature Admin contient les commandes set-channel-logs, set-channel-birthday, etc.`);
+    // Feature ready - logs supprimés pour éviter le spam
   }
 }; 

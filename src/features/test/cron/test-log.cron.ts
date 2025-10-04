@@ -22,12 +22,11 @@ export class TestLogCron {
 
   public start(): void {
     this.job.start();
-    console.log(chalk.cyan('🧪 Test log cron started (runs every 5 seconds)'));
+    console.log(chalk.yellow('   ├─ 🧪 Test') + chalk.gray(` • toutes les 5 secondes`));
   }
 
   public stop(): void {
     this.job.stop();
-    console.log(chalk.cyan('🧪 Test log cron stopped'));
   }
 
   private async logMessage(): Promise<void> {

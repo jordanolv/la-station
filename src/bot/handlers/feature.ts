@@ -8,115 +8,136 @@ import { BotClient } from '../client';
  * @param featuresPath Le chemin vers le dossier des fonctionnalités
  */
 export async function loadFeatures(botClient: BotClient, featuresPath: string): Promise<void> {
-  try {    
-    // Lecture du dossier des fonctionnalités
+  try {
+    const chalk = require('chalk');
     const features = fs.readdirSync(featuresPath, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory())
       .map(dirent => dirent.name);
-    
-    console.log(`Chargement de ${features.length} fonctionnalités...`);
-    
+
+    console.log(chalk.cyan('📦 [FEATURES]') + chalk.gray(` Chargement de ${features.length} modules...`));
+
+    let totalCommands = 0;
+    let totalSlash = 0;
+    let totalEvents = 0;
+
     for (const feature of features) {
-      console.log(`Chargement de la fonctionnalité ${feature}...`);
       const featurePath = path.join(featuresPath, feature);
-      
-      // Chargement des commandes
-      await loadCommands(botClient, featurePath, feature);
-      
-      // Chargement des slash commands
-      await loadSlashCommands(botClient, featurePath, feature);
-      
-      // Chargement des événements
-      await loadEvents(botClient, featurePath, feature);
+      const counts = {
+        commands: await loadCommands(botClient, featurePath, feature),
+        slash: await loadSlashCommands(botClient, featurePath, feature),
+        events: await loadEvents(botClient, featurePath, feature)
+      };
+
+      totalCommands += counts.commands;
+      totalSlash += counts.slash;
+      totalEvents += counts.events;
+
+      // Afficher une ligne par feature si elle a du contenu
+      if (counts.slash > 0 || counts.events > 0 || counts.commands > 0) {
+        const parts = [];
+        if (counts.slash > 0) parts.push(`${counts.slash} slash`);
+        if (counts.events > 0) parts.push(`${counts.events} events`);
+        if (counts.commands > 0) parts.push(`${counts.commands} cmds`);
+        console.log(chalk.cyan('   ├─') + chalk.gray(` ${feature}: ${parts.join(', ')}`));
+      }
     }
-    
-    console.log('Toutes les fonctionnalités ont été chargées!');
+
+    console.log(chalk.cyan('   └─') + chalk.green(` Total: ${totalSlash} slash • ${totalEvents} events • ${totalCommands} cmds`));
   } catch (error) {
-    console.error('Erreur lors du chargement des fonctionnalités:', error);
+    const chalk = require('chalk');
+    console.error(chalk.red('❌ [FEATURES]'), error);
   }
 }
 
 /**
  * Charge les commandes d'une fonctionnalité
  */
-async function loadCommands(botClient: BotClient, featurePath: string, featureName: string): Promise<void> {
+async function loadCommands(botClient: BotClient, featurePath: string, featureName: string): Promise<number> {
   const commandsPath = path.join(featurePath, 'commands');
-  
+
   if (!fs.existsSync(commandsPath)) {
-    return; // Pas de dossier "commands", on passe
+    return 0;
   }
-  
-  // Lecture récursive des commandes dans les sous-dossiers
+
   const commandFiles = getFilesRecursively(commandsPath, ['.ts', '.js']);
-  
+  let count = 0;
+
   for (const filePath of commandFiles) {
     try {
       const command = require(filePath).default;
-      
       if (command && command.name) {
         botClient.commands.set(command.name.toLowerCase(), command);
-        // console.log(`Commande chargée: ${command.name} (${featureName})`);
+        count++;
       }
     } catch (error) {
-      console.error(`Erreur lors du chargement de la commande ${filePath}:`, error);
+      const chalk = require('chalk');
+      console.error(chalk.red(`❌ [${featureName}]`), path.basename(filePath), error);
     }
   }
+
+  return count;
 }
 
 /**
  * Charge les slash commands d'une fonctionnalité
  */
-async function loadSlashCommands(botClient: BotClient, featurePath: string, featureName: string): Promise<void> {
+async function loadSlashCommands(botClient: BotClient, featurePath: string, featureName: string): Promise<number> {
   const slashPath = path.join(featurePath, 'slash');
-  
+
   if (!fs.existsSync(slashPath)) {
-    return; // Pas de dossier "slash", on passe
+    return 0;
   }
-  
+
   const slashFiles = getFilesRecursively(slashPath, ['.ts', '.js']);
-  
+  let count = 0;
+
   for (const filePath of slashFiles) {
     try {
       const slashCommand = require(filePath).default;
-      
       if (slashCommand && slashCommand.data) {
         botClient.slashCommands.set(slashCommand.data.name.toLowerCase(), slashCommand);
-        //console.log(`Slash command chargée: ${slashCommand.data.name} (${featureName})`);
+        count++;
       }
     } catch (error) {
-      console.error(`Erreur lors du chargement de la slash command ${filePath}:`, error);
+      const chalk = require('chalk');
+      console.error(chalk.red(`❌ [${featureName}]`), path.basename(filePath), error);
     }
   }
+
+  return count;
 }
 
 /**
  * Charge les événements d'une fonctionnalité
  */
-async function loadEvents(botClient: BotClient, featurePath: string, featureName: string): Promise<void> {
+async function loadEvents(botClient: BotClient, featurePath: string, featureName: string): Promise<number> {
   const eventsPath = path.join(featurePath, 'events');
-  
+
   if (!fs.existsSync(eventsPath)) {
-    return; // Pas de dossier "events", on passe
+    return 0;
   }
-  
+
   const eventFiles = getFilesRecursively(eventsPath, ['.ts', '.js']);
-  
+  let count = 0;
+
   for (const filePath of eventFiles) {
     try {
       const event = require(filePath).default;
-      
       if (event && event.name && event.execute) {
         if (event.once) {
           botClient.once(event.name, (...args) => event.execute(botClient, ...args));
         } else {
           botClient.on(event.name, (...args) => event.execute(botClient, ...args));
         }
-        console.log(`✅ Événement chargé: ${event.name} (${featureName})`);
+        count++;
       }
     } catch (error) {
-      console.error(`Erreur lors du chargement de l'événement ${filePath}:`, error);
+      const chalk = require('chalk');
+      console.error(chalk.red(`❌ [${featureName}]`), path.basename(filePath), error);
     }
   }
+
+  return count;
 }
 
 /**

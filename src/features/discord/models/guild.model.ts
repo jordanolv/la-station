@@ -63,7 +63,8 @@ export type IGuild = DocumentType<Guild>;
 
 // Créer le modèle avec Typegoose
 const GuildModel = getModelForClass(Guild, {
-  schemaOptions: { collection: 'guilds' }
+  schemaOptions: { collection: 'guilds' },
+  options: { allowMixed: 0 } // Supprime les warnings "Setting Mixed for property"
 });
 
 export default GuildModel; 

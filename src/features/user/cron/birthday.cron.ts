@@ -26,12 +26,12 @@ export class BirthdayCron {
 
   public start(): void {
     this.job.start();
-    console.log(`🎂 Birthday cron started (runs daily at 00:00 ${this.TZ})`);
+    const chalk = require('chalk');
+    console.log(chalk.yellow('   ├─ 🎂 Birthday') + chalk.gray(` • tous les jours à 00:00 ${this.TZ}`));
   }
 
   public stop(): void {
     this.job.stop();
-    console.log('🎂 Birthday cron stopped');
   }
 
   public async checkBirthdays(): Promise<void> {

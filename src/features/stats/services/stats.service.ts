@@ -140,7 +140,6 @@ export class StatsService {
     const userState = voiceStates.get(userKey);
 
     if (!userState) {
-      console.warn(`[STATS][VOICE] Impossible de terminer la session vocale pour ${username} (${userId}) dans ${guildId}: état introuvable.`);
       return;
     }
 
@@ -182,14 +181,7 @@ export class StatsService {
         { feature: 'stats', title: 'Session vocale terminée' }
       );
 
-      const segmentDetails = segments
-        .map(segment => `${segment.date.toLocaleDateString('fr-FR')} (${this.formatVoiceTime(segment.seconds)})`)
-        .join(', ');
-      console.log(
-        `[STATS][VOICE] Session terminée pour ${username} (${userId}) dans ${guildId} - ${channelInfo}. ` +
-        `Début: ${sessionStartText} / Fin: ${sessionEndText}. ` +
-        `Durée totale: ${this.formatVoiceTime(totalSeconds)}. Segments: ${segmentDetails}`
-      );
+      // Session terminée - log supprimé pour éviter le spam
     } catch (error) {
       console.error('Erreur lors de la mise à jour des statistiques vocales:', error);
       await LogService.error(
@@ -344,16 +336,8 @@ export class StatsService {
 
     if (newEligible) {
       this.resumeVoiceSession(session, now);
-      console.log(
-        `[STATS][VOICE] Session reprise pour ${username} (${userId}) dans ${guildId} - salon ${channelName}. ` +
-        `Reprise: ${new Date(now).toLocaleString('fr-FR')}`
-      );
     } else {
       this.pauseVoiceSession(session, now);
-      console.log(
-        `[STATS][VOICE] Session mise en pause pour ${username} (${userId}) dans ${guildId} - salon ${channelName}. ` +
-        `Pause: ${new Date(now).toLocaleString('fr-FR')}`
-      );
     }
   }
 
@@ -368,12 +352,6 @@ export class StatsService {
     if (!oldState.channelId) return;
     const channelType = oldState.channel?.type;
     if (channelType && !this.isTrackableVoiceChannel(channelType)) return;
-
-    const channelName = oldState.channel?.name || oldState.channelId;
-    console.log(
-      `[STATS][VOICE] Fin de session détectée pour ${oldState.member?.user.tag || username} (${userId}) ` +
-      `dans ${guildId} - salon ${channelName}.`
-    );
 
     await this.endVoiceSession(client, userId, guildId, username);
   }
@@ -423,9 +401,8 @@ export class StatsService {
     });
 
     if (restoredCount > 0) {
-      console.log(`[STATS][VOICE] ${restoredCount} session(s) vocale(s) réhydratée(s) au démarrage.`);
-    } else {
-      console.log('[STATS][VOICE] Aucune session vocale à réhydrater au démarrage.');
+      const chalk = require('chalk');
+      console.log(chalk.cyan('🎙️  [VOICE]') + chalk.gray(` ${restoredCount} session(s) réhydratée(s)`));
     }
   }
 

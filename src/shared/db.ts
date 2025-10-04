@@ -9,22 +9,20 @@ class Database {
     // Gestion des événements de connexion
     mongoose.connection.on('connected', () => {
       this._isConnected = true;
-      console.log('MongoDB connecté avec succès');
     });
 
     mongoose.connection.on('disconnected', () => {
       this._isConnected = false;
-      console.log('MongoDB déconnecté');
     });
 
     mongoose.connection.on('error', (err) => {
-      console.error('Erreur MongoDB:', err);
+      const chalk = require('chalk');
+      console.error(chalk.red('❌ [DB]'), err);
     });
 
     // Gestion propre de la déconnexion
     process.on('SIGINT', async () => {
       await mongoose.connection.close();
-      console.log('Connexion MongoDB fermée suite à l\'arrêt de l\'application');
       process.exit(0);
     });
   }
@@ -49,10 +47,10 @@ class Database {
     }
 
     try {
-      console.log('Connexion à MongoDB...');
       await mongoose.connect(uri, {});
     } catch (error) {
-      console.error('Erreur lors de la connexion à MongoDB:', error);
+      const chalk = require('chalk');
+      console.error(chalk.red('❌ [DB] Erreur de connexion:'), error);
       throw error;
     }
   }

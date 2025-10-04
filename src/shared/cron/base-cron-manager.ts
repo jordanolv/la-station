@@ -25,16 +25,42 @@ export abstract class BaseCronManager implements IStartStoppable {
    * Démarre tous les crons gérés par ce gestionnaire
    */
   public startAll(): void {
-    console.log(`Starting all ${this.featureName} cron jobs...`);
     this.crons.forEach(cron => cron.start());
+
+    // Log de fin uniquement pour le global manager
+    if (this.featureName === 'global' && this.crons.length > 0) {
+      const chalk = require('chalk');
+      console.log(chalk.yellow('   └─') + chalk.green(` ${this.getActiveJobsCount()} job(s) actif(s)`));
+    }
+  }
+
+  /**
+   * Compte le nombre total de jobs actifs
+   */
+  private getActiveJobsCount(): number {
+    let count = 0;
+    this.crons.forEach(cron => {
+      if ((cron as any).getCrons) {
+        count += (cron as any).getCrons().length;
+      } else {
+        count += 1;
+      }
+    });
+    return count;
   }
 
   /**
    * Arrête tous les crons gérés par ce gestionnaire
    */
   public stopAll(): void {
-    console.log(`Stopping all ${this.featureName} cron jobs...`);
     this.crons.forEach(cron => cron.stop());
+  }
+
+  /**
+   * Récupère la liste des crons
+   */
+  public getCrons(): IStartStoppable[] {
+    return this.crons;
   }
 
   /**

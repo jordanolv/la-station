@@ -6,7 +6,6 @@ export default {
   once: true,
 
   execute(client: BotClient) {
-    console.log(`✅ Feature User chargée avec succès!`);
-    console.log(`🔍 La feature User contient les commandes slash "/me" et "/profil"`);
+    // Feature ready - logs supprimés pour éviter le spam
   }
 }; 
