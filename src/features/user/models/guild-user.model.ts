@@ -19,6 +19,28 @@ class GuildUserProfil {
   lvl!: number;
 }
 
+class GameStats {
+  @prop({ default: 0 })
+  wins!: number;
+
+  @prop({ default: 0 })
+  losses!: number;
+}
+
+class ArcadeStats {
+  @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
+  shifumi!: GameStats;
+
+  @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
+  puissance4!: GameStats;
+
+  @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
+  morpion!: GameStats;
+
+  @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
+  battle!: GameStats;
+}
+
 class GuildUserStats {
   @prop({ default: 0 })
   totalMsg!: number;
@@ -28,6 +50,9 @@ class GuildUserStats {
 
   @prop({ type: () => [VoiceHistoryEntry], default: [] })
   voiceHistory!: VoiceHistoryEntry[];
+
+  @prop({ type: () => ArcadeStats, default: () => ({}) })
+  arcade!: ArcadeStats;
 }
 
 class GuildUserInfos {

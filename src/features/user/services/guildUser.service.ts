@@ -1,6 +1,7 @@
 import { User, Guild } from 'discord.js';
 import GlobalUserModel from '../models/global-user.model';
 import GuildUserModel, { IGuildUser } from '../models/guild-user.model';
+import { ArcadeGameName } from '../../arcade/types/arcade.types';
 
 export class UserService {
 
@@ -91,11 +92,11 @@ export class UserService {
 
     // Regrouper les entrées par jour
     const dailyStats = new Map<string, number>();
-    
+
     user.stats.voiceHistory.forEach(entry => {
       const entryDate = new Date(entry.date);
       entryDate.setHours(0, 0, 0, 0);
-      
+
       if (entryDate >= sevenDaysAgo) {
         const dateKey = entryDate.toISOString().split('T')[0];
         dailyStats.set(dateKey, (dailyStats.get(dateKey) || 0) + entry.time);
@@ -109,6 +110,46 @@ export class UserService {
         time
       }))
       .sort((a, b) => a.date.getTime() - b.date.getTime());
+  }
+
+  static async updateGuildUserMoney(discordId: string, guildId: string, amount: number) {
+    return GuildUserModel.findOneAndUpdate(
+      { discordId, guildId },
+      { $inc: { 'profil.money': amount } },
+      { new: true }
+    );
+  }
+
+  static async getGuildUserMoney(discordId: string, guildId: string): Promise<number> {
+    const user = await GuildUserModel.findOne({ discordId, guildId });
+    return user?.profil?.money || 0;
+  }
+
+  static async recordArcadeWin(discordId: string, guildId: string, gameName: ArcadeGameName) {
+    return GuildUserModel.findOneAndUpdate(
+      { discordId, guildId },
+      { $inc: { [`stats.arcade.${gameName}.wins`]: 1 } },
+      { new: true, upsert: true }
+    );
+  }
+
+  static async recordArcadeLoss(discordId: string, guildId: string, gameName: ArcadeGameName) {
+    return GuildUserModel.findOneAndUpdate(
+      { discordId, guildId },
+      { $inc: { [`stats.arcade.${gameName}.losses`]: 1 } },
+      { new: true, upsert: true }
+    );
+  }
+
+  static async getArcadeStats(discordId: string, guildId: string, gameName?: ArcadeGameName) {
+    const user = await GuildUserModel.findOne({ discordId, guildId });
+    if (!user?.stats?.arcade) return gameName ? { wins: 0, losses: 0 } : { shifumi: { wins: 0, losses: 0 }, puissance4: { wins: 0, losses: 0 }, morpion: { wins: 0, losses: 0 }, battle: { wins: 0, losses: 0 } };
+
+    if (gameName) {
+      return user.stats.arcade[gameName] || { wins: 0, losses: 0 };
+    }
+
+    return user.stats.arcade;
   }
 
 } 
