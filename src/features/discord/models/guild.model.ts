@@ -17,9 +17,10 @@ class GuildConfig {
   colors!: Map<string, any>;
 
   @prop({
-    default: () => ({})
+    default: () => ({}),
+    type: () => Object
   })
-  channels?: Map<string, any>;
+  channels?: { [key: string]: string };
 }
 
 class GuildFeatures {
