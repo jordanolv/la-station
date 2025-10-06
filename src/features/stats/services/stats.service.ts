@@ -407,15 +407,15 @@ export class StatsService {
   }
 
   /**
-   * Normalise une date au début de journée
+   * Normalise une date au début de journée (heure locale)
    */
   private static normalizeDate(date: Date): Date {
-    const local = new Date(date);
-    return new Date(Date.UTC(
-      local.getUTCFullYear(),
-      local.getUTCMonth(),
-      local.getUTCDate()
-    ));
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      0, 0, 0, 0
+    );
   }
 
   private static isSameDay(dateA: Date, dateB: Date): boolean {
@@ -437,7 +437,7 @@ export class StatsService {
     while (cursor < end) {
       const dayStart = this.normalizeDate(cursor);
       const nextDayStart = new Date(dayStart);
-      nextDayStart.setUTCDate(nextDayStart.getUTCDate() + 1);
+      nextDayStart.setDate(nextDayStart.getDate() + 1);
 
       const segmentEnd = new Date(Math.min(nextDayStart.getTime(), end.getTime()));
       const diffSeconds = Math.floor((segmentEnd.getTime() - cursor.getTime()) / 1000);
