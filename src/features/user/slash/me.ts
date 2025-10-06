@@ -12,6 +12,7 @@ async function buildCard(
   discordUser: { username: string; displayAvatarURL: (options?: { size?: number; extension?: string }) => string },
   guildUser: GuildUserDoc,
   guildName: string,
+  roles: { name: string; color: string }[],
   backgroundUrl: string | undefined = process.env.PROFILE_CARD_BACKGROUND_URL
 ) {
   const { buffer, filename } = await ProfileCardService.generate({
@@ -19,7 +20,8 @@ async function buildCard(
     discordUser,
     guildUser,
     guildName,
-    backgroundUrl
+    backgroundUrl,
+    roles
   });
 
   return {
@@ -51,7 +53,16 @@ export default {
         return;
       }
 
-      const { attachment } = await buildCard(interaction.user, user, interaction.guild.name);
+      const member = await interaction.guild.members.fetch(interaction.user.id);
+      const roles = member.roles.cache
+        .filter(role => role.name !== '@everyone')
+        .sort((a, b) => b.position - a.position)
+        .map(role => ({
+          name: role.name,
+          color: role.hexColor
+        }));
+
+      const { attachment } = await buildCard(interaction.user, user, interaction.guild.name, roles);
 
       await interaction.reply({
         files: [attachment]
