@@ -5,9 +5,11 @@ const FALLBACK_LAYOUT = {
   avatar: { x: 1033, y: 157, radius: 77 },
   voiceChart: { x: 140, y: 400, width: 640, height: 260 },
   xpBar: { x: 205, y: 154, width: 475, height: 10, radius: 5, backgroundColor: "rgba(20, 28, 45, 1)", fillColor: "#8ad3f4" },
+  xpGroup: { offsetX: 0, offsetY: 0 },
+  roleBadges: { x: 100, y: 300, maxWidth: 600, maxHeight: 100, badgeHeight: 28, gap: 8 },
   info: [
-    { key: 'xpPercent', x: 104, y: 159, fontSize: 20, fontWeight: '500', color: '#FFFFFF', align: 'left' },
-    { key: 'xpValue', x: 400, y: 220, fontSize: 35, fontWeight: '700', color: '#FFFFFF', align: 'center' },
+    { key: 'xpPercent', x: 104, y: 159, fontSize: 20, fontWeight: '500', color: '#FFFFFF', align: 'left', group: 'xpGroup' },
+    { key: 'xpValue', x: 400, y: 220, fontSize: 35, fontWeight: '700', color: '#FFFFFF', align: 'center', group: 'xpGroup' },
     { key: 'username', x: 1033, y: 54, fontSize: 22, fontWeight: '400', color: '#FFFFFF', align: 'center' },
     { key: 'bio', x: 1033, y: 259, fontSize: 20, fontWeight: '400', color: '#FFFFFF', align: 'center' },
     { key: 'joinedTimeline', x: 260, y: 420, fontSize: 26, fontWeight: '600', color: '#FFFFFF', align: 'left' },
@@ -18,7 +20,8 @@ const FALLBACK_LAYOUT = {
     { key: 'birthdayValue', x: 895, y: 455, fontSize: 19, fontWeight: '600', color: '#FFFFFF', align: 'left' },
     { key: 'joinedValue', x: 1135, y: 455, fontSize: 19, fontWeight: '600', color: '#FFFFFF', align: 'left' },
     { key: 'messagesValue', x: 895, y: 569, fontSize: 26, fontWeight: '600', color: '#FFFFFF', align: 'left' },
-    { key: 'voiceValue', x: 895, y: 660, fontSize: 26, fontWeight: '600', color: '#FFFFFF', align: 'left' }
+    { key: 'voiceValue', x: 895, y: 660, fontSize: 26, fontWeight: '600', color: '#FFFFFF', align: 'left' },
+    { key: 'dailyStreakValue', x: 1135, y: 569, fontSize: 26, fontWeight: '600', color: '#FFFFFF', align: 'left' }
   ],
   stats: []
 };
@@ -57,6 +60,8 @@ async function loadLayout() {
           avatar: data?.avatar ?? FALLBACK_LAYOUT.avatar,
           voiceChart: data?.voiceChart ?? FALLBACK_LAYOUT.voiceChart,
           xpBar: data?.xpBar ?? FALLBACK_LAYOUT.xpBar,
+          xpGroup: data?.xpGroup ?? FALLBACK_LAYOUT.xpGroup,
+          roleBadges: data?.roleBadges ?? FALLBACK_LAYOUT.roleBadges,
           info: Array.isArray(data?.info) && data.info.length > 0 ? data.info : FALLBACK_LAYOUT.info,
           stats: Array.isArray(data?.stats) ? data.stats : FALLBACK_LAYOUT.stats,
         };
@@ -70,6 +75,8 @@ async function loadLayout() {
     avatar: FALLBACK_LAYOUT.avatar,
     voiceChart: FALLBACK_LAYOUT.voiceChart,
     xpBar: FALLBACK_LAYOUT.xpBar,
+    xpGroup: FALLBACK_LAYOUT.xpGroup,
+    roleBadges: FALLBACK_LAYOUT.roleBadges,
     info: FALLBACK_LAYOUT.info,
     stats: FALLBACK_LAYOUT.stats
   };
@@ -145,6 +152,88 @@ function drawRoundedRect(ctx, x, y, width, height, radius, color, opacity = 1) {
   ctx.closePath();
   ctx.fillStyle = color;
   ctx.fill();
+  ctx.restore();
+}
+
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+function darkenColor(hex, factor = 0.15) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return 'rgba(20, 28, 45, 0.8)';
+  const r = Math.floor(rgb.r * factor);
+  const g = Math.floor(rgb.g * factor);
+  const b = Math.floor(rgb.b * factor);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function cleanRoleName(name) {
+  return name
+    .replace(/:[a-zA-Z0-9_]+:/g, '')
+    .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+    .trim();
+}
+
+function drawRoleBadges(ctx, roles, config) {
+  if (!roles || roles.length === 0) return;
+
+  ctx.save();
+  const { x, y, maxWidth, maxHeight, badgeHeight, gap } = config;
+  const fontSize = badgeHeight * 0.55;
+  const circleRadius = badgeHeight * 0.25;
+  const paddingX = badgeHeight * 0.5;
+  const gapBetweenCircleAndText = badgeHeight * 0.35;
+  const paddingLeft = paddingX + circleRadius * 2 + gapBetweenCircleAndText;
+
+  let currentX = x;
+  let currentY = y;
+
+  roles.forEach(role => {
+    const cleanName = cleanRoleName(role.name);
+    if (!cleanName) return;
+
+    ctx.font = `500 ${fontSize}px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif`;
+    const textMetrics = ctx.measureText(cleanName);
+    const badgeWidth = paddingLeft + textMetrics.width + paddingX;
+
+    if (currentX + badgeWidth > x + maxWidth && currentX > x) {
+      currentX = x;
+      currentY += badgeHeight + gap;
+    }
+
+    // Vérifier si on dépasse la hauteur max
+    if (currentY + badgeHeight > y + maxHeight) {
+      return; // Stop rendering badges
+    }
+
+    const roleColor = role.color === '#000000' ? '#99aab5' : role.color;
+    const darkBgColor = darkenColor(roleColor, 0.15);
+
+    drawRoundedRect(ctx, currentX, currentY, badgeWidth, badgeHeight, badgeHeight / 2, darkBgColor, 0.9);
+
+    ctx.beginPath();
+    ctx.arc(currentX + paddingX + circleRadius, currentY + badgeHeight / 2, circleRadius, 0, Math.PI * 2);
+    ctx.fillStyle = roleColor;
+    ctx.fill();
+
+    const textX = currentX + paddingX + circleRadius * 2 + gapBetweenCircleAndText;
+    const textY = currentY + badgeHeight / 2;
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    ctx.font = `500 ${fontSize}px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif`;
+    ctx.fillText(cleanName, textX, textY);
+
+    currentX += badgeWidth + gap;
+  });
+
   ctx.restore();
 }
 
@@ -274,6 +363,8 @@ function resolveText(key, state) {
       return formatDuration(state.voiceTotal);
     case 'sevenVoiceValue':
       return formatDuration(state.voice7);
+    case 'dailyStreakValue':
+      return `🔥 ${state.dailyStreak ?? 0}`;
     default:
       return state[key] ?? '';
   }
@@ -312,6 +403,8 @@ function setupPlayground(layoutData) {
   const textAlignInput = document.getElementById('textAlign');
   const textXInput = document.getElementById('textX');
   const textYInput = document.getElementById('textY');
+  const maxWidthInput = document.getElementById('maxWidth');
+  const maxHeightInput = document.getElementById('maxHeight');
   const configOutput = document.getElementById('configOutput');
 
   canvas.width = WIDTH;
@@ -321,18 +414,52 @@ function setupPlayground(layoutData) {
   const statsLayout = Array.isArray(layoutData.stats) ? layoutData.stats : [];
   const voiceChartConfig = layoutData.voiceChart || FALLBACK_LAYOUT.voiceChart;
   const xpBarConfig = layoutData.xpBar || FALLBACK_LAYOUT.xpBar;
+  const roleBadgesConfig = layoutData.roleBadges || FALLBACK_LAYOUT.roleBadges;
   const voiceChartLegend = infoLayout.find(item => item.key === 'voiceChartLegend');
   const voiceChartCenter = voiceChartLegend && voiceChartLegend.align === 'center' ? voiceChartLegend.x : null;
 
   let avatarSettings = { ...(layoutData.avatar || FALLBACK_LAYOUT.avatar) };
   const DEFAULT_AVATAR_SETTINGS = { ...avatarSettings };
 
+  let xpGroupSettings = { ...(layoutData.xpGroup || FALLBACK_LAYOUT.xpGroup) };
+  const DEFAULT_XP_GROUP_SETTINGS = { ...xpGroupSettings };
+
+  let roleBadgesSettings = { ...(layoutData.roleBadges || FALLBACK_LAYOUT.roleBadges) };
+  const DEFAULT_ROLE_BADGES_SETTINGS = { ...roleBadgesSettings };
+
   const BASE_CONFIG = {
-    info: infoLayout.map(item => ({
-      ...item,
-      label: item.key,
-      getText: state => resolveText(item.key, state),
-    })),
+    info: [
+      {
+        key: 'xpGroup',
+        label: 'Groupe XP',
+        x: 0,
+        y: 0,
+        fontSize: 0,
+        fontWeight: '500',
+        color: '#FFFFFF',
+        align: 'left',
+        getText: () => '',
+        isSpecial: true
+      },
+      {
+        key: 'roleBadges',
+        label: 'Badges de rôles',
+        x: roleBadgesSettings.x,
+        y: roleBadgesSettings.y,
+        fontSize: 0,
+        fontWeight: '500',
+        color: '#FFFFFF',
+        align: 'left',
+        getText: () => '',
+        isSpecial: true
+      },
+      ...infoLayout.map(item => ({
+        ...item,
+        label: item.key,
+        getText: state => resolveText(item.key, state),
+        group: item.group || undefined,
+      }))
+    ],
     stats: statsLayout.map(item => ({
       ...item,
       label: item.key,
@@ -360,9 +487,60 @@ function setupPlayground(layoutData) {
     messages: 1245,
     voiceTotal: 32 * 3600 + 45 * 60,
     voice7: 6 * 3600,
+    dailyStreak: 7,
     avatarUrl: 'https://cdn.discordapp.com/embed/avatars/0.png',
     backgroundUrl: './template.png',
-    voiceHistory: createDefaultVoiceHistory()
+    voiceHistory: createDefaultVoiceHistory(),
+    roles: [
+      { name: '🟡Légende du ridge', color: '#f1c40f' },
+      { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+            { name: '🟡Légende du ridge', color: '#f1c40f' },
+      { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+            { name: '🟡Légende du ridge', color: '#f1c40f' },
+      { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+            { name: '🟡Légende du ridge', color: '#f1c40f' },
+      { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+            { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+            { name: '🟡Légende du ridge', color: '#f1c40f' },
+      { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+            { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+            { name: '🟡Légende du ridge', color: '#f1c40f' },
+      { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+            { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+            { name: '🟡Légende du ridge', color: '#f1c40f' },
+      { name: '🟠Scout', color: '#e67e22' },
+      { name: '🟣Campeur du dimanche', color: '#9b59b6' },
+      { name: '🟢habbo', color: '#2ecc71' },
+      { name: '🔵test', color: '#3498db' },
+      { name: '🔴lslsl', color: '#e74c3c' }
+    ]
   };
 
   backgroundInput.value = defaultState.backgroundUrl;
@@ -414,20 +592,42 @@ function setupPlayground(layoutData) {
     const dailyTotals = computeVoiceDailyTotals(state.voiceHistory);
     renderVoiceChart(ctx, voiceChartConfig, dailyTotals, voiceChartCenter);
 
-    // Draw XP bar
+    // Draw XP bar (avec offset du groupe)
     const xpPercent = (state.xpCurrent / state.xpNeeded) || 0;
-    drawProgressBar(ctx, xpBarConfig, xpPercent);
+    const adjustedXpBarConfig = {
+      ...xpBarConfig,
+      x: xpBarConfig.x + xpGroupSettings.offsetX,
+      y: xpBarConfig.y + xpGroupSettings.offsetY
+    };
+    drawProgressBar(ctx, adjustedXpBarConfig, xpPercent);
+
+    // Draw role badges
+    if (state.roles && state.roles.length > 0) {
+      drawRoleBadges(ctx, state.roles, roleBadgesSettings);
+    }
 
     const items = workingConfig[currentView];
     items.forEach(item => {
+      // Skip special items (xpGroup, roleBadges)
+      if (item.isSpecial) return;
+
       const stateNow = getCurrentState();
       const text = item.customText ?? item.getText(stateNow);
+
+      // Calculer la position avec le décalage du groupe XP
+      let finalX = item.x;
+      let finalY = item.y;
+      if (item.group === 'xpGroup') {
+        finalX += xpGroupSettings.offsetX;
+        finalY += xpGroupSettings.offsetY;
+      }
+
       ctx.save();
       ctx.fillStyle = item.color;
       ctx.font = `${item.fontWeight} ${item.fontSize}px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif`;
       ctx.textAlign = item.align;
       ctx.textBaseline = 'middle';
-      ctx.fillText(text, item.x, item.y);
+      ctx.fillText(text, finalX, finalY);
       ctx.restore();
     });
   }
@@ -452,12 +652,47 @@ function setupPlayground(layoutData) {
     if (!item) return;
     const state = getCurrentState();
     textSelect.value = key;
-    textContentInput.value = item.customText ?? item.getText(state);
-    textSizeInput.value = item.fontSize;
-    textColorInput.value = item.color;
-    textAlignInput.value = item.align;
-    textXInput.value = Math.round(item.x);
-    textYInput.value = Math.round(item.y);
+
+    if (key === 'xpGroup') {
+      textContentInput.value = '[Groupe XP - barre + % + valeur]';
+      textContentInput.disabled = true;
+      textSizeInput.disabled = true;
+      textColorInput.disabled = true;
+      textAlignInput.disabled = true;
+      textXInput.value = Math.round(xpGroupSettings.offsetX);
+      textYInput.value = Math.round(xpGroupSettings.offsetY);
+      maxWidthInput.value = '';
+      maxWidthInput.disabled = true;
+      maxHeightInput.value = '';
+      maxHeightInput.disabled = true;
+    } else if (key === 'roleBadges') {
+      textContentInput.value = '[Badges de rôles - groupe]';
+      textContentInput.disabled = true;
+      textSizeInput.disabled = true;
+      textColorInput.disabled = true;
+      textAlignInput.disabled = true;
+      textXInput.value = Math.round(item.x);
+      textYInput.value = Math.round(item.y);
+      maxWidthInput.value = roleBadgesSettings.maxWidth || '';
+      maxWidthInput.disabled = false;
+      maxHeightInput.value = roleBadgesSettings.maxHeight || '';
+      maxHeightInput.disabled = false;
+    } else {
+      textContentInput.disabled = false;
+      textSizeInput.disabled = false;
+      textColorInput.disabled = false;
+      textAlignInput.disabled = false;
+      textContentInput.value = item.customText ?? item.getText(state);
+      textSizeInput.value = item.fontSize;
+      textColorInput.value = item.color;
+      textAlignInput.value = item.align;
+      textXInput.value = Math.round(item.x);
+      textYInput.value = Math.round(item.y);
+      maxWidthInput.value = item.maxWidth || '';
+      maxWidthInput.disabled = false;
+      maxHeightInput.value = item.maxHeight || '';
+      maxHeightInput.disabled = false;
+    }
   }
 
   function updateItemFromInputs() {
@@ -465,15 +700,37 @@ function setupPlayground(layoutData) {
     const item = workingConfig[currentView].find(el => el.key === selectedKey);
     if (!item) return;
 
-    const state = getCurrentState();
-    const defaultText = item.getText(state);
-    const content = textContentInput.value;
-    item.customText = content && content !== defaultText ? content : null;
-    item.fontSize = Number(textSizeInput.value) || item.fontSize;
-    item.color = textColorInput.value || item.color;
-    item.align = textAlignInput.value || item.align;
-    item.x = Number(textXInput.value) || item.x;
-    item.y = Number(textYInput.value) || item.y;
+    if (selectedKey === 'xpGroup') {
+      // Mise à jour spéciale pour xpGroup
+      xpGroupSettings.offsetX = Number(textXInput.value) || xpGroupSettings.offsetX;
+      xpGroupSettings.offsetY = Number(textYInput.value) || xpGroupSettings.offsetY;
+    } else if (selectedKey === 'roleBadges') {
+      // Mise à jour spéciale pour roleBadges
+      roleBadgesSettings.x = Number(textXInput.value) || roleBadgesSettings.x;
+      roleBadgesSettings.y = Number(textYInput.value) || roleBadgesSettings.y;
+      const maxWidth = Number(maxWidthInput.value);
+      const maxHeight = Number(maxHeightInput.value);
+      if (maxWidth > 0) roleBadgesSettings.maxWidth = maxWidth;
+      if (maxHeight > 0) roleBadgesSettings.maxHeight = maxHeight;
+      item.x = roleBadgesSettings.x;
+      item.y = roleBadgesSettings.y;
+    } else {
+      const state = getCurrentState();
+      const defaultText = item.getText(state);
+      const content = textContentInput.value;
+      item.customText = content && content !== defaultText ? content : null;
+      item.fontSize = Number(textSizeInput.value) || item.fontSize;
+      item.color = textColorInput.value || item.color;
+      item.align = textAlignInput.value || item.align;
+      item.x = Number(textXInput.value) || item.x;
+      item.y = Number(textYInput.value) || item.y;
+      const maxWidth = Number(maxWidthInput.value);
+      const maxHeight = Number(maxHeightInput.value);
+      if (maxWidth > 0) item.maxWidth = maxWidth;
+      else delete item.maxWidth;
+      if (maxHeight > 0) item.maxHeight = maxHeight;
+      else delete item.maxHeight;
+    }
 
     renderCanvas();
     updateExport();
@@ -484,8 +741,24 @@ function setupPlayground(layoutData) {
       avatar: { ...avatarSettings },
       voiceChart: { ...voiceChartConfig },
       xpBar: { ...xpBarConfig },
-      info: workingConfig.info.map(({ key, x, y, fontSize, fontWeight, color, align, customText }) => ({ key, x, y, fontSize, fontWeight, color, align, customText })),
-      stats: workingConfig.stats.map(({ key, x, y, fontSize, fontWeight, color, align, customText }) => ({ key, x, y, fontSize, fontWeight, color, align, customText })),
+      xpGroup: { ...xpGroupSettings },
+      roleBadges: { ...roleBadgesSettings },
+      info: workingConfig.info.filter(item => !item.isSpecial).map(({ key, x, y, fontSize, fontWeight, color, align, customText, group, maxWidth, maxHeight }) => {
+        const obj = { key, x, y, fontSize, fontWeight, color, align };
+        if (customText) obj.customText = customText;
+        if (group) obj.group = group;
+        if (maxWidth) obj.maxWidth = maxWidth;
+        if (maxHeight) obj.maxHeight = maxHeight;
+        return obj;
+      }),
+      stats: workingConfig.stats.filter(item => !item.isSpecial).map(({ key, x, y, fontSize, fontWeight, color, align, customText, group, maxWidth, maxHeight }) => {
+        const obj = { key, x, y, fontSize, fontWeight, color, align };
+        if (customText) obj.customText = customText;
+        if (group) obj.group = group;
+        if (maxWidth) obj.maxWidth = maxWidth;
+        if (maxHeight) obj.maxHeight = maxHeight;
+        return obj;
+      }),
     };
     configOutput.value = JSON.stringify(exportData, null, 2);
   }
@@ -494,6 +767,8 @@ function setupPlayground(layoutData) {
     workingConfig.info = deepCloneConfig(BASE_CONFIG.info);
     workingConfig.stats = deepCloneConfig(BASE_CONFIG.stats);
     avatarSettings = { ...DEFAULT_AVATAR_SETTINGS };
+    xpGroupSettings = { ...DEFAULT_XP_GROUP_SETTINGS };
+    roleBadgesSettings = { ...DEFAULT_ROLE_BADGES_SETTINGS };
     syncAvatarInputs();
     render(currentView);
   }
@@ -512,10 +787,40 @@ function setupPlayground(layoutData) {
 
   function handleKeyNudge(event) {
     if (!selectedKey) return;
-    const item = workingConfig[currentView].find(el => el.key === selectedKey);
-    if (!item) return;
     const step = event.shiftKey ? 5 : 1;
     let updated = false;
+
+    if (selectedKey === 'xpGroup') {
+      switch (event.key) {
+        case 'ArrowUp':
+          xpGroupSettings.offsetY -= step;
+          updated = true;
+          break;
+        case 'ArrowDown':
+          xpGroupSettings.offsetY += step;
+          updated = true;
+          break;
+        case 'ArrowLeft':
+          xpGroupSettings.offsetX -= step;
+          updated = true;
+          break;
+        case 'ArrowRight':
+          xpGroupSettings.offsetX += step;
+          updated = true;
+          break;
+      }
+      if (updated) {
+        textXInput.value = Math.round(xpGroupSettings.offsetX);
+        textYInput.value = Math.round(xpGroupSettings.offsetY);
+        renderCanvas();
+        updateExport();
+      }
+      return;
+    }
+
+    const item = workingConfig[currentView].find(el => el.key === selectedKey);
+    if (!item) return;
+
     switch (event.key) {
       case 'ArrowUp':
         item.y = Math.max(0, item.y - step);
@@ -535,6 +840,10 @@ function setupPlayground(layoutData) {
         break;
     }
     if (updated) {
+      if (selectedKey === 'roleBadges') {
+        roleBadgesSettings.x = item.x;
+        roleBadgesSettings.y = item.y;
+      }
       textXInput.value = Math.round(item.x);
       textYInput.value = Math.round(item.y);
       renderCanvas();
@@ -555,6 +864,8 @@ function setupPlayground(layoutData) {
   textAlignInput.addEventListener('change', updateItemFromInputs);
   textXInput.addEventListener('input', updateItemFromInputs);
   textYInput.addEventListener('input', updateItemFromInputs);
+  maxWidthInput.addEventListener('input', updateItemFromInputs);
+  maxHeightInput.addEventListener('input', updateItemFromInputs);
 
   rerenderBtn.addEventListener('click', () => render(currentView));
   resetBtn.addEventListener('click', resetConfig);
@@ -619,6 +930,8 @@ function setupPlayground(layoutData) {
   textContentInput.addEventListener('keydown', stopPropagation);
   textColorInput.addEventListener('keydown', stopPropagation);
   textAlignInput.addEventListener('keydown', stopPropagation);
+  maxWidthInput.addEventListener('keydown', stopPropagation);
+  maxHeightInput.addEventListener('keydown', stopPropagation);
 
   render(defaultState.view);
   syncAvatarInputs();
