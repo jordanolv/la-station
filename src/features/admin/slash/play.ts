@@ -114,6 +114,14 @@ export default {
       }
 
       try {
+        // Sauvegarder le nom actuel du bot
+        const botMember = interaction.guild.members.cache.get(interaction.client.user.id);
+        const originalNickname = botMember?.nickname || null;
+
+        // Changer le nom du bot
+        const newNickname = `🎵 ${equipe.charAt(0).toUpperCase() + equipe.slice(1)}`;
+        await botMember?.setNickname(newNickname).catch(console.error);
+
         // Rejoindre le canal vocal
         const connection = joinVoiceChannel({
           channelId: voiceChannel.id,
@@ -126,7 +134,11 @@ export default {
 
         // Créer un lecteur audio
         const player = createAudioPlayer();
-        const resource = createAudioResource(audioPath);
+        const resource = createAudioResource(audioPath, {
+          inlineVolume: true
+        });
+
+        resource.volume?.setVolume(0.6);
 
         // Jouer l'audio
         player.play(resource);
@@ -136,6 +148,8 @@ export default {
         player.on(AudioPlayerStatus.Idle, () => {
           connection.destroy();
           activeConnections.delete(interaction.guild.id);
+          // Restaurer le nom original du bot
+          botMember?.setNickname(originalNickname).catch(console.error);
         });
 
         // Gérer les erreurs
@@ -143,6 +157,8 @@ export default {
           console.error('Erreur du lecteur audio:', error);
           connection.destroy();
           activeConnections.delete(interaction.guild.id);
+          // Restaurer le nom original du bot en cas d'erreur
+          botMember?.setNickname(originalNickname).catch(console.error);
         });
 
         await interaction.reply({
