@@ -45,8 +45,10 @@ export class BirthdayCron {
       
       for (const [guildId, discordGuild] of guilds) {
         try {
+
           // Vérifier si le channel de logs est configuré
-          const logChannelId = await LogService.getLogsChannelId(guildId);
+          const logChannelId = await LogService.getLogsChannelId(guildId, discordGuild.name);
+
           if (!logChannelId) {
             continue;
           }

@@ -32,32 +32,25 @@ export class LogService {
    */
   static async setLogsChannel(guildId: string, channelId: string): Promise<void> {
     const guild = await GuildService.getOrCreateGuild(guildId);
-    
+
     if (!guild.config.channels) {
-      guild.config.channels = new Map();
+      guild.config.channels = {};
     }
-    guild.config.channels.set('logs', channelId);
-    
+
+    // Stocker comme objet simple avec la clé 'logs'
+    (guild.config.channels as any).logs = channelId;
+
     await guild.save();
   }
 
   /**
    * Récupère le channel de logs configuré
    */
-  static async getLogsChannelId(guildId: string): Promise<string | null> {
-    const guild = await GuildService.getOrCreateGuild(guildId);
-    
-    // Gestion du cas où channels est un objet au lieu d'une Map
-    let logsChannelId: string | null = null;
-    if (guild.config.channels) {
-      if (guild.config.channels instanceof Map) {
-        logsChannelId = guild.config.channels.get('logs') || null;
-      } else if (typeof guild.config.channels === 'object') {
-        logsChannelId = (guild.config.channels as any).logs || null;
-      }
-    }
-    
-    return logsChannelId;
+  static async getLogsChannelId(guildId: string, guildName?: string): Promise<string | null> {
+    const guild = await GuildService.getOrCreateGuild(guildId, guildName);
+
+    // Récupérer le channel de logs depuis l'objet channels
+    return guild.config.channels?.logs || null;
   }
 
   /**
