@@ -65,6 +65,7 @@ type LayoutItem = LayoutConfigItem & {
 type VoiceDailyTotal = {
   label: string;
   seconds: number;
+  previousSeconds: number;
 };
 
 const TEXT_RESOLVERS: Record<string, (data: RenderData) => string | null | undefined> = {
@@ -253,12 +254,23 @@ function computeVoiceDailyTotals(history: any[]): VoiceDailyTotal[] {
   const diff = weekday === 0 ? -6 : 1 - weekday; // lundi
   startOfWeek.setDate(startOfWeek.getDate() + diff);
 
+  // Calculer le début de la semaine précédente
+  const startOfPreviousWeek = new Date(startOfWeek);
+  startOfPreviousWeek.setDate(startOfPreviousWeek.getDate() - 7);
+
   const totals: VoiceDailyTotal[] = [];
   for (let i = 0; i < daysCount; i += 1) {
+    // Semaine actuelle
     const dayStart = new Date(startOfWeek);
     dayStart.setDate(startOfWeek.getDate() + i);
     const dayEnd = new Date(dayStart);
     dayEnd.setDate(dayEnd.getDate() + 1);
+
+    // Semaine précédente (même jour de la semaine)
+    const previousDayStart = new Date(startOfPreviousWeek);
+    previousDayStart.setDate(startOfPreviousWeek.getDate() + i);
+    const previousDayEnd = new Date(previousDayStart);
+    previousDayEnd.setDate(previousDayEnd.getDate() + 1);
 
     const seconds = (history ?? []).reduce((sum, entry) => {
       if (!entry) return sum;
@@ -271,12 +283,23 @@ function computeVoiceDailyTotals(history: any[]): VoiceDailyTotal[] {
       return sum;
     }, 0);
 
+    const previousSeconds = (history ?? []).reduce((sum, entry) => {
+      if (!entry) return sum;
+      const entryDate = new Date(entry.date);
+      if (Number.isNaN(entryDate.getTime())) return sum;
+      if (entryDate >= previousDayStart && entryDate < previousDayEnd) {
+        const time = typeof entry.time === 'number' ? entry.time : 0;
+        return sum + time;
+      }
+      return sum;
+    }, 0);
+
     const label = dayStart
       .toLocaleDateString('fr-FR', { weekday: 'short' })
       .replace('.', '')
       .toUpperCase();
 
-    totals.push({ label, seconds });
+    totals.push({ label, seconds, previousSeconds });
   }
 
   return totals;
@@ -293,10 +316,8 @@ function drawVoiceChart(
   ctx.save();
   const offset = centerX !== undefined ? centerX - (x + width / 2) : 0;
   const containerX = x + offset;
-  // ctx.fillStyle = 'rgba(12, 18, 31, 0.65)';
-  // ctx.fillRect(containerX, y, width, height);
 
-  const maxSeconds = Math.max(...totals.map(t => t.seconds), 0);
+  const maxSeconds = Math.max(...totals.map(t => Math.max(t.seconds, t.previousSeconds)), 0);
 
   if (maxSeconds === 0) {
     const offset = centerX !== undefined ? centerX - (x + width / 2) : 0;
@@ -309,6 +330,37 @@ function drawVoiceChart(
     ctx.restore();
     return;
   }
+
+  // Dessiner la légende à droite de "Dernière activité" (en bas du chart)
+  const legendY = y + height + 20; // En dessous du chart
+  const legendStartX = x + width - 230;
+  const squareSize = 9;
+  const legendGap = 5;
+  const spaceBetweenItems = 79;
+
+  // Carré gris (semaine précédente)
+  ctx.fillStyle = 'rgba(100, 100, 120, 0.5)';
+  ctx.fillRect(legendStartX, legendY - squareSize / 2, squareSize, squareSize);
+  drawText(ctx, 'Sem. dern.', legendStartX + squareSize + legendGap, legendY, {
+    size: 11,
+    color: 'rgba(200, 200, 220, 0.8)',
+    align: 'left',
+    fontWeight: '400',
+  });
+
+  // Carré bleu (semaine actuelle)
+  const legendBlueX = legendStartX + spaceBetweenItems;
+  const gradient = ctx.createLinearGradient(legendBlueX, legendY - squareSize / 2, legendBlueX, legendY - squareSize / 2 + squareSize);
+  gradient.addColorStop(0, '#8ad3f4');
+  gradient.addColorStop(1, '#7fc1df');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(legendBlueX, legendY - squareSize / 2, squareSize, squareSize);
+  drawText(ctx, 'Cette sem.', legendBlueX + squareSize + legendGap, legendY, {
+    size: 11,
+    color: '#FFFFFF',
+    align: 'left',
+    fontWeight: '500',
+  });
 
   const paddingBottom = 40;
   const paddingTop = 30;
@@ -329,29 +381,71 @@ function drawVoiceChart(
   let startX = desiredCenter - totalWidth / 2;
   startX = Math.max(containerX, Math.min(startX, containerX + width - totalWidth));
 
+  // Largeur de chaque barre (actuelle et précédente)
+  const singleBarWidth = barWidth / 2 - 2; // 2px d'espace entre les barres
+
   totals.forEach((item, index) => {
-    const barHeight = (item.seconds / maxSeconds) * usableHeight;
     const barX = startX + index * (barWidth + gapBetween);
+
+    // Calculer les hauteurs pour positionner les textes correctement
+    const prevBarHeight = (item.previousSeconds / maxSeconds) * usableHeight;
+    const prevBarY = y + paddingTop + (usableHeight - prevBarHeight);
+    const barHeight = (item.seconds / maxSeconds) * usableHeight;
     const barY = y + paddingTop + (usableHeight - barHeight);
 
-    const gradient = ctx.createLinearGradient(barX, barY, barX, barY + barHeight);
-    gradient.addColorStop(0, '#8ad3f4');
-    gradient.addColorStop(1, '#7fc1df');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(barX, barY, barWidth, barHeight);
+    // Trouver la barre la plus haute pour positionner le texte au-dessus
+    const highestBarY = Math.min(prevBarY, barY);
+    const textY = highestBarY - 16;
 
+    // Barre de la semaine précédente (à gauche, en gris)
+    if (item.previousSeconds > 0) {
+      ctx.fillStyle = 'rgba(100, 100, 120, 0.5)';
+      ctx.fillRect(barX, prevBarY, singleBarWidth, prevBarHeight);
+    }
+
+    // Barre de la semaine actuelle (à droite, en bleu)
+    if (item.seconds > 0) {
+      const gradient = ctx.createLinearGradient(barX, barY, barX, barY + barHeight);
+      gradient.addColorStop(0, '#8ad3f4');
+      gradient.addColorStop(1, '#7fc1df');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(barX + singleBarWidth + 4, barY, singleBarWidth, barHeight);
+    }
+
+    // Afficher les valeurs au-dessus des barres (sur une seule ligne)
+    if (item.previousSeconds > 0 && item.seconds > 0) {
+      // Les deux valeurs : semaine dernière (gris) et actuelle (blanc)
+      const textCombined = `${formatDuration(item.previousSeconds, true)} - ${formatDuration(item.seconds, true)}`;
+      drawText(ctx, textCombined, barX + barWidth / 2, textY, {
+        size: 14,
+        color: '#FFFFFF',
+        align: 'center',
+        fontWeight: '500',
+      });
+    } else if (item.seconds > 0) {
+      // Seulement semaine actuelle
+      drawText(ctx, formatDuration(item.seconds, true), barX + barWidth / 2, textY, {
+        size: 15,
+        color: '#FFFFFF',
+        align: 'center',
+        fontWeight: '500',
+      });
+    } else if (item.previousSeconds > 0) {
+      // Seulement semaine précédente
+      drawText(ctx, formatDuration(item.previousSeconds, true), barX + barWidth / 2, textY, {
+        size: 14,
+        color: 'rgba(200, 200, 220, 0.8)',
+        align: 'center',
+        fontWeight: '400',
+      });
+    }
+
+    // Label du jour (centré sous les deux barres)
     drawText(ctx, item.label, barX + barWidth / 2, y + height - paddingBottom / 2, {
       size: 18,
       color: '#FFFFFF',
       align: 'center',
       fontWeight: '600',
-    });
-
-    drawText(ctx, formatDuration(item.seconds), barX + barWidth / 2, barY - 14, {
-      size: 18,
-      color: '#FFFFFF',
-      align: 'center',
-      fontWeight: '500',
     });
   });
 
@@ -399,17 +493,18 @@ function calculateXpProgress(level: number, experience: number): { current: numb
   return { current, required, percent };
 }
 
-function formatDuration(seconds: number): string {
+function formatDuration(seconds: number, compact: boolean = false): string {
   if (!seconds || seconds <= 0) return '0s';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
+  const separator = compact ? '' : ' ';
   if (hours >= 1) {
     const rest = minutes % 60;
-    return rest > 0 ? `${hours}h ${rest}m` : `${hours}h`;
+    return rest > 0 ? `${hours}h${separator}${rest}m` : `${hours}h`;
   }
   if (minutes >= 1) {
     const restSec = Math.floor(seconds % 60);
-    return restSec > 0 ? `${minutes}m ${restSec}s` : `${minutes}m`;
+    return restSec > 0 ? `${minutes}m${separator}${restSec}s` : `${minutes}m`;
   }
   return `${Math.floor(seconds)}s`;
 }

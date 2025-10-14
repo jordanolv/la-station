@@ -8,7 +8,7 @@
     { "key": "username", "x": 1033, "y": 54, "fontSize": 22, "fontWeight": "400", "color": "#FFFFFF", "align": "center" },
     { "key": "bio", "x": 1033, "y": 259, "fontSize": 20, "fontWeight": "400", "color": "#FFFFFF", "align": "center" },
     { "key": "joinedTimeline", "x": 260, "y": 420, "fontSize": 26, "fontWeight": "600", "color": "#FFFFFF", "align": "left" },
-    { "key": "voiceChartLegend", "x": 400, "y": 680, "fontSize": 20, "fontWeight": "500", "color": "#FFFFFF", "align": "center" },
+    { "key": "voiceChartLegend", "x": 400, "y": 680, "fontSize": 16, "fontWeight": "500", "color": "#FFFFFF", "align": "center" },
     { "key": "lastActiveTimeline", "x": 260, "y": 465, "fontSize": 20, "fontWeight": "600", "color": "#FFFFFF", "align": "left" },
     { "key": "ridgecoinValue", "x": 895, "y": 365, "fontSize": 26, "fontWeight": "700", "color": "#FFFFFF", "align": "left" },
     { "key": "levelValue", "x": 1135, "y": 365, "fontSize": 26, "fontWeight": "700", "color": "#FFFFFF", "align": "left" },

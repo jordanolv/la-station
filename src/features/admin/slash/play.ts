@@ -138,7 +138,7 @@ export default {
           inlineVolume: true
         });
 
-        resource.volume?.setVolume(0.6);
+        resource.volume?.setVolume(0.2); // Régler le volume si nécessaire
 
         // Jouer l'audio
         player.play(resource);
