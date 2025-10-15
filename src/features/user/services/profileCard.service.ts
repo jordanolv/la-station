@@ -15,6 +15,7 @@ type ProfileCardOptions = {
   guildUser: IGuildUser | (IGuildUser & { toObject?: () => IGuildUser });
   guildName: string;
   backgroundUrl?: string;
+  roles?: { name: string; color: string }[];
 };
 
 const CARD_WIDTH = 1280;
@@ -38,7 +39,8 @@ type RenderData = {
   joined: string;
   lastActive: string;
   voiceTotal: string;
-   voiceDailyTotals: VoiceDailyTotal[];
+  dailyStreak: string;
+  voiceDailyTotals: VoiceDailyTotal[];
 };
 
 type LayoutConfigItem = {
@@ -49,12 +51,15 @@ type LayoutConfigItem = {
   fontWeight: string;
   color: string;
   align: CanvasAlign;
+  group?: string;
 };
 
 type LayoutConfigFile = {
   avatar?: { x: number; y: number; radius: number };
   voiceChart?: { x: number; y: number; width: number; height: number };
   xpBar?: { x: number; y: number; width: number; height: number; radius: number; backgroundColor: string; fillColor: string };
+  xpGroup?: { offsetX: number; offsetY: number };
+  roleBadges?: { x: number; y: number; maxWidth: number; maxHeight: number; badgeHeight: number; gap: number };
   info?: LayoutConfigItem[];
 };
 
@@ -71,6 +76,7 @@ type VoiceDailyTotal = {
 const TEXT_RESOLVERS: Record<string, (data: RenderData) => string | null | undefined> = {
   xpPercent: data => data.xpPercent,
   xpValue: data => data.xpValue,
+  xpValueWithPercent: data => `${data.xpValue} (${data.xpPercent})`,
   username: data => data.username,
   bio: data => data.bio,
   ridgecoinValue: data => data.ridgecoin,
@@ -79,6 +85,7 @@ const TEXT_RESOLVERS: Record<string, (data: RenderData) => string | null | undef
   joinedValue: data => data.joined,
   messagesValue: data => data.messages,
   voiceValue: data => data.voiceTotal,
+  dailyStreakValue: data => data.dailyStreak,
   voiceChartLegend: data => (data.lastActive !== '-' ? `Dernière activité : ${data.lastActive}` : ''),
   joinedTimeline: () => null,
   lastActiveTimeline: () => null,
@@ -91,6 +98,8 @@ const AVATAR_RADIUS = layoutFile.avatar?.radius ?? 105;
 const AVATAR_SIZE = AVATAR_RADIUS * 2;
 const VOICE_CHART_CONFIG = layoutFile.voiceChart ?? { x: 140, y: 400, width: 640, height: 260 };
 const XP_BAR_CONFIG = layoutFile.xpBar ?? { x: 200, y: 215, width: 520, height: 42, radius: 24, backgroundColor: 'rgba(20, 28, 45, 0.6)', fillColor: '#8ad3f4' };
+const XP_GROUP_OFFSET = layoutFile.xpGroup ?? { offsetX: 0, offsetY: 0 };
+const ROLE_BADGES_CONFIG = layoutFile.roleBadges ?? { x: 100, y: 300, maxWidth: 600, maxHeight: 100, badgeHeight: 28, gap: 8 };
 const voiceChartLegendLayout = (layoutFile.info ?? []).find(item => item.key === 'voiceChartLegend');
 const VOICE_CHART_CENTER = voiceChartLegendLayout?.align === 'center' ? voiceChartLegendLayout.x : undefined;
 
@@ -110,6 +119,38 @@ function resolveBackgroundPath(custom?: string): string | undefined {
   }
 
   return DEFAULT_BACKGROUND_PATH;
+}
+
+function registerEmojiFont() {
+  if (GlobalFonts.has('NotoColorEmoji')) return;
+
+  // Try to register Noto Color Emoji for emoji support
+  try {
+    // Try different possible locations for Noto Color Emoji
+    const possiblePaths = [
+      // macOS system font
+      '/System/Library/Fonts/Apple Color Emoji.ttc',
+      '/Library/Fonts/Apple Color Emoji.ttc',
+      // Linux system fonts
+      '/usr/share/fonts/truetype/noto-color-emoji/NotoColorEmoji.ttf',
+      '/usr/share/fonts/noto-color-emoji/NotoColorEmoji.ttf',
+      // Windows system font
+      'C:\\Windows\\Fonts\\seguiemj.ttf',
+      // Fallback to any Noto Color Emoji
+      require.resolve('@fontsource/noto-color-emoji/files/noto-color-emoji-400-normal.ttf')
+    ];
+
+    for (const fontPath of possiblePaths) {
+      try {
+        GlobalFonts.registerFromPath(fontPath, 'NotoColorEmoji');
+        return;
+      } catch {
+        continue;
+      }
+    }
+  } catch {
+    // If all fail, continue without emoji font
+  }
 }
 
 function registerFontOnce() {
@@ -226,16 +267,149 @@ function drawText(
   ctx.fillStyle = color;
   ctx.textBaseline = 'middle';
   ctx.textAlign = align;
-  ctx.font = `${fontWeight} ${size}px ${fontFamily}`;
+  
+  // Check if text contains emojis and use appropriate font stack
+  const hasEmojis = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(text);
+  const fontStack = hasEmojis 
+    ? `${fontWeight} ${size}px "Apple Color Emoji", "Noto Color Emoji", "Segoe UI Emoji", ${fontFamily}`
+    : `${fontWeight} ${size}px ${fontFamily}`;
+  
+  ctx.font = fontStack;
   ctx.fillText(text, x, y);
   ctx.restore();
 }
 
-function renderLayout(ctx: SKRSContext2D, layout: LayoutItem[], data: RenderData): void {
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+function darkenColor(hex: string, factor: number = 0.15): string {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return 'rgba(20, 28, 45, 0.8)';
+  const r = Math.floor(rgb.r * factor);
+  const g = Math.floor(rgb.g * factor);
+  const b = Math.floor(rgb.b * factor);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function cleanRoleName(name: string): string {
+  // Supprimer les emojis Discord (:emoji:) et les emojis Unicode
+  return name
+    .replace(/:[a-zA-Z0-9_]+:/g, '') // Emojis Discord (:x:, :emoji:, etc.)
+    .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '') // Emojis Unicode
+    .trim();
+}
+
+function drawRoleBadges(
+  ctx: SKRSContext2D,
+  roles: { name: string; color: string }[],
+  config: { x: number; y: number; maxWidth: number; maxHeight: number; badgeHeight: number; gap: number }
+): void {
+  if (!roles || roles.length === 0) return;
+
+  ctx.save();
+  const { x, y, maxWidth, maxHeight, badgeHeight, gap } = config;
+  const fontSize = badgeHeight * 0.55;
+  const circleRadius = badgeHeight * 0.25;
+  const paddingX = badgeHeight * 0.5;
+  const gapBetweenCircleAndText = badgeHeight * 0.35;
+  const paddingLeft = paddingX + circleRadius * 2 + gapBetweenCircleAndText;
+
+  let currentX = x;
+  let currentY = y;
+
+  roles.forEach(role => {
+    const cleanName = cleanRoleName(role.name);
+    if (!cleanName) return; // Skip si le nom est vide après nettoyage
+
+    ctx.font = `500 ${fontSize}px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif`;
+    const textMetrics = ctx.measureText(cleanName);
+    const badgeWidth = paddingLeft + textMetrics.width + paddingX;
+
+    if (currentX + badgeWidth > x + maxWidth && currentX > x) {
+      currentX = x;
+      currentY += badgeHeight + gap;
+    }
+
+    // Vérifier si on dépasse la hauteur max
+    if (currentY + badgeHeight > y + maxHeight) {
+      return; // Stop rendering badges
+    }
+
+    const roleColor = role.color === '#000000' ? '#99aab5' : role.color;
+    const darkBgColor = darkenColor(roleColor, 0.15);
+
+    drawRoundedRect(ctx, currentX, currentY, badgeWidth, badgeHeight, badgeHeight / 2, darkBgColor, 0.9);
+
+    ctx.beginPath();
+    ctx.arc(currentX + paddingX + circleRadius, currentY + badgeHeight / 2, circleRadius, 0, Math.PI * 2);
+    ctx.fillStyle = roleColor;
+    ctx.fill();
+
+    const textX = currentX + paddingX + circleRadius * 2 + gapBetweenCircleAndText;
+    const textY = currentY + badgeHeight / 2;
+
+    ctx.save();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    ctx.font = `500 ${fontSize}px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif`;
+    ctx.fillText(cleanName, textX, textY);
+    ctx.restore();
+
+    currentX += badgeWidth + gap;
+  });
+
+  ctx.restore();
+}
+
+function renderLayout(ctx: SKRSContext2D, layout: LayoutItem[], data: RenderData, xpGroupOffset = { offsetX: 0, offsetY: 0 }): void {
   layout.forEach(item => {
     const content = item.text(data);
     if (!content) return;
-    drawText(ctx, content, item.x, item.y, {
+
+    // Appliquer l'offset si l'item appartient au groupe xpGroup
+    const offsetX = item.group === 'xpGroup' ? xpGroupOffset.offsetX : 0;
+    const offsetY = item.group === 'xpGroup' ? xpGroupOffset.offsetY : 0;
+
+    // Patch: dailyStreakValue rendu séparé emoji + chiffre
+    if (item.key === 'dailyStreakValue' && typeof content === 'string' && content.startsWith('🔥')) {
+      // Séparer emoji et chiffre
+      const match = content.match(/^(🔥)\s*(\d+)/);
+      if (match) {
+        const emoji = match[1];
+        const number = match[2];
+        // Rendu emoji
+        drawText(ctx, emoji, item.x + offsetX, item.y + offsetY, {
+          size: item.fontSize,
+          color: item.color,
+          align: item.align,
+          fontWeight: item.fontWeight,
+          fontFamily: 'Apple Color Emoji, Noto Color Emoji, Segoe UI Emoji',
+        });
+        // Mesurer largeur emoji
+        ctx.save();
+        ctx.font = `${item.fontWeight} ${item.fontSize}px Apple Color Emoji, Noto Color Emoji, Segoe UI Emoji`;
+        const emojiWidth = ctx.measureText(emoji).width;
+        ctx.restore();
+        // Rendu chiffre juste après
+        drawText(ctx, number, item.x + offsetX + emojiWidth + 4, item.y + offsetY, {
+          size: item.fontSize,
+          color: item.color,
+          align: 'left',
+          fontWeight: item.fontWeight,
+          fontFamily: 'Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
+        });
+        return;
+      }
+    }
+    // Rendu standard
+    drawText(ctx, content, item.x + offsetX, item.y + offsetY, {
       size: item.fontSize,
       color: item.color,
       align: item.align,
@@ -363,17 +537,17 @@ function drawVoiceChart(
   });
 
   const paddingBottom = 40;
-  const paddingTop = 30;
+  const paddingTop = 10;
   const usableHeight = height - paddingBottom - paddingTop;
 
-  let gapBetween = Math.min(40, width * 0.06);
+  let gapBetween = Math.min(25, width * 0.04);
   let barWidth = (width - gapBetween * (totals.length - 1)) / totals.length;
-  if (barWidth > 70) {
-    barWidth = 70;
+  if (barWidth > 185) {
+    barWidth = 185;
     gapBetween = (width - barWidth * totals.length) / Math.max(totals.length - 1, 1);
-  } else if (barWidth < 28) {
-    barWidth = 28;
-    gapBetween = Math.max(12, (width - barWidth * totals.length) / Math.max(totals.length - 1, 1));
+  } else if (barWidth < 65) {
+    barWidth = 65;
+    gapBetween = Math.max(10, (width - barWidth * totals.length) / Math.max(totals.length - 1, 1));
   }
 
   const totalWidth = barWidth * totals.length + gapBetween * Math.max(totals.length - 1, 0);
@@ -382,7 +556,7 @@ function drawVoiceChart(
   startX = Math.max(containerX, Math.min(startX, containerX + width - totalWidth));
 
   // Largeur de chaque barre (actuelle et précédente)
-  const singleBarWidth = barWidth / 2 - 2; // 2px d'espace entre les barres
+  const singleBarWidth = (barWidth - 0.5) / 2; // 0.5px d'espace total entre les barres
 
   totals.forEach((item, index) => {
     const barX = startX + index * (barWidth + gapBetween);
@@ -393,14 +567,23 @@ function drawVoiceChart(
     const barHeight = (item.seconds / maxSeconds) * usableHeight;
     const barY = y + paddingTop + (usableHeight - barHeight);
 
-    // Trouver la barre la plus haute pour positionner le texte au-dessus
-    const highestBarY = Math.min(prevBarY, barY);
-    const textY = highestBarY - 16;
-
     // Barre de la semaine précédente (à gauche, en gris)
     if (item.previousSeconds > 0) {
       ctx.fillStyle = 'rgba(100, 100, 120, 0.5)';
       ctx.fillRect(barX, prevBarY, singleBarWidth, prevBarHeight);
+
+      // Texte vertical dans la barre précédente
+      if (prevBarHeight > 40) {
+        ctx.save();
+        ctx.translate(barX + singleBarWidth / 2, prevBarY + prevBarHeight / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '500 12px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(formatDuration(item.previousSeconds, true), 0, 0);
+        ctx.restore();
+      }
     }
 
     // Barre de la semaine actuelle (à droite, en bleu)
@@ -409,35 +592,20 @@ function drawVoiceChart(
       gradient.addColorStop(0, '#8ad3f4');
       gradient.addColorStop(1, '#7fc1df');
       ctx.fillStyle = gradient;
-      ctx.fillRect(barX + singleBarWidth + 4, barY, singleBarWidth, barHeight);
-    }
+      ctx.fillRect(barX + singleBarWidth + 0.5, barY, singleBarWidth, barHeight);
 
-    // Afficher les valeurs au-dessus des barres (sur une seule ligne)
-    if (item.previousSeconds > 0 && item.seconds > 0) {
-      // Les deux valeurs : semaine dernière (gris) et actuelle (blanc)
-      const textCombined = `${formatDuration(item.previousSeconds, true)} - ${formatDuration(item.seconds, true)}`;
-      drawText(ctx, textCombined, barX + barWidth / 2, textY, {
-        size: 14,
-        color: '#FFFFFF',
-        align: 'center',
-        fontWeight: '500',
-      });
-    } else if (item.seconds > 0) {
-      // Seulement semaine actuelle
-      drawText(ctx, formatDuration(item.seconds, true), barX + barWidth / 2, textY, {
-        size: 15,
-        color: '#FFFFFF',
-        align: 'center',
-        fontWeight: '500',
-      });
-    } else if (item.previousSeconds > 0) {
-      // Seulement semaine précédente
-      drawText(ctx, formatDuration(item.previousSeconds, true), barX + barWidth / 2, textY, {
-        size: 14,
-        color: 'rgba(200, 200, 220, 0.8)',
-        align: 'center',
-        fontWeight: '400',
-      });
+      // Texte vertical dans la barre actuelle
+      if (barHeight > 40) {
+        ctx.save();
+        ctx.translate(barX + singleBarWidth + 0.5 + singleBarWidth / 2, barY + barHeight / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '500 12px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(formatDuration(item.seconds, true), 0, 0);
+        ctx.restore();
+      }
     }
 
     // Label du jour (centré sous les deux barres)
@@ -540,6 +708,7 @@ function buildRenderData(
   const money = guildUser?.profil?.money ?? 0;
   const totalMessages = guildUser?.stats?.totalMsg ?? 0;
   const voiceTime = guildUser?.stats?.voiceTime ?? 0;
+  const dailyStreak = guildUser?.stats?.dailyStreak ?? 0;
 
   const { current, required, percent } = calculateXpProgress(level, experience);
 
@@ -557,17 +726,22 @@ function buildRenderData(
     messages: totalMessages.toLocaleString('fr-FR'),
     level: String(level),
     joined: guildUser?.infos?.registeredAt ? formatDateFR(guildUser.infos.registeredAt) : '-',
-    lastActive: guildUser?.infos?.updatedAt ? formatDateFR(guildUser.infos.updatedAt) : '-',
+    lastActive: guildUser?.stats?.lastActivityDate ? formatDateFR(guildUser.stats.lastActivityDate) : '-',
     voiceTotal: formatDurationHoursOnly(voiceTime),
+    dailyStreak: `🔥 ${dailyStreak}`,
     voiceDailyTotals: computeVoiceDailyTotals(guildUser?.stats?.voiceHistory ?? []),
+    // DEBUG
+    // eslint-disable-next-line no-console
+    ...(console.log('DEBUG dailyStreak:', dailyStreak), {})
   };
 }
 
 export class ProfileCardService {
   static async generate(options: ProfileCardOptions): Promise<{ buffer: Buffer; filename: string }> {
     registerFontOnce();
+    registerEmojiFont();
 
-    const { view, discordUser, guildUser, guildName } = options;
+    const { view, discordUser, guildUser, guildName, roles } = options;
     const data = getContext(guildUser);
     const renderData = buildRenderData(discordUser, data, guildName);
 
@@ -576,7 +750,7 @@ export class ProfileCardService {
 
     await this.renderBackground(ctx, resolveBackgroundPath(options.backgroundUrl));
 
-    await this.renderCard(ctx, discordUser, renderData);
+    await this.renderCard(ctx, discordUser, renderData, roles);
 
     const buffer = canvas.toBuffer('image/png');
     const filename = `profile-${view}.png`;
@@ -605,15 +779,16 @@ export class ProfileCardService {
   private static async renderCard(
     ctx: SKRSContext2D,
     discordUser: ProfileCardOptions['discordUser'],
-    renderData: RenderData
+    renderData: RenderData,
+    roles?: { name: string; color: string }[]
   ) {
     const avatarUrl = discordUser.displayAvatarURL({ size: 256, extension: 'png' });
     await drawAvatarCircle(ctx, avatarUrl, AVATAR_CENTER_X, AVATAR_CENTER_Y, AVATAR_RADIUS);
 
     drawProgressBar(
       ctx,
-      XP_BAR_CONFIG.x,
-      XP_BAR_CONFIG.y,
+      XP_BAR_CONFIG.x + XP_GROUP_OFFSET.offsetX,
+      XP_BAR_CONFIG.y + XP_GROUP_OFFSET.offsetY,
       XP_BAR_CONFIG.width,
       XP_BAR_CONFIG.height,
       renderData.xpPercentValue,
@@ -624,8 +799,12 @@ export class ProfileCardService {
       }
     );
 
+    if (roles && roles.length > 0) {
+      drawRoleBadges(ctx, roles, ROLE_BADGES_CONFIG);
+    }
+
     drawVoiceChart(ctx, VOICE_CHART_CONFIG, renderData.voiceDailyTotals, VOICE_CHART_CENTER);
 
-    renderLayout(ctx, CARD_LAYOUT, renderData);
+    renderLayout(ctx, CARD_LAYOUT, renderData, XP_GROUP_OFFSET);
   }
 }
