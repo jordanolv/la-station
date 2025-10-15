@@ -107,12 +107,23 @@ function computeVoiceDailyTotals(history = []) {
   const diff = weekday === 0 ? -6 : 1 - weekday;
   startOfWeek.setDate(startOfWeek.getDate() + diff);
 
+  // Calculer le début de la semaine précédente
+  const startOfPreviousWeek = new Date(startOfWeek);
+  startOfPreviousWeek.setDate(startOfPreviousWeek.getDate() - 7);
+
   const totals = [];
   for (let i = 0; i < daysCount; i += 1) {
+    // Semaine actuelle
     const dayStart = new Date(startOfWeek);
     dayStart.setDate(startOfWeek.getDate() + i);
     const dayEnd = new Date(dayStart);
     dayEnd.setDate(dayEnd.getDate() + 1);
+
+    // Semaine précédente (même jour de la semaine)
+    const previousDayStart = new Date(startOfPreviousWeek);
+    previousDayStart.setDate(startOfPreviousWeek.getDate() + i);
+    const previousDayEnd = new Date(previousDayStart);
+    previousDayEnd.setDate(previousDayEnd.getDate() + 1);
 
     const seconds = history.reduce((sum, entry) => {
       if (!entry) return sum;
@@ -125,12 +136,23 @@ function computeVoiceDailyTotals(history = []) {
       return sum;
     }, 0);
 
+    const previousSeconds = history.reduce((sum, entry) => {
+      if (!entry) return sum;
+      const entryDate = new Date(entry.date);
+      if (Number.isNaN(entryDate.getTime())) return sum;
+      if (entryDate >= previousDayStart && entryDate < previousDayEnd) {
+        const time = typeof entry.time === 'number' ? entry.time : 0;
+        return sum + time;
+      }
+      return sum;
+    }, 0);
+
     const label = dayStart
       .toLocaleDateString('fr-FR', { weekday: 'short' })
       .replace('.', '')
       .toUpperCase();
 
-    totals.push({ label, seconds });
+    totals.push({ label, seconds, previousSeconds });
   }
 
   return totals;
@@ -257,10 +279,8 @@ function renderVoiceChart(ctx, config, totals, centerX) {
   ctx.save();
   const offset = centerX != null ? centerX - (x + width / 2) : 0;
   const containerX = x + offset;
-  // ctx.fillStyle = 'rgba(12, 18, 31, 0.65)';
-  // ctx.fillRect(containerX, y, width, height);
 
-  const maxSeconds = Math.max(...totals.map(t => t.seconds), 0);
+  const maxSeconds = Math.max(...totals.map(t => Math.max(t.seconds, t.previousSeconds || 0)), 0);
 
   if (maxSeconds === 0) {
     const offset = centerX != null ? centerX - (x + width / 2) : 0;
@@ -273,18 +293,18 @@ function renderVoiceChart(ctx, config, totals, centerX) {
     return;
   }
 
-  const paddingTop = 30;
+  const paddingTop = 10;
   const paddingBottom = 40;
   const usableHeight = height - paddingBottom - paddingTop;
 
-  let gapBetween = Math.min(40, width * 0.06);
+  let gapBetween = Math.min(25, width * 0.04);
   let barWidth = (width - gapBetween * (totals.length - 1)) / totals.length;
-  if (barWidth > 70) {
-    barWidth = 70;
+  if (barWidth > 185) {
+    barWidth = 185;
     gapBetween = (width - barWidth * totals.length) / Math.max(totals.length - 1, 1);
-  } else if (barWidth < 28) {
-    barWidth = 28;
-    gapBetween = Math.max(12, (width - barWidth * totals.length) / Math.max(totals.length - 1, 1));
+  } else if (barWidth < 65) {
+    barWidth = 65;
+    gapBetween = Math.max(10, (width - barWidth * totals.length) / Math.max(totals.length - 1, 1));
   }
 
   const totalWidth = barWidth * totals.length + gapBetween * Math.max(totals.length - 1, 0);
@@ -292,26 +312,79 @@ function renderVoiceChart(ctx, config, totals, centerX) {
   let startX = desiredCenter - totalWidth / 2;
   startX = Math.max(containerX, Math.min(startX, containerX + width - totalWidth));
 
+  // Largeur de chaque barre (actuelle et précédente)
+  const singleBarWidth = (barWidth - 0.5) / 2; // 0.5px d'espace total entre les barres
+
   totals.forEach((item, index) => {
-    const barHeight = (item.seconds / maxSeconds) * usableHeight;
     const barX = startX + index * (barWidth + gapBetween);
+
+    // Calculer les hauteurs pour positionner les textes correctement
+    const prevBarHeight = ((item.previousSeconds || 0) / maxSeconds) * usableHeight;
+    const prevBarY = y + paddingTop + (usableHeight - prevBarHeight);
+    const barHeight = (item.seconds / maxSeconds) * usableHeight;
     const barY = y + paddingTop + (usableHeight - barHeight);
 
-    const gradient = ctx.createLinearGradient(barX, barY, barX, barY + barHeight);
-    gradient.addColorStop(0, '#8ad3f4');
-    gradient.addColorStop(1, '#7fc1df');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(barX, barY, barWidth, barHeight);
+    // Barre de la semaine précédente (à gauche, en gris)
+    if (item.previousSeconds && item.previousSeconds > 0) {
+      ctx.fillStyle = 'rgba(100, 100, 120, 0.5)';
+      ctx.fillRect(barX, prevBarY, singleBarWidth, prevBarHeight);
 
+      // Texte vertical dans la barre précédente (si assez haute)
+      if (prevBarHeight > 30) {
+        ctx.save();
+        ctx.translate(barX + singleBarWidth / 2, prevBarY + prevBarHeight / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '500 12px "Montserrat", "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(formatDuration(item.previousSeconds, true), 0, 0);
+        ctx.restore();
+      } else {
+        // Pour les petites barres: afficher au-dessus
+        ctx.fillStyle = 'rgba(200, 200, 220, 0.8)';
+        ctx.font = '400 10px "Montserrat", "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(formatDuration(item.previousSeconds, true), barX + singleBarWidth / 2, prevBarY - 4);
+      }
+    }
+
+    // Barre de la semaine actuelle (à droite, en bleu)
+    if (item.seconds > 0) {
+      const gradient = ctx.createLinearGradient(barX, barY, barX, barY + barHeight);
+      gradient.addColorStop(0, '#8ad3f4');
+      gradient.addColorStop(1, '#7fc1df');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(barX + singleBarWidth + 0.5, barY, singleBarWidth, barHeight);
+
+      // Texte vertical dans la barre actuelle (si assez haute)
+      if (barHeight > 40) {
+        ctx.save();
+        ctx.translate(barX + singleBarWidth + 0.5 + singleBarWidth / 2, barY + barHeight / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '500 12px "Montserrat", "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(formatDuration(item.seconds, true), 0, 0);
+        ctx.restore();
+      } else {
+        // Pour les petites barres: afficher au-dessus
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '500 10px "Montserrat", "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(formatDuration(item.seconds, true), barX + singleBarWidth + 0.5 + singleBarWidth / 2, barY - 4);
+      }
+    }
+
+    // Label du jour (centré sous les deux barres)
     ctx.fillStyle = '#FFFFFF';
     ctx.font = '600 18px "Montserrat", "Segoe UI", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(item.label, barX + barWidth / 2, y + height - paddingBottom / 2);
-
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = '500 18px "Montserrat", "Segoe UI", sans-serif';
-    ctx.fillText(formatDuration(item.seconds), barX + barWidth / 2, barY - 14);
   });
 
   ctx.restore();
@@ -325,11 +398,24 @@ function createDefaultVoiceHistory() {
   const diff = weekday === 0 ? -6 : 1 - weekday;
   startOfWeek.setDate(startOfWeek.getDate() + diff);
 
-  const sampleSeconds = [900, 2400, 0, 1800, 3600, 1200, 2100];
-  return sampleSeconds.map((seconds, index) => ({
+  const startOfPreviousWeek = new Date(startOfWeek);
+  startOfPreviousWeek.setDate(startOfPreviousWeek.getDate() - 7);
+
+  // Données pour la semaine actuelle (en secondes: 2h30, 4h, 30m, 3h, 5h30, 2h, 4h30)
+  const sampleSeconds = [9000, 14400, 1800, 10800, 19800, 7200, 16200];
+  const currentWeek = sampleSeconds.map((seconds, index) => ({
     date: new Date(startOfWeek.getTime() + index * 86400000).toISOString(),
     time: seconds,
   }));
+
+  // Données pour la semaine précédente (en secondes: 1h30, 3h, 2h, 1h, 4h30, 2h30, 3h30)
+  const previousSampleSeconds = [5400, 10800, 7200, 3600, 16200, 9000, 12600];
+  const previousWeek = previousSampleSeconds.map((seconds, index) => ({
+    date: new Date(startOfPreviousWeek.getTime() + index * 86400000).toISOString(),
+    time: seconds,
+  }));
+
+  return [...previousWeek, ...currentWeek];
 }
 
 function resolveText(key, state) {
@@ -338,6 +424,8 @@ function resolveText(key, state) {
       return `${Math.round((state.xpCurrent / state.xpNeeded) * 100)}%`;
     case 'xpValue':
       return `${state.xpCurrent}/${state.xpNeeded} XP`;
+    case 'xpValueWithPercent':
+      return `${state.xpCurrent}/${state.xpNeeded} XP (${Math.round((state.xpCurrent / state.xpNeeded) * 100)}%)`;
     case 'username':
       return state.username;
     case 'bio':
@@ -477,7 +565,7 @@ function setupPlayground(layoutData) {
     username: 'Jordz',
     guildName: 'The Ridge',
     level: 32,
-    xpCurrent: 750,
+    xpCurrent: 350,
     xpNeeded: 1000,
     money: 12450,
     birthday: '15/08/1995',
