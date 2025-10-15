@@ -730,9 +730,6 @@ function buildRenderData(
     voiceTotal: formatDurationHoursOnly(voiceTime),
     dailyStreak: `🔥 ${dailyStreak}`,
     voiceDailyTotals: computeVoiceDailyTotals(guildUser?.stats?.voiceHistory ?? []),
-    // DEBUG
-    // eslint-disable-next-line no-console
-    ...(console.log('DEBUG dailyStreak:', dailyStreak), {})
   };
 }
 
