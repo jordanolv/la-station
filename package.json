@@ -58,6 +58,7 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@fontsource/noto-color-emoji": "^5.2.10",
     "@types/node": "^20.17.30",
     "nodemon": "^3.0.1",
     "tsc-alias": "^1.8.15",
