@@ -1,7 +1,7 @@
 import { createCanvas, loadImage, GlobalFonts } from '@napi-rs/canvas';
 import type { SKRSContext2D } from '@napi-rs/canvas';
 import { IGuildUser } from '../models/guild-user.model';
-import layoutConfig from './profileCard.layout.json';
+import layoutConfig from './meCard.layout.json';
 import path from 'path';
 
 type ProfileCardView = 'info' | 'stats';
@@ -20,7 +20,7 @@ type ProfileCardOptions = {
 
 const CARD_WIDTH = 1280;
 const CARD_HEIGHT = 720;
-const DEFAULT_BACKGROUND_PATH = path.resolve(process.cwd(), 'canva/template.png');
+const DEFAULT_BACKGROUND_PATH = path.resolve(process.cwd(), 'canva/assets/me-template.png');
 const DEFAULT_FONT_PATH = path.resolve(process.cwd(), 'src/assets/fonts/HelveticaNeueLTStd-Bd.otf');
 
 type CanvasAlign = 'left' | 'right' | 'center' | 'start' | 'end';
@@ -56,7 +56,7 @@ type LayoutConfigItem = {
 
 type LayoutConfigFile = {
   avatar?: { x: number; y: number; radius: number };
-  voiceChart?: { x: number; y: number; width: number; height: number };
+  voiceChart?: { x: number; y: number; width: number; height: number; centerX?: number; legendOffsetX?: number; legendOffsetY?: number };
   xpBar?: { x: number; y: number; width: number; height: number; radius: number; backgroundColor: string; fillColor: string };
   xpGroup?: { offsetX: number; offsetY: number };
   roleBadges?: { x: number; y: number; maxWidth: number; maxHeight: number; badgeHeight: number; gap: number };
@@ -86,9 +86,9 @@ const TEXT_RESOLVERS: Record<string, (data: RenderData) => string | null | undef
   messagesValue: data => data.messages,
   voiceValue: data => data.voiceTotal,
   dailyStreakValue: data => data.dailyStreak,
-  voiceChartLegend: data => (data.lastActive !== '-' ? `Dernière activité : ${data.lastActive}` : ''),
+  lastActivity: data => (data.lastActive !== '-' ? `Dernière activité : ${data.lastActive}` : ''),
+  voiceChartLegend: () => null,
   joinedTimeline: () => null,
-  lastActiveTimeline: () => null,
 };
 
 const layoutFile = layoutConfig as LayoutConfigFile;
@@ -100,8 +100,7 @@ const VOICE_CHART_CONFIG = layoutFile.voiceChart ?? { x: 140, y: 400, width: 640
 const XP_BAR_CONFIG = layoutFile.xpBar ?? { x: 200, y: 215, width: 520, height: 42, radius: 24, backgroundColor: 'rgba(20, 28, 45, 0.6)', fillColor: '#8ad3f4' };
 const XP_GROUP_OFFSET = layoutFile.xpGroup ?? { offsetX: 0, offsetY: 0 };
 const ROLE_BADGES_CONFIG = layoutFile.roleBadges ?? { x: 100, y: 300, maxWidth: 600, maxHeight: 100, badgeHeight: 28, gap: 8 };
-const voiceChartLegendLayout = (layoutFile.info ?? []).find(item => item.key === 'voiceChartLegend');
-const VOICE_CHART_CENTER = voiceChartLegendLayout?.align === 'center' ? voiceChartLegendLayout.x : undefined;
+const VOICE_CHART_CENTER = layoutFile.voiceChart?.centerX;
 
 const CARD_LAYOUT: LayoutItem[] = (layoutFile.info ?? []).map(item => ({
   ...item,
@@ -377,37 +376,6 @@ function renderLayout(ctx: SKRSContext2D, layout: LayoutItem[], data: RenderData
     const offsetX = item.group === 'xpGroup' ? xpGroupOffset.offsetX : 0;
     const offsetY = item.group === 'xpGroup' ? xpGroupOffset.offsetY : 0;
 
-    // Patch: dailyStreakValue rendu séparé emoji + chiffre
-    if (item.key === 'dailyStreakValue' && typeof content === 'string' && content.startsWith('🔥')) {
-      // Séparer emoji et chiffre
-      const match = content.match(/^(🔥)\s*(\d+)/);
-      if (match) {
-        const emoji = match[1];
-        const number = match[2];
-        // Rendu emoji
-        drawText(ctx, emoji, item.x + offsetX, item.y + offsetY, {
-          size: item.fontSize,
-          color: item.color,
-          align: item.align,
-          fontWeight: item.fontWeight,
-          fontFamily: 'Apple Color Emoji, Noto Color Emoji, Segoe UI Emoji',
-        });
-        // Mesurer largeur emoji
-        ctx.save();
-        ctx.font = `${item.fontWeight} ${item.fontSize}px Apple Color Emoji, Noto Color Emoji, Segoe UI Emoji`;
-        const emojiWidth = ctx.measureText(emoji).width;
-        ctx.restore();
-        // Rendu chiffre juste après
-        drawText(ctx, number, item.x + offsetX + emojiWidth + 4, item.y + offsetY, {
-          size: item.fontSize,
-          color: item.color,
-          align: 'left',
-          fontWeight: item.fontWeight,
-          fontFamily: 'Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
-        });
-        return;
-      }
-    }
     // Rendu standard
     drawText(ctx, content, item.x + offsetX, item.y + offsetY, {
       size: item.fontSize,
@@ -481,20 +449,22 @@ function computeVoiceDailyTotals(history: any[]): VoiceDailyTotal[] {
 
 function drawVoiceChart(
   ctx: SKRSContext2D,
-  config: { x: number; y: number; width: number; height: number },
+  config: { x: number; y: number; width: number; height: number; centerX?: number; legendOffsetX?: number; legendOffsetY?: number },
   totals: VoiceDailyTotal[],
   centerX?: number
 ): void {
   if (!config) return;
-  const { x, y, width, height } = config;
+  const { x, y, width, height, legendOffsetX = 0, legendOffsetY = 20 } = config;
+  // Use centerX from config if provided, otherwise use the parameter
+  const effectiveCenterX = config.centerX !== undefined ? config.centerX : centerX;
   ctx.save();
-  const offset = centerX !== undefined ? centerX - (x + width / 2) : 0;
+  const offset = effectiveCenterX !== undefined ? effectiveCenterX - (x + width / 2) : 0;
   const containerX = x + offset;
 
   const maxSeconds = Math.max(...totals.map(t => Math.max(t.seconds, t.previousSeconds)), 0);
 
   if (maxSeconds === 0) {
-    const offset = centerX !== undefined ? centerX - (x + width / 2) : 0;
+    const offset = effectiveCenterX !== undefined ? effectiveCenterX - (x + width / 2) : 0;
     drawText(ctx, 'Aucune activité vocale récente', x + width / 2 + offset, y + height / 2, {
       size: 22,
       color: '#FFFFFF',
@@ -505,111 +475,191 @@ function drawVoiceChart(
     return;
   }
 
-  // Dessiner la légende à droite de "Dernière activité" (en bas du chart)
-  const legendY = y + height + 20; // En dessous du chart
-  const legendStartX = x + width - 230;
+  // Draw legend at the bottom of the chart (left side)
+  const legendY = y + height + legendOffsetY;
+  const legendStartX = containerX + legendOffsetX;
   const squareSize = 9;
   const legendGap = 5;
   const spaceBetweenItems = 79;
 
-  // Carré gris (semaine précédente)
-  ctx.fillStyle = 'rgba(100, 100, 120, 0.5)';
+  // Gray square (previous week)
+  ctx.fillStyle = 'rgba(220, 220, 230, 0.7)';
   ctx.fillRect(legendStartX, legendY - squareSize / 2, squareSize, squareSize);
-  drawText(ctx, 'Sem. dern.', legendStartX + squareSize + legendGap, legendY, {
-    size: 11,
-    color: 'rgba(200, 200, 220, 0.8)',
-    align: 'left',
-    fontWeight: '400',
-  });
+  ctx.fillStyle = 'rgba(220, 220, 230, 0.8)';
+  ctx.font = '400 11px "Montserrat", sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Sem. dern.', legendStartX + squareSize + legendGap, legendY);
 
-  // Carré bleu (semaine actuelle)
+  // Blue square (current week)
   const legendBlueX = legendStartX + spaceBetweenItems;
-  const gradient = ctx.createLinearGradient(legendBlueX, legendY - squareSize / 2, legendBlueX, legendY - squareSize / 2 + squareSize);
-  gradient.addColorStop(0, '#8ad3f4');
-  gradient.addColorStop(1, '#7fc1df');
-  ctx.fillStyle = gradient;
+  ctx.fillStyle = '#8ad3f4';
   ctx.fillRect(legendBlueX, legendY - squareSize / 2, squareSize, squareSize);
-  drawText(ctx, 'Cette sem.', legendBlueX + squareSize + legendGap, legendY, {
-    size: 11,
-    color: '#FFFFFF',
-    align: 'left',
-    fontWeight: '500',
-  });
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '500 11px "Montserrat", sans-serif';
+  ctx.fillText('Cette sem.', legendBlueX + squareSize + legendGap, legendY);
 
-  const paddingBottom = 40;
-  const paddingTop = 10;
+  const paddingTop = 30;
+  const paddingBottom = 45;
+  const paddingLeft = 35;
+  const paddingRight = 10;
   const usableHeight = height - paddingBottom - paddingTop;
+  const usableWidth = width - paddingLeft - paddingRight;
+  const chartStartX = containerX + paddingLeft;
 
-  let gapBetween = Math.min(25, width * 0.04);
-  let barWidth = (width - gapBetween * (totals.length - 1)) / totals.length;
-  if (barWidth > 185) {
-    barWidth = 185;
-    gapBetween = (width - barWidth * totals.length) / Math.max(totals.length - 1, 1);
-  } else if (barWidth < 65) {
-    barWidth = 65;
-    gapBetween = Math.max(10, (width - barWidth * totals.length) / Math.max(totals.length - 1, 1));
+  const segmentWidth = usableWidth / (totals.length - 1);
+
+  // Draw Y-axis grid and labels with rounded values
+  const maxHours = Math.ceil(maxSeconds / 3600);
+  const step = Math.max(1, Math.ceil(maxHours / 4));
+  const gridValues: number[] = [];
+
+  for (let h = 0; h <= maxHours; h += step) {
+    gridValues.push(h * 3600);
   }
 
-  const totalWidth = barWidth * totals.length + gapBetween * Math.max(totals.length - 1, 0);
-  const desiredCenter = centerX ?? (containerX + width / 2);
-  let startX = desiredCenter - totalWidth / 2;
-  startX = Math.max(containerX, Math.min(startX, containerX + width - totalWidth));
+  gridValues.forEach(value => {
+    const ratio = value / maxSeconds;
+    const gridY = y + paddingTop + usableHeight * (1 - ratio);
 
-  // Largeur de chaque barre (actuelle et précédente)
-  const singleBarWidth = (barWidth - 0.5) / 2; // 0.5px d'espace total entre les barres
+    // Draw grid line
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(chartStartX, gridY);
+    ctx.lineTo(chartStartX + usableWidth, gridY);
+    ctx.stroke();
+    ctx.restore();
+  });
 
+  // Build points for continuous line chart
+  const currentPoints = totals.map((item, index) => {
+    const pointX = chartStartX + index * segmentWidth;
+    const pointHeight = (item.seconds / maxSeconds) * usableHeight;
+    const pointY = y + paddingTop + (usableHeight - pointHeight);
+    return { x: pointX, y: pointY, value: item.seconds };
+  });
+
+  const previousPoints = totals.map((item, index) => {
+    const pointX = chartStartX + index * segmentWidth;
+    const pointHeight = (item.previousSeconds / maxSeconds) * usableHeight;
+    const pointY = y + paddingTop + (usableHeight - pointHeight);
+    return { x: pointX, y: pointY, value: item.previousSeconds };
+  });
+
+  // Draw previous week area chart (gray - behind current week)
+  ctx.save();
+
+  // Fill area under the curve
+  ctx.beginPath();
+  ctx.moveTo(previousPoints[0].x, y + paddingTop + usableHeight);
+  previousPoints.forEach((point, index) => {
+    if (index === 0) {
+      ctx.lineTo(point.x, point.y);
+    } else {
+      ctx.lineTo(point.x, point.y);
+    }
+  });
+  ctx.lineTo(previousPoints[previousPoints.length - 1].x, y + paddingTop + usableHeight);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(220, 220, 230, 0.15)';
+  ctx.fill();
+
+  // Draw line
+  ctx.beginPath();
+  previousPoints.forEach((point, index) => {
+    if (index === 0) ctx.moveTo(point.x, point.y);
+    else ctx.lineTo(point.x, point.y);
+  });
+  ctx.strokeStyle = 'rgba(220, 220, 230, 0.4)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.restore();
+
+  // Draw current week area chart (blue)
+  ctx.save();
+
+  // Fill area under the curve
+  ctx.beginPath();
+  ctx.moveTo(currentPoints[0].x, y + paddingTop + usableHeight);
+  currentPoints.forEach((point, index) => {
+    if (index === 0) {
+      ctx.lineTo(point.x, point.y);
+    } else {
+      ctx.lineTo(point.x, point.y);
+    }
+  });
+  ctx.lineTo(currentPoints[currentPoints.length - 1].x, y + paddingTop + usableHeight);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(138, 211, 244, 0.4)';
+  ctx.fill();
+
+  // Draw line with glow effect
+  ctx.save();
+  ctx.shadowColor = '#8ad3f4';
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
+  ctx.beginPath();
+  currentPoints.forEach((point, index) => {
+    if (index === 0) ctx.moveTo(point.x, point.y);
+    else ctx.lineTo(point.x, point.y);
+  });
+  ctx.strokeStyle = '#8ad3f4';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.restore();
+
+  // Draw dots and values for current week (blue) with percentage change
+  currentPoints.forEach((point, index) => {
+    if (totals[index].seconds > 0) {
+      // Draw dot
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#8ad3f4';
+      ctx.fill();
+      ctx.restore();
+
+      // Draw value above dot
+      const currentValue = formatDuration(totals[index].seconds, true);
+      drawText(ctx, currentValue, point.x, point.y - 18, {
+        size: 18,
+        color: '#FFFFFF',
+        align: 'center',
+        fontWeight: '600',
+      });
+
+      // Calculate and draw percentage change
+      if (totals[index].previousSeconds > 0) {
+        const diff = totals[index].seconds - totals[index].previousSeconds;
+        const percentChange = Math.round((diff / totals[index].previousSeconds) * 100);
+
+        if (percentChange !== 0) {
+          const sign = percentChange > 0 ? '+' : '';
+          const percentText = `${sign}${percentChange}%`;
+          const percentColor = percentChange > 0 ? '#2ecc71' : '#e74c3c';
+
+          drawText(ctx, percentText, point.x, point.y - 35, {
+            size: 14,
+            color: percentColor,
+            align: 'center',
+            fontWeight: '600',
+          });
+        }
+      }
+    }
+  });
+
+  ctx.restore();
+
+  // Draw labels below each point
   totals.forEach((item, index) => {
-    const barX = startX + index * (barWidth + gapBetween);
-
-    // Calculer les hauteurs pour positionner les textes correctement
-    const prevBarHeight = (item.previousSeconds / maxSeconds) * usableHeight;
-    const prevBarY = y + paddingTop + (usableHeight - prevBarHeight);
-    const barHeight = (item.seconds / maxSeconds) * usableHeight;
-    const barY = y + paddingTop + (usableHeight - barHeight);
-
-    // Barre de la semaine précédente (à gauche, en gris)
-    if (item.previousSeconds > 0) {
-      ctx.fillStyle = 'rgba(100, 100, 120, 0.5)';
-      ctx.fillRect(barX, prevBarY, singleBarWidth, prevBarHeight);
-
-      // Texte vertical dans la barre précédente
-      if (prevBarHeight > 40) {
-        ctx.save();
-        ctx.translate(barX + singleBarWidth / 2, prevBarY + prevBarHeight / 2);
-        ctx.rotate(-Math.PI / 2);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '500 12px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(formatDuration(item.previousSeconds, true), 0, 0);
-        ctx.restore();
-      }
-    }
-
-    // Barre de la semaine actuelle (à droite, en bleu)
-    if (item.seconds > 0) {
-      const gradient = ctx.createLinearGradient(barX, barY, barX, barY + barHeight);
-      gradient.addColorStop(0, '#8ad3f4');
-      gradient.addColorStop(1, '#7fc1df');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(barX + singleBarWidth + 0.5, barY, singleBarWidth, barHeight);
-
-      // Texte vertical dans la barre actuelle
-      if (barHeight > 40) {
-        ctx.save();
-        ctx.translate(barX + singleBarWidth + 0.5 + singleBarWidth / 2, barY + barHeight / 2);
-        ctx.rotate(-Math.PI / 2);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '500 12px Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(formatDuration(item.seconds, true), 0, 0);
-        ctx.restore();
-      }
-    }
-
-    // Label du jour (centré sous les deux barres)
-    drawText(ctx, item.label, barX + barWidth / 2, y + height - paddingBottom / 2, {
+    const pointX = chartStartX + index * segmentWidth;
+    drawText(ctx, item.label, pointX, y + height - 18, {
       size: 18,
       color: '#FFFFFF',
       align: 'center',
@@ -728,11 +778,8 @@ function buildRenderData(
     joined: guildUser?.infos?.registeredAt ? formatDateFR(guildUser.infos.registeredAt) : '-',
     lastActive: guildUser?.stats?.lastActivityDate ? formatDateFR(guildUser.stats.lastActivityDate) : '-',
     voiceTotal: formatDurationHoursOnly(voiceTime),
-    dailyStreak: `🔥 ${dailyStreak}`,
+    dailyStreak: String(dailyStreak),
     voiceDailyTotals: computeVoiceDailyTotals(guildUser?.stats?.voiceHistory ?? []),
-    // DEBUG
-    // eslint-disable-next-line no-console
-    ...(console.log('DEBUG dailyStreak:', dailyStreak), {})
   };
 }
 
