@@ -4,7 +4,7 @@ import {
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { UserService } from '../services/guildUser.service';
-import { ProfileCardService } from '../services/profileCard.service';
+import { ProfileCardService } from '../services/meCard.service';
 
 type GuildUserDoc = NonNullable<Awaited<ReturnType<typeof UserService.getGuildUserByDiscordId>>>;
 
