@@ -8,6 +8,14 @@ class VoiceHistoryEntry {
   time!: number;
 }
 
+class MessageHistoryEntry {
+  @prop({ default: () => new Date() })
+  date!: Date;
+
+  @prop({ default: 0 })
+  count!: number;
+}
+
 class GuildUserProfil {
   @prop({ default: 500 })
   money!: number;
@@ -44,6 +52,9 @@ class ArcadeStats {
 class GuildUserStats {
   @prop({ default: 0 })
   totalMsg!: number;
+
+  @prop({ type: () => [MessageHistoryEntry], default: [] })
+  messageHistory!: MessageHistoryEntry[];
 
   @prop({ default: 0 })
   voiceTime!: number;
