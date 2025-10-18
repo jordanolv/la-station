@@ -1,6 +1,6 @@
 {
   "avatar": { "x": 1033, "y": 155, "radius": 70 },
-  "voiceChart": { "x": 44, "y": 400, "width": 690, "height": 260, "centerX": 390, "legendOffsetX": 20, "legendOffsetY": 20 },
+  "voiceChart": { "x": 44, "y": 400, "width": 690, "height": 246, "centerX": 390, "legendOffsetX": 20, "legendOffsetY": 37 },
   "xpBar": { "x": 152, "y": 153, "width": 358, "height": 25, "radius": 12, "backgroundColor": "rgba(20, 28, 45, 0.8)", "fillColor": "#8ad3f4" },
   "xpGroup": { "offsetX": 704, "offsetY": 94 },
   "roleBadges": { "x": 48, "y": 44, "maxWidth": 700, "maxHeight": 230, "badgeHeight": 28, "gap": 8 },

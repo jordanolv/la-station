@@ -69,6 +69,7 @@ type LayoutItem = LayoutConfigItem & {
 
 type VoiceDailyTotal = {
   label: string;
+  dateLabel: string;
   seconds: number;
   previousSeconds: number;
 };
@@ -391,26 +392,18 @@ function computeVoiceDailyTotals(history: any[]): VoiceDailyTotal[] {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const startOfWeek = new Date(today);
-  const weekday = startOfWeek.getDay(); // 0 dimanche ... 6 samedi
-  const diff = weekday === 0 ? -6 : 1 - weekday; // lundi
-  startOfWeek.setDate(startOfWeek.getDate() + diff);
-
-  // Calculer le début de la semaine précédente
-  const startOfPreviousWeek = new Date(startOfWeek);
-  startOfPreviousWeek.setDate(startOfPreviousWeek.getDate() - 7);
-
   const totals: VoiceDailyTotal[] = [];
-  for (let i = 0; i < daysCount; i += 1) {
-    // Semaine actuelle
-    const dayStart = new Date(startOfWeek);
-    dayStart.setDate(startOfWeek.getDate() + i);
+
+  for (let i = daysCount - 1; i >= 0; i -= 1) {
+    // Jour actuel (7 derniers jours glissants)
+    const dayStart = new Date(today);
+    dayStart.setDate(today.getDate() - i);
     const dayEnd = new Date(dayStart);
     dayEnd.setDate(dayEnd.getDate() + 1);
 
-    // Semaine précédente (même jour de la semaine)
-    const previousDayStart = new Date(startOfPreviousWeek);
-    previousDayStart.setDate(startOfPreviousWeek.getDate() + i);
+    // Jour correspondant 7 jours avant (pour la comparaison)
+    const previousDayStart = new Date(dayStart);
+    previousDayStart.setDate(dayStart.getDate() - 7);
     const previousDayEnd = new Date(previousDayStart);
     previousDayEnd.setDate(previousDayEnd.getDate() + 1);
 
@@ -441,7 +434,9 @@ function computeVoiceDailyTotals(history: any[]): VoiceDailyTotal[] {
       .replace('.', '')
       .toUpperCase();
 
-    totals.push({ label, seconds, previousSeconds });
+    const dateLabel = dayStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+
+    totals.push({ label, dateLabel, seconds, previousSeconds });
   }
 
   return totals;
@@ -659,11 +654,21 @@ function drawVoiceChart(
   // Draw labels below each point
   totals.forEach((item, index) => {
     const pointX = chartStartX + index * segmentWidth;
-    drawText(ctx, item.label, pointX, y + height - 18, {
-      size: 18,
+
+    // Draw day label (LUN, MAR, etc.)
+    drawText(ctx, item.label, pointX, y + height - 22, {
+      size: 16,
       color: '#FFFFFF',
       align: 'center',
       fontWeight: '600',
+    });
+
+    // Draw date label (13/10)
+    drawText(ctx, item.dateLabel, pointX, y + height - 6, {
+      size: 13,
+      color: 'rgba(255, 255, 255, 0.6)',
+      align: 'center',
+      fontWeight: '400',
     });
   });
 
