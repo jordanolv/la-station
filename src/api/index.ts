@@ -10,6 +10,7 @@ import vocManager from './routes/voc-manager'
 // import suggestions from '../features/suggestions/routes/suggestions.route' // Moved to guilds.ts
 import party from '../features/party/routes/party.routes'
 import chatGaming from '../features/chat-gaming/routes/chat-gaming.routes'
+import canva from './routes/canva'
 
 import path from 'path'
 
@@ -93,6 +94,19 @@ export function createAPI(client: BotClient) {
   // app.route('/api/suggestions', suggestions) // Routes moved to guilds.ts
   app.route('/api/party', party)
   app.route('/api/chat-gaming', chatGaming)
+  app.route('/canva', canva)
+
+  // Serve canva preview web interface
+  app.get('/canva-preview', async (c) => {
+    const htmlPath = path.join(projectRoot, 'canva/web/index.html')
+    try {
+      const html = fs.readFileSync(htmlPath, 'utf-8')
+      return c.html(html)
+    } catch (error) {
+      return c.text('Canva preview page not found', 404)
+    }
+  })
+
   // Health check
   app.get('/health', (c) => {
     return c.json({ status: 'ok' })
