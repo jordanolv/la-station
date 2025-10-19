@@ -3,7 +3,7 @@
  * Architecture hybride : PSD pour les textes statiques + Canvas pour éléments dynamiques
  */
 
-import { renderFromPsdToBuffer } from '../features/test/services/psd-render.service';
+import { renderFromPsdToBuffer } from './psd-render.service';
 import { createCanvas, loadImage, SKRSContext2D } from '@napi-rs/canvas';
 import path from 'path';
 import fs from 'fs';

@@ -5,7 +5,7 @@
 
 import { createCanvas, loadImage, SKRSContext2D } from '@napi-rs/canvas';
 import { TemplateRenderService } from '../../../shared/template-render.service';
-import { extractReferenceLayersFromPsd, LayerPosition } from '../../test/services/psd-render.service';
+import { extractReferenceLayersFromPsd, LayerPosition } from '../../../shared/psd-render.service';
 import { IGuildUser } from '../models/guild-user.model';
 import layoutConfig from './meCard.layout.json';
 import path from 'path';

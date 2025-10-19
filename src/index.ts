@@ -1,5 +1,6 @@
 import { startBot } from './bot/start';
 import { startApiServer } from './api/start';
+import { initializeCanvas } from './shared/canvas-init';
 import dotenv from 'dotenv';
 import chalk from 'chalk';
 
@@ -10,6 +11,9 @@ async function main() {
     console.log(chalk.cyan('═'.repeat(60)));
     console.log(chalk.cyan.bold('          🚀 DÉMARRAGE DE LA STATION'));
     console.log(chalk.cyan('═'.repeat(60)));
+
+    // Initialiser le canvas (nécessaire pour @napi-rs/canvas)
+    initializeCanvas();
 
     const botClient = await startBot();
     const API_PORT = process.env.API_PORT ? parseInt(process.env.API_PORT) : 3051;
