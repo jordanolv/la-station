@@ -4,7 +4,7 @@ import {
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { UserService } from '../services/guildUser.service';
-import { ProfileCardService } from '../services/meCard.service';
+import { MeTemplateService } from '../services/me-template.service';
 
 type GuildUserDoc = NonNullable<Awaited<ReturnType<typeof UserService.getGuildUserByDiscordId>>>;
 
@@ -12,15 +12,12 @@ async function buildCard(
   discordUser: { username: string; displayAvatarURL: (options?: { size?: number; extension?: string }) => string },
   guildUser: GuildUserDoc,
   guildName: string,
-  roles: { name: string; color: string }[],
-  backgroundUrl: string | undefined = process.env.PROFILE_CARD_BACKGROUND_URL
+  roles: { name: string; color: string }[]
 ) {
-  const { buffer, filename } = await ProfileCardService.generate({
-    view: 'info',
+  const { buffer, filename } = await MeTemplateService.generate({
     discordUser,
     guildUser,
     guildName,
-    backgroundUrl,
     roles
   });
 
