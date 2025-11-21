@@ -1,39 +1,44 @@
 <template>
-  <div class="w-full p-4 md:p-8">
-    <div v-if="loading && !guild" class="text-center text-neutral-400 py-10">
-      <p>Chargement des informations du serveur...</p>
-    </div>
-    <div v-else-if="!guild" class="text-center text-red-500 py-10">
-      <h2 class="text-2xl font-semibold mb-4">Serveur introuvable</h2>
-      <p class="text-neutral-400 mb-6">Impossible de trouver les informations pour ce serveur (ID: {{ guildId }}).<br/>Vérifiez l'ID ou que vous avez accès à ce serveur.</p>
-      <router-link to="/" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow transition-colors duration-150">Retour à l'accueil</router-link>
+  <div class="w-full space-y-8">
+    <div v-if="loading && !guild" class="flex flex-col items-center justify-center py-24 space-y-4">
+      <div class="w-8 h-8 border-2 border-border border-t-white rounded-full animate-spin"></div>
+      <p class="text-muted text-sm">Chargement des informations du serveur...</p>
     </div>
 
-    <div v-else class="dashboard-grid">
+    <div v-else-if="!guild" class="flex flex-col items-center justify-center py-24 text-center border border-border border-dashed rounded-xl bg-surface/30">
+      <div class="w-16 h-16 rounded-full bg-surface border border-border flex items-center justify-center mb-4 text-red-500">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+      </div>
+      <h2 class="text-lg font-medium text-white mb-1">Serveur introuvable</h2>
+      <p class="text-muted max-w-sm mb-6">Impossible de trouver les informations pour ce serveur (ID: {{ guildId }}).<br/>Vérifiez l'ID ou que vous avez accès à ce serveur.</p>
+      <router-link to="/" class="px-4 py-2 text-sm font-medium text-white bg-surface hover:bg-surface-hover border border-border rounded-md transition-all">Retour à l'accueil</router-link>
+    </div>
+
+    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Main Stats & Feature Cards -->
-      <div class="main-content-area space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <StatCard title="Nom du Serveur" :value="guild.name" description="Nom Discord actuel du serveur" />
           <StatCard title="Préfixe du Bot" :value="guild.config?.prefix || 'Non défini'" />
           <StatCard title="Date d'enregistrement">
-            <p class="text-3xl font-bold text-white">{{ formatDate(guild.registeredAt) }}</p>
+            <p class="text-2xl font-bold text-white tracking-tight">{{ formatDate(guild.registeredAt) }}</p>
           </StatCard>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
            <StatCard title="Voc Channels Créés" :value="guild.features?.vocGaming?.nbChannelsCreated || 0" description="Nombre de salons vocaux temporaires créés" />
            <StatCard title="Forums Gaming Créés" :value="guild.features?.chatGaming?.nbForumCreated || 0" description="Nombre de forums de jeu créés"/>
            <StatCard title="Couleur Principale">
-             <div v-if="guild.config?.colors?.primary" class="flex items-center space-x-2 mt-2">
-                <div class="w-8 h-8 rounded border border-neutral-600" :style="{ backgroundColor: guild.config.colors.primary }"></div>
-                <span class="text-2xl font-bold text-white">{{ guild.config.colors.primary }}</span>
+             <div v-if="guild.config?.colors?.primary" class="flex items-center space-x-3 mt-2">
+                <div class="w-10 h-10 rounded-lg border border-border shadow-sm" :style="{ backgroundColor: guild.config.colors.primary }"></div>
+                <span class="text-xl font-mono font-medium text-white">{{ guild.config.colors.primary }}</span>
              </div>
-             <p v-else class="text-2xl font-bold text-neutral-500">(Non définie)</p>
+             <p v-else class="text-xl font-bold text-muted">(Non définie)</p>
            </StatCard>
         </div>
 
-        <div class="bg-neutral-800 p-6 rounded-xl shadow-lg">
-          <h3 class="text-xl font-semibold text-neutral-100 mb-4">État des Fonctionnalités</h3>
+        <div class="bg-surface border border-border rounded-xl p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-white mb-6">État des Fonctionnalités</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <FeatureStatusCard featureName="Logs" :status="guild.features?.logs?.enabled" :details="guild.features?.logs?.channel ? `# ${getChannelName(guild.features.logs.channel)}` : 'Canal non défini'" />
             <FeatureStatusCard featureName="Voc Gaming" :status="guild.features?.vocGaming?.enabled" :details="guild.features?.vocGaming?.channelToJoin ? `Salon à rejoindre: ${getChannelName(guild.features.vocGaming.channelToJoin)}` : 'Canal non défini'" />
@@ -43,18 +48,10 @@
             <FeatureStatusCard featureName="Suggestions" :status="guild.features?.suggestions?.enabled" :details="guild.features?.suggestions?.channelCount ? `${guild.features.suggestions.channelCount} channels configurés` : 'Aucun channel configuré'" />
           </div>
         </div>
-
-         <!-- You can add more StatCard or custom cards here -->
-         <!-- Example: 
-         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <StatCard title="Voc Gaming Channels Créés" :value="guild.features?.vocGaming?.nbChannelsCreated || 0" />
-            <StatCard title="Forums Chat Gaming Créés" :value="guild.features?.chatGaming?.nbForumCreated || 0" />
-         </div>
-         -->
       </div>
 
       <!-- Leaderboard Area -->
-      <div class="leaderboard-area">
+      <div class="lg:col-span-1 h-full min-h-[400px]">
         <GuildUserLeaderboard :guildId="guildId" />
       </div>
     </div>
@@ -72,10 +69,14 @@ import GuildUserLeaderboard from '../../components/guild/GuildUserLeaderboard.vu
 const FeatureStatusCard = {
   props: { featureName: String, status: Boolean, details: String },
   template: `
-    <div class="bg-neutral-750 p-4 rounded-lg shadow">
-      <h4 class="text-md font-semibold text-neutral-200">{{ featureName }}</h4>
-      <p :class="status ? 'text-green-400' : 'text-red-400'" class="text-sm font-medium">{{ status ? 'Activé' : 'Désactivé' }}</p>
-      <p v-if="details" class="text-xs text-neutral-400 mt-1">{{ details }}</p>
+    <div class="bg-surface-hover/50 border border-border p-4 rounded-lg transition-colors hover:border-border-hover">
+      <div class="flex items-center justify-between mb-2">
+        <h4 class="text-sm font-medium text-white">{{ featureName }}</h4>
+        <div :class="status ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'" class="px-1.5 py-0.5 rounded text-[10px] font-medium border uppercase tracking-wide">
+          {{ status ? 'ON' : 'OFF' }}
+        </div>
+      </div>
+      <p v-if="details" class="text-xs text-muted truncate" :title="details">{{ details }}</p>
     </div>
   `
 }
@@ -144,29 +145,4 @@ watch(() => authStore.guilds, (newGuilds) => {
   }
 }, { deep: true, immediate: authStore.guilds.length > 0 });
 
-</script>
-
-<style scoped>
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr)); /* Single column on small screens */
-  gap: 1.5rem; /* 24px */
-}
-
-@media (min-width: 1024px) { /* lg breakpoint */
-  .dashboard-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr)); /* Three columns on large screens */
-  }
-  .main-content-area {
-    grid-column: span 2 / span 2; /* Main content takes 2 columns */
-  }
-  .leaderboard-area {
-    grid-column: span 1 / span 1; /* Leaderboard takes 1 column */
-  }
-}
-
-/* Ensure cards within the main content area's grid take full width */
-.main-content-area .grid > * {
-  width: 100%;
-}
-</style> 
+</script> 

@@ -10,6 +10,16 @@ const router = createRouter({
       component: () => import('../views/auth/LoginView.vue')
     },
     {
+      path: '/auth/callback',
+      name: 'auth-callback',
+      component: () => import('../views/auth/CallbackView.vue')
+    },
+    {
+      path: '/leaderboard/:id',
+      name: 'leaderboard',
+      component: () => import('../views/LeaderboardView.vue')
+    },
+    {
       path: '/servers',
       name: 'servers',
       component: () => import('../views/server/ServersView.vue'),
@@ -39,16 +49,30 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore()
-  
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/')
-  } else if (to.name === 'login' && authStore.isAuthenticated) {
-    next('/servers')
-  } else {
-    next()
+
+  // Attendre que l'auth soit initialisée
+  if (!authStore.isInitialized) {
+    await authStore.initialize()
   }
+
+  // Routes qui nécessitent l'authentification
+  if (to.meta.requiresAuth) {
+    if (!authStore.isAuthenticated) {
+      // Rediriger vers la page de login
+      next({ name: 'login', query: { redirect: to.fullPath } })
+      return
+    }
+  }
+
+  // Si l'utilisateur est déjà connecté et essaie d'accéder à la page de login
+  if (to.name === 'login' && authStore.isAuthenticated) {
+    next('/servers')
+    return
+  }
+
+  next()
 })
 
 export default router 

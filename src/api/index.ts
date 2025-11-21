@@ -20,13 +20,13 @@ export function createAPI(client: BotClient) {
   // Middleware
   app.use('*', logger())
   
-  // Configuration CORS plus permissive
+  // Configuration CORS pour les cookies httpOnly
   app.use('*', cors({
-    origin: '*', // Autorise toutes les origines
-    allowHeaders: ['Authorization', 'Content-Type'],
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    allowHeaders: ['Content-Type', 'Cookie', 'Authorization'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    exposeHeaders: ['Content-Length', 'Content-Type'],
-    credentials: true,
+    exposeHeaders: ['Set-Cookie'],
+    credentials: true, // IMPORTANT: nécessaire pour les cookies
     maxAge: 86400 // 24 heures
   }))
 

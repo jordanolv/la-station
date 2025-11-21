@@ -2,7 +2,7 @@
   <div>
     <div class="mb-6">
       <h2 class="text-xl font-semibold text-white mb-2">🎮 Chat Gaming</h2>
-      <p class="text-gray-400">
+      <p class="text-muted">
         Créez des jeux communautaires qui génèrent automatiquement des threads et des rôles.
         Les membres peuvent réagir pour obtenir le rôle du jeu.
       </p>
@@ -10,7 +10,7 @@
 
     <!-- Settings Section -->
     <div class="mb-8">
-      <div class="bg-gray-700 rounded-lg p-6">
+      <div class="bg-surface border border-border rounded-xl p-6 shadow-sm">
         <h3 class="text-lg font-medium text-white mb-4">⚙️ Configuration</h3>
         <div class="space-y-4">
           <!-- Channel Selection -->
@@ -30,7 +30,7 @@
             <button 
               @click="saveSettings"
               :disabled="isSavingSettings"
-              class="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+              class="bg-white text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 font-medium"
             >
               <svg v-if="isSavingSettings" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -43,7 +43,7 @@
           </div>
 
           <!-- Settings Success Message -->
-          <div v-if="showSettingsSuccess" class="bg-green-600 text-white p-3 rounded-lg flex items-center space-x-2">
+          <div v-if="showSettingsSuccess" class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 p-3 rounded-lg flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
@@ -51,14 +51,14 @@
           </div>
 
           <!-- Warning if no channel configured -->
-          <div v-if="!settings.channelId" class="bg-yellow-600 bg-opacity-20 border border-yellow-600 rounded-lg p-4">
+          <div v-if="!settings.channelId" class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
             <div class="flex items-start space-x-3">
-              <svg class="w-5 h-5 text-yellow-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-amber-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.728-.833-2.498 0L4.316 15.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <div>
-                <p class="text-yellow-400 font-medium">Canal non configuré</p>
-                <p class="text-yellow-300 text-sm">
+                <p class="text-amber-500 font-medium">Canal non configuré</p>
+                <p class="text-amber-500/80 text-sm">
                   Veuillez sélectionner un canal pour que les jeux puissent être créés.
                 </p>
               </div>
@@ -74,7 +74,7 @@
         <h3 class="text-lg font-medium text-white">Jeux créés</h3>
         <button 
           @click="showCreateModal = true"
-          class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+          class="bg-surface hover:bg-surface-hover border border-border text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -83,44 +83,44 @@
         </button>
       </div>
 
-      <div v-if="isLoadingGames" class="text-center py-8">
-        <div class="inline-block w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-gray-400 mt-2">Chargement des jeux...</p>
+      <div v-if="isLoadingGames" class="text-center py-12">
+        <div class="inline-block w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-muted mt-2">Chargement des jeux...</p>
       </div>
 
-      <div v-else-if="games.length === 0" class="text-center py-8 bg-gray-700 rounded-lg">
+      <div v-else-if="games.length === 0" class="text-center py-12 bg-surface border border-border rounded-xl">
         <div class="text-4xl mb-2">🎮</div>
-        <p class="text-gray-400">Aucun jeu créé pour le moment</p>
-        <p class="text-gray-500 text-sm">Créez votre premier jeu pour commencer !</p>
+        <p class="text-white font-medium">Aucun jeu créé pour le moment</p>
+        <p class="text-muted text-sm">Créez votre premier jeu pour commencer !</p>
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div 
           v-for="game in games" 
           :key="game._id"
-          class="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors"
+          class="bg-surface border border-border rounded-xl p-4 hover:border-white/20 transition-colors group"
         >
           <div class="flex items-start justify-between mb-3">
-            <div class="flex-1">
-              <h4 class="text-white font-medium">{{ game.name }}</h4>
-              <p v-if="game.description" class="text-gray-400 text-sm mt-1">{{ game.description }}</p>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-white font-medium truncate">{{ game.name }}</h4>
+              <p v-if="game.description" class="text-muted text-sm mt-1 line-clamp-2">{{ game.description }}</p>
             </div>
-            <div v-if="game.image" class="ml-3">
-              <img :src="getImageUrl(game.image)" :alt="game.name" class="w-12 h-12 rounded-lg object-cover">
+            <div v-if="game.image" class="ml-3 flex-shrink-0">
+              <img :src="getImageUrl(game.image || undefined) || ''" :alt="game.name" class="w-12 h-12 rounded-lg object-cover border border-border">
             </div>
           </div>
           
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between pt-3 border-t border-border mt-3">
             <div class="flex items-center space-x-2">
               <div 
-                class="w-4 h-4 rounded-full border-2"
+                class="w-3 h-3 rounded-full ring-1 ring-white/20"
                 :style="{ backgroundColor: game.color || '#55CCFC' }"
               ></div>
-              <span class="text-gray-400 text-sm">{{ game.color || '#55CCFC' }}</span>
+              <span class="text-muted text-xs font-mono">{{ game.color || '#55CCFC' }}</span>
             </div>
             <button 
               @click="deleteGame(game)"
-              class="text-red-400 hover:text-red-300 transition-colors p-1"
+              class="text-muted hover:text-red-400 transition-colors p-1 opacity-0 group-hover:opacity-100"
               title="Supprimer"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,13 +133,13 @@
     </div>
 
     <!-- Create Game Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
-        <div class="flex items-center justify-between mb-4">
+    <div v-if="showCreateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div class="bg-surface border border-border rounded-xl p-6 w-full max-w-md shadow-2xl animate-slide-up">
+        <div class="flex items-center justify-between mb-6">
           <h3 class="text-lg font-semibold text-white">Créer un nouveau jeu</h3>
           <button 
             @click="closeCreateModal"
-            class="text-gray-400 hover:text-white transition-colors"
+            class="text-muted hover:text-white transition-colors"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -149,59 +149,66 @@
 
         <form @submit.prevent="createGame" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Nom du jeu</label>
+            <label class="block text-sm font-medium text-muted mb-1.5">Nom du jeu</label>
             <input 
               v-model="newGame.name"
               type="text" 
               required
-              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              class="w-full bg-background border border-border rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors placeholder:text-muted/50"
               placeholder="Ex: Minecraft, Valorant..."
             >
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Description (optionnel)</label>
+            <label class="block text-sm font-medium text-muted mb-1.5">Description (optionnel)</label>
             <textarea 
               v-model="newGame.description"
               rows="3"
-              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              class="w-full bg-background border border-border rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors placeholder:text-muted/50 resize-none"
               placeholder="Description du jeu..."
             ></textarea>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Couleur</label>
-            <input 
-              v-model="newGame.color"
-              type="color"
-              class="w-full h-10 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
+            <label class="block text-sm font-medium text-muted mb-1.5">Couleur</label>
+            <div class="flex gap-2">
+              <input 
+                v-model="newGame.color"
+                type="color"
+                class="h-10 w-14 bg-background border border-border rounded-lg cursor-pointer p-1"
+              >
+              <input 
+                v-model="newGame.color"
+                type="text"
+                class="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-white/20 transition-colors font-mono uppercase"
+              >
+            </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Image (optionnel)</label>
+            <label class="block text-sm font-medium text-muted mb-1.5">Image (optionnel)</label>
             <input 
               @change="handleImageUpload"
               type="file"
               accept="image/*"
-              class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              class="w-full bg-background border border-border rounded-lg px-3 py-2 text-muted file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-surface-hover file:text-white hover:file:bg-white/10"
             >
           </div>
 
           <div class="flex space-x-3 pt-4">
             <button 
-              type="submit"
-              :disabled="isCreatingGame || !newGame.name"
-              class="flex-1 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 rounded-lg transition-colors"
-            >
-              {{ isCreatingGame ? 'Création...' : 'Créer' }}
-            </button>
-            <button 
               type="button"
               @click="closeCreateModal"
-              class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-lg transition-colors"
+              class="flex-1 bg-surface hover:bg-surface-hover border border-border text-white py-2 px-4 rounded-lg transition-colors"
             >
               Annuler
+            </button>
+            <button 
+              type="submit"
+              :disabled="isCreatingGame || !newGame.name"
+              class="flex-1 bg-white text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4 rounded-lg transition-colors font-medium"
+            >
+              {{ isCreatingGame ? 'Création...' : 'Créer' }}
             </button>
           </div>
         </form>
@@ -212,7 +219,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '../../utils/axios'
 import { useAuthStore } from '../../stores/auth'
 import { useImageUrl } from '../../composables/useImageUrl'
 import ChannelSelect from '../ui/ChannelSelect.vue'
@@ -224,8 +231,6 @@ interface Props {
 const props = defineProps<Props>()
 const authStore = useAuthStore()
 const { getImageUrl } = useImageUrl()
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051'
 
 // Settings state
 const settings = ref({
@@ -250,12 +255,8 @@ const newGame = ref({
 // Settings functions
 const loadSettings = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/guilds/${props.guildId}/features/chat-gaming/settings`, {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`
-      }
-    })
-    
+    const response = await api.get(`/api/guilds/${props.guildId}/features/chat-gaming/settings`)
+
     if (response.data.settings) {
       settings.value = {
         channelId: response.data.settings.channelId || ''
@@ -269,18 +270,13 @@ const loadSettings = async () => {
 const saveSettings = async () => {
   try {
     isSavingSettings.value = true
-    
+
     const payload = {
       channelId: settings.value.channelId
     }
-    
-    await axios.put(`${API_BASE_URL}/api/guilds/${props.guildId}/features/chat-gaming/settings`, payload, {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-    
+
+    await api.put(`/api/guilds/${props.guildId}/features/chat-gaming/settings`, payload)
+
     showSettingsSuccess.value = true
     setTimeout(() => {
       showSettingsSuccess.value = false
@@ -295,11 +291,7 @@ const saveSettings = async () => {
 const loadGames = async () => {
   try {
     isLoadingGames.value = true
-    const response = await axios.get(`${API_BASE_URL}/api/chat-gaming`, {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`
-      }
-    })
+    const response = await api.get('/api/chat-gaming')
     games.value = response.data.games || []
   } catch (error) {
     console.error('Error loading games:', error)
@@ -311,19 +303,18 @@ const loadGames = async () => {
 const createGame = async () => {
   try {
     isCreatingGame.value = true
-    
+
     const formData = new FormData()
     formData.append('gamename', newGame.value.name)
     formData.append('gamedescription', newGame.value.description)
     formData.append('gamecolor', newGame.value.color)
-    
+
     if (newGame.value.image) {
       formData.append('gameimage', newGame.value.image)
     }
 
-    await axios.post(`${API_BASE_URL}/api/chat-gaming`, formData, {
+    await api.post('/api/chat-gaming', formData, {
       headers: {
-        Authorization: `Bearer ${authStore.token}`,
         'Content-Type': 'multipart/form-data'
       }
     })
@@ -343,11 +334,7 @@ const deleteGame = async (game: any) => {
   }
 
   try {
-    await axios.delete(`${API_BASE_URL}/api/chat-gaming/${game._id}`, {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`
-      }
-    })
+    await api.delete(`/api/chat-gaming/${game._id}`)
     await loadGames()
   } catch (error) {
     console.error('Error deleting game:', error)

@@ -1,31 +1,48 @@
 <template>
-  <div class="bg-neutral-800 p-6 rounded-xl shadow-lg h-full flex flex-col">
-    <h3 class="text-xl font-semibold text-neutral-100 mb-4">🏆 Leaderboard</h3>
-    <div v-if="loading" class="text-center text-neutral-400 py-5">
-      <p>Chargement du classement...</p>
+  <div class="bg-surface border border-border p-6 rounded-xl shadow-sm h-full flex flex-col">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-semibold text-white">🏆 Leaderboard</h3>
+      <span class="text-xs text-muted bg-surface-hover px-2 py-1 rounded border border-border">Top Members</span>
     </div>
-    <div v-else-if="error" class="text-center text-red-400 py-5">
-      <p>Impossible de charger le classement pour le moment.<br/>{{ error }}</p>
+
+    <div v-if="loading" class="flex-1 flex flex-col items-center justify-center py-10 space-y-3">
+      <div class="w-6 h-6 border-2 border-border border-t-white rounded-full animate-spin"></div>
+      <p class="text-sm text-muted">Chargement du classement...</p>
     </div>
-    <div v-else-if="users.length === 0" class="text-center text-neutral-400 py-5">
-      <p>Aucun utilisateur à afficher dans le classement pour le moment.</p>
+
+    <div v-else-if="error" class="flex-1 flex flex-col items-center justify-center py-10 text-center">
+      <div class="text-red-400 mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+      </div>
+      <p class="text-sm text-muted">{{ error }}</p>
     </div>
-    <ul v-else class="space-y-3 overflow-y-auto flex-1">
-      <li v-for="(user, index) in users" :key="user.discordId" class="flex items-center justify-between p-3 bg-neutral-750 rounded-lg">
-        <div class="flex items-center">
-          <span class="text-lg font-medium text-neutral-300 mr-3">{{ index + 1 }}.</span>
+
+    <div v-else-if="users.length === 0" class="flex-1 flex flex-col items-center justify-center py-10 text-center">
+      <p class="text-sm text-muted">Aucun utilisateur à afficher dans le classement pour le moment.</p>
+    </div>
+
+    <ul v-else class="space-y-2 overflow-y-auto flex-1 pr-2 custom-scrollbar">
+      <li v-for="(user, index) in users" :key="user.discordId" 
+        class="flex items-center justify-between p-3 rounded-lg hover:bg-surface-hover transition-colors group border border-transparent hover:border-border"
+      >
+        <div class="flex items-center gap-4">
+          <div class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-hover border border-border text-sm font-bold text-muted group-hover:text-white transition-colors">
+            {{ index + 1 }}
+          </div>
           <div>
-            <p class="text-md font-semibold text-white">{{ user.name }}</p>
-            <p class="text-xs text-neutral-400">Niv. {{ user.profil.lvl }} - {{ user.profil.exp }} XP</p>
+            <p class="text-sm font-medium text-white group-hover:text-accent transition-colors">{{ user.name }}</p>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="text-xs text-muted bg-surface-hover px-1.5 py-0.5 rounded">Lvl {{ user.profil.lvl }}</span>
+              <span class="text-xs text-muted">{{ user.profil.exp }} XP</span>
+            </div>
           </div>
         </div>
         <div class="text-right">
-          <p class="text-sm text-neutral-200">{{ user.stats.totalMsg }} msgs</p>
-          <p class="text-xs text-neutral-400">{{ formatVoiceTime(user.stats.voiceTime) }} vocal</p>
+          <p class="text-xs font-medium text-white">{{ user.stats.totalMsg }} msgs</p>
+          <p class="text-[10px] text-muted uppercase tracking-wide mt-0.5">{{ formatVoiceTime(user.stats.voiceTime) }} vocal</p>
         </div>
       </li>
     </ul>
-    <p v-if="!loading && !error && users.length > 0" class="text-xs text-neutral-500 mt-4 text-center">Le classement est mis à jour périodiquement.</p>
   </div>
 </template>
 
@@ -53,7 +70,6 @@ export interface LeaderboardUser { // Exporting for potential use elsewhere
   // avatar?: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051';
 
 const props = defineProps({
   guildId: {
@@ -67,7 +83,6 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 
 const fetchLeaderboard = async () => {
-  console.log('API_BASE_URL', API_BASE_URL);
   if (!props.guildId) {
     error.value = "ID du serveur non fourni.";
     loading.value = false;
@@ -76,18 +91,13 @@ const fetchLeaderboard = async () => {
   loading.value = true;
   error.value = null;
   try {
-    // API endpoint: GET /api/guilds/:guildId/leaderboard
-    // This endpoint should return data conforming to LeaderboardUser[]
-    // and ideally be sorted by the backend.
-    const response = await axios.get<LeaderboardUser[]>(`${API_BASE_URL}/api/guilds/${props.guildId}/leaderboard`);
-    // Assuming backend sorts. If not, sort here:
-    // users.value = response.data.sort((a, b) => b.profil.lvl - a.profil.lvl || b.profil.exp - a.profil.exp);
+    const response = await api.get<LeaderboardUser[]>(`/api/guilds/${props.guildId}/leaderboard`);
     users.value = response.data;
 
   } catch (err) {
     console.error('Failed to fetch leaderboard:', err);
     users.value = []; 
-    if (axios.isAxiosError(err)) {
+    if (api.isAxiosError(err)) {
       const axiosError = err as AxiosError;
       if (axiosError.response?.status === 404) {
         error.value = "Aucune donnée de classement trouvée pour ce serveur.";
@@ -121,23 +131,20 @@ watch(() => props.guildId, (newGuildId, oldGuildId) => {
     fetchLeaderboard();
   }
 });
-
-// Note: For `bg-neutral-750` to work, ensure it's defined in your tailwind.config.js if it's a custom color.
-// e.g., 'neutral-750': '#303030'
 </script>
 
 <style scoped>
-/* Styling for scrollbar if needed, e.g. */
-/* 
-.overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
 }
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background-color: #4f4f4f; 
-  border-radius: 3px;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
 }
-.overflow-y-auto::-webkit-scrollbar-track {
-  background-color: transparent;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
 }
-*/
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
 </style> 
