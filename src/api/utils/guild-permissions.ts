@@ -12,16 +12,14 @@ interface DiscordGuild {
  * Vérifie que l'utilisateur authentifié a les permissions admin sur une guild
  * @param c - Context Hono
  * @param guildId - ID de la guild Discord
- * @returns true si l'utilisateur a les permissions, sinon envoie une réponse d'erreur et retourne false
+ * @returns true si l'utilisateur a les permissions, sinon envoie une réponse d'erreur et retourne la réponse
  */
-export async function requireGuildPermissions(c: Context, guildId: string): Promise<boolean> {
+export async function requireGuildPermissions(c: Context, guildId: string): Promise<true | Response> {
   const authContext = c as AuthContext;
   const user = authContext.get('user');
 
   if (!user) {
-    c.status(401);
-    c.json({ error: 'Authentication required' });
-    return false;
+    return c.json({ error: 'Authentication required' }, 401);
   }
 
   try {
@@ -34,9 +32,7 @@ export async function requireGuildPermissions(c: Context, guildId: string): Prom
 
     if (!response.ok) {
       console.error(`Failed to fetch user guilds: ${response.status}`);
-      c.status(500);
-      c.json({ error: 'Failed to verify guild access' });
-      return false;
+      return c.json({ error: 'Failed to verify guild access' }, 500);
     }
 
     const guilds = await response.json() as DiscordGuild[];
@@ -45,12 +41,10 @@ export async function requireGuildPermissions(c: Context, guildId: string): Prom
     const userGuild = guilds.find(guild => guild.id === guildId);
 
     if (!userGuild) {
-      c.status(403);
-      c.json({
+      return c.json({
         error: 'You do not have access to this guild',
         code: 'GUILD_NOT_FOUND'
-      });
-      return false;
+      }, 403);
     }
 
     // Vérifier les permissions administrateur
@@ -61,19 +55,15 @@ export async function requireGuildPermissions(c: Context, guildId: string): Prom
         : (userGuild.permissions & 0x8) !== 0);
 
     if (!hasAdminPermissions) {
-      c.status(403);
-      c.json({
+      return c.json({
         error: 'You do not have administrator permissions for this guild',
         code: 'INSUFFICIENT_PERMISSIONS'
-      });
-      return false;
+      }, 403);
     }
 
     return true;
   } catch (error) {
     console.error('Guild permissions check error:', error);
-    c.status(500);
-    c.json({ error: 'Failed to verify guild permissions' });
-    return false;
+    return c.json({ error: 'Failed to verify guild permissions' }, 500);
   }
 }

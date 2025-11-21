@@ -1,6 +1,5 @@
 import { Hono } from 'hono';
 import GuildUserModel from '../../features/user/models/guild-user.model';
-import mongoose from 'mongoose';
 import { BotClient } from '../../bot/client';
 import GuildModel from '../../features/discord/models/guild.model';
 import { SuggestionsService } from '../../features/suggestions/services/suggestions.service';
@@ -36,7 +35,6 @@ guilds.get('/:id/leaderboard', async (c) => {
     const guildId = c.req.param('id');
     const timeFilter = c.req.query('time') || 'all'; // all, today, week, month
     const sortBy = c.req.query('sortBy') || 'level'; // level, messages, voiceTime
-    const userFilter = c.req.query('user'); // Optional: filter by specific user ID
 
     // Get all users from the guild
     const users = await GuildUserModel.find({ guildId });
@@ -169,7 +167,7 @@ guilds.get('/:id/leaderboard', async (c) => {
       ? leaderboardData.reduce((sum, u) => sum + u.level, 0) / leaderboardData.length
       : 0;
 
-    // Activity distribution (messages by hour for today)
+    // Activity distribution (messages by hour)
     const hourlyActivity = Array(24).fill(0);
     if (timeFilter === 'today' || timeFilter === 'all') {
       users.forEach(user => {
@@ -182,6 +180,10 @@ guilds.get('/:id/leaderboard', async (c) => {
               const hour = date.getHours();
               hourlyActivity[hour] += entry.count;
             }
+          } else if (timeFilter === 'all') {
+            // Pour 'all', on compte tous les messages peu importe la date
+            const hour = date.getHours();
+            hourlyActivity[hour] += entry.count;
           }
         });
       });
@@ -216,58 +218,6 @@ guilds.get('/:id/leaderboard', async (c) => {
 
 // Toutes les autres routes nécessitent l'authentification
 guilds.use('*', authMiddleware);
-
-// GET /api/guilds/:guildId/leaderboard
-guilds.get('/:guildId/leaderboard', async (c) => {
-  const guildId = c.req.param('guildId');
-
-  if (!guildId) {
-    c.status(400);
-    return c.json({ message: 'Guild ID is required' });
-  }
-
-  // Validate if guildId is a valid ObjectId if your guildId in GuildUser is an ObjectId
-  // If guildId in GuildUser is a string (like a Discord Snowflake), this check might not be needed
-  // or should be a string format check.
-  // For this example, let's assume guildId in GuildUser model is a string (Discord ID).
-
-  try {
-    const leaderboardData = await GuildUserModel.find({ guildId: guildId })
-      .sort({ 'profil.lvl': -1, 'profil.exp': -1 })
-      .limit(100) 
-      .select('discordId name profil stats.totalMsg stats.voiceTime') // Simplified select for lean
-      .lean(); 
-
-    if (!leaderboardData || leaderboardData.length === 0) {
-      c.status(404);
-      return c.json({ message: 'No leaderboard data found for this guild.' });
-    }
-
-    // Transform data to match LeaderboardUser interface from frontend
-    const formattedLeaderboard = leaderboardData.map(user => ({
-      discordId: user.discordId,
-      name: user.name,
-      profil: {
-        lvl: user.profil.lvl,
-        exp: user.profil.exp,
-        money: user.profil.money, // Assuming money is part of profil in GuildUser model
-      },
-      stats: {
-        totalMsg: user.stats.totalMsg,
-        voiceTime: user.stats.voiceTime,
-      }
-    }));
-
-    return c.json(formattedLeaderboard);
-  } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
-      c.status(400);
-      return c.json({ message: 'Invalid Guild ID format.' });
-    }
-    c.status(500);
-    return c.json({ message: 'Internal server error' });
-  }
-});
 
 // Get available features for a guild
 guilds.get('/:id/features', async (c) => {
@@ -340,8 +290,9 @@ guilds.post('/:id/features/:featureId/toggle', async (c) => {
     const featureId = c.req.param('featureId');
 
     // Vérifier les permissions
-    if (!await requireGuildPermissions(c, guildId)) {
-      return; // La réponse d'erreur a déjà été envoyée
+    const permCheck = await requireGuildPermissions(c, guildId);
+    if (permCheck !== true) {
+      return permCheck;
     }
 
     const { enabled } = await c.req.json();
@@ -500,8 +451,9 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
     const featureId = c.req.param('featureId');
 
     // Vérifier les permissions
-    if (!await requireGuildPermissions(c, guildId)) {
-      return;
+    const permCheck = await requireGuildPermissions(c, guildId);
+    if (permCheck !== true) {
+      return permCheck;
     }
 
     const updates = await c.req.json();
@@ -862,8 +814,9 @@ guilds.put('/:id/features/voice-channels/settings', async (c) => {
   try {
     const guildId = c.req.param('id');
 
-    if (!await requireGuildPermissions(c, guildId)) {
-      return;
+    const permCheck = await requireGuildPermissions(c, guildId);
+    if (permCheck !== true) {
+      return permCheck;
     }
 
     const { joinChannels, enabled } = await c.req.json();
