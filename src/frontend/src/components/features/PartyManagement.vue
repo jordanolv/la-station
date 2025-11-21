@@ -3,13 +3,13 @@
     <!-- Header -->
     <div>
       <h2 class="text-xl font-semibold text-white mb-2">Gestion des Soirées</h2>
-      <p class="text-gray-400">Organisez des événements et soirées gaming pour votre communauté</p>
+      <p class="text-muted">Organisez des événements et soirées gaming pour votre communauté</p>
     </div>
 
     <!-- Configuration -->
-    <div class="bg-gray-800 rounded-lg p-6">
+    <div class="bg-surface border border-border rounded-xl p-6">
       <h3 class="text-lg font-medium text-white mb-4 flex items-center space-x-2">
-        <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
@@ -33,7 +33,7 @@
       <div class="flex items-center space-x-4">
         <button
           @click="showCreateModal = true"
-          class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
+          class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 shadow-lg shadow-pink-900/20"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -45,11 +45,11 @@
       <div class="flex items-center justify-between gap-4">
         <!-- Compteur d'événements avec icône -->
         <div class="flex items-center space-x-2">
-          <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          <span class="text-sm font-medium text-gray-300">
-            <span class="text-pink-400">{{ filteredEvents.length }}</span> affiché(s) / <span class="text-gray-400">{{ party.events.value.length }}</span> total
+          <span class="text-sm font-medium text-muted">
+            <span class="text-pink-400">{{ filteredEvents.length }}</span> affiché(s) / <span class="text-gray-400">{{ events.length }}</span> total
           </span>
         </div>
         
@@ -58,8 +58,8 @@
           @click="showCompletedEvents = !showCompletedEvents"
           class="px-3 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 hover:scale-105"
           :class="showCompletedEvents 
-            ? 'bg-pink-600/20 border-pink-500/50 text-pink-400 shadow-sm shadow-pink-500/20' 
-            : 'bg-gray-700/50 border-gray-600/50 text-gray-400 hover:bg-gray-600/50 hover:border-gray-500/50 hover:text-gray-300'"
+            ? 'bg-pink-500/10 border-pink-500/50 text-pink-400 shadow-sm shadow-pink-500/20' 
+            : 'bg-surface border-border text-muted hover:bg-surface-hover hover:text-white'"
         >
           ✓ Événements terminés
         </button>
@@ -67,63 +67,64 @@
     </div>
 
     <!-- Events List -->
-    <div v-if="party.loading.value" class="text-center py-8">
-      <div class="text-gray-400">Chargement des événements...</div>
+    <div v-if="loading" class="text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500 mb-4"></div>
+      <div class="text-muted">Chargement des événements...</div>
     </div>
 
-    <div v-else-if="filteredEvents.length === 0 && party.events.value.length === 0" class="text-center py-12 bg-gray-800 rounded-lg">
+    <div v-else-if="filteredEvents.length === 0 && events.length === 0" class="text-center py-12 bg-surface border border-border rounded-xl">
       <div class="text-4xl mb-4">🎉</div>
       <h3 class="text-lg font-medium text-white mb-2">Aucun événement programmé</h3>
-      <p class="text-gray-400 mb-4">Créez votre premier événement pour rassembler votre communauté</p>
+      <p class="text-muted mb-4">Créez votre premier événement pour rassembler votre communauté</p>
       <button
         @click="showCreateModal = true"
-        class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg transition-colors"
+        class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-pink-900/20"
       >
         Créer un événement
       </button>
     </div>
 
     <!-- Message si tous les événements sont terminés mais la checkbox n'est pas cochée -->
-    <div v-else-if="filteredEvents.length === 0 && party.events.value.length > 0" class="text-center py-12 bg-gray-800 rounded-lg">
+    <div v-else-if="filteredEvents.length === 0 && events.length > 0" class="text-center py-12 bg-surface border border-border rounded-xl">
       <div class="text-4xl mb-4">✅</div>
       <h3 class="text-lg font-medium text-white mb-2">Tous les événements sont terminés</h3>
-      <p class="text-gray-400 mb-4">Cochez "Afficher les événements terminés" pour les voir ou créez un nouvel événement</p>
+      <p class="text-muted mb-4">Cochez "Afficher les événements terminés" pour les voir ou créez un nouvel événement</p>
     </div>
 
     <div v-else class="grid gap-4">
       <!-- Message d'erreur si il y en a une -->
-      <div v-if="party.error.value" class="bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded mb-4">
-        {{ party.error.value }}
-        <button @click="party.clearError()" class="ml-2 text-red-400 hover:text-red-200">×</button>
+      <div v-if="error" class="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg mb-4 flex items-center justify-between">
+        <span>{{ error }}</span>
+        <button @click="party.clearError()" class="text-red-400 hover:text-red-300">×</button>
       </div>
       
       <div
         v-for="event in filteredEvents"
         :key="event._id"
-        class="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors"
+        class="bg-surface border border-border rounded-xl p-6 hover:border-pink-500/30 transition-colors group"
       >
         <div class="flex items-start justify-between">
           <div class="flex-1">
             <!-- Event Header -->
             <div class="flex items-center space-x-3 mb-3">
               <div 
-                class="w-4 h-4 rounded-full"
-                :style="{ backgroundColor: event.color }"
+                class="w-3 h-3 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)]"
+                :style="{ backgroundColor: event.color, boxShadow: `0 0 10px ${event.color}` }"
               ></div>
               <h3 class="text-lg font-semibold text-white">{{ event.name }}</h3>
-              <span class="bg-gray-700 text-gray-300 px-2 py-1 text-xs rounded">{{ event.game }}</span>
+              <span class="bg-background border border-border text-muted px-2 py-0.5 text-xs rounded-md">{{ event.game }}</span>
             </div>
 
             <!-- Event Info -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div class="flex items-center space-x-2 text-gray-400">
+              <div class="flex items-center space-x-2 text-muted">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 <span>{{ party.formatDate(event.date) }}</span>
               </div>
               
-              <div class="flex items-center space-x-2 text-gray-400">
+              <div class="flex items-center space-x-2 text-muted">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -132,7 +133,7 @@
               
               <button 
                 @click="toggleParticipantsDisplay(event._id)"
-                class="flex items-center space-x-2 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer"
+                class="flex items-center space-x-2 text-muted hover:text-white transition-colors cursor-pointer"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -151,13 +152,13 @@
             </div>
 
             <!-- Description -->
-            <p v-if="event.description" class="text-gray-300 mb-4">{{ event.description }}</p>
+            <p v-if="event.description" class="text-gray-300 mb-4 text-sm leading-relaxed">{{ event.description }}</p>
 
             <!-- Liste des participants (affichage conditionnel) -->
             <div v-if="expandedParticipants.has(event._id) && event.participants.length > 0" class="mb-4">
-              <div class="bg-gray-700/50 rounded-lg p-3 border border-gray-600/50">
-                <h4 class="text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
-                  <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="bg-background/50 rounded-lg p-3 border border-border/50">
+                <h4 class="text-sm font-medium text-white mb-2 flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                   </svg>
                   <span>Participants inscrits</span>
@@ -168,14 +169,15 @@
                   <div
                     v-for="participant in eventParticipants[event._id]"
                     :key="participant.id"
-                    class="px-2 py-1 bg-gray-600/50 rounded text-xs text-gray-300 border border-gray-500/50"
+                    class="px-2 py-1 bg-surface rounded text-xs text-gray-300 border border-border flex items-center gap-1"
                   >
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                     {{ participant.displayName || participant.name }}
                   </div>
                 </div>
                 
                 <!-- Message si les participants n'ont pas pu être chargés -->
-                <div v-else class="text-xs text-gray-400">
+                <div v-else class="text-xs text-muted">
                   Chargement des participants...
                 </div>
               </div>
@@ -183,18 +185,18 @@
             
             <!-- Message si aucun participant -->
             <div v-else-if="expandedParticipants.has(event._id) && event.participants.length === 0" class="mb-4">
-              <div class="bg-gray-700/50 rounded-lg p-3 border border-gray-600/50 text-center">
-                <p class="text-xs text-gray-400">Aucun participant inscrit pour le moment</p>
+              <div class="bg-background/50 rounded-lg p-3 border border-border/50 text-center">
+                <p class="text-xs text-muted">Aucun participant inscrit pour le moment</p>
               </div>
             </div>
 
             <!-- Participants Progress -->
             <div class="mb-4">
-              <div class="flex justify-between text-sm text-gray-400 mb-1">
+              <div class="flex justify-between text-sm text-muted mb-1">
                 <span>Participants</span>
                 <span>{{ event.currentSlots }}/{{ event.maxSlots }}</span>
               </div>
-              <div class="w-full bg-gray-700 rounded-full h-2">
+              <div class="w-full bg-background rounded-full h-2 overflow-hidden">
                 <div 
                   class="h-2 rounded-full transition-all duration-300"
                   :style="{ 
@@ -208,34 +210,34 @@
             <!-- Event Status -->
             <div class="flex items-center space-x-2">
               <span 
-                class="px-2 py-1 text-xs font-medium rounded-full"
+                class="px-2 py-0.5 text-xs font-medium rounded border"
                 :class="party.getEventStatusClass(event)"
               >
                 {{ party.getEventStatus(event) }}
               </span>
               
-              <span v-if="event.roleId" class="text-xs text-pink-400">
+              <span v-if="event.roleId" class="text-xs text-pink-400 bg-pink-400/10 px-2 py-0.5 rounded border border-pink-400/20">
                 @{{ event.name.toLowerCase().replace(/\s+/g, '-') }}
               </span>
             </div>
           </div>
 
           <!-- Event Image -->
-          <div v-if="event.image" class="ml-6">
+          <div v-if="event.image" class="ml-6 hidden sm:block">
             <img 
               :src="event.image" 
               :alt="event.name"
-              class="w-24 h-24 object-cover rounded-lg"
+              class="w-24 h-24 object-cover rounded-lg border border-border"
             />
           </div>
 
           <!-- Actions -->
-          <div class="ml-6 flex flex-col space-y-2">
+          <div class="ml-6 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <!-- Bouton Démarrer (visible seulement si status = pending et date passée) -->
             <button
               v-if="party.canStartEvent(event)"
               @click="startEvent(event)"
-              class="bg-green-600 hover:bg-green-700 text-white p-2 rounded transition-colors"
+              class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition-colors shadow-lg shadow-green-900/20"
               title="Démarrer la soirée"
             >
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -247,7 +249,7 @@
             <button
               v-if="party.canEndEvent(event)"
               @click="prepareEndEvent(event)"
-              class="text-orange-400 hover:text-orange-300 p-2 rounded transition-colors"
+              class="bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 border border-orange-500/20 p-2 rounded-lg transition-colors"
               title="Terminer la soirée"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,7 +259,7 @@
             
             <button
               @click="editEvent(event)"
-              class="text-gray-400 hover:text-white p-2 rounded transition-colors"
+              class="text-muted hover:text-white p-2 rounded-lg transition-colors hover:bg-white/5"
               title="Modifier"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,7 +269,7 @@
             
             <button
               @click="deleteEvent(event._id)"
-              class="text-red-400 hover:text-red-300 p-2 rounded transition-colors"
+              class="text-muted hover:text-red-400 p-2 rounded-lg transition-colors hover:bg-red-500/10"
               title="Supprimer"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,15 +291,15 @@
     />
 
     <!-- End Event Modal -->
-    <div v-if="showEndModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div v-if="showEndModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+      <div class="bg-surface border border-border rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-xl font-semibold text-white">
             Terminer la soirée
           </h3>
           <button
             @click="closeEndModal"
-            class="text-gray-400 hover:text-white transition-colors"
+            class="text-muted hover:text-white transition-colors"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -307,97 +309,97 @@
 
         <div v-if="endingEvent" class="space-y-6">
           <!-- Event Info -->
-          <div class="bg-gray-700 rounded-lg p-4">
-            <h4 class="font-semibold text-white mb-2">{{ endingEvent.name }}</h4>
-            <p class="text-gray-300 text-sm">{{ endingEvent.game }}</p>
+          <div class="bg-background rounded-lg p-4 border border-border">
+            <h4 class="font-semibold text-white mb-1">{{ endingEvent.name }}</h4>
+            <p class="text-muted text-sm">{{ endingEvent.game }}</p>
           </div>
 
-                      <!-- Participants Selection -->
-            <div>
-              <h4 class="text-lg font-medium text-white mb-4">
-                Participants présents
-                <span class="text-sm text-gray-400">({{ selectedParticipants.length }}/{{ participantsInfo.length }})</span>
-              </h4>
-              
-              <!-- Select All / Deselect All -->
-              <div class="mb-4">
-                <button
-                  @click="selectedParticipants = participantsInfo.map(p => p.id)"
-                  class="text-sm text-blue-400 hover:text-blue-300 mr-4"
-                >
-                  Tout sélectionner
-                </button>
-                <button
-                  @click="selectedParticipants = []"
-                  class="text-sm text-gray-400 hover:text-gray-300"
-                >
-                  Tout désélectionner
-                </button>
-              </div>
-
-              <!-- Participants List with Clickable Labels -->
-              <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
-                <div
-                  v-for="participant in participantsInfo"
-                  :key="participant.id"
-                  @click="toggleParticipant(participant.id)"
-                  class="px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 select-none"
-                  :class="selectedParticipants.includes(participant.id) 
-                    ? 'bg-pink-600 text-white border border-pink-500' 
-                    : 'bg-gray-700 text-gray-300 border border-gray-600 hover:bg-gray-600'"
-                >
-                  <span class="font-medium">{{ participant.displayName }}</span>
-                </div>
-              </div>
+          <!-- Participants Selection -->
+          <div>
+            <h4 class="text-lg font-medium text-white mb-4 flex items-center justify-between">
+              <span>Participants présents</span>
+              <span class="text-sm text-muted font-normal">({{ selectedParticipants.length }}/{{ participantsInfo.length }})</span>
+            </h4>
+            
+            <!-- Select All / Deselect All -->
+            <div class="mb-4 flex space-x-4">
+              <button
+                @click="selectedParticipants = participantsInfo.map(p => p.id)"
+                class="text-sm text-pink-400 hover:text-pink-300 transition-colors"
+              >
+                Tout sélectionner
+              </button>
+              <button
+                @click="selectedParticipants = []"
+                class="text-sm text-muted hover:text-white transition-colors"
+              >
+                Tout désélectionner
+              </button>
             </div>
 
-                      <!-- Reward Amount -->
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                Montant à distribuer (optionnel)
-              </label>
-              <div class="flex items-center space-x-2">
-                <input
-                  v-model.number="rewardAmount"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                  placeholder="0.00"
-                />
-                <span class="text-gray-400">€</span>
+            <!-- Participants List with Clickable Labels -->
+            <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-1">
+              <div
+                v-for="participant in participantsInfo"
+                :key="participant.id"
+                @click="toggleParticipant(participant.id)"
+                class="px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 select-none border"
+                :class="selectedParticipants.includes(participant.id) 
+                  ? 'bg-pink-600 text-white border-pink-500 shadow-md shadow-pink-900/20' 
+                  : 'bg-background text-muted border-border hover:border-gray-500'"
+              >
+                <span class="font-medium text-sm">{{ participant.displayName }}</span>
               </div>
-              <p class="text-xs text-gray-400 mt-1">
-                Ce montant sera distribué équitablement entre les participants présents
-              </p>
             </div>
+          </div>
 
-            <!-- XP Amount -->
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                XP à distribuer (optionnel)
-              </label>
-              <div class="flex items-center space-x-2">
-                <input
-                  v-model.number="xpAmount"
-                  type="number"
-                  min="0"
-                  step="1"
-                  class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                  placeholder="0"
-                />
-                <span class="text-gray-400">XP</span>
-              </div>
-              <p class="text-xs text-gray-400 mt-1">
-                Ce montant d'XP sera distribué équitablement entre les participants présents
-              </p>
+          <!-- Reward Amount -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Montant à distribuer (optionnel)
+            </label>
+            <div class="flex items-center space-x-2">
+              <input
+                v-model.number="rewardAmount"
+                type="number"
+                min="0"
+                step="0.01"
+                class="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                placeholder="0.00"
+              />
+              <span class="text-muted">€</span>
             </div>
+            <p class="text-xs text-muted mt-1">
+              Ce montant sera distribué équitablement entre les participants présents
+            </p>
+          </div>
+
+          <!-- XP Amount -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              XP à distribuer (optionnel)
+            </label>
+            <div class="flex items-center space-x-2">
+              <input
+                v-model.number="xpAmount"
+                type="number"
+                min="0"
+                step="1"
+                class="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                placeholder="0"
+              />
+              <span class="text-muted">XP</span>
+            </div>
+            <p class="text-xs text-muted mt-1">
+              Ce montant d'XP sera distribué équitablement entre les participants présents
+            </p>
+          </div>
 
           <!-- Actions -->
-          <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-700">
+          <div class="flex items-center justify-end space-x-3 pt-6 border-t border-border">
             <button
               @click="closeEndModal"
-              class="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              class="px-4 py-2 text-muted hover:text-white transition-colors"
             >
               Annuler
             </button>
@@ -405,7 +407,7 @@
             <button
               @click="endEvent"
               :disabled="selectedParticipants.length === 0"
-              class="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg transition-colors"
+              class="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg transition-colors shadow-lg shadow-orange-900/20"
             >
               Terminer la soirée
             </button>
@@ -419,7 +421,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useParty } from '../../composables/useParty'
-import { useImageUrl } from '../../composables/useImageUrl'
 import { useAuthStore } from '../../stores/auth'
 import { useApi } from '../../composables/useApi'
 import EventModal from './party/EventModal.vue'
@@ -431,11 +432,13 @@ const props = defineProps<{
 }>()
 
 const authStore = useAuthStore()
-const { getImageUrl } = useImageUrl()
 const { get, put } = useApi()
 
 // Récupération du composable party
 const party = useParty(props.guildId)
+const events = party.events
+const loading = party.loading
+const error = party.error
 
 // Configuration du rôle par défaut
 const defaultRoleId = ref('')
@@ -454,10 +457,10 @@ const eventParticipants = ref<Record<string, ParticipantInfo[]>>({})
 // Événements filtrés selon l'état de la checkbox
 const filteredEvents = computed(() => {
   if (showCompletedEvents.value) {
-    return party.events.value // Afficher tous les événements
+    return events.value // Afficher tous les événements
   } else {
     // Afficher seulement les événements non terminés (status !== 'ended')
-    return party.events.value.filter(event => event.status !== 'ended')
+    return events.value.filter(event => event.status !== 'ended')
   }
 })
 
@@ -634,7 +637,7 @@ async function loadEventParticipants(eventId: string) {
 // Charger la configuration du rôle par défaut
 async function loadDefaultRole() {
   try {
-    const response = await get(`/api/guilds/${props.guildId}/features/party/settings`)
+    const response = await get<{ settings?: { defaultRoleId: string } }>(`/api/guilds/${props.guildId}/features/party/settings`)
     if (response.settings?.defaultRoleId) {
       defaultRoleId.value = response.settings.defaultRoleId
     }

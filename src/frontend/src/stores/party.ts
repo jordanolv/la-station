@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useApi } from '../composables/useApi'
+import api from '../utils/axios'
 
 export interface ParticipantInfo {
   id: string
@@ -45,7 +46,6 @@ export interface ChatGamingGame {
 
 export const usePartyStore = defineStore('party', () => {
   const { get, post, delete: del } = useApi()
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051'
 
   // État réactif
   const events = ref<Event[]>([])
@@ -101,26 +101,17 @@ export const usePartyStore = defineStore('party', () => {
       clearError()
 
       eventData.append('guildId', guildId)
-      
-      const authStore = useAuthStore()
-      const response = await fetch(`${API_BASE_URL}/api/party`, {
-        method: 'POST',
+
+      const response = await api.post('/api/party', eventData, {
         headers: {
-          'Authorization': `Bearer ${authStore.token}`
-        },
-        body: eventData
+          'Content-Type': 'multipart/form-data'
+        }
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-      
       // Mise à jour optimiste du cache
-      events.value.unshift(result.event)
-      
-      return result.event
+      events.value.unshift(response.data.event)
+
+      return response.data.event
     } catch (err: any) {
       handleError(err, 'création d\'événement')
       throw err
@@ -134,28 +125,19 @@ export const usePartyStore = defineStore('party', () => {
       loading.value = true
       clearError()
 
-      const authStore = useAuthStore()
-      const response = await fetch(`${API_BASE_URL}/api/party/${eventId}`, {
-        method: 'PUT',
+      const response = await api.put(`/api/party/${eventId}`, eventData, {
         headers: {
-          'Authorization': `Bearer ${authStore.token}`
-        },
-        body: eventData
+          'Content-Type': 'multipart/form-data'
+        }
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const result = await response.json()
-      
       // Mise à jour optimiste du cache
       const index = events.value.findIndex(e => e._id === eventId)
       if (index !== -1) {
-        events.value[index] = result.event
+        events.value[index] = response.data.event
       }
-      
-      return result.event
+
+      return response.data.event
     } catch (err: any) {
       handleError(err, 'modification d\'événement')
       throw err
@@ -289,6 +271,3 @@ export const usePartyStore = defineStore('party', () => {
     forceStopLoading
   }
 })
-
-// Import nécessaire pour useAuthStore
-import { useAuthStore } from './auth'

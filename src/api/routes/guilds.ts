@@ -5,8 +5,217 @@ import { BotClient } from '../../bot/client';
 import GuildModel from '../../features/discord/models/guild.model';
 import { SuggestionsService } from '../../features/suggestions/services/suggestions.service';
 import { GuildService } from '../../features/discord/services/guild.service';
+import { authMiddleware } from '../middleware/auth.middleware';
+import { requireGuildPermissions } from '../utils/guild-permissions';
 
 const guilds = new Hono();
+
+// Route publique bot-status (avant authentification)
+guilds.get('/:id/bot-status', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+
+    const client = BotClient.getInstance();
+    const guild = client.guilds.cache.get(guildId);
+
+    return c.json({
+      botPresent: !!guild,
+      inviteUrl: guild ? null : `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=8&scope=bot&guild_id=${guildId}`
+    });
+  } catch (error) {
+    return c.json({
+      botPresent: false,
+      inviteUrl: `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=8&scope=bot&guild_id=${c.req.param('id')}`
+    }, 200);
+  }
+});
+
+// Route publique leaderboard
+guilds.get('/:id/leaderboard', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const timeFilter = c.req.query('time') || 'all'; // all, today, week, month
+    const sortBy = c.req.query('sortBy') || 'level'; // level, messages, voiceTime
+    const userFilter = c.req.query('user'); // Optional: filter by specific user ID
+
+    // Get all users from the guild
+    const users = await GuildUserModel.find({ guildId });
+
+    // Calculate today's start
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Calculate week start (Monday)
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1);
+    weekStart.setHours(0, 0, 0, 0);
+
+    // Calculate month start
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+
+    // Filter and calculate stats based on timeFilter
+    const leaderboardData = users.map(user => {
+      let messages = user.stats?.totalMsg || 0;
+      let voiceTime = user.stats?.voiceTime || 0;
+      let messageHistory = user.stats?.messageHistory || [];
+      let voiceHistory = user.stats?.voiceHistory || [];
+
+      if (timeFilter === 'today') {
+        const todayMsgEntry = user.stats?.messageHistory?.find(entry => {
+          const entryDate = new Date(entry.date);
+          entryDate.setHours(0, 0, 0, 0);
+          return entryDate.getTime() === today.getTime();
+        });
+        messages = todayMsgEntry?.count || 0;
+        messageHistory = todayMsgEntry ? [todayMsgEntry] : [];
+
+        const todayVoiceEntry = user.stats?.voiceHistory?.find(entry => {
+          const entryDate = new Date(entry.date);
+          entryDate.setHours(0, 0, 0, 0);
+          return entryDate.getTime() === today.getTime();
+        });
+        voiceTime = todayVoiceEntry?.time || 0;
+        voiceHistory = todayVoiceEntry ? [todayVoiceEntry] : [];
+      } else if (timeFilter === 'week') {
+        messageHistory = user.stats?.messageHistory?.filter(entry => new Date(entry.date) >= weekStart) || [];
+        messages = messageHistory.reduce((sum, entry) => sum + entry.count, 0);
+
+        voiceHistory = user.stats?.voiceHistory?.filter(entry => new Date(entry.date) >= weekStart) || [];
+        voiceTime = voiceHistory.reduce((sum, entry) => sum + entry.time, 0);
+      } else if (timeFilter === 'month') {
+        messageHistory = user.stats?.messageHistory?.filter(entry => new Date(entry.date) >= monthStart) || [];
+        messages = messageHistory.reduce((sum, entry) => sum + entry.count, 0);
+
+        voiceHistory = user.stats?.voiceHistory?.filter(entry => new Date(entry.date) >= monthStart) || [];
+        voiceTime = voiceHistory.reduce((sum, entry) => sum + entry.time, 0);
+      }
+
+      // Calculate hourly activity for this user
+      const userHourlyActivity = Array(24).fill(0);
+      const relevantHistory = timeFilter === 'today'
+        ? messageHistory
+        : timeFilter === 'week'
+        ? user.stats?.messageHistory?.filter(entry => new Date(entry.date) >= weekStart) || []
+        : timeFilter === 'month'
+        ? user.stats?.messageHistory?.filter(entry => new Date(entry.date) >= monthStart) || []
+        : user.stats?.messageHistory || [];
+
+      relevantHistory.forEach(entry => {
+        const date = new Date(entry.date);
+        const hour = date.getHours();
+        // Add the count to the corresponding hour
+        userHourlyActivity[hour] += entry.count;
+      });
+
+      // Calculate arcade stats
+      const arcadeStats = user.stats?.arcade as any || {};
+      const totalArcadeWins = (arcadeStats.shifumi?.wins || 0) +
+                               (arcadeStats.puissance4?.wins || 0) +
+                               (arcadeStats.morpion?.wins || 0) +
+                               (arcadeStats.battle?.wins || 0);
+      const totalArcadeLosses = (arcadeStats.shifumi?.losses || 0) +
+                                 (arcadeStats.puissance4?.losses || 0) +
+                                 (arcadeStats.morpion?.losses || 0) +
+                                 (arcadeStats.battle?.losses || 0);
+
+      return {
+        discordId: user.discordId,
+        name: user.name,
+        level: user.profil?.lvl || 0,
+        exp: user.profil?.exp || 0,
+        messages,
+        voiceTime: Math.round(voiceTime / 60), // Convert to minutes
+        money: user.profil?.money || 0,
+        messageHistory: messageHistory.map(entry => ({
+          date: entry.date,
+          count: entry.count
+        })),
+        voiceHistory: voiceHistory.map(entry => ({
+          date: entry.date,
+          time: Math.round(entry.time / 60) // Convert to minutes
+        })),
+        hourlyActivity: userHourlyActivity,
+        arcade: {
+          shifumi: arcadeStats.shifumi || { wins: 0, losses: 0 },
+          puissance4: arcadeStats.puissance4 || { wins: 0, losses: 0 },
+          morpion: arcadeStats.morpion || { wins: 0, losses: 0 },
+          battle: arcadeStats.battle || { wins: 0, losses: 0 },
+          totalWins: totalArcadeWins,
+          totalLosses: totalArcadeLosses
+        }
+      };
+    });
+
+    // Sort based on sortBy parameter
+    leaderboardData.sort((a, b) => {
+      if (sortBy === 'level') {
+        const lvlDiff = b.level - a.level;
+        if (lvlDiff !== 0) return lvlDiff;
+        return b.exp - a.exp;
+      } else if (sortBy === 'messages') {
+        return b.messages - a.messages;
+      } else if (sortBy === 'voiceTime') {
+        return b.voiceTime - a.voiceTime;
+      }
+      return 0;
+    });
+
+    // Calculate chart data
+    const totalMessages = leaderboardData.reduce((sum, u) => sum + u.messages, 0);
+    const totalVoiceTime = leaderboardData.reduce((sum, u) => sum + u.voiceTime, 0);
+    const avgLevel = leaderboardData.length > 0
+      ? leaderboardData.reduce((sum, u) => sum + u.level, 0) / leaderboardData.length
+      : 0;
+
+    // Activity distribution (messages by hour for today)
+    const hourlyActivity = Array(24).fill(0);
+    if (timeFilter === 'today' || timeFilter === 'all') {
+      users.forEach(user => {
+        user.stats?.messageHistory?.forEach(entry => {
+          const date = new Date(entry.date);
+          if (timeFilter === 'today') {
+            const entryDate = new Date(date);
+            entryDate.setHours(0, 0, 0, 0);
+            if (entryDate.getTime() === today.getTime()) {
+              const hour = date.getHours();
+              hourlyActivity[hour] += entry.count;
+            }
+          }
+        });
+      });
+    }
+
+    // Level distribution
+    const levelDistribution: Record<string, number> = {};
+    leaderboardData.forEach(user => {
+      const levelRange = `${Math.floor(user.level / 10) * 10}-${Math.floor(user.level / 10) * 10 + 9}`;
+      levelDistribution[levelRange] = (levelDistribution[levelRange] || 0) + 1;
+    });
+
+    return c.json({
+      leaderboard: leaderboardData.slice(0, 100), // Top 100
+      stats: {
+        totalMembers: users.length,
+        totalMessages,
+        totalVoiceTime,
+        avgLevel: Math.round(avgLevel * 10) / 10,
+        activeMembers: leaderboardData.filter(u => u.messages > 0 || u.voiceTime > 0).length
+      },
+      charts: {
+        hourlyActivity,
+        levelDistribution
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    return c.json({ error: 'Failed to fetch leaderboard' }, 500);
+  }
+});
+
+// Toutes les autres routes nécessitent l'authentification
+guilds.use('*', authMiddleware);
 
 // GET /api/guilds/:guildId/leaderboard
 guilds.get('/:guildId/leaderboard', async (c) => {
@@ -60,26 +269,6 @@ guilds.get('/:guildId/leaderboard', async (c) => {
   }
 });
 
-// Get bot status for a guild
-guilds.get('/:id/bot-status', async (c) => {
-  try {
-    const guildId = c.req.param('id');
-    
-    const client = BotClient.getInstance();
-    const guild = client.guilds.cache.get(guildId);
-    
-    return c.json({
-      botPresent: !!guild,
-      inviteUrl: guild ? null : `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=8&scope=bot&guild_id=${guildId}`
-    });
-  } catch (error) {
-    return c.json({ 
-      botPresent: false, 
-      inviteUrl: `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=8&scope=bot&guild_id=${c.req.param('id')}`
-    }, 200);
-  }
-});
-
 // Get available features for a guild
 guilds.get('/:id/features', async (c) => {
   try {
@@ -95,21 +284,21 @@ guilds.get('/:id/features', async (c) => {
     const featureList = [
       {
         id: 'chat-gaming',
-        name: 'Chat Gaming',
+        name: 'Gaming',
         description: 'Créez des jeux communautaires avec des rôles automatiques',
         icon: '🎮',
         enabled: features.chatGaming?.enabled || false
       },
       {
         id: 'leveling',
-        name: 'Système de niveaux',
+        name: 'Niveaux',
         description: 'Système de niveaux et d\'expérience pour les membres',
         icon: '📈',
         enabled: features.leveling?.enabled || false
       },
       {
         id: 'voice-channels',
-        name: 'Salons vocaux',
+        name: 'Vocal',
         description: 'Gestion automatique des salons vocaux',
         icon: '🔊',
         enabled: features.vocManager?.enabled || false
@@ -123,14 +312,14 @@ guilds.get('/:id/features', async (c) => {
       },
       {
         id: 'suggestions',
-        name: 'Système de Suggestions',
+        name: 'Suggestions',
         description: 'Système de suggestions avec formulaires et votes',
         icon: '💡',
         enabled: features.suggestions?.enabled || false
       },
       {
         id: 'party',
-        name: 'Gestion des Soirées',
+        name: 'Soirées',
         description: 'Organisez des événements et soirées gaming pour votre communauté',
         icon: '🎉',
         enabled: features.party?.enabled || false
@@ -149,8 +338,14 @@ guilds.post('/:id/features/:featureId/toggle', async (c) => {
   try {
     const guildId = c.req.param('id');
     const featureId = c.req.param('featureId');
+
+    // Vérifier les permissions
+    if (!await requireGuildPermissions(c, guildId)) {
+      return; // La réponse d'erreur a déjà été envoyée
+    }
+
     const { enabled } = await c.req.json();
-    
+
     // Get guild name from Discord if creating new guild
     const client = BotClient.getInstance();
     const discordGuild = client.guilds.cache.get(guildId);
@@ -303,8 +498,14 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
   try {
     const guildId = c.req.param('id');
     const featureId = c.req.param('featureId');
+
+    // Vérifier les permissions
+    if (!await requireGuildPermissions(c, guildId)) {
+      return;
+    }
+
     const updates = await c.req.json();
-    
+
     // Get guild name from Discord if creating new guild
     const client = BotClient.getInstance();
     const discordGuild = client.guilds.cache.get(guildId);
@@ -354,6 +555,57 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
   } catch (error) {
     console.error('Error updating feature settings:', error);
     return c.json({ error: 'Failed to update feature settings' }, 500);
+  }
+});
+
+// Get leveling stats for a guild
+guilds.get('/:id/features/leveling/stats', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+
+    // Récupérer tous les utilisateurs de la guild
+    const users = await GuildUserModel.find({ guildId });
+
+    // Calculer les statistiques
+    const totalXp = users.reduce((sum, user) => sum + (user.profil?.exp || 0), 0);
+    const activeMembers = users.filter(user => (user.profil?.exp || 0) > 0).length;
+
+    // Level ups aujourd'hui (approximation basée sur l'activité récente)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const recentLevelUps = users.filter(user => {
+      // On estime qu'un utilisateur avec beaucoup d'XP a level up récemment
+      // C'est une approximation, idéalement on devrait avoir un champ updatedAt
+      return (user.profil?.lvl || 0) > 0;
+    }).length;
+
+    // Top 10 leaderboard
+    const leaderboard = users
+      .sort((a, b) => {
+        const lvlDiff = (b.profil?.lvl || 0) - (a.profil?.lvl || 0);
+        if (lvlDiff !== 0) return lvlDiff;
+        return (b.profil?.exp || 0) - (a.profil?.exp || 0);
+      })
+      .slice(0, 10)
+      .map(user => ({
+        discordId: user.discordId,
+        name: user.name,
+        level: user.profil?.lvl || 0,
+        exp: user.profil?.exp || 0
+      }));
+
+    return c.json({
+      stats: {
+        totalXp,
+        activeMembers,
+        levelUpsToday: Math.min(recentLevelUps, 50), // Approximation
+        totalMembers: users.length
+      },
+      leaderboard
+    });
+  } catch (error) {
+    console.error('Error fetching leveling stats:', error);
+    return c.json({ error: 'Failed to fetch leveling stats' }, 500);
   }
 });
 
@@ -582,6 +834,145 @@ guilds.get('/:id/roles', async (c) => {
   } catch (error) {
     console.error('Error fetching guild roles:', error);
     return c.json({ error: 'Failed to fetch roles' }, 500);
+  }
+});
+
+// Get voice-channels (voc-manager) settings for a guild
+guilds.get('/:id/features/voice-channels/settings', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+    const guild = await GuildService.getOrCreateGuild(guildId, '');
+
+    return c.json({
+      settings: {
+        enabled: guild.features?.vocManager?.enabled || false,
+        joinChannels: guild.features?.vocManager?.joinChannels || [],
+        createdChannels: guild.features?.vocManager?.createdChannels || [],
+        channelCount: guild.features?.vocManager?.channelCount || 0
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching voice-channels settings:', error);
+    return c.json({ error: 'Failed to fetch voice-channels settings' }, 500);
+  }
+});
+
+// Update voice-channels (voc-manager) settings
+guilds.put('/:id/features/voice-channels/settings', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+
+    if (!await requireGuildPermissions(c, guildId)) {
+      return;
+    }
+
+    const { joinChannels, enabled } = await c.req.json();
+    const guild = await GuildService.getOrCreateGuild(guildId, '');
+
+    if (!guild.features) guild.features = {};
+    if (!guild.features.vocManager) {
+      guild.features.vocManager = {
+        enabled: false,
+        joinChannels: [],
+        createdChannels: [],
+        channelCount: 0
+      };
+    }
+
+    if (joinChannels !== undefined) guild.features.vocManager.joinChannels = joinChannels;
+    if (enabled !== undefined) guild.features.vocManager.enabled = enabled;
+
+    await guild.save();
+
+    return c.json({
+      message: 'Voice-channels settings updated successfully',
+      settings: guild.features.vocManager
+    });
+  } catch (error) {
+    console.error('Error updating voice-channels settings:', error);
+    return c.json({ error: 'Failed to update voice-channels settings' }, 500);
+  }
+});
+
+// Get voice stats for a guild
+guilds.get('/:id/features/voice-channels/stats', async (c) => {
+  try {
+    const guildId = c.req.param('id');
+
+    // Get all users from the guild
+    const users = await GuildUserModel.find({ guildId });
+
+    // Calculate voice stats
+    const totalVoiceTime = users.reduce((sum, user) => sum + (user.stats?.voiceTime || 0), 0);
+    const activeVoiceUsers = users.filter(user => (user.stats?.voiceTime || 0) > 0).length;
+
+    // Calculate voice time today from voiceHistory
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const voiceTimeToday = users.reduce((sum, user) => {
+      const todayEntry = user.stats?.voiceHistory?.find(entry => {
+        const entryDate = new Date(entry.date);
+        entryDate.setHours(0, 0, 0, 0);
+        return entryDate.getTime() === today.getTime();
+      });
+      return sum + (todayEntry?.time || 0);
+    }, 0);
+
+    // Get currently active voice users from Discord
+    const client = BotClient.getInstance();
+    const guild = client.guilds.cache.get(guildId);
+    let currentActiveUsers = 0;
+    let activeChannelsCount = 0;
+
+    if (guild) {
+      const voiceStates = guild.voiceStates.cache;
+      currentActiveUsers = voiceStates.filter(state => state.channelId).size;
+
+      // Count unique voice channels with users
+      const activeChannelIds = new Set(
+        Array.from(voiceStates.values())
+          .filter(state => state.channelId)
+          .map(state => state.channelId)
+      );
+      activeChannelsCount = activeChannelIds.size;
+    }
+
+    // Calculate peak activity hour (simplified - from historical data)
+    let peakHour = '8:00 PM';
+    const hourlyData: Record<number, number> = {};
+    users.forEach(user => {
+      user.stats?.voiceHistory?.forEach(entry => {
+        const hour = new Date(entry.date).getHours();
+        hourlyData[hour] = (hourlyData[hour] || 0) + entry.time;
+      });
+    });
+    if (Object.keys(hourlyData).length > 0) {
+      const peakHourNum = Object.entries(hourlyData).reduce((max, [hour, time]) =>
+        time > (hourlyData[max] || 0) ? parseInt(hour) : max
+      , 0);
+      const isPM = peakHourNum >= 12;
+      const displayHour = peakHourNum > 12 ? peakHourNum - 12 : peakHourNum || 12;
+      peakHour = `${displayHour}:00 ${isPM ? 'PM' : 'AM'}`;
+    }
+
+    // Format total voice time in hours
+    const totalVoiceTimeHours = Math.round(totalVoiceTime / 3600);
+    const voiceTimeTodayHours = Math.round(voiceTimeToday / 3600);
+
+    return c.json({
+      stats: {
+        currentActiveUsers,
+        totalVoiceTime: totalVoiceTimeHours,
+        voiceTimeToday: voiceTimeTodayHours,
+        activeChannels: activeChannelsCount,
+        peakActivity: peakHour,
+        totalMembers: users.length,
+        activeVoiceUsers
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching voice stats:', error);
+    return c.json({ error: 'Failed to fetch voice stats' }, 500);
   }
 });
 

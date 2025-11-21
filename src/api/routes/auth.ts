@@ -1,8 +1,8 @@
 import { Hono } from 'hono';
-import { jwt } from 'hono/jwt';
-import { sign, verify } from 'jsonwebtoken';
+import { sign } from 'jsonwebtoken';
 import { BotClient } from '../../bot/client';
-import { JwtPayload } from 'jsonwebtoken';
+import { authMiddleware } from '../middleware/auth.middleware';
+import type { AuthContext } from '../middleware/auth.middleware';
 
 interface DiscordTokenResponse {
   access_token: string;
@@ -80,7 +80,7 @@ auth.get('/discord/callback', async (c) => {
     console.log(`Réponse brute de Discord: ${responseText}`);
     
     // Tentative de parser la réponse JSON
-    let tokenData;
+    let tokenData: DiscordTokenResponse;
     try {
       tokenData = JSON.parse(responseText) as DiscordTokenResponse;
     } catch (parseError) {
@@ -125,20 +125,25 @@ auth.get('/discord/callback', async (c) => {
 
     const token = sign(
       jwtPayload,
-      process.env.JWT_SECRET || 'your-secret-key'
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '7d' } // Token expire dans 7 jours
     );
-    
-    // Vérifier le JWT juste après l'avoir créé
-    try {
-      const decoded = verify(token, process.env.JWT_SECRET || 'your-secret-key') as JwtPayload & { access_token: string };
-      console.log('✅ JWT vérifié immédiatement après création:');
-      console.log('- id:', decoded.id);
-      console.log('- access_token présent:', !!decoded.access_token);
-    } catch (error) {
-      console.error('❌ Erreur lors de la vérification du JWT créé:', error);
-    }
 
-    return c.redirect(`${process.env.FRONTEND_URL}/?token=${token}`);
+    // Définir le cookie httpOnly sécurisé
+    const isProduction = process.env.NODE_ENV === 'production'
+    const cookieOptions = [
+      `auth_token=${token}`,
+      'HttpOnly',
+      isProduction ? 'Secure' : '', // Secure seulement en production (HTTPS)
+      'SameSite=Lax',
+      `Max-Age=${7 * 24 * 60 * 60}`,
+      'Path=/'
+    ].filter(Boolean).join('; ')
+
+    c.header('Set-Cookie', cookieOptions)
+
+    // Rediriger sans le token dans l'URL
+    return c.redirect(`${process.env.FRONTEND_URL}/auth/callback`);
   } catch (error) {
     console.error('Authentication error:', error);
     return c.json({ error: 'Authentication failed' }, 500);
@@ -151,104 +156,81 @@ auth.get('/discord/callback', async (c) => {
 //   alg: 'HS256'
 // }));
 
+// Route pour récupérer les informations de l'utilisateur actuel
+auth.get('/me', authMiddleware, async (c: AuthContext) => {
+  const user = c.get('user');
+
+  return c.json({
+    id: user.id,
+    username: user.name,
+    avatar: user.avatar,
+    discriminator: user.discriminator
+  });
+});
+
 // Logout route
 auth.post('/logout', (c) => {
+  // Supprimer le cookie d'authentification
+  const isProduction = process.env.NODE_ENV === 'production'
+  const cookieOptions = [
+    'auth_token=',
+    'HttpOnly',
+    isProduction ? 'Secure' : '',
+    'SameSite=Lax',
+    'Max-Age=0',
+    'Path=/'
+  ].filter(Boolean).join('; ')
+
+  c.header('Set-Cookie', cookieOptions)
   return c.json({ message: 'Logged out successfully' });
 });
 
-// Route pour récupérer les serveurs de l'utilisateur
-auth.get('/guilds', async (c) => {
+// Route pour récupérer les serveurs de l'utilisateur (protégée)
+auth.get('/guilds', authMiddleware, async (c: AuthContext) => {
   console.log('🔍 Route /guilds appelée');
-  
-  // Log tous les headers pour déboguer
-  console.log('📋 Headers reçus:');
-  const headers = Object.fromEntries(
-    [...c.req.raw.headers.entries()].map(([key, value]) => [key, value])
-  );
-  console.log(headers);
-  
-  const auth_header = c.req.header('Authorization');
-  console.log(`📝 Authorization header: ${auth_header || 'NON PRÉSENT'}`);
-  
-  const token = auth_header?.split(' ')[1];
-  console.log(`🎟️ Token extrait: ${token ? token.substring(0, 10) + '...' : 'AUCUN'}`);
-  
-  if (!token) {
-    return c.json({ error: 'No token provided' }, 401);
-  }
+
+  // Récupérer l'utilisateur depuis le contexte (ajouté par le middleware)
+  const user = c.get('user');
 
   try {
-    // Décoder le JWT pour obtenir le token d'accès Discord
-    console.log(`🔑 JWT_SECRET défini: ${!!process.env.JWT_SECRET}`);
-    
-    // Décodage sans vérification pour voir le contenu
-    try {
-      const decodedWithoutVerify = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
-      console.log('📄 Contenu du JWT (sans vérification):');
-      console.log(JSON.stringify(decodedWithoutVerify, null, 2));
-      console.log('Access token présent dans le JWT non vérifié:', !!decodedWithoutVerify.access_token);
-    } catch (err) {
-      console.error('❌ Erreur lors du décodage sans vérification:', err);
-    }
-    
-    // Décodage avec vérification (normal)
-    const decoded = verify(token, process.env.JWT_SECRET || 'your-secret-key') as JwtPayload & { access_token: string };
-    console.log('✅ Token JWT vérifié avec succès');
-    console.log('📄 Contenu du JWT après vérification:');
-    console.log(JSON.stringify(decoded, null, 2));
-    
-    if (!decoded.access_token) {
-      console.log('❌ Access token Discord non trouvé dans le JWT');
-      return c.json({ error: 'No Discord access token found' }, 401);
-    }
-    
-    console.log(`🔑 Access token Discord (premiers caractères): ${decoded.access_token.substring(0, 10)}...`);
+    console.log('🔄 Tentative de récupération des guilds depuis Discord API...');
+    console.log(`🔑 User ID: ${user.id}`);
 
-    // Utiliser le token d'accès Discord pour récupérer les serveurs
-    try {
-      console.log('🔄 Tentative de récupération des guilds depuis Discord API...');
-      const response = await fetch('https://discord.com/api/users/@me/guilds', {
-        headers: {
-          Authorization: `Bearer ${decoded.access_token}`,
-        },
-      });
+    const response = await fetch('https://discord.com/api/users/@me/guilds', {
+      headers: {
+        Authorization: `Bearer ${user.access_token}`,
+      },
+    });
 
-      console.log(`📊 Status de la réponse Discord: ${response.status}`);
-      
-      if (!response.ok) {
-        const errorBody = await response.text();
-        console.error(`❌ Erreur Discord API: ${response.status} - ${errorBody}`);
-        return c.json({ 
-          error: 'Discord API error', 
-          status: response.status,
-          details: errorBody
-        }, 500);
-      }
+    console.log(`📊 Status de la réponse Discord: ${response.status}`);
 
-      const guilds = await response.json() as any[];
-      console.log(`✅ Guilds récupérés: ${guilds.length}`);
-
-      // Filtrer pour ne garder que les serveurs où l'utilisateur est admin
-      const adminGuilds = guilds.filter(guild =>
-        guild.owner === true ||
-        (typeof guild.permissions === 'string'
-          ? (BigInt(guild.permissions) & 0x8n) !== 0n
-          : (guild.permissions & 0x8) !== 0)
-      );
-      
-      console.log(`👑 Guilds avec droits admin: ${adminGuilds.length}`);
-
-      return c.json(adminGuilds);
-    } catch (fetchError) {
-      console.error('❌ Erreur lors de la requête vers Discord API:', fetchError);
-      return c.json({ 
-        error: 'Failed to communicate with Discord API',
-        details: fetchError instanceof Error ? fetchError.message : String(fetchError)
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`❌ Erreur Discord API: ${response.status} - ${errorBody}`);
+      return c.json({
+        error: 'Discord API error',
+        status: response.status,
+        details: errorBody
       }, 500);
     }
+
+    const guilds = await response.json() as any[];
+    console.log(`✅ Guilds récupérés: ${guilds.length}`);
+
+    // Filtrer pour ne garder que les serveurs où l'utilisateur est admin
+    const adminGuilds = guilds.filter(guild =>
+      guild.owner === true ||
+      (typeof guild.permissions === 'string'
+        ? (BigInt(guild.permissions) & 0x8n) !== 0n
+        : (guild.permissions & 0x8) !== 0)
+    );
+
+    console.log(`👑 Guilds avec droits admin: ${adminGuilds.length}`);
+
+    return c.json(adminGuilds);
   } catch (error) {
-    console.error('❌ Erreur de vérification du token:', error);
-    return c.json({ 
+    console.error('❌ Erreur lors de la récupération des guilds:', error);
+    return c.json({
       error: 'Failed to fetch guilds',
       details: error instanceof Error ? error.message : String(error)
     }, 500);

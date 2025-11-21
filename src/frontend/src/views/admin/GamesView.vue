@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from 'axios'
+import api from '../../utils/axios'
 import { IGame } from '../../types/game'
 
 const gameName = ref('')
@@ -100,7 +100,7 @@ const handleSubmit = async () => {
     }
     formData.append('gamecolor', gameColor.value)
     
-    await axios.post('/api/chat-gaming', formData, {
+    await api.post('/api/chat-gaming', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -123,7 +123,7 @@ const handleSubmit = async () => {
 
 const loadGames = async () => {
   try {
-    const response = await axios.get('/api/chat-gaming')
+    const response = await api.get('/api/chat-gaming')
     games.value = response.data.games
   } catch (err) {
     console.error('Failed to load games:', err)

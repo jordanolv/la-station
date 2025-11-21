@@ -15,13 +15,12 @@
 import { ref, onMounted, computed } from 'vue'
 import GuildCard from './GuildCard.vue'
 import { useAuthStore } from '../../stores/auth'
-import axios from 'axios'
+import api from '../../utils/axios'
 
 const emit = defineEmits(['access'])
 const authStore = useAuthStore()
 const guilds = computed(() => authStore.guilds)
 const botGuilds = ref<string[]>([])
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051';
 
 const getInviteLink = (guildId: string) => {
   const clientId = (import.meta as any).env.VITE_DISCORD_CLIENT_ID || ''
@@ -33,7 +32,7 @@ const onAccess = (guild: any) => {
 }
 
 onMounted(async () => {
-  const res = await axios.get(`${API_BASE_URL}/api/auth/bot-guilds`)
+  const res = await api.get(`/api/auth/bot-guilds`)
   botGuilds.value = res.data.map((g: any) => g.id)
 })
 </script>
