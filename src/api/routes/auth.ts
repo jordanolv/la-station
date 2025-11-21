@@ -129,15 +129,14 @@ auth.get('/discord/callback', async (c) => {
       { expiresIn: '7d' } // Token expire dans 7 jours
     );
 
-    // Définir le cookie httpOnly sécurisé
-    const isProduction = process.env.NODE_ENV === 'production'
+    const domain = process.env.COOKIE_DOMAIN || undefined;
     const cookieOptions = [
       `auth_token=${token}`,
       'HttpOnly',
-      isProduction ? 'Secure' : '', // Secure seulement en production (HTTPS)
       'SameSite=Lax',
       `Max-Age=${7 * 24 * 60 * 60}`,
-      'Path=/'
+      'Path=/',
+      domain ? `Domain=${domain}` : ''
     ].filter(Boolean).join('; ')
 
     c.header('Set-Cookie', cookieOptions)
@@ -168,17 +167,15 @@ auth.get('/me', authMiddleware, async (c: AuthContext) => {
   });
 });
 
-// Logout route
 auth.post('/logout', (c) => {
-  // Supprimer le cookie d'authentification
-  const isProduction = process.env.NODE_ENV === 'production'
+  const domain = process.env.COOKIE_DOMAIN || undefined;
   const cookieOptions = [
     'auth_token=',
     'HttpOnly',
-    isProduction ? 'Secure' : '',
     'SameSite=Lax',
     'Max-Age=0',
-    'Path=/'
+    'Path=/',
+    domain ? `Domain=${domain}` : ''
   ].filter(Boolean).join('; ')
 
   c.header('Set-Cookie', cookieOptions)
