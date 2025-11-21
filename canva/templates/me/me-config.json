@@ -1,0 +1,110 @@
+{
+  "name": "me",
+  "psd": "me.psd",
+  "background": "me-background.png",
+  "dimensions": {
+    "width": 1500,
+    "height": 900
+  },
+  "psdVariables": {
+    "RC": "ridgecoin",
+    "LVL": "level",
+    "BIRTHDAY": "birthday",
+    "HEREFROM": "joinedDate",
+    "MSG": "messages",
+    "TEMPSVOC": "voiceTime",
+    "STREAK": "dailyStreak",
+    "USERNAME": "username",
+    "LAST_ACTIVITY": "lastActivity"
+  },
+  "canvasOverlays": {
+    "avatar": {
+      "enabled": false,
+      "x": 1033,
+      "y": 155,
+      "radius": 70
+    },
+    "xpBar": {
+      "enabled": false,
+      "x": 152,
+      "y": 153,
+      "width": 358,
+      "height": 25,
+      "radius": 12,
+      "backgroundColor": "rgba(20, 28, 45, 0.8)",
+      "fillColor": "#8ad3f4"
+    },
+    "voiceChart": {
+      "enabled": true,
+      "x": 44,
+      "y": 400,
+      "width": 690,
+      "height": 246,
+      "centerX": 390,
+      "legendOffsetX": 20,
+      "legendOffsetY": 37
+    },
+    "roleBadges": {
+      "enabled": true,
+      "x": 48,
+      "y": 44,
+      "maxWidth": 700,
+      "maxHeight": 230,
+      "badgeHeight": 28,
+      "gap": 8
+    }
+  },
+  "xpGroup": {
+    "offsetX": 704,
+    "offsetY": 94
+  },
+  "additionalTexts": [
+    {
+      "key": "xpValueWithPercent",
+      "x": 331,
+      "y": 166,
+      "fontSize": 16,
+      "fontWeight": "600",
+      "color": "#FFFFFF",
+      "align": "center",
+      "group": "xpGroup"
+    },
+    {
+      "key": "username",
+      "x": 1033,
+      "y": 54,
+      "fontSize": 22,
+      "fontWeight": "400",
+      "color": "#FFFFFF",
+      "align": "center"
+    },
+    {
+      "key": "lastActivity",
+      "x": 743,
+      "y": 880,
+      "fontSize": 16,
+      "fontWeight": "500",
+      "color": "#FFFFFF",
+      "align": "right"
+    }
+  ],
+  "testData": {
+    "ridgecoin": "1,234",
+    "level": "42",
+    "birthday": "15/03",
+    "joinedDate": "01/01/2023",
+    "messages": "5,678",
+    "voiceTime": "120h",
+    "dailyStreak": "7",
+    "currentXp": 750,
+    "requiredXp": 1000,
+    "avatarUrl": "https://cdn.discordapp.com/embed/avatars/0.png",
+    "xpPercent": 0.75,
+    "username": "TestUser",
+    "voiceHistory": [30, 45, 60, 90, 120, 100, 80],
+    "roles": [
+      { "name": "Admin", "color": "#FF0000" },
+      { "name": "Developer", "color": "#00FF00" }
+    ]
+  }
+}

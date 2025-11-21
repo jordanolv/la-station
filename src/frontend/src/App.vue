@@ -1,28 +1,26 @@
 <template>
-  <div class="app min-h-screen bg-gray-900 text-white">
+  <MainLayout v-if="!isStandalonePage">
     <router-view />
-  </div>
+  </MainLayout>
+  <router-view v-else />
 </template>
 
 <script setup lang="ts">
-// Clean App component - all routing logic is now in the router
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import MainLayout from './layouts/MainLayout.vue'
+
+const route = useRoute()
+
+// Pages that should not use MainLayout
+const standalonePages = ['leaderboard']
+
+const isStandalonePage = computed(() => {
+  return standalonePages.includes(route.name as string)
+})
 </script>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+/* Global resets or overrides if needed, but mostly handled by Tailwind and base.css */
 </style>
+

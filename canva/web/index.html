@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas Template Preview</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2.5rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 30px;
+    }
+
+    .template-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .template-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+
+    .template-preview {
+      width: 100%;
+      height: 300px;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .template-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .template-info {
+      padding: 20px;
+    }
+
+    .template-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .template-description {
+      color: #666;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .template-dimensions {
+      display: inline-block;
+      background: #f0f0f0;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .template-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .loading {
+      text-align: center;
+      color: white;
+      font-size: 1.2rem;
+      padding: 40px;
+    }
+
+    .error {
+      background: #ff4444;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .refresh-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: transform 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .refresh-btn:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Canvas Template Preview</h1>
+    <div id="templates-container">
+      <div class="loading">Chargement des templates...</div>
+    </div>
+  </div>
+
+  <button class="refresh-btn" onclick="loadTemplates()" title="Rafraîchir">
+    🔄
+  </button>
+
+  <script>
+    const API_URL = window.location.origin;
+
+    async function loadTemplates() {
+      const container = document.getElementById('templates-container');
+      container.innerHTML = '<div class="loading">Chargement des templates...</div>';
+
+      try {
+        const response = await fetch(`${API_URL}/canva`);
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to load templates');
+        }
+
+        if (data.templates.length === 0) {
+          container.innerHTML = '<div class="error">Aucun template trouvé. Ajoutez des templates dans canva/templates/</div>';
+          return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'templates-grid';
+
+        data.templates.forEach(template => {
+          const card = createTemplateCard(template);
+          grid.appendChild(card);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(grid);
+      } catch (error) {
+        console.error('Error loading templates:', error);
+        container.innerHTML = `<div class="error">Erreur lors du chargement: ${error.message}</div>`;
+      }
+    }
+
+    function createTemplateCard(template) {
+      const card = document.createElement('div');
+      card.className = 'template-card';
+
+      const previewUrl = `${API_URL}${template.previewUrl}?t=${Date.now()}`;
+
+      card.innerHTML = `
+        <div class="template-preview">
+          <img src="${previewUrl}" alt="${template.name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27400%27 height=%27300%27%3E%3Crect fill=%27%23f0f0f0%27 width=%27400%27 height=%27300%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 text-anchor=%27middle%27 dy=%27.3em%27 fill=%27%23999%27 font-family=%27Arial%27%3EPreview unavailable%3C/text%3E%3C/svg%3E'">
+        </div>
+        <div class="template-info">
+          <div class="template-name">${template.name}</div>
+          <div class="template-description">${template.description || 'Aucune description'}</div>
+          <div class="template-dimensions">${template.dimensions.width} × ${template.dimensions.height}px</div>
+          <div class="template-actions">
+            <a href="${previewUrl}" target="_blank" class="btn btn-primary">Voir en grand</a>
+            <button onclick="refreshPreview('${template.name}')" class="btn btn-secondary">Rafraîchir</button>
+          </div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    function refreshPreview(templateName) {
+      const img = document.querySelector(`img[alt="${templateName}"]`);
+      if (img) {
+        const url = new URL(img.src);
+        url.searchParams.set('t', Date.now());
+        img.src = url.toString();
+      }
+    }
+
+    // Load templates on page load
+    loadTemplates();
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+      const images = document.querySelectorAll('.template-preview img');
+      images.forEach(img => {
+        const url = new URL(img.src);
+        url.searchParams.set('t', Date.now());
+        img.src = url.toString();
+      });
+    }, 30000);
+  </script>
+</body>
+</html>

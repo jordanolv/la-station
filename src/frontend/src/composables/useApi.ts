@@ -1,37 +1,9 @@
 import { ref } from 'vue'
-import axios from 'axios'
-import { useAuthStore } from '../stores/auth'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051'
+import api from '../utils/axios'
 
 export function useApi() {
-  const authStore = useAuthStore()
   const loading = ref(false)
   const error = ref<string | null>(null)
-
-  const api = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-
-  // Request interceptor to add auth token
-  api.interceptors.request.use((config) => {
-    if (authStore.token) {
-      config.headers.Authorization = `Bearer ${authStore.token}`
-    }
-    return config
-  })
-
-  // Response interceptor for error handling
-  api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      console.error('API Error:', error)
-      return Promise.reject(error)
-    }
-  )
 
   const request = async <T>(
     method: 'get' | 'post' | 'put' | 'delete',
@@ -42,16 +14,16 @@ export function useApi() {
     try {
       loading.value = true
       error.value = null
-      
-      console.log(`[USE_API] ${method.toUpperCase()} ${API_BASE_URL}${url}`)
-      
+
+      console.log(`[USE_API] ${method.toUpperCase()} ${url}`)
+
       const response = await api.request({
         method,
         url,
         data,
         ...config
       })
-      
+
       console.log(`[USE_API] Response:`, response.data)
       return response.data
     } catch (err: any) {

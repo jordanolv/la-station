@@ -70,7 +70,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import api from '../../utils/axios'
 import { useAuthStore } from '../../stores/auth'
 
 interface Props {
@@ -80,7 +80,6 @@ interface Props {
 const props = defineProps<Props>()
 const authStore = useAuthStore()
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051'
 
 const isLoading = ref(true)
 const isSaving = ref(false)
@@ -95,11 +94,7 @@ const settings = ref({
 const loadSettings = async () => {
   try {
     isLoading.value = true
-    const response = await axios.get(`${API_BASE_URL}/api/guilds/${props.guildId}/features/leveling/settings`, {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`
-      }
-    })
+    const response = await api.get(`/api/guilds/${props.guildId}/features/leveling/settings`)
     
     if (response.data.settings) {
       settings.value = {
@@ -125,10 +120,9 @@ const saveSettings = async () => {
       channelNotif: settings.value.channelNotif || null
     }
     
-    await axios.put(`${API_BASE_URL}/api/guilds/${props.guildId}/features/leveling/settings`, payload, {
+    await api.put(`/api/guilds/${props.guildId}/features/leveling/settings`, payload, {
       headers: {
-        Authorization: `Bearer ${authStore.token}`,
-        'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
       }
     })
     

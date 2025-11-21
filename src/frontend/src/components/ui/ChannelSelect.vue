@@ -81,7 +81,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import axios from 'axios'
+import api from '../../utils/axios'
 import { useAuthStore } from '../../stores/auth'
 
 interface Channel {
@@ -114,7 +114,6 @@ const emit = defineEmits<{
 }>()
 
 const authStore = useAuthStore()
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3051'
 
 const loading = ref(true)
 const error = ref('')
@@ -158,11 +157,7 @@ const loadChannels = async () => {
     loading.value = true
     error.value = ''
     
-    const response = await axios.get(`${API_BASE_URL}/api/guilds/${props.guildId}/channels`, {
-      headers: {
-        Authorization: `Bearer ${authStore.token}`
-      }
-    })
+    const response = await api.get(`/api/guilds/${props.guildId}/channels`)
     
     const data = response.data
     

@@ -4,21 +4,21 @@
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-xl font-semibold text-white mb-2">Système de Suggestions</h2>
-        <p class="text-gray-400">Configurez les formulaires et channels pour les suggestions</p>
+        <p class="text-muted">Configurez les formulaires et channels pour les suggestions</p>
       </div>
       <div class="flex items-center space-x-3">
-        <span class="text-sm text-gray-400">{{ config?.enabled ? 'Activé' : 'Désactivé' }}</span>
+        <span class="text-sm text-muted">{{ config?.enabled ? 'Activé' : 'Désactivé' }}</span>
         <button
           @click="toggleFeature"
           :class="[
             'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-            config?.enabled ? 'bg-purple-600' : 'bg-gray-600'
+            config?.enabled ? 'bg-white' : 'bg-surface border border-border'
           ]"
         >
           <span
             :class="[
-              'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
-              config?.enabled ? 'translate-x-6' : 'translate-x-1'
+              'inline-block h-4 w-4 transform rounded-full transition-transform',
+              config?.enabled ? 'translate-x-6 bg-black' : 'translate-x-1 bg-muted'
             ]"
           />
         </button>
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Configuration Tabs -->
-    <div class="border-b border-gray-700">
+    <div class="border-b border-border">
       <nav class="-mb-px flex space-x-8">
         <button
           v-for="tab in tabs"
@@ -35,8 +35,8 @@
           :class="[
             'border-b-2 py-2 px-1 text-sm font-medium transition-colors',
             activeTab === tab.id
-              ? 'border-purple-500 text-purple-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
+              ? 'border-white text-white'
+              : 'border-transparent text-muted hover:text-white'
           ]"
         >
           {{ tab.name }}
@@ -52,19 +52,22 @@
           <h3 class="text-lg font-medium text-white">Formulaires de suggestions</h3>
           <button
             @click="showCreateFormModal = true"
-            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+            class="bg-surface hover:bg-surface-hover border border-border text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
           >
-            + Nouveau formulaire
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Nouveau formulaire</span>
           </button>
         </div>
 
-        <div v-if="config.forms.length === 0" class="text-center py-12 bg-gray-800 rounded-lg">
+        <div v-if="config.forms.length === 0" class="text-center py-12 bg-surface border border-border rounded-xl">
           <div class="text-4xl mb-4">📝</div>
           <h3 class="text-lg font-medium text-white mb-2">Aucun formulaire</h3>
-          <p class="text-gray-400 mb-4">Créez votre premier formulaire de suggestions</p>
+          <p class="text-muted mb-4">Créez votre premier formulaire de suggestions</p>
           <button
             @click="showCreateFormModal = true"
-            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+            class="bg-white text-black hover:bg-gray-200 px-4 py-2 rounded-lg transition-colors font-medium"
           >
             Créer un formulaire
           </button>
@@ -74,21 +77,22 @@
           <div
             v-for="form in config.forms"
             :key="form.id"
-            class="bg-gray-800 rounded-lg p-4 border border-gray-700"
+            class="bg-surface border border-border rounded-xl p-4 hover:border-white/20 transition-colors group"
           >
             <div class="flex items-center justify-between">
               <div>
                 <h4 class="font-medium text-white">{{ form.name }}</h4>
-                <p class="text-sm text-gray-400 mt-1">{{ form.description }}</p>
-                <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                <p class="text-sm text-muted mt-1">{{ form.description }}</p>
+                <div class="flex items-center space-x-4 mt-2 text-xs text-muted/70">
                   <span>{{ form.fields.length }} champs</span>
                   <span>Créé le {{ new Date(form.createdAt).toLocaleDateString('fr-FR') }}</span>
                 </div>
               </div>
-              <div class="flex items-center space-x-2">
+              <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   @click="editForm(form)"
-                  class="text-gray-400 hover:text-white p-2"
+                  class="text-muted hover:text-white p-2 transition-colors"
+                  title="Modifier"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -96,7 +100,8 @@
                 </button>
                 <button
                   @click="deleteForm(form.id)"
-                  class="text-red-400 hover:text-red-300 p-2"
+                  class="text-muted hover:text-red-400 p-2 transition-colors"
+                  title="Supprimer"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -114,19 +119,22 @@
           <h3 class="text-lg font-medium text-white">Channels de suggestions</h3>
           <button
             @click="showAddChannelModal = true"
-            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+            class="bg-surface hover:bg-surface-hover border border-border text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
           >
-            + Ajouter un channel
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Ajouter un channel</span>
           </button>
         </div>
 
-        <div v-if="config.channels.length === 0" class="text-center py-12 bg-gray-800 rounded-lg">
+        <div v-if="config.channels.length === 0" class="text-center py-12 bg-surface border border-border rounded-xl">
           <div class="text-4xl mb-4">#️⃣</div>
           <h3 class="text-lg font-medium text-white mb-2">Aucun channel configuré</h3>
-          <p class="text-gray-400 mb-4">Ajoutez des channels pour permettre les suggestions</p>
+          <p class="text-muted mb-4">Ajoutez des channels pour permettre les suggestions</p>
           <button
             @click="showAddChannelModal = true"
-            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+            class="bg-white text-black hover:bg-gray-200 px-4 py-2 rounded-lg transition-colors font-medium"
           >
             Ajouter un channel
           </button>
@@ -136,29 +144,31 @@
           <div
             v-for="channel in config.channels"
             :key="channel.channelId"
-            class="bg-gray-800 rounded-lg p-4 border border-gray-700"
+            class="bg-surface border border-border rounded-xl p-4 hover:border-white/20 transition-colors group"
           >
             <div class="flex items-center justify-between">
               <div>
-                <h4 class="font-medium text-white"># {{ channel.channelName || channel.channelId }}</h4>
-                <div class="flex items-center space-x-4 mt-2 text-sm text-gray-400">
+                <h4 class="font-medium text-white flex items-center gap-2">
+                  <span class="text-muted">#</span> {{ channel.channelName || channel.channelId }}
+                </h4>
+                <div class="flex items-center space-x-4 mt-2 text-sm text-muted">
                   <span>{{ channel.suggestionCount }} suggestions</span>
                   <span>Republication: {{ channel.republishInterval }}</span>
-                  <span v-if="channel.readOnly" class="text-yellow-400">Lecture seule</span>
-                  <span v-if="channel.pinButton" class="text-blue-400">Bouton épinglé</span>
+                  <span v-if="channel.readOnly" class="text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded text-xs">Lecture seule</span>
+                  <span v-if="channel.pinButton" class="text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded text-xs">Bouton épinglé</span>
                 </div>
               </div>
-              <div class="flex items-center space-x-2">
+              <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   @click="publishButton(channel.channelId)"
-                  class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                  class="bg-surface hover:bg-surface-hover border border-border text-white px-3 py-1 rounded text-sm transition-colors"
                   title="Publier le bouton dans ce channel"
                 >
                   Publier bouton
                 </button>
                 <button
                   @click="editChannel(channel)"
-                  class="text-gray-400 hover:text-white p-2"
+                  class="text-muted hover:text-white p-2 transition-colors"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -166,7 +176,7 @@
                 </button>
                 <button
                   @click="removeChannel(channel.channelId)"
-                  class="text-red-400 hover:text-red-300 p-2"
+                  class="text-muted hover:text-red-400 p-2 transition-colors"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -185,7 +195,7 @@
           <div class="flex items-center space-x-2">
             <select
               v-model="suggestionChannelFilter"
-              class="bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-1 text-sm"
+              class="bg-surface border border-border text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-white/20"
             >
               <option value="all">Tous les channels</option>
               <option
@@ -198,7 +208,7 @@
             </select>
             <select
               v-model="suggestionFilter"
-              class="bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-1 text-sm"
+              class="bg-surface border border-border text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-white/20"
             >
               <option value="all">Tous les statuts</option>
               <option value="pending">En attente</option>
@@ -209,36 +219,36 @@
           </div>
         </div>
 
-        <div v-if="suggestions.length === 0" class="text-center py-12 bg-gray-800 rounded-lg">
+        <div v-if="suggestions.length === 0" class="text-center py-12 bg-surface border border-border rounded-xl">
           <div class="text-4xl mb-4">💡</div>
           <h3 class="text-lg font-medium text-white mb-2">Aucune suggestion</h3>
-          <p class="text-gray-400">Les suggestions apparaîtront ici une fois soumises</p>
+          <p class="text-muted">Les suggestions apparaîtront ici une fois soumises</p>
         </div>
 
         <div v-else class="space-y-4">
           <div
             v-for="suggestion in filteredSuggestions"
             :key="suggestion._id"
-            class="bg-gray-800 rounded-lg p-4 border border-gray-700"
+            class="bg-surface border border-border rounded-xl p-4 hover:border-white/20 transition-colors"
           >
             <div class="flex items-start justify-between">
               <div class="flex-1">
-                <div class="flex items-center space-x-3 mb-2">
+                <div class="flex items-center space-x-3 mb-3">
                   <img
                     :src="suggestion.authorAvatar"
                     :alt="suggestion.authorUsername"
-                    class="w-6 h-6 rounded-full"
+                    class="w-6 h-6 rounded-full border border-border"
                   >
-                  <span class="font-medium text-white">{{ suggestion.authorUsername }}</span>
-                  <span class="text-xs text-gray-500">
+                  <span class="font-medium text-white text-sm">{{ suggestion.authorUsername }}</span>
+                  <span class="text-xs text-muted">
                     {{ new Date(suggestion.createdAt).toLocaleDateString('fr-FR') }}
                   </span>
-                  <span class="text-xs text-blue-400 bg-blue-900 px-2 py-1 rounded">
+                  <span class="text-xs text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded border border-blue-400/20">
                     # {{ getChannelName(suggestion.channelId) }}
                   </span>
                   <span
                     :class="[
-                      'px-2 py-1 rounded-full text-xs',
+                      'px-2 py-0.5 rounded text-xs border',
                       getStatusColor(suggestion.status)
                     ]"
                   >
@@ -246,43 +256,43 @@
                   </span>
                 </div>
                 
-                <h4 class="font-medium text-white mb-2">
+                <h4 class="font-medium text-white mb-2 text-base">
                   {{ suggestion.fields[0]?.value || 'Sans titre' }}
                 </h4>
                 
-                <div v-if="suggestion.fields.length > 1" class="space-y-1 mb-3">
+                <div v-if="suggestion.fields.length > 1" class="space-y-2 mb-4 bg-background/50 p-3 rounded-lg border border-border/50">
                   <div
                     v-for="field in suggestion.fields.slice(1)"
                     :key="field.fieldId"
                     class="text-sm"
                   >
-                    <span class="text-gray-400">{{ field.label }}:</span>
-                    <span class="text-gray-300 ml-2">
+                    <span class="text-muted block text-xs uppercase tracking-wider mb-0.5">{{ field.label }}</span>
+                    <span class="text-gray-200">
                       {{ field.value.length > 100 ? field.value.substring(0, 100) + '...' : field.value }}
                     </span>
                   </div>
                 </div>
 
-                <div v-if="suggestion.reactions.length > 0" class="flex items-center space-x-4 text-sm text-gray-400">
+                <div v-if="suggestion.reactions.length > 0" class="flex items-center space-x-4 text-sm text-muted">
                   <div
                     v-for="reaction in suggestion.reactions"
                     :key="reaction.emoji"
-                    class="flex items-center space-x-1"
+                    class="flex items-center space-x-1 bg-background px-2 py-1 rounded border border-border"
                   >
                     <span>{{ reaction.emoji }}</span>
-                    <span>{{ reaction.count }}</span>
+                    <span class="font-mono">{{ reaction.count }}</span>
                   </div>
                   <div class="ml-4">
-                    <span class="font-medium">Score: {{ suggestion.score }}</span>
+                    <span class="font-medium text-white">Score: {{ suggestion.score }}</span>
                   </div>
                 </div>
               </div>
 
-              <div class="flex flex-col space-y-2 ml-4">
+              <div class="flex flex-col space-y-2 ml-4 min-w-[200px]">
                 <select
                   :value="suggestion.status"
                   @change="updateSuggestionStatus(suggestion._id, ($event.target as HTMLSelectElement).value)"
-                  class="bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 text-sm"
+                  class="bg-background border border-border text-white rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-white/20"
                 >
                   <option value="pending">En attente</option>
                   <option value="approved">Approuvée</option>
@@ -293,21 +303,21 @@
                   <input
                     v-model="moderationNotes[suggestion._id]"
                     type="text"
-                    placeholder="Note de modération (optionnelle)"
-                    class="bg-gray-700 border border-gray-600 text-white rounded px-2 py-1 text-xs flex-1"
+                    placeholder="Note de modération..."
+                    class="bg-background border border-border text-white rounded-lg px-3 py-1.5 text-xs flex-1 focus:outline-none focus:ring-1 focus:ring-white/20"
                     @keyup.enter="addModerationNote(suggestion._id)"
                   >
                   <button
                     @click="addModerationNote(suggestion._id)"
                     :disabled="!moderationNotes[suggestion._id]?.trim()"
-                    class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-2 py-1 rounded text-xs transition-colors"
+                    class="bg-white text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed px-2 py-1.5 rounded-lg text-xs transition-colors font-bold"
                     title="Ajouter la note"
                   >
                     ✓
                   </button>
                 </div>
-                <div v-if="suggestion.moderatorNote" class="text-xs text-gray-400 bg-gray-800 p-2 rounded">
-                  <strong>Note:</strong> {{ suggestion.moderatorNote }}
+                <div v-if="suggestion.moderatorNote" class="text-xs text-muted bg-background p-2 rounded-lg border border-border">
+                  <strong class="text-white block mb-0.5">Note:</strong> {{ suggestion.moderatorNote }}
                 </div>
               </div>
             </div>
@@ -317,13 +327,13 @@
     </div>
 
     <!-- Disabled State -->
-    <div v-else class="text-center py-12 bg-gray-800 rounded-lg">
+    <div v-else class="text-center py-12 bg-surface border border-border rounded-xl">
       <div class="text-4xl mb-4">💡</div>
       <h3 class="text-lg font-medium text-white mb-2">Système de suggestions désactivé</h3>
-      <p class="text-gray-400 mb-4">Activez le système pour commencer à configurer les suggestions</p>
+      <p class="text-muted mb-4">Activez le système pour commencer à configurer les suggestions</p>
       <button
         @click="toggleFeature"
-        class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+        class="bg-white text-black hover:bg-gray-200 px-4 py-2 rounded-lg transition-colors font-medium"
       >
         Activer les suggestions
       </button>
@@ -614,12 +624,12 @@ async function publishButton(channelId: string) {
 
 function getStatusColor(status: string): string {
   const colors = {
-    pending: 'bg-blue-500 text-white',
-    approved: 'bg-green-500 text-white',
-    rejected: 'bg-red-500 text-white',
-    implemented: 'bg-purple-500 text-white'
+    pending: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+    approved: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    rejected: 'bg-red-500/10 text-red-400 border-red-500/20',
+    implemented: 'bg-purple-500/10 text-purple-400 border-purple-500/20'
   }
-  return colors[status as keyof typeof colors] || 'bg-gray-500 text-white'
+  return colors[status as keyof typeof colors] || 'bg-gray-500/10 text-gray-400 border-gray-500/20'
 }
 
 function getStatusLabel(status: string): string {
