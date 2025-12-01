@@ -207,62 +207,18 @@
 
         <!-- Stats Cards -->
         <transition name="fade" mode="out-in">
-          <!-- VS Mode: Side by side comparison -->
+          <!-- VS Mode: Direct comparison -->
           <div v-if="isVsMode" key="vs-mode" class="space-y-6">
-            <!-- Comparison Cards -->
-            <div class="grid grid-cols-2 gap-4">
-              <!-- User 1 -->
-              <div class="space-y-4">
-                <div class="text-center pb-3 border-b border-border">
-                  <div class="text-xl font-bold text-blue-500 mb-1">{{ selectedUsers[0].name }}</div>
-                  <div class="text-sm text-muted">Player 1</div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                  <div class="bg-surface border border-border rounded-xl p-4">
-                    <div class="text-muted text-xs font-medium uppercase tracking-wider mb-2">Level</div>
-                    <div class="text-2xl font-bold text-white">{{ selectedUsers[0].level }}</div>
-                    <div class="text-xs text-muted mt-1">{{ selectedUsers[0].exp }} XP</div>
-                  </div>
-                  <div class="bg-surface border border-border rounded-xl p-4">
-                    <div class="text-muted text-xs font-medium uppercase tracking-wider mb-2">Messages</div>
-                    <div class="text-2xl font-bold text-white">{{ formatNumber(selectedUsers[0].messages) }}</div>
-                  </div>
-                  <div class="bg-surface border border-border rounded-xl p-4">
-                    <div class="text-muted text-xs font-medium uppercase tracking-wider mb-2">Voice</div>
-                    <div class="text-2xl font-bold text-white">{{ formatTime(selectedUsers[0].voiceTime) }}</div>
-                  </div>
-                  <div class="bg-surface border border-border rounded-xl p-4">
-                    <div class="text-muted text-xs font-medium uppercase tracking-wider mb-2">Money</div>
-                    <div class="text-2xl font-bold text-white">{{ formatNumber(selectedUsers[0].money) }}💰</div>
-                  </div>
-                </div>
+            <!-- Players Header -->
+            <div class="flex items-center justify-between bg-surface border border-border rounded-xl p-4">
+              <div class="flex items-center gap-3">
+                <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+                <span class="text-lg font-bold text-blue-500">{{ selectedUsers[0].name }}</span>
               </div>
-
-              <!-- User 2 -->
-              <div class="space-y-4">
-                <div class="text-center pb-3 border-b border-border">
-                  <div class="text-xl font-bold text-purple-500 mb-1">{{ selectedUsers[1].name }}</div>
-                  <div class="text-sm text-muted">Player 2</div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                  <div class="bg-surface border border-border rounded-xl p-4">
-                    <div class="text-muted text-xs font-medium uppercase tracking-wider mb-2">Level</div>
-                    <div class="text-2xl font-bold text-white">{{ selectedUsers[1].level }}</div>
-                    <div class="text-xs text-muted mt-1">{{ selectedUsers[1].exp }} XP</div>
-                  </div>
-                  <div class="bg-surface border border-border rounded-xl p-4">
-                    <div class="text-muted text-xs font-medium uppercase tracking-wider mb-2">Messages</div>
-                    <div class="text-2xl font-bold text-white">{{ formatNumber(selectedUsers[1].messages) }}</div>
-                  </div>
-                  <div class="bg-surface border border-border rounded-xl p-4">
-                    <div class="text-muted text-xs font-medium uppercase tracking-wider mb-2">Voice</div>
-                    <div class="text-2xl font-bold text-white">{{ formatTime(selectedUsers[1].voiceTime) }}</div>
-                  </div>
-                  <div class="bg-surface border border-border rounded-xl p-4">
-                    <div class="text-muted text-xs font-medium uppercase tracking-wider mb-2">Money</div>
-                    <div class="text-2xl font-bold text-white">{{ formatNumber(selectedUsers[1].money) }}💰</div>
-                  </div>
-                </div>
+              <span class="text-muted font-medium">VS</span>
+              <div class="flex items-center gap-3">
+                <span class="text-lg font-bold text-purple-500">{{ selectedUsers[1].name }}</span>
+                <div class="w-2 h-2 rounded-full bg-purple-500"></div>
               </div>
             </div>
 
@@ -390,11 +346,47 @@
           <div class="px-6 py-4 border-b border-border">
             <h3 class="font-semibold text-white">Activity by Hour</h3>
             <p class="text-xs text-muted mt-1">
-              {{ selectedUser ? `${selectedUser.name}'s message activity throughout the day` : 'Message activity throughout the day' }}
+              <span v-if="isVsMode">
+                Comparison of <span class="text-blue-400">{{ selectedUsers[0].name }}</span> vs <span class="text-purple-400">{{ selectedUsers[1].name }}</span>
+              </span>
+              <span v-else-if="selectedUser">{{ selectedUser.name }}'s message activity throughout the day</span>
+              <span v-else>Message activity throughout the day</span>
             </p>
           </div>
           <div class="p-6">
-            <div class="flex items-end justify-between gap-1 h-48 px-2">
+            <!-- VS Mode: Two bars per hour -->
+            <div v-if="isVsMode && selectedUsers[0].hourlyActivity && selectedUsers[1].hourlyActivity" class="flex items-end justify-between gap-2 h-48 px-2">
+              <div
+                v-for="hour in 24"
+                :key="hour - 1"
+                class="flex-1 flex flex-col items-center gap-2"
+              >
+                <div class="flex-1 w-full flex items-end gap-0.5">
+                  <div
+                    :style="{ height: getBarHeight(selectedUsers[0].hourlyActivity![hour - 1], Math.max(...selectedUsers[0].hourlyActivity!, ...selectedUsers[1].hourlyActivity!)) + '%' }"
+                    class="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 hover:from-blue-600 hover:to-blue-500 rounded-tl transition-all relative group"
+                    :title="`${selectedUsers[0].name}: ${selectedUsers[0].hourlyActivity![hour - 1]} messages`"
+                  >
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-background border border-border px-2 py-1 rounded text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      {{ selectedUsers[0].hourlyActivity![hour - 1] }}
+                    </div>
+                  </div>
+                  <div
+                    :style="{ height: getBarHeight(selectedUsers[1].hourlyActivity![hour - 1], Math.max(...selectedUsers[0].hourlyActivity!, ...selectedUsers[1].hourlyActivity!)) + '%' }"
+                    class="flex-1 bg-gradient-to-t from-purple-500 to-purple-400 hover:from-purple-600 hover:to-purple-500 rounded-tr transition-all relative group"
+                    :title="`${selectedUsers[1].name}: ${selectedUsers[1].hourlyActivity![hour - 1]} messages`"
+                  >
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-background border border-border px-2 py-1 rounded text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      {{ selectedUsers[1].hourlyActivity![hour - 1] }}
+                    </div>
+                  </div>
+                </div>
+                <div class="text-[10px] text-muted">{{ hour - 1 }}</div>
+              </div>
+            </div>
+
+            <!-- Single user or global mode -->
+            <div v-else class="flex items-end justify-between gap-1 h-48 px-2">
               <div
                 v-for="(count, hour) in displayedHourlyActivity"
                 :key="hour"
@@ -422,8 +414,72 @@
           </div>
         </div>
 
-        <!-- User-specific charts (when user is selected) -->
-        <template v-if="selectedUser">
+        <!-- Arcade Stats (VS Mode or Single User) -->
+        <template v-if="isVsMode || selectedUser">
+          <div v-if="isVsMode" class="bg-surface border border-border rounded-xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-border">
+              <h3 class="font-semibold text-white">Arcade Games Comparison</h3>
+              <p class="text-xs text-muted mt-1">
+                <span class="text-blue-400">{{ selectedUsers[0].name }}</span> vs <span class="text-purple-400">{{ selectedUsers[1].name }}</span>
+              </p>
+            </div>
+            <div class="p-6 space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div v-for="gameName in ['puissance4', 'morpion']" :key="gameName" class="bg-background rounded-lg p-4">
+                  <h4 class="text-sm font-medium text-white mb-3 text-center capitalize">
+                    {{ gameName === 'puissance4' ? 'Connect 4' : 'Tic-Tac-Toe' }}
+                  </h4>
+                  <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-blue-400">{{ selectedUsers[0].name }}</span>
+                      <div class="flex gap-2">
+                        <span class="text-sm font-semibold text-emerald-500">{{ ((selectedUsers[0].arcade as any)?.[gameName] as any)?.wins || 0 }}W</span>
+                        <span class="text-sm font-semibold text-red-500">{{ ((selectedUsers[0].arcade as any)?.[gameName] as any)?.losses || 0 }}L</span>
+                      </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-purple-400">{{ selectedUsers[1].name }}</span>
+                      <div class="flex gap-2">
+                        <span class="text-sm font-semibold text-emerald-500">{{ ((selectedUsers[1].arcade as any)?.[gameName] as any)?.wins || 0 }}W</span>
+                        <span class="text-sm font-semibold text-red-500">{{ ((selectedUsers[1].arcade as any)?.[gameName] as any)?.losses || 0 }}L</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-4 pt-4 border-t border-border">
+                <div>
+                  <div class="text-xs text-muted mb-2 text-center">Total Wins</div>
+                  <div class="flex items-center justify-between bg-background rounded-lg p-3">
+                    <span class="text-lg font-bold text-blue-500">{{ selectedUsers[0].arcade?.totalWins || 0 }}</span>
+                    <span class="text-xs text-muted">vs</span>
+                    <span class="text-lg font-bold text-purple-500">{{ selectedUsers[1].arcade?.totalWins || 0 }}</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-xs text-muted mb-2 text-center">Total Losses</div>
+                  <div class="flex items-center justify-between bg-background rounded-lg p-3">
+                    <span class="text-lg font-bold text-blue-500">{{ selectedUsers[0].arcade?.totalLosses || 0 }}</span>
+                    <span class="text-xs text-muted">vs</span>
+                    <span class="text-lg font-bold text-purple-500">{{ selectedUsers[1].arcade?.totalLosses || 0 }}</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-xs text-muted mb-2 text-center">Win Rate</div>
+                  <div class="flex items-center justify-between bg-background rounded-lg p-3">
+                    <span class="text-lg font-bold text-blue-500">{{ calculateWinRate(selectedUsers[0].arcade?.totalWins || 0, selectedUsers[0].arcade?.totalLosses || 0) }}%</span>
+                    <span class="text-xs text-muted">vs</span>
+                    <span class="text-lg font-bold text-purple-500">{{ calculateWinRate(selectedUsers[1].arcade?.totalWins || 0, selectedUsers[1].arcade?.totalLosses || 0) }}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- User-specific charts (when single user is selected) -->
+        <template v-if="selectedUser && !isVsMode">
           <!-- Message Activity Over Time -->
           <div v-if="selectedUser.messageHistory && selectedUser.messageHistory.length > 0" class="bg-surface border border-border rounded-xl overflow-hidden">
             <div class="px-6 py-4 border-b border-border">
@@ -753,6 +809,25 @@ onMounted(() => {
 </script>
 
 <style scoped>
+:deep(*::-webkit-scrollbar) {
+  width: 8px;
+  height: 8px;
+}
+
+:deep(*::-webkit-scrollbar-track) {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+:deep(*::-webkit-scrollbar-thumb) {
+  background: #333;
+  border-radius: 4px;
+}
+
+:deep(*::-webkit-scrollbar-thumb:hover) {
+  background: #444;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
