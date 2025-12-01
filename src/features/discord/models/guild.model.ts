@@ -1,4 +1,4 @@
-import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
+import { prop, getModelForClass, DocumentType, modelOptions } from '@typegoose/typegoose';
 import { ChatGamingConfig } from '../../chat-gaming/models/chatGamingConfig.model';
 import { LevelingConfig } from '../../leveling/models/levelingConfig.model';
 import { VocManagerConfig, IVocManager } from '../../voc-manager/models/vocManagerConfig.model';
@@ -7,6 +7,7 @@ import { SuggestionsConfig } from '../../suggestions/models/suggestionConfig.mod
 import { BirthdayConfig } from '../../user/models/birthdayConfig.model';
 import { ArcadeConfig } from '../../arcade/models/arcadeConfig.model';
 
+@modelOptions({ options: { allowMixed: 0 } })
 class GuildConfig {
   @prop({ default: '!' })
   prefix!: string;
