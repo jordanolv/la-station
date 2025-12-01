@@ -2,7 +2,17 @@ import { Events, Interaction } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { GuildService } from '../services/guild.service';
 import { SuggestionsService } from '../../suggestions/services/suggestions.service';
-import meCommand from '../../user/slash/me';
+import { handleLFMButtonInteraction } from '../../looking-for-mate/events/lfm-interactions';
+import {
+  GAME_SELECT_ID,
+  CUSTOM_GAME_MODAL_ID,
+  RANKED_BUTTON_ID,
+  CASUAL_BUTTON_ID,
+  PRIVATE_BUTTON_ID,
+  CONTINUE_BUTTON_ID,
+  RANK_MODAL_ID_PREFIX,
+  FINAL_MODAL_ID_PREFIX,
+} from '../../looking-for-mate/slash/lfm';
 
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
@@ -61,14 +71,42 @@ export default {
       else if (interaction.isButton && interaction.isButton()) {
         if (interaction.customId === 'create_suggestion') {
           await SuggestionsService.handleButtonInteraction(interaction);
+        } else if (interaction.customId.startsWith('lfm_')) {
+          await handleLFMButtonInteraction(interaction, client);
+        } else if (interaction.customId.startsWith(RANKED_BUTTON_ID)) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleRankedButton === 'function') {
+            await lfmCommand.handleRankedButton(interaction, client);
+          }
+        } else if (interaction.customId.startsWith(CASUAL_BUTTON_ID)) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleCasualButton === 'function') {
+            await lfmCommand.handleCasualButton(interaction, client);
+          }
+        } else if (interaction.customId.startsWith(PRIVATE_BUTTON_ID)) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handlePrivateButton === 'function') {
+            await lfmCommand.handlePrivateButton(interaction, client);
+          }
+        } else if (interaction.customId.startsWith(CONTINUE_BUTTON_ID)) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleContinueButton === 'function') {
+            await lfmCommand.handleContinueButton(interaction, client);
+          }
         } else {
         }
       }
       
       // Gestion des menus de sélection
       else if (interaction.isStringSelectMenu && interaction.isStringSelectMenu()) {
+        if (interaction.customId === GAME_SELECT_ID) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleGameSelect === 'function') {
+            await lfmCommand.handleGameSelect(interaction, client);
+          }
+        }
       }
-      
+
       // Gestion des modals
       else if (interaction.isModalSubmit && interaction.isModalSubmit()) {
         if (interaction.customId.startsWith('suggestion_modal_')) {
@@ -77,6 +115,21 @@ export default {
           const profileCommand = client.slashCommands.get('profil');
           if (profileCommand && typeof profileCommand.handleModal === 'function') {
             await profileCommand.handleModal(interaction);
+          }
+        } else if (interaction.customId === CUSTOM_GAME_MODAL_ID) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleCustomGameModal === 'function') {
+            await lfmCommand.handleCustomGameModal(interaction, client);
+          }
+        } else if (interaction.customId.startsWith(RANK_MODAL_ID_PREFIX)) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleRankModal === 'function') {
+            await lfmCommand.handleRankModal(interaction, client);
+          }
+        } else if (interaction.customId.startsWith(FINAL_MODAL_ID_PREFIX)) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleFinalModal === 'function') {
+            await lfmCommand.handleFinalModal(interaction, client);
           }
         } else {
         }
