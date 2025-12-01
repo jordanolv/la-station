@@ -1,7 +1,8 @@
-import { prop, getModelForClass, index, DocumentType } from '@typegoose/typegoose';
+import { prop, getModelForClass, index, DocumentType, modelOptions } from '@typegoose/typegoose';
 
 export type SuggestionStatus = 'pending' | 'approved' | 'rejected' | 'implemented' | 'under_review';
 
+@modelOptions({ options: { allowMixed: 0 } })
 export class SuggestionReaction {
   @prop({ required: true })
   emoji!: string;
@@ -13,6 +14,7 @@ export class SuggestionReaction {
   users!: string[]; // User IDs qui ont réagi
 }
 
+@modelOptions({ options: { allowMixed: 0 } })
 export class SuggestionField {
   @prop({ required: true })
   fieldId!: string;
@@ -27,6 +29,7 @@ export class SuggestionField {
   type!: 'text' | 'textarea';
 }
 
+@modelOptions({ options: { allowMixed: 0 } })
 @index({ guildId: 1, channelId: 1, createdAt: -1 })
 @index({ guildId: 1, status: 1, score: -1 })
 @index({ authorId: 1, guildId: 1 })
@@ -63,7 +66,8 @@ export class SuggestionItem {
   fields!: SuggestionField[];
 
   // Métadonnées
-  @prop({ 
+  @prop({
+    type: String,
     enum: ['pending', 'approved', 'rejected', 'implemented', 'under_review'],
     default: 'pending'
   })
