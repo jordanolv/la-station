@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 
 export class ChatGamingItem {
   _id!: Types.ObjectId;
-  
+
   @prop({ required: true })
   name!: string;
 
@@ -12,6 +12,9 @@ export class ChatGamingItem {
 
   @prop()
   image?: string;
+
+  @prop()
+  banner?: string;
 
   @prop()
   color?: string;
