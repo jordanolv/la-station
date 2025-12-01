@@ -1,12 +1,9 @@
 import mongoose from 'mongoose';
-
-// Classe singleton pour gérer la connexion à la base de données
 class Database {
   private static instance: Database;
   private _isConnected: boolean = false;
 
   private constructor() {
-    // Gestion des événements de connexion
     mongoose.connection.on('connected', () => {
       this._isConnected = true;
     });
@@ -20,7 +17,6 @@ class Database {
       console.error(chalk.red('❌ [DB]'), err);
     });
 
-    // Gestion propre de la déconnexion
     process.on('SIGINT', async () => {
       await mongoose.connection.close();
       process.exit(0);
@@ -47,7 +43,13 @@ class Database {
     }
 
     try {
-      await mongoose.connect(uri, {});
+      await mongoose.connect(uri, {
+        maxPoolSize: 10,
+        minPoolSize: 2,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        family: 4 
+      });
     } catch (error) {
       const chalk = require('chalk');
       console.error(chalk.red('❌ [DB] Erreur de connexion:'), error);
@@ -81,7 +83,6 @@ class Database {
   }
 }
 
-// Export de l'instance de la base de données
 export const db = Database.getInstance();
 
 // Fonction de compatibilité avec l'ancien code

@@ -7,14 +7,15 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "start": "pm2 start src/index.ts --name la-station",
-    "mg": "concurrently \"ts-node src/database/scripts/updateGuilds.ts\" \"ts-node src/database/scripts/updateUsers.ts\"",
-    "watch": "nodemon --exec ts-node src/index.ts",
+    "mg": "concurrently \"node -r @swc-node/register src/database/scripts/updateGuilds.ts\" \"node -r @swc-node/register src/database/scripts/updateUsers.ts\"",
+    "watch": "nodemon --exec node -r @swc-node/register src/index.ts",
     "dev:front": "cd src/frontend && npm run dev",
-    "dev:bot": "ts-node src/index.ts",
+    "dev:bot": "node -r @swc-node/register src/index.ts",
+    "dev:bot:old": "ts-node src/index.ts",
     "dev": "concurrently \"npm run dev:front\" \"npm run dev:bot\"",
-    "voice:import": "ts-node src/database/scripts/importVoiceStats.ts",
-    "psd:create-template": "ts-node scripts/create-test-template.ts",
-    "psd:test": "ts-node src/features/test/services/psd-render-example.ts"
+    "voice:import": "node -r @swc-node/register src/database/scripts/importVoiceStats.ts",
+    "psd:create-template": "node -r @swc-node/register scripts/create-test-template.ts",
+    "psd:test": "node -r @swc-node/register src/features/test/services/psd-render-example.ts"
   },
   "keywords": [
     "discord",
@@ -42,7 +43,7 @@
     "cron": "^4.1.4",
     "date-fns-tz": "^3.2.0",
     "discord-oauth2": "^2.12.1",
-    "discord.js": "^14.13.0",
+    "discord.js": "^14.25.1",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
@@ -63,6 +64,9 @@
   },
   "devDependencies": {
     "@fontsource/noto-color-emoji": "^5.2.10",
+    "@swc-node/register": "^1.11.1",
+    "@swc/cli": "^0.7.9",
+    "@swc/core": "^1.15.3",
     "@types/node": "^20.17.30",
     "nodemon": "^3.0.1",
     "tsc-alias": "^1.8.15",

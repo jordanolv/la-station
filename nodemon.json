@@ -1,0 +1,9 @@
+{
+  "watch": ["src"],
+  "ext": "ts,js,json",
+  "ignore": ["src/frontend/**", "dist/**", "node_modules/**"],
+  "exec": "node -r @swc-node/register src/index.ts",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
