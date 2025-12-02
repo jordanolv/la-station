@@ -14,6 +14,11 @@
           "name": "me",
           "description": "Générez votre carte de profil personnalisée avec vos stats",
           "usage": ""
+        },
+        {
+          "name": "leaderboard",
+          "description": "Consultez les classements du serveur (Messages, Vocal, Arcade, Streak)",
+          "usage": ""
         }
       ]
     },

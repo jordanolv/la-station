@@ -71,6 +71,11 @@ export default {
           await handleLFMAcceptReject(interaction, client);
         } else if (interaction.customId.startsWith('lfm_')) {
           await handleLFMButtonInteraction(interaction, client);
+        } else if (interaction.customId.startsWith('leaderboard_')) {
+          const leaderboardCommand = client.slashCommands.get('leaderboard');
+          if (leaderboardCommand && typeof leaderboardCommand.handleButtonInteraction === 'function') {
+            await leaderboardCommand.handleButtonInteraction(interaction, client);
+          }
         }
       }
 
