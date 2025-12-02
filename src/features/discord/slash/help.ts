@@ -26,14 +26,8 @@ export default {
     // Vérifier si l'utilisateur est admin
     const isAdmin = interaction.memberPermissions?.has('Administrator') || false;
 
-    // Filtrer les catégories selon les permissions
-    const filteredCategories = categories.filter(cat => {
-      // Masquer la catégorie Admin si l'utilisateur n'est pas admin
-      if (cat.name === 'Administration' && !isAdmin) {
-        return false;
-      }
-      return true;
-    });
+    // Filtrer les catégories publiques (sans Administration)
+    const publicCategories = categories.filter(cat => cat.name !== 'Administration');
 
     // Créer l'embed principal
     const mainEmbed = new EmbedBuilder()
@@ -46,8 +40,8 @@ export default {
       .setThumbnail(client.user?.displayAvatarURL() || '')
       .setTimestamp();
 
-    // Ajouter un aperçu de chaque catégorie
-    for (const category of filteredCategories) {
+    // Ajouter un aperçu de chaque catégorie publique
+    for (const category of publicCategories) {
       mainEmbed.addFields({
         name: `${category.emoji} ${category.name}`,
         value: `${category.description}\n*${category.commands.length} commande${category.commands.length > 1 ? 's' : ''}*`,
@@ -57,12 +51,12 @@ export default {
 
     mainEmbed.setFooter({ text: 'Sélectionnez une catégorie pour voir les détails' });
 
-    // Créer le menu de sélection
+    // Créer le menu de sélection (seulement catégories publiques)
     const selectMenu = new StringSelectMenuBuilder()
       .setCustomId('help_category')
       .setPlaceholder('Choisissez une catégorie')
       .addOptions(
-        filteredCategories.map(cat => ({
+        publicCategories.map(cat => ({
           label: cat.name,
           description: cat.description.substring(0, 100), // Max 100 caractères pour Discord
           emoji: cat.emoji,
@@ -73,11 +67,46 @@ export default {
     const row = new ActionRowBuilder<StringSelectMenuBuilder>()
       .addComponents(selectMenu);
 
-    // Utiliser withResponse au lieu de fetchReply
+    // Envoyer le message principal (public)
     const response = await interaction.reply({
       embeds: [mainEmbed],
       components: [row]
     });
+
+    // Si l'utilisateur est admin, envoyer les commandes admin en éphémère
+    if (isAdmin) {
+      const adminCategory = categories.find(cat => cat.name === 'Administration');
+
+      if (adminCategory) {
+        const adminEmbed = new EmbedBuilder()
+          .setTitle(`${adminCategory.emoji} ${adminCategory.name}`)
+          .setDescription(adminCategory.description)
+          .setColor(0xff6b6b)
+          .setTimestamp();
+
+        // Ajouter chaque commande admin
+        for (const cmd of adminCategory.commands) {
+          let fieldValue = cmd.description;
+          if (cmd.usage && cmd.usage.trim()) {
+            fieldValue += `\n\`\`\`/${cmd.name} ${cmd.usage}\`\`\``;
+          } else {
+            fieldValue += `\n\`\`\`/${cmd.name}\`\`\``;
+          }
+          adminEmbed.addFields({
+            name: '\u200B', // Caractère invisible pour pas de titre
+            value: fieldValue,
+            inline: false
+          });
+        }
+
+        adminEmbed.setFooter({ text: '⚠️ Ces commandes sont réservées aux administrateurs' });
+
+        await interaction.followUp({
+          embeds: [adminEmbed],
+          ephemeral: true
+        });
+      }
+    }
 
     const message = await response.fetch();
 
@@ -88,7 +117,7 @@ export default {
     });
 
     collector.on('collect', async (selectInteraction: StringSelectMenuInteraction) => {
-      const selectedCategory = filteredCategories.find(cat => cat.name === selectInteraction.values[0]);
+      const selectedCategory = publicCategories.find(cat => cat.name === selectInteraction.values[0]);
 
       if (!selectedCategory) {
         await selectInteraction.reply({
@@ -108,11 +137,13 @@ export default {
       // Ajouter chaque commande de la catégorie
       for (const cmd of selectedCategory.commands) {
         let fieldValue = cmd.description;
-        if (cmd.usage) {
-          fieldValue += `\n\`\`\`${cmd.usage}\`\`\``;
+        if (cmd.usage && cmd.usage.trim()) {
+          fieldValue += `\n\`\`\`/${cmd.name} ${cmd.usage}\`\`\``;
+        } else {
+          fieldValue += `\n\`\`\`/${cmd.name}\`\`\``;
         }
         categoryEmbed.addFields({
-          name: `/${cmd.name}`,
+          name: '\u200B', // Caractère invisible pour pas de titre
           value: fieldValue,
           inline: false
         });

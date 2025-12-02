@@ -8,12 +8,12 @@
         {
           "name": "profil",
           "description": "Configurez votre bio et date d'anniversaire",
-          "usage": "/profil"
+          "usage": ""
         },
         {
           "name": "me",
           "description": "Générez votre carte de profil personnalisée avec vos stats",
-          "usage": "/me"
+          "usage": ""
         }
       ]
     },
@@ -25,39 +25,46 @@
         {
           "name": "morpion",
           "description": "Jouez au Morpion contre un autre joueur",
-          "usage": "/morpion adversaire:@user mise:100"
+          "usage": "adversaire:@user mise:100"
         },
         {
           "name": "puissance4",
           "description": "Jouez au Puissance 4 contre un autre joueur",
-          "usage": "/puissance4 adversaire:@user mise:100"
+          "usage": "adversaire:@user mise:100"
         },
         {
           "name": "shifumi",
           "description": "Jouez au Pierre-Feuille-Ciseaux contre un autre joueur",
-          "usage": "/shifumi adversaire:@user mise:100"
+          "usage": "adversaire:@user mise:100"
         },
         {
           "name": "battle",
           "description": "Défiez un joueur dans un combat de stats",
-          "usage": "/battle adversaire:@user mise:100"
+          "usage": "adversaire:@user mise:100"
         }
       ]
     },
     {
-      "name": "Looking for Mate",
-      "emoji": "🎯",
-      "description": "Trouvez des coéquipiers pour jouer",
+      "name": "Communauté",
+      "emoji": "🤝",
+      "description": "Organisez et rejoignez des sessions de jeu avec d'autres membres",
       "commands": [
         {
           "name": "lfm",
-          "description": "Créez une annonce pour trouver des coéquipiers",
-          "usage": "/lfm jeu:\"League of Legends\" nombre:4 description:\"Ranked flex\""
-        },
+          "description": "Créez une annonce pour trouver des coéquipiers pour une session de jeu",
+          "usage": ""
+        }
+      ]
+    },
+    {
+      "name": "Vocal & Audio",
+      "emoji": "🎵",
+      "description": "Commandes pour les canaux vocaux",
+      "commands": [
         {
-          "name": "lfm-cancel",
-          "description": "Annulez votre annonce LFM active",
-          "usage": "/lfm-cancel"
+          "name": "play",
+          "description": "Jouez un fichier audio dans un canal vocal",
+          "usage": "fichier:audio.mp3"
         }
       ]
     },
@@ -68,23 +75,18 @@
       "commands": [
         {
           "name": "set-channel",
-          "description": "Configurez les channels pour différentes fonctionnalités (Logs, Anniversaires)",
-          "usage": "/set-channel feature:birthday channel:#anniversaires"
-        },
-        {
-          "name": "play",
-          "description": "Jouez un fichier audio dans un canal vocal",
-          "usage": "/play fichier:audio.mp3"
+          "description": "Configurez les channels pour différentes fonctionnalités",
+          "usage": "feature:birthday channel:#anniversaires"
         },
         {
           "name": "send-embeds",
           "description": "Envoyez un embed personnalisé dans un channel",
-          "usage": "/send-embeds"
+          "usage": ""
         },
         {
           "name": "reply",
           "description": "Fait répondre le bot à un message spécifique",
-          "usage": "/reply channel-id:123456 message-id:789012 contenu:\"Votre message\""
+          "usage": "channel-id:123456 message-id:789012 contenu:\"Message\""
         }
       ]
     }
