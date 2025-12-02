@@ -8,8 +8,8 @@ export default {
 
   execute(client: BotClient) {
     const statuses = [
-      { name: 'Bienvenue sur The Ridge ! 👋', type: ActivityType.Playing },
-      { name: '/profil pour votre remplir votre profil !', type: ActivityType.Watching }
+      { name: 'Bienvenue sur The Ridge ⛰️', type: ActivityType.Playing },
+      { name: '/profil pour remplir votre profil 📝', type: ActivityType.Watching }
     ];
 
     let currentStatusIndex = 0;

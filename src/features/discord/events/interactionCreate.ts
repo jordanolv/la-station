@@ -2,7 +2,13 @@ import { Events, Interaction } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { GuildService } from '../services/guild.service';
 import { SuggestionsService } from '../../suggestions/services/suggestions.service';
-import meCommand from '../../user/slash/me';
+import { handleLFMButtonInteraction, handleLFMAcceptReject } from '../../looking-for-mate/events/lfm-interactions';
+import {
+  GAME_SELECT_ID,
+  MODE_SELECT_ID,
+  CUSTOM_GAME_MODAL_ID,
+  FINAL_MODAL_ID_PREFIX,
+} from '../../looking-for-mate/slash/lfm';
 
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
@@ -61,14 +67,28 @@ export default {
       else if (interaction.isButton && interaction.isButton()) {
         if (interaction.customId === 'create_suggestion') {
           await SuggestionsService.handleButtonInteraction(interaction);
-        } else {
+        } else if (interaction.customId.startsWith('lfm_accept_') || interaction.customId.startsWith('lfm_reject_')) {
+          await handleLFMAcceptReject(interaction, client);
+        } else if (interaction.customId.startsWith('lfm_')) {
+          await handleLFMButtonInteraction(interaction, client);
         }
       }
-      
+
       // Gestion des menus de sélection
       else if (interaction.isStringSelectMenu && interaction.isStringSelectMenu()) {
+        if (interaction.customId === GAME_SELECT_ID) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleGameSelect === 'function') {
+            await lfmCommand.handleGameSelect(interaction, client);
+          }
+        } else if (interaction.customId === MODE_SELECT_ID) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleModeSelect === 'function') {
+            await lfmCommand.handleModeSelect(interaction, client);
+          }
+        }
       }
-      
+
       // Gestion des modals
       else if (interaction.isModalSubmit && interaction.isModalSubmit()) {
         if (interaction.customId.startsWith('suggestion_modal_')) {
@@ -77,6 +97,16 @@ export default {
           const profileCommand = client.slashCommands.get('profil');
           if (profileCommand && typeof profileCommand.handleModal === 'function') {
             await profileCommand.handleModal(interaction);
+          }
+        } else if (interaction.customId === CUSTOM_GAME_MODAL_ID) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleCustomGameModal === 'function') {
+            await lfmCommand.handleCustomGameModal(interaction, client);
+          }
+        } else if (interaction.customId.startsWith(FINAL_MODAL_ID_PREFIX)) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleFinalModal === 'function') {
+            await lfmCommand.handleFinalModal(interaction, client);
           }
         } else {
         }
