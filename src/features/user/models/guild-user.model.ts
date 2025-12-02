@@ -68,6 +68,9 @@ class GuildUserStats {
   @prop({ default: 0 })
   dailyStreak!: number;
 
+  @prop({ default: 0 })
+  partyParticipated!: number;
+
   @prop()
   lastActivityDate?: Date;
 }

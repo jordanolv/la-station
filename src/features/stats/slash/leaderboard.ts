@@ -9,13 +9,13 @@ import {
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import GuildUserModel from '../../user/models/guild-user.model';
-import GlobalUserModel from '../../user/models/global-user.model';
 
 export const LEADERBOARD_TYPE = {
   MESSAGES: 'messages',
   VOCAL: 'vocal',
   ARCADE: 'arcade',
   STREAK: 'streak',
+  PARTIES: 'parties',
 } as const;
 
 type LeaderboardType = typeof LEADERBOARD_TYPE[keyof typeof LEADERBOARD_TYPE];
@@ -106,6 +106,17 @@ async function showLeaderboard(
         .limit(10)
         .lean();
       break;
+
+    case LEADERBOARD_TYPE.PARTIES:
+      title = 'Soirées';
+      emoji = '🎉';
+      sortField = 'stats.partyParticipated';
+      formatValue = (val) => `${val} soirées`;
+      users = await GuildUserModel.find({ guildId })
+        .sort({ 'stats.partyParticipated': -1 })
+        .limit(10)
+        .lean();
+      break;
   }
 
   // Créer l'embed
@@ -149,6 +160,8 @@ async function showLeaderboard(
       userValue = userDoc?.stats?.voiceTime || 0;
     } else if (sortField === 'stats.dailyStreak') {
       userValue = userDoc?.stats?.dailyStreak || 0;
+    } else if (sortField === 'stats.partyParticipated') {
+      userValue = userDoc?.stats?.partyParticipated || 0;
     }
   }
 
@@ -170,6 +183,8 @@ async function showLeaderboard(
       value = user.stats?.voiceTime || 0;
     } else if (sortField === 'stats.dailyStreak') {
       value = user.stats?.dailyStreak || 0;
+    } else if (sortField === 'stats.partyParticipated') {
+      value = user.stats?.partyParticipated || 0;
     }
 
     try {
@@ -212,7 +227,12 @@ async function showLeaderboard(
       .setCustomId('leaderboard_streak')
       .setLabel('Streak')
       .setEmoji('🔥')
-      .setStyle(type === LEADERBOARD_TYPE.STREAK ? ButtonStyle.Primary : ButtonStyle.Secondary)
+      .setStyle(type === LEADERBOARD_TYPE.STREAK ? ButtonStyle.Primary : ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setCustomId('leaderboard_parties')
+      .setLabel('Soirées')
+      .setEmoji('🎉')
+      .setStyle(type === LEADERBOARD_TYPE.PARTIES ? ButtonStyle.Primary : ButtonStyle.Secondary)
   );
 
   if (isUpdate) {
