@@ -1,6 +1,5 @@
-import { prop, getModelForClass, index } from '@typegoose/typegoose';
+import { prop, getModelForClass } from '@typegoose/typegoose';
 
-@index({ id: 1 }, { unique: true })
 export class GlobalUser {
   @prop({ required: true, unique: true })
   id!: string;

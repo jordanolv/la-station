@@ -15,9 +15,19 @@ async function main() {
     // Initialiser le canvas (nécessaire pour @napi-rs/canvas)
     initializeCanvas();
 
-    const botClient = await startBot();
+    // Démarrer le bot et l'API en parallèle pour gagner du temps
     const API_PORT = process.env.API_PORT ? parseInt(process.env.API_PORT) : 3051;
-    startApiServer(API_PORT);
+
+    const [botClient] = await Promise.all([
+      startBot(),
+      // L'API démarre après que le bot soit initialisé via BotClient.getInstance()
+      new Promise<void>(resolve => {
+        setTimeout(() => {
+          startApiServer(API_PORT);
+          resolve();
+        }, 100); // Petit délai pour s'assurer que le bot est bien init
+      })
+    ]);
 
     console.log(chalk.cyan('═'.repeat(60)));
     console.log(chalk.green.bold('          ✅ LA STATION EST EN LIGNE'));

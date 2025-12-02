@@ -8,9 +8,8 @@ export default {
 
   execute(client: BotClient) {
     const statuses = [
-      { name: 'Bienvenue sur La Station ! 👋', type: ActivityType.Playing },
-      { name: '/ask pour me poser une question 🤖', type: ActivityType.Watching },
-      { name: '/birthday pour votre anniversaire 🎂', type: ActivityType.Watching }
+      { name: 'Bienvenue sur The Ridge ⛰️', type: ActivityType.Playing },
+      { name: '/profil pour remplir votre profil 📝', type: ActivityType.Watching }
     ];
 
     let currentStatusIndex = 0;
@@ -22,10 +21,7 @@ export default {
     };
 
     setStatus();
-
     setInterval(setStatus, 8000);
-
-    // Réhydrate les sessions vocales actives au démarrage
     StatsService.rehydrateActiveSessions(client);
   }
 };

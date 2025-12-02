@@ -20,24 +20,33 @@ export async function loadFeatures(botClient: BotClient, featuresPath: string): 
     let totalSlash = 0;
     let totalEvents = 0;
 
-    for (const feature of features) {
+    // Charger toutes les features en parallèle pour gagner du temps
+    const featurePromises = features.map(async (feature) => {
       const featurePath = path.join(featuresPath, feature);
-      const counts = {
-        commands: await loadCommands(botClient, featurePath, feature),
-        slash: await loadSlashCommands(botClient, featurePath, feature),
-        events: await loadEvents(botClient, featurePath, feature)
-      };
 
-      totalCommands += counts.commands;
-      totalSlash += counts.slash;
-      totalEvents += counts.events;
+      // Charger commands, slash et events en parallèle pour chaque feature
+      const [commands, slash, events] = await Promise.all([
+        loadCommands(botClient, featurePath, feature),
+        loadSlashCommands(botClient, featurePath, feature),
+        loadEvents(botClient, featurePath, feature)
+      ]);
 
-      // Afficher une ligne par feature si elle a du contenu
-      if (counts.slash > 0 || counts.events > 0 || counts.commands > 0) {
+      return { feature, commands, slash, events };
+    });
+
+    const results = await Promise.all(featurePromises);
+
+    // Afficher les résultats
+    for (const { feature, commands, slash, events } of results) {
+      totalCommands += commands;
+      totalSlash += slash;
+      totalEvents += events;
+
+      if (slash > 0 || events > 0 || commands > 0) {
         const parts = [];
-        if (counts.slash > 0) parts.push(`${counts.slash} slash`);
-        if (counts.events > 0) parts.push(`${counts.events} events`);
-        if (counts.commands > 0) parts.push(`${counts.commands} cmds`);
+        if (slash > 0) parts.push(`${slash} slash`);
+        if (events > 0) parts.push(`${events} events`);
+        if (commands > 0) parts.push(`${commands} cmds`);
         console.log(chalk.cyan('   ├─') + chalk.gray(` ${feature}: ${parts.join(', ')}`));
       }
     }
@@ -60,22 +69,26 @@ async function loadCommands(botClient: BotClient, featurePath: string, featureNa
   }
 
   const commandFiles = getFilesRecursively(commandsPath, ['.ts', '.js']);
-  let count = 0;
 
-  for (const filePath of commandFiles) {
-    try {
-      const command = require(filePath).default;
-      if (command && command.name) {
-        botClient.commands.set(command.name.toLowerCase(), command);
-        count++;
+  // Charger tous les fichiers en parallèle
+  const results = await Promise.allSettled(
+    commandFiles.map(async (filePath) => {
+      try {
+        const command = require(filePath).default;
+        if (command && command.name) {
+          botClient.commands.set(command.name.toLowerCase(), command);
+          return true;
+        }
+        return false;
+      } catch (error) {
+        const chalk = require('chalk');
+        console.error(chalk.red(`❌ [${featureName}]`), path.basename(filePath), error);
+        return false;
       }
-    } catch (error) {
-      const chalk = require('chalk');
-      console.error(chalk.red(`❌ [${featureName}]`), path.basename(filePath), error);
-    }
-  }
+    })
+  );
 
-  return count;
+  return results.filter(r => r.status === 'fulfilled' && r.value).length;
 }
 
 /**
@@ -89,22 +102,26 @@ async function loadSlashCommands(botClient: BotClient, featurePath: string, feat
   }
 
   const slashFiles = getFilesRecursively(slashPath, ['.ts', '.js']);
-  let count = 0;
 
-  for (const filePath of slashFiles) {
-    try {
-      const slashCommand = require(filePath).default;
-      if (slashCommand && slashCommand.data) {
-        botClient.slashCommands.set(slashCommand.data.name.toLowerCase(), slashCommand);
-        count++;
+  // Charger tous les fichiers en parallèle
+  const results = await Promise.allSettled(
+    slashFiles.map(async (filePath) => {
+      try {
+        const slashCommand = require(filePath).default;
+        if (slashCommand && slashCommand.data) {
+          botClient.slashCommands.set(slashCommand.data.name.toLowerCase(), slashCommand);
+          return true;
+        }
+        return false;
+      } catch (error) {
+        const chalk = require('chalk');
+        console.error(chalk.red(`❌ [${featureName}]`), path.basename(filePath), error);
+        return false;
       }
-    } catch (error) {
-      const chalk = require('chalk');
-      console.error(chalk.red(`❌ [${featureName}]`), path.basename(filePath), error);
-    }
-  }
+    })
+  );
 
-  return count;
+  return results.filter(r => r.status === 'fulfilled' && r.value).length;
 }
 
 /**
@@ -118,26 +135,30 @@ async function loadEvents(botClient: BotClient, featurePath: string, featureName
   }
 
   const eventFiles = getFilesRecursively(eventsPath, ['.ts', '.js']);
-  let count = 0;
 
-  for (const filePath of eventFiles) {
-    try {
-      const event = require(filePath).default;
-      if (event && event.name && event.execute) {
-        if (event.once) {
-          botClient.once(event.name, (...args) => event.execute(botClient, ...args));
-        } else {
-          botClient.on(event.name, (...args) => event.execute(botClient, ...args));
+  // Charger tous les fichiers en parallèle
+  const results = await Promise.allSettled(
+    eventFiles.map(async (filePath) => {
+      try {
+        const event = require(filePath).default;
+        if (event && event.name && event.execute) {
+          if (event.once) {
+            botClient.once(event.name, (...args) => event.execute(botClient, ...args));
+          } else {
+            botClient.on(event.name, (...args) => event.execute(botClient, ...args));
+          }
+          return true;
         }
-        count++;
+        return false;
+      } catch (error) {
+        const chalk = require('chalk');
+        console.error(chalk.red(`❌ [${featureName}]`), path.basename(filePath), error);
+        return false;
       }
-    } catch (error) {
-      const chalk = require('chalk');
-      console.error(chalk.red(`❌ [${featureName}]`), path.basename(filePath), error);
-    }
-  }
+    })
+  );
 
-  return count;
+  return results.filter(r => r.status === 'fulfilled' && r.value).length;
 }
 
 /**

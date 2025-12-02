@@ -1,5 +1,6 @@
-import { prop } from '@typegoose/typegoose';
+import { prop, modelOptions } from '@typegoose/typegoose';
 
+@modelOptions({ options: { allowMixed: 0 } })
 export class LevelingConfig {
   @prop({ default: false })
   enabled!: boolean;
