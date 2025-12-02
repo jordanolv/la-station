@@ -73,6 +73,9 @@ class GuildUserStats {
 
   @prop()
   lastActivityDate?: Date;
+
+  @prop()
+  lastDailyClaimDate?: Date;
 }
 
 class GuildUserInfos {

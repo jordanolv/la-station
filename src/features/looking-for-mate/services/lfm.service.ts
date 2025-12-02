@@ -191,7 +191,21 @@ export class LFMService {
       inline: true
     });
 
-    // Rank if specified
+    // Type (Ranked/Casual/Privé)
+    let typeValue = 'Casual';
+    if (request.rank === 'Privé') {
+      typeValue = 'Privé';
+    } else if (request.rank && request.rank !== 'Casual' && request.rank !== 'Privé') {
+      typeValue = 'Ranked';
+    }
+
+    fields.push({
+      name: '🏷️ Type',
+      value: typeValue,
+      inline: true
+    });
+
+    // Rank if specified (only for Ranked type)
     if (request.rank && request.rank !== 'Casual' && request.rank !== 'Privé') {
       fields.push({
         name: '⭐ Rank',

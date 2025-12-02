@@ -17,7 +17,12 @@
         },
         {
           "name": "leaderboard",
-          "description": "Consultez les classements du serveur (Messages, Vocal, Arcade, Streak)",
+          "description": "Consultez les classements du serveur (Messages, Vocal, Arcade, Streak, Soirées)",
+          "usage": ""
+        },
+        {
+          "name": "daily",
+          "description": "Réclamez votre récompense quotidienne (argent & XP aléatoires)",
           "usage": ""
         }
       ]
