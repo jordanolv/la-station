@@ -15,6 +15,7 @@ export interface CreateLFMRequestDTO {
   game: string;
   numberOfMates: number;
   rank?: string;
+  sessionTime?: string;
   description?: string;
 }
 
@@ -30,6 +31,7 @@ export class LFMService {
       ...data,
       status: 'open',
       createdAt: new Date(),
+      interestedUsers: [data.userId], // Auto-add creator to the lobby
     });
 
     return request;
@@ -114,13 +116,15 @@ export class LFMService {
   async updateMessageInfo(
     requestId: string,
     messageId: string,
-    channelId: string
+    channelId: string,
+    threadId?: string
   ): Promise<ILFMRequest | null> {
     return LFMRequestModel.findByIdAndUpdate(
       requestId,
       {
         messageId,
         channelId,
+        threadId,
         updatedAt: new Date(),
       },
       { new: true }
@@ -155,42 +159,62 @@ export class LFMService {
    * Create Discord embed for LFM request
    */
   createLFMEmbed(request: ILFMRequest, user: User, gameColor?: string, gameBanner?: string): EmbedBuilder {
+    const progressBar = this.createProgressBar(request.interestedUsers?.length || 0, request.numberOfMates);
+
     const embed = new EmbedBuilder()
-      .setColor((gameColor as any) || '#00ff00')
-      .setTitle('🎮 Looking For Mate')
-      .setDescription(request.description || 'Aucune description fournie')
+      .setColor((gameColor as any) || '#5865F2')
+      .setTitle('Nouveau Lobby')
+      .setDescription(progressBar)
       .setAuthor({
         name: user.username,
         iconURL: user.displayAvatarURL(),
+        url: 'https://discord.com'
       })
-      .addFields(
-        { name: '🎯 Jeu', value: request.game, inline: true },
-        { name: '👥 Nombre de joueurs recherchés', value: request.numberOfMates.toString(), inline: true },
-        { name: '⭐ Rank/Niveau', value: request.rank || 'Non spécifié', inline: true },
-        {
-          name: '👤 Créé par',
-          value: `<@${request.userId}>`,
-          inline: true,
-        },
-        {
-          name: '📊 Statut',
-          value: this.getStatusEmoji(request.status),
-          inline: true,
-        }
-      )
-      .setTimestamp(request.createdAt)
-      .setFooter({ text: `ID: ${request._id}` });
+      .setThumbnail(user.displayAvatarURL({ size: 256 }));
+
+    // Add fields
+    const fields: Array<{ name: string; value: string; inline: boolean }> = [];
+
+    // Session time
+    if (request.sessionTime) {
+      fields.push({
+        name: '🕐 Heure',
+        value: request.sessionTime,
+        inline: true
+      });
+    }
+
+    // Game
+    fields.push({
+      name: '🎮 Game',
+      value: request.game,
+      inline: true
+    });
+
+    // Rank if specified
+    if (request.rank && request.rank !== 'Casual' && request.rank !== 'Privé') {
+      fields.push({
+        name: '⭐ Rank',
+        value: request.rank,
+        inline: true
+      });
+    }
+
+    embed.addFields(fields);
 
     // Add game banner if available
     if (gameBanner) {
       embed.setImage(gameBanner);
     }
 
-    // Add interested users if any
+    // Add interested users list
     if (request.interestedUsers && request.interestedUsers.length > 0) {
-      const interestedList = request.interestedUsers.map((id) => `<@${id}>`).join(', ');
+      const interestedList = request.interestedUsers
+        .map((id, index) => `${index + 1}. <@${id}>`)
+        .join('\n');
+
       embed.addFields({
-        name: `✋ Joueurs intéressés (${request.interestedUsers.length})`,
+        name: `👥 Joueurs (${request.interestedUsers.length}/${request.numberOfMates})`,
         value: interestedList,
         inline: false,
       });
@@ -200,53 +224,47 @@ export class LFMService {
   }
 
   /**
+   * Create a progress bar for the number of interested users
+   */
+  private createProgressBar(current: number, total: number): string {
+    const filled = Math.min(current, total);
+    const empty = Math.max(total - current, 0);
+    const filledBar = '🟦'.repeat(filled);
+    const emptyBar = '⬜'.repeat(empty);
+    return `${filledBar}${emptyBar} **${current}/${total}**`;
+  }
+
+  /**
    * Create action row with buttons for LFM request
    */
   createLFMButtons(requestId: string, isOwner: boolean = false): ActionRowBuilder<ButtonBuilder> {
     const row = new ActionRowBuilder<ButtonBuilder>();
 
-    if (!isOwner) {
+    // Always show join/leave buttons
+    row.addComponents(
+      new ButtonBuilder()
+        .setCustomId(`lfm_join_${requestId}`)
+        .setLabel('Participer')
+        .setStyle(ButtonStyle.Primary)
+        .setEmoji('🎮'),
+      new ButtonBuilder()
+        .setCustomId(`lfm_leave_${requestId}`)
+        .setLabel('Quitter')
+        .setStyle(ButtonStyle.Secondary)
+        .setEmoji('👋')
+    );
+
+    // Add delete button for owner
+    if (isOwner) {
       row.addComponents(
         new ButtonBuilder()
-          .setCustomId(`lfm_join_${requestId}`)
-          .setLabel('Je suis intéressé !')
-          .setStyle(ButtonStyle.Success)
-          .setEmoji('✋'),
-        new ButtonBuilder()
-          .setCustomId(`lfm_leave_${requestId}`)
-          .setLabel('Plus intéressé')
-          .setStyle(ButtonStyle.Secondary)
-          .setEmoji('❌')
-      );
-    } else {
-      row.addComponents(
-        new ButtonBuilder()
-          .setCustomId(`lfm_complete_${requestId}`)
-          .setLabel('Groupe complet')
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji('✅'),
-        new ButtonBuilder()
-          .setCustomId(`lfm_cancel_${requestId}`)
-          .setLabel('Annuler')
+          .setCustomId(`lfm_delete_${requestId}`)
           .setStyle(ButtonStyle.Danger)
-          .setEmoji('🚫')
+          .setEmoji('🗑️')
       );
     }
 
     return row;
-  }
-
-  /**
-   * Get status emoji
-   */
-  private getStatusEmoji(status: string): string {
-    const statusMap: Record<string, string> = {
-      open: '🟢 Ouvert',
-      in_progress: '🟡 En cours',
-      completed: '✅ Complet',
-      cancelled: '🔴 Annulé',
-    };
-    return statusMap[status] || status;
   }
 
   /**

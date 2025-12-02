@@ -27,6 +27,9 @@ export class LFMRequest {
   rank?: string;
 
   @prop()
+  sessionTime?: string;
+
+  @prop()
   description?: string;
 
   @prop({ default: 'open', enum: ['open', 'in_progress', 'completed', 'cancelled'] })
@@ -37,6 +40,9 @@ export class LFMRequest {
 
   @prop()
   channelId?: string; // Discord channel ID where the LFM was posted
+
+  @prop()
+  threadId?: string; // Discord thread ID for the LFM discussion
 
   @prop({ type: () => [String], default: [] })
   interestedUsers!: string[]; // User IDs who expressed interest

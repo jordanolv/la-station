@@ -9,10 +9,13 @@ export class GameDBService {
   }
 
   /**
-   * Get a game by name
+   * Get a game by name (case-insensitive)
    */
   async getGameByName(guildId: string, name: string): Promise<IChatGamingItem | null> {
-    return ChatGamingItemModel.findOne({ guildId, name });
+    return ChatGamingItemModel.findOne({
+      guildId,
+      name: { $regex: new RegExp(`^${name}$`, 'i') }
+    });
   }
 
   /**

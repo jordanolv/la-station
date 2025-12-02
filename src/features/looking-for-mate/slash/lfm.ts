@@ -10,8 +10,6 @@ import {
   MessageFlags,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
-  ButtonBuilder,
-  ButtonStyle,
   ButtonInteraction,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
@@ -19,18 +17,17 @@ import LFMService from '../services/lfm.service';
 import GameDBService from '../services/game-db.service';
 
 export const GAME_SELECT_ID = 'lfm-game-select';
+export const MODE_SELECT_ID = 'lfm-mode-select';
 export const CUSTOM_GAME_MODAL_ID = 'lfm-custom-game-modal';
 export const CUSTOM_GAME_INPUT_ID = 'lfm-custom-game-input';
-export const RANKED_BUTTON_ID = 'lfm-ranked-btn';
-export const CASUAL_BUTTON_ID = 'lfm-casual-btn';
-export const PRIVATE_BUTTON_ID = 'lfm-private-btn';
-export const RANK_MODAL_ID_PREFIX = 'lfm-rank-modal';
-export const RANK_MIN_INPUT_ID = 'lfm-rank-min';
-export const RANK_MAX_INPUT_ID = 'lfm-rank-max';
-export const CONTINUE_BUTTON_ID = 'lfm-continue-btn';
 export const FINAL_MODAL_ID_PREFIX = 'lfm-final-modal';
 export const MATES_INPUT_ID = 'lfm-mates';
+export const RANK_INPUT_ID = 'lfm-rank';
+export const TIME_INPUT_ID = 'lfm-time';
 export const DESCRIPTION_INPUT_ID = 'lfm-description';
+
+// Store selected games per user
+const userGameSelections = new Map<string, string>();
 
 export default {
   data: new SlashCommandBuilder()
@@ -108,17 +105,41 @@ export default {
         ]
       );
 
-    const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
+    const gameRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
+
+    // Add mode select menu
+    const modeSelect = new StringSelectMenuBuilder()
+      .setCustomId(MODE_SELECT_ID)
+      .setPlaceholder('Sélectionnez le mode')
+      .addOptions(
+        {
+          label: '🏆 Ranked',
+          value: 'Ranked',
+          description: 'Partie compétitive classée'
+        },
+        {
+          label: '😎 Casual',
+          value: 'Casual',
+          description: 'Partie décontractée'
+        },
+        {
+          label: '🔒 Privé',
+          value: 'Privé',
+          description: 'Partie privée entre amis'
+        }
+      );
+
+    const modeRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(modeSelect);
 
     await interaction.reply({
-      content: '🎮 **Étape 1/4** : Sélectionnez le jeu pour lequel vous cherchez des coéquipiers :',
-      components: [row],
+      content: '🎮 **Étape 1/2** : Sélectionnez le jeu et le mode :',
+      components: [gameRow, modeRow],
       flags: MessageFlags.Ephemeral,
     });
   },
 
   /**
-   * Step 2: Handle game selection
+   * Handle game selection
    */
   async handleGameSelect(interaction: StringSelectMenuInteraction, _client: BotClient) {
     try {
@@ -144,10 +165,48 @@ export default {
         return;
       }
 
-      // Show ranked/casual buttons
-      await this.showRankedButtons(interaction, selectedGame);
+      // Store the selected game for this user
+      userGameSelections.set(interaction.user.id, selectedGame);
+
+      // Just acknowledge the selection
+      await interaction.update({
+        content: `🎮 **${selectedGame}** sélectionné ! Maintenant choisissez le mode :`,
+      });
     } catch (error) {
       console.error('Error handling game select:', error);
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({
+          content: '❌ Une erreur est survenue.',
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+    }
+  },
+
+  /**
+   * Handle mode selection - this is where we open the final modal
+   */
+  async handleModeSelect(interaction: StringSelectMenuInteraction, _client: BotClient) {
+    try {
+      const selectedGame = userGameSelections.get(interaction.user.id);
+
+      if (!selectedGame) {
+        await interaction.reply({
+          content: '❌ Veuillez d\'abord sélectionner un jeu.',
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      const selectedMode = interaction.values[0];
+
+      // Clean up the stored selection
+      userGameSelections.delete(interaction.user.id);
+
+      // Open the final modal
+      await this.showFinalModal(interaction as any, selectedGame, selectedMode);
+    } catch (error) {
+      console.error('Error handling mode select:', error);
       if (!interaction.replied && !interaction.deferred) {
         await interaction.reply({
           content: '❌ Une erreur est survenue.',
@@ -164,8 +223,49 @@ export default {
     try {
       const customGame = interaction.fields.getTextInputValue(CUSTOM_GAME_INPUT_ID).trim();
 
-      // Show ranked/casual buttons
-      await this.showRankedButtons(interaction, customGame);
+      // Store the custom game for this user
+      userGameSelections.set(interaction.user.id, customGame);
+
+      // Create the game and mode select menus
+      const gameSelect = new StringSelectMenuBuilder()
+        .setCustomId(GAME_SELECT_ID)
+        .setPlaceholder(customGame)
+        .addOptions({
+          label: customGame,
+          value: customGame,
+          default: true
+        });
+
+      const gameRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(gameSelect);
+
+      const modeSelect = new StringSelectMenuBuilder()
+        .setCustomId(MODE_SELECT_ID)
+        .setPlaceholder('Sélectionnez le mode')
+        .addOptions(
+          {
+            label: '🏆 Ranked',
+            value: 'Ranked',
+            description: 'Partie compétitive classée'
+          },
+          {
+            label: '😎 Casual',
+            value: 'Casual',
+            description: 'Partie décontractée'
+          },
+          {
+            label: '🔒 Privé',
+            value: 'Privé',
+            description: 'Partie privée entre amis'
+          }
+        );
+
+      const modeRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(modeSelect);
+
+      await interaction.reply({
+        content: `🎮 **${customGame}** sélectionné ! Maintenant choisissez le mode :`,
+        components: [gameRow, modeRow],
+        flags: MessageFlags.Ephemeral,
+      });
     } catch (error) {
       console.error('Error handling custom game modal:', error);
       await interaction.reply({
@@ -176,238 +276,88 @@ export default {
   },
 
   /**
-   * Step 3: Show ranked/casual/private buttons
-   */
-  async showRankedButtons(interaction: StringSelectMenuInteraction | ModalSubmitInteraction, gameName: string) {
-    const rankedButton = new ButtonBuilder()
-      .setCustomId(`${RANKED_BUTTON_ID}_${gameName}`)
-      .setLabel('🏆 Ranked')
-      .setStyle(ButtonStyle.Primary);
-
-    const casualButton = new ButtonBuilder()
-      .setCustomId(`${CASUAL_BUTTON_ID}_${gameName}`)
-      .setLabel('😎 Casual')
-      .setStyle(ButtonStyle.Secondary);
-
-    const privateButton = new ButtonBuilder()
-      .setCustomId(`${PRIVATE_BUTTON_ID}_${gameName}`)
-      .setLabel('🔒 Privé')
-      .setStyle(ButtonStyle.Success);
-
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(rankedButton, casualButton, privateButton);
-
-    const updateMethod = interaction.isStringSelectMenu() ? 'update' : 'reply';
-
-    await (interaction as any)[updateMethod]({
-      content: `🎮 **${gameName}**\n\n**Étape 2/4** : Quel type de partie recherchez-vous ?`,
-      components: [row],
-      flags: MessageFlags.Ephemeral,
-    });
-  },
-
-  /**
-   * Step 4a: Handle ranked button - Show rank modal
-   */
-  async handleRankedButton(interaction: ButtonInteraction, _client: BotClient) {
-    try {
-      const gameName = interaction.customId.replace(`${RANKED_BUTTON_ID}_`, '');
-
-      const modal = new ModalBuilder()
-        .setCustomId(`${RANK_MODAL_ID_PREFIX}_${gameName}`)
-        .setTitle(`🏆 ${gameName} - Ranked`);
-
-      const rankMinInput = new TextInputBuilder()
-        .setCustomId(RANK_MIN_INPUT_ID)
-        .setLabel('Rank minimum recherché')
-        .setStyle(TextInputStyle.Short)
-        .setPlaceholder('Ex: Gold, Platine, Diamant... (ou "Peu importe")')
-        .setRequired(false)
-        .setMaxLength(50);
-
-      const rankMaxInput = new TextInputBuilder()
-        .setCustomId(RANK_MAX_INPUT_ID)
-        .setLabel('Rank maximum recherché')
-        .setStyle(TextInputStyle.Short)
-        .setPlaceholder('Ex: Platine, Diamant, Master... (ou "Peu importe")')
-        .setRequired(false)
-        .setMaxLength(50);
-
-      modal.addComponents(
-        new ActionRowBuilder<TextInputBuilder>().addComponents(rankMinInput),
-        new ActionRowBuilder<TextInputBuilder>().addComponents(rankMaxInput)
-      );
-
-      await interaction.showModal(modal);
-    } catch (error) {
-      console.error('Error handling ranked button:', error);
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: '❌ Une erreur est survenue.',
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-    }
-  },
-
-  /**
-   * Step 4b: Handle casual button - Show final modal directly
-   */
-  async handleCasualButton(interaction: ButtonInteraction, _client: BotClient) {
-    try {
-      const gameName = interaction.customId.replace(`${CASUAL_BUTTON_ID}_`, '');
-
-      await this.showFinalModal(interaction, gameName, 'Casual');
-    } catch (error) {
-      console.error('Error handling casual button:', error);
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: '❌ Une erreur est survenue.',
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-    }
-  },
-
-  /**
-   * Step 4c: Handle private button - Show final modal directly without rank
-   */
-  async handlePrivateButton(interaction: ButtonInteraction, _client: BotClient) {
-    try {
-      const gameName = interaction.customId.replace(`${PRIVATE_BUTTON_ID}_`, '');
-
-      await this.showFinalModal(interaction, gameName, 'Privé');
-    } catch (error) {
-      console.error('Error handling private button:', error);
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: '❌ Une erreur est survenue.',
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-    }
-  },
-
-  /**
-   * Handle rank modal submission
-   */
-  async handleRankModal(interaction: ModalSubmitInteraction, _client: BotClient) {
-    try {
-      const gameName = interaction.customId.replace(`${RANK_MODAL_ID_PREFIX}_`, '');
-      const rankMin = interaction.fields.getTextInputValue(RANK_MIN_INPUT_ID)?.trim() || 'Peu importe';
-      const rankMax = interaction.fields.getTextInputValue(RANK_MAX_INPUT_ID)?.trim() || 'Peu importe';
-
-      const rankDisplay = rankMin === 'Peu importe' && rankMax === 'Peu importe'
-        ? 'Peu importe'
-        : `${rankMin} - ${rankMax}`;
-
-      // Show a button to continue (can't show modal directly after modal submission)
-      const continueButton = new ButtonBuilder()
-        .setCustomId(`${CONTINUE_BUTTON_ID}_${gameName}_${rankDisplay}`)
-        .setLabel('Continuer')
-        .setStyle(ButtonStyle.Primary)
-        .setEmoji('➡️');
-
-      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(continueButton);
-
-      await interaction.reply({
-        content: `✅ Rank: **${rankDisplay}**\nCliquez sur le bouton pour continuer.`,
-        components: [row],
-        flags: MessageFlags.Ephemeral,
-      });
-    } catch (error) {
-      console.error('Error handling rank modal:', error);
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: '❌ Une erreur est survenue.',
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-    }
-  },
-
-  /**
-   * Handle continue button after rank modal
-   */
-  async handleContinueButton(interaction: ButtonInteraction, _client: BotClient) {
-    try {
-      // Extract game name and rank from customId: lfm-continue-btn_GameName_Rank
-      const parts = interaction.customId.replace(`${CONTINUE_BUTTON_ID}_`, '').split('_');
-      const gameName = parts[0];
-      const rank = parts.slice(1).join('_'); // In case rank contains underscores
-
-      await this.showFinalModal(interaction, gameName, rank);
-    } catch (error) {
-      console.error('Error handling continue button:', error);
-      if (!interaction.replied && !interaction.deferred) {
-        await interaction.reply({
-          content: '❌ Une erreur est survenue.',
-          flags: MessageFlags.Ephemeral,
-        });
-      }
-    }
-  },
-
-  /**
-   * Step 5: Show final modal for mates + description
+   * Step 2: Show final modal (all info in one modal)
    */
   async showFinalModal(
     interaction: ButtonInteraction,
     gameName: string,
-    rank: string
+    mode: string
   ) {
+    const isRanked = mode === 'Ranked';
+
     const modal = new ModalBuilder()
-      .setCustomId(`${FINAL_MODAL_ID_PREFIX}_${gameName}_${rank}`)
-      .setTitle(`🎮 ${gameName}`);
+      .setCustomId(`${FINAL_MODAL_ID_PREFIX}_${gameName}_${mode}`)
+      .setTitle(`🎮 ${gameName} - ${mode}`);
 
     const matesInput = new TextInputBuilder()
       .setCustomId(MATES_INPUT_ID)
-      .setLabel('Nombre de coéquipiers recherchés')
+      .setLabel('Nombre de joueurs recherchés')
       .setStyle(TextInputStyle.Short)
-      .setPlaceholder('Ex: 1, 2, 3, 4...')
+      .setPlaceholder('Ex: 2 pour du 3v3')
       .setRequired(true)
       .setMaxLength(2);
 
-    const descriptionInput = new TextInputBuilder()
-      .setCustomId(DESCRIPTION_INPUT_ID)
-      .setLabel('Description (optionnel)')
-      .setStyle(TextInputStyle.Paragraph)
-      .setPlaceholder('Ex: Cherche joueurs chill pour s\'amuser, micro souhaité...')
+    const timeInput = new TextInputBuilder()
+      .setCustomId(TIME_INPUT_ID)
+      .setLabel('Heure de la session')
+      .setStyle(TextInputStyle.Short)
+      .setPlaceholder('Ex: 20h30, Maintenant, Dans 1h...')
       .setRequired(false)
-      .setMaxLength(500);
+      .setMaxLength(50);
 
-    modal.addComponents(
+    const components = [
       new ActionRowBuilder<TextInputBuilder>().addComponents(matesInput),
-      new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput)
-    );
+      new ActionRowBuilder<TextInputBuilder>().addComponents(timeInput),
+    ];
 
-    // Both ButtonInteraction and ModalSubmitInteraction support showModal
-    await (interaction as any).showModal(modal);
+    // Add rank field only for Ranked mode
+    if (isRanked) {
+      const rankInput = new TextInputBuilder()
+        .setCustomId(RANK_INPUT_ID)
+        .setLabel('Rank minimum requis')
+        .setStyle(TextInputStyle.Short)
+        .setPlaceholder('Ex: Champ 3, GC 2, Tous niveaux...')
+        .setRequired(false)
+        .setMaxLength(50);
+
+      components.push(new ActionRowBuilder<TextInputBuilder>().addComponents(rankInput));
+    }
+
+    modal.addComponents(...components);
+    await interaction.showModal(modal);
   },
 
   /**
-   * Step 6: Handle final modal and create LFM request
+   * Step 2: Handle final modal and create LFM request
    */
   async handleFinalModal(interaction: ModalSubmitInteraction, _client: BotClient) {
     try {
       await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-      // Extract game name and rank from modal customId
+      // Extract game name and mode from modal customId
       const parts = interaction.customId.replace(`${FINAL_MODAL_ID_PREFIX}_`, '').split('_');
-      const rank = parts.pop() || 'Casual';
+      const mode = parts.pop() || 'Casual';
       const game = parts.join('_');
+      const isRanked = mode === 'Ranked';
 
       // Get input values
       const matesRaw = interaction.fields.getTextInputValue(MATES_INPUT_ID).trim();
-      const description = interaction.fields.getTextInputValue(DESCRIPTION_INPUT_ID)?.trim() || undefined;
+      const time = interaction.fields.getTextInputValue(TIME_INPUT_ID)?.trim() || undefined;
+      const rank = isRanked
+        ? interaction.fields.getTextInputValue(RANK_INPUT_ID)?.trim() || 'Tous niveaux'
+        : mode;
 
       // Validate number of mates
       const numberOfMates = parseInt(matesRaw, 10);
       if (isNaN(numberOfMates) || numberOfMates < 1 || numberOfMates > 10) {
         await interaction.editReply({
-          content: '❌ Le nombre de coéquipiers doit être un nombre entre 1 et 10.',
+          content: '❌ Le nombre de places doit être un nombre entre 1 et 10.',
         });
         return;
       }
+
+      // Add +1 to include the creator in the total
+      const totalSlots = numberOfMates + 1;
 
       // Create LFM request
       const request = await LFMService.createRequest({
@@ -415,9 +365,9 @@ export default {
         username: interaction.user.username,
         guildId: interaction.guildId!,
         game,
-        numberOfMates,
+        numberOfMates: totalSlots,
         rank,
-        description,
+        sessionTime: time,
       });
 
       // Get game color and banner
@@ -426,7 +376,7 @@ export default {
 
       // Create embed and buttons
       const embed = LFMService.createLFMEmbed(request, interaction.user, gameColor, gameBanner);
-      const buttons = LFMService.createLFMButtons(request._id.toString(), false);
+      const buttons = LFMService.createLFMButtons(request._id.toString(), true);
 
       // Try to find a LFM channel or use current channel
       const guild = interaction.guild;
@@ -450,11 +400,21 @@ export default {
           components: [buttons],
         });
 
+        // Create a thread on the message
+        const thread = await message.startThread({
+          name: `${game} - ${interaction.user.username}`,
+          autoArchiveDuration: 1440, // 24 hours
+          reason: 'LFM lobby thread'
+        });
+
+        // Add the creator to the thread
+        await thread.members.add(interaction.user.id);
+
         // Update request with message info
-        await LFMService.updateMessageInfo(request._id.toString(), message.id, targetChannel.id);
+        await LFMService.updateMessageInfo(request._id.toString(), message.id, targetChannel.id, thread.id);
 
         await interaction.editReply({
-          content: `✅ Votre annonce LFM a été créée avec succès dans <#${targetChannel.id}> !`,
+          content: `✅ Votre annonce LFM a été créée avec succès dans <#${targetChannel.id}> !\nUn thread a été créé : ${thread.toString()}`,
         });
       } else {
         await interaction.editReply({

@@ -2,6 +2,9 @@ import {
   ButtonInteraction,
   EmbedBuilder,
   MessageFlags,
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder,
 } from 'discord.js';
 import LFMService from '../services/lfm.service';
 import GameDBService from '../services/game-db.service';
@@ -50,6 +53,9 @@ export async function handleLFMButtonInteraction(
         break;
       case 'cancel':
         await handleCancel(interaction, requestId);
+        break;
+      case 'delete':
+        await handleDelete(interaction, requestId);
         break;
       default:
         await interaction.followUp({
@@ -107,53 +113,148 @@ async function handleJoin(interaction: ButtonInteraction, requestId: string): Pr
     return;
   }
 
-  // Add user to interested list
-  const updatedRequest = await LFMService.addInterestedUser(requestId, interaction.user.id);
+  const requestOwner = await interaction.client.users.fetch(request.userId);
 
-  if (!updatedRequest) {
+  // Auto-accept for Casual and Privé modes (only Ranked needs approval)
+  const isRanked = request.rank && request.rank !== 'Casual' && request.rank !== 'Privé';
+
+  if (!isRanked) {
+    // Auto-accept the user
+    const updatedRequest = await LFMService.addInterestedUser(requestId, interaction.user.id);
+
+    if (!updatedRequest) {
+      await interaction.followUp({
+        content: '❌ Impossible de rejoindre cette annonce.',
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    // Update the message embed
+    const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
+    const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
+    const embed = LFMService.createLFMEmbed(updatedRequest, requestOwner, gameColor, gameBanner);
+    const buttons = LFMService.createLFMButtons(requestId, true); // Always show delete button for owner
+
+    await interaction.editReply({
+      embeds: [embed],
+      components: [buttons],
+    });
+
+    // Add user to the thread if it exists
+    if (updatedRequest.threadId) {
+      try {
+        const channel = await interaction.client.channels.fetch(updatedRequest.threadId);
+        if (channel?.isThread()) {
+          await channel.members.add(interaction.user.id);
+        }
+      } catch (error) {
+        console.error('Failed to add user to thread:', error);
+      }
+    }
+
+    // Notify the user
     await interaction.followUp({
-      content: '❌ Impossible de rejoindre cette annonce.',
+      content: `✅ Vous avez rejoint le lobby !${updatedRequest.threadId ? ` Rendez-vous dans le thread <#${updatedRequest.threadId}> !` : ''}`,
       flags: MessageFlags.Ephemeral,
     });
+
+    // Notify the owner
+    try {
+      await requestOwner.send({
+        embeds: [
+          new EmbedBuilder()
+            .setColor('#00ff00')
+            .setTitle('✋ Nouveau joueur !')
+            .setDescription(`**${interaction.user.username}** a rejoint votre lobby **${request.game}**.`)
+            .setThumbnail(interaction.user.displayAvatarURL())
+            .addFields(
+              { name: '🎯 Jeu', value: request.game, inline: true },
+              { name: '👥 Places', value: `${updatedRequest.interestedUsers.length}/${request.numberOfMates}`, inline: true }
+            )
+            .setTimestamp(),
+        ],
+      });
+    } catch (error) {
+      console.error('Failed to send DM to request owner:', error);
+    }
+
     return;
   }
 
-  // Update the message embed
-  const requestOwner = await interaction.client.users.fetch(request.userId);
-  const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
-  const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
-  const embed = LFMService.createLFMEmbed(updatedRequest, requestOwner, gameColor, gameBanner);
-  const buttons = LFMService.createLFMButtons(requestId, false);
-
-  await interaction.editReply({
-    embeds: [embed],
-    components: [buttons],
-  });
-
-  // Notify the user
+  // For Ranked mode, require approval
   await interaction.followUp({
-    content: `✅ Vous avez rejoint l'annonce ! Le créateur (<@${request.userId}>) a été notifié.`,
+    content: `⏳ Votre demande a été envoyée au créateur (<@${request.userId}>). En attente de validation...`,
     flags: MessageFlags.Ephemeral,
   });
 
-  // Try to DM the request owner
+  // Try to DM the request owner with Accept/Reject buttons
+
   try {
+    const dmEmbed = new EmbedBuilder()
+      .setColor('#00ff00')
+      .setTitle('✋ Nouveau joueur intéressé !')
+      .setDescription(`**${interaction.user.username}** (<@${interaction.user.id}>) souhaite rejoindre votre lobby **${request.game}**.`)
+      .setThumbnail(interaction.user.displayAvatarURL())
+      .addFields(
+        { name: '🎯 Jeu', value: request.game, inline: true },
+        { name: '👥 Places', value: `${request.interestedUsers.length}/${request.numberOfMates}`, inline: true },
+        { name: '⭐ Rank', value: request.rank || 'Non spécifié', inline: true }
+      )
+      .setTimestamp();
+
+    const acceptButton = new ButtonBuilder()
+      .setCustomId(`lfm_accept_${requestId}_${interaction.user.id}`)
+      .setLabel('Accepter')
+      .setStyle(ButtonStyle.Success)
+      .setEmoji('✅');
+
+    const rejectButton = new ButtonBuilder()
+      .setCustomId(`lfm_reject_${requestId}_${interaction.user.id}`)
+      .setLabel('Refuser')
+      .setStyle(ButtonStyle.Danger)
+      .setEmoji('❌');
+
+    const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(acceptButton, rejectButton);
+
     await requestOwner.send({
-      embeds: [
-        new EmbedBuilder()
-          .setColor('#00ff00')
-          .setTitle('✋ Nouveau joueur intéressé !')
-          .setDescription(`<@${interaction.user.id}> est intéressé par votre annonce LFM pour **${request.game}**.`)
-          .addFields(
-            { name: '🎯 Jeu', value: request.game, inline: true },
-            { name: '👥 Joueurs recherchés', value: request.numberOfMates.toString(), inline: true },
-            { name: '⭐ Rank', value: request.rank || 'Non spécifié', inline: true }
-          )
-          .setTimestamp(),
-      ],
+      embeds: [dmEmbed],
+      components: [actionRow],
     });
   } catch (error) {
     console.error('Failed to send DM to request owner:', error);
+
+    // If DM fails, auto-accept the user
+    const updatedRequest = await LFMService.addInterestedUser(requestId, interaction.user.id);
+
+    if (updatedRequest) {
+      const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
+      const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
+      const embed = LFMService.createLFMEmbed(updatedRequest, requestOwner, gameColor, gameBanner);
+      const buttons = LFMService.createLFMButtons(requestId, true);
+
+      await interaction.message.edit({
+        embeds: [embed],
+        components: [buttons],
+      });
+
+      // Add user to the thread if it exists
+      if (updatedRequest.threadId) {
+        try {
+          const channel = await interaction.client.channels.fetch(updatedRequest.threadId);
+          if (channel?.isThread()) {
+            await channel.members.add(interaction.user.id);
+          }
+        } catch (error) {
+          console.error('Failed to add user to thread:', error);
+        }
+      }
+
+      await interaction.followUp({
+        content: `✅ Vous avez été automatiquement accepté dans le lobby !${updatedRequest.threadId ? ` Vous avez été ajouté au thread <#${updatedRequest.threadId}> !` : ''}`,
+        flags: MessageFlags.Ephemeral,
+      });
+    }
   }
 }
 
@@ -196,12 +297,24 @@ async function handleLeave(interaction: ButtonInteraction, requestId: string): P
   const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
   const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
   const embed = LFMService.createLFMEmbed(updatedRequest, requestOwner, gameColor, gameBanner);
-  const buttons = LFMService.createLFMButtons(requestId, false);
+  const buttons = LFMService.createLFMButtons(requestId, true);
 
   await interaction.editReply({
     embeds: [embed],
     components: [buttons],
   });
+
+  // Remove user from the thread if it exists
+  if (updatedRequest.threadId) {
+    try {
+      const channel = await interaction.client.channels.fetch(updatedRequest.threadId);
+      if (channel?.isThread()) {
+        await channel.members.remove(interaction.user.id);
+      }
+    } catch (error) {
+      console.error('Failed to remove user from thread:', error);
+    }
+  }
 
   await interaction.followUp({
     content: '✅ Vous avez quitté l\'annonce.',
@@ -352,5 +465,197 @@ async function handleCancel(interaction: ButtonInteraction, requestId: string): 
     } catch (error) {
       console.error(`Failed to send DM to user ${userId}:`, error);
     }
+  }
+}
+
+/**
+ * Handle delete button click (owner only)
+ */
+async function handleDelete(interaction: ButtonInteraction, requestId: string): Promise<void> {
+  const request = await LFMService.getRequest(requestId);
+
+  if (!request) {
+    await interaction.followUp({
+      content: '❌ Cette annonce n\'existe plus.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  // Check if user is the request owner
+  if (request.userId !== interaction.user.id) {
+    await interaction.followUp({
+      content: '❌ Seul le créateur de l\'annonce peut la supprimer.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  await interaction.deferUpdate();
+
+  // Delete the request from database
+  await LFMService.deleteRequest(requestId);
+
+  // Delete the message
+  try {
+    await interaction.message.delete();
+  } catch (error) {
+    console.error('Failed to delete message:', error);
+  }
+
+  // Close/archive the thread if it exists
+  if (request.threadId) {
+    try {
+      const thread = await interaction.client.channels.fetch(request.threadId);
+      if (thread?.isThread()) {
+        await thread.setArchived(true);
+      }
+    } catch (error) {
+      console.error('Failed to archive thread:', error);
+    }
+  }
+
+  await interaction.followUp({
+    content: '🗑️ Votre annonce a été supprimée avec succès.',
+    flags: MessageFlags.Ephemeral,
+  });
+}
+
+/**
+ * Handle accept button click in DM (owner only)
+ */
+export async function handleLFMAcceptReject(
+  interaction: ButtonInteraction,
+  client: BotClient
+): Promise<void> {
+  const customId = interaction.customId;
+
+  // Parse customId: lfm_accept_{requestId}_{userId} or lfm_reject_{requestId}_{userId}
+  const parts = customId.split('_');
+  if (parts.length !== 4) return;
+
+  const action = parts[1]; // 'accept' or 'reject'
+  const requestId = parts[2];
+  const userId = parts[3];
+
+  const request = await LFMService.getRequest(requestId);
+
+  if (!request) {
+    await interaction.reply({
+      content: '❌ Cette annonce n\'existe plus.',
+      ephemeral: true,
+    });
+    return;
+  }
+
+  // Check if user is the request owner
+  if (request.userId !== interaction.user.id) {
+    await interaction.reply({
+      content: '❌ Seul le créateur de l\'annonce peut accepter/refuser.',
+      ephemeral: true,
+    });
+    return;
+  }
+
+  await interaction.deferUpdate();
+
+  const applicant = await client.users.fetch(userId);
+
+  if (action === 'accept') {
+    // Add user to the lobby
+    const updatedRequest = await LFMService.addInterestedUser(requestId, userId);
+
+    if (!updatedRequest) {
+      await interaction.followUp({
+        content: '❌ Impossible d\'ajouter ce joueur.',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    // Update the lobby message
+    try {
+      const channel = await client.channels.fetch(request.channelId!);
+      if (channel?.isTextBased()) {
+        const message = await channel.messages.fetch(request.messageId!);
+        const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
+        const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
+        const embed = LFMService.createLFMEmbed(updatedRequest, interaction.user, gameColor, gameBanner);
+        const buttons = LFMService.createLFMButtons(requestId, true);
+
+        await message.edit({
+          embeds: [embed],
+          components: [buttons],
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update lobby message:', error);
+    }
+
+    // Add user to thread
+    if (updatedRequest.threadId) {
+      try {
+        const thread = await client.channels.fetch(updatedRequest.threadId);
+        if (thread?.isThread()) {
+          await thread.members.add(userId);
+        }
+      } catch (error) {
+        console.error('Failed to add user to thread:', error);
+      }
+    }
+
+    // Notify the applicant
+    try {
+      await applicant.send({
+        embeds: [
+          new EmbedBuilder()
+            .setColor('#00ff00')
+            .setTitle('✅ Demande acceptée !')
+            .setDescription(`Votre demande pour rejoindre le lobby **${request.game}** a été acceptée par <@${request.userId}> !${updatedRequest.threadId ? `\n\nRendez-vous dans le thread <#${updatedRequest.threadId}> !` : ''}`)
+            .setTimestamp(),
+        ],
+      });
+    } catch (error) {
+      console.error('Failed to send DM to applicant:', error);
+    }
+
+    // Edit the DM message to show accepted
+    await interaction.editReply({
+      embeds: [
+        new EmbedBuilder()
+          .setColor('#00ff00')
+          .setTitle('✅ Joueur accepté')
+          .setDescription(`Vous avez accepté **${applicant.username}** dans votre lobby **${request.game}**.`)
+          .setTimestamp(),
+      ],
+      components: [],
+    });
+  } else {
+    // Reject the user
+    try {
+      await applicant.send({
+        embeds: [
+          new EmbedBuilder()
+            .setColor('#ff0000')
+            .setTitle('❌ Demande refusée')
+            .setDescription(`Votre demande pour rejoindre le lobby **${request.game}** a été refusée par le créateur.`)
+            .setTimestamp(),
+        ],
+      });
+    } catch (error) {
+      console.error('Failed to send DM to applicant:', error);
+    }
+
+    // Edit the DM message to show rejected
+    await interaction.editReply({
+      embeds: [
+        new EmbedBuilder()
+          .setColor('#ff0000')
+          .setTitle('❌ Joueur refusé')
+          .setDescription(`Vous avez refusé **${applicant.username}** pour votre lobby **${request.game}**.`)
+          .setTimestamp(),
+      ],
+      components: [],
+    });
   }
 }
