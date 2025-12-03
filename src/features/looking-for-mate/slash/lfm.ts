@@ -573,15 +573,11 @@ export default {
       try {
         const ChatGamingItemModel = (await import('../../chat-gaming/models/chatGamingItem.model')).default;
 
-        console.log(`[LFM] Searching for game "${selection.game}" in guildId "${interaction.guildId}"`);
-
         // Try exact match first
         let chatGamingItem = await ChatGamingItemModel.findOne({
           guildId: interaction.guildId!,
           name: selection.game
         });
-
-        console.log(`[LFM] Exact match result:`, chatGamingItem ? 'FOUND' : 'NOT FOUND');
 
         // If not found, try case-insensitive search
         if (!chatGamingItem) {
@@ -589,22 +585,9 @@ export default {
             guildId: interaction.guildId!,
             name: { $regex: new RegExp(`^${selection.game}$`, 'i') }
           });
-          console.log(`[LFM] Case-insensitive match result:`, chatGamingItem ? 'FOUND' : 'NOT FOUND');
-        }
-
-        // Debug: show all games for this guild
-        if (!chatGamingItem) {
-          const allGames = await ChatGamingItemModel.find({ guildId: interaction.guildId! });
-          console.log(`[LFM] All games in guild:`, allGames.map(g => g.name));
         }
 
         gameRoleId = chatGamingItem?.roleId;
-
-        if (gameRoleId) {
-          console.log(`[LFM] ✅ Found role for game "${selection.game}": ${gameRoleId}`);
-        } else {
-          console.log(`[LFM] ❌ No role found for game "${selection.game}"`);
-        }
       } catch (error) {
         console.error('[LFM] Error fetching game role:', error);
       }
