@@ -578,32 +578,8 @@ export default {
         totalSlots = 10;
       }
 
-      // Try to find game role in chat_gaming_items
-      let gameRoleId: string | undefined;
-      try {
-        const ChatGamingItemModel = (await import('../../chat-gaming/models/chatGamingItem.model')).default;
-
-        // Use roleGameName if specified in config, otherwise use game name
-        const gameNameToSearch = selection.gameConfig.roleGameName || selection.game;
-
-        // Try exact match first
-        let chatGamingItem = await ChatGamingItemModel.findOne({
-          guildId: interaction.guildId!,
-          name: gameNameToSearch
-        });
-
-        // If not found, try case-insensitive search
-        if (!chatGamingItem) {
-          chatGamingItem = await ChatGamingItemModel.findOne({
-            guildId: interaction.guildId!,
-            name: { $regex: new RegExp(`^${gameNameToSearch}$`, 'i') }
-          });
-        }
-
-        gameRoleId = chatGamingItem?.roleId;
-      } catch (error) {
-        console.error('[LFM] Error fetching game role:', error);
-      }
+      // Get game role ID from config
+      const gameRoleId = selection.gameConfig.roleId || undefined;
 
       // Create LFM request
       const request = await LFMService.createRequest({

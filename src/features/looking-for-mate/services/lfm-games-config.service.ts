@@ -31,11 +31,11 @@ export interface GameConfig {
   emoji: string;
   color: string;
   banner?: string;
+  roleId?: string;
   partyModeField: PartyModeField;
   privateDefaultSlots?: number;
   typeOptions: TypeOption[];
   rankOptions: RankOption[];
-  roleGameName?: string; // Name of the game to search for role in chat_gaming_items
 }
 
 export interface CustomGameConfig {
