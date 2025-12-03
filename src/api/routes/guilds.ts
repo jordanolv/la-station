@@ -478,7 +478,36 @@ guilds.put('/:id/features/:featureId/settings', async (c) => {
         updatedSettings = guild.features.leveling;
         break;
       case 'voice-channels':
-        guild.features.vocManager = { ...guild.features.vocManager, ...updates };
+        // Merge intelligemment en préservant les joinChannels existants
+        if (!guild.features.vocManager) {
+          guild.features.vocManager = {
+            enabled: false,
+            joinChannels: [],
+            createdChannels: [],
+            channelCount: 0
+          };
+        }
+
+        // Ne pas écraser joinChannels si non fourni dans l'update ou s'ils sont incomplets
+        const currentJoinChannels = guild.features.vocManager.joinChannels || [];
+        let newJoinChannels = currentJoinChannels;
+
+        if (updates.joinChannels && Array.isArray(updates.joinChannels)) {
+          // Mapper les champs du frontend vers le modèle backend
+          // Le frontend envoie "channelId" mais le modèle attend "id"
+          newJoinChannels = updates.joinChannels.map((ch: any) => ({
+            id: ch.channelId || ch.id, // Support des deux formats
+            category: ch.category,
+            nameTemplate: ch.nameTemplate || '🎮 {username} #{count}'
+          })).filter((ch: any) => ch.id && ch.category); // Filtrer les invalides
+        }
+
+        guild.features.vocManager = {
+          ...guild.features.vocManager,
+          ...updates,
+          joinChannels: newJoinChannels
+        };
+
         updatedSettings = guild.features.vocManager;
         break;
       case 'birthday':

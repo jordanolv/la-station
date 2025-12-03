@@ -11,6 +11,13 @@ import {
   CUSTOM_GAME_MODAL_ID,
   FINAL_MODAL_ID_PREFIX,
 } from '../../looking-for-mate/slash/lfm';
+import { VOC_CONFIG_BUTTON_ID, VOC_INVITE_USER_SELECT_ID } from '../../voc-manager/services/vocManager.service';
+import {
+  handleVocConfigButton,
+  handleVocConfigModal,
+  handleVocInviteUserSelect,
+  VOC_CONFIG_MODAL_ID
+} from '../../voc-manager/interactions/vocConfigHandler';
 
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
@@ -78,6 +85,8 @@ export default {
           if (leaderboardCommand && typeof leaderboardCommand.handleButtonInteraction === 'function') {
             await leaderboardCommand.handleButtonInteraction(interaction, client);
           }
+        } else if (interaction.customId.startsWith(VOC_CONFIG_BUTTON_ID)) {
+          await handleVocConfigButton(interaction, client);
         }
       }
 
@@ -106,6 +115,13 @@ export default {
         }
       }
 
+      // Gestion des user select menus
+      else if (interaction.isUserSelectMenu && interaction.isUserSelectMenu()) {
+        if (interaction.customId.startsWith(VOC_INVITE_USER_SELECT_ID)) {
+          await handleVocInviteUserSelect(interaction, client);
+        }
+      }
+
       // Gestion des modals
       else if (interaction.isModalSubmit && interaction.isModalSubmit()) {
         if (interaction.customId.startsWith('suggestion_modal_')) {
@@ -125,6 +141,8 @@ export default {
           if (lfmCommand && typeof lfmCommand.handleFinalModal === 'function') {
             await lfmCommand.handleFinalModal(interaction, client);
           }
+        } else if (interaction.customId.startsWith(VOC_CONFIG_MODAL_ID)) {
+          await handleVocConfigModal(interaction, client);
         } else {
         }
       }
