@@ -169,10 +169,17 @@ export class LFMService {
     const typeText = request.type || 'Casual';
     const title = `Nouveau Lobby sur ${gameAbbr} en ${typeText}`;
 
+    // Build description with optional description text above progress bar
+    let description = '';
+    if (request.description) {
+      description += `${request.description}\n\n`;
+    }
+    description += progressBar;
+
     const embed = new EmbedBuilder()
       .setColor((gameColor as any) || '#5865F2')
       .setTitle(title)
-      .setDescription(progressBar)
+      .setDescription(description)
       .setAuthor({
         name: user.username,
         iconURL: user.displayAvatarURL(),
