@@ -14,6 +14,16 @@
           "name": "me",
           "description": "Générez votre carte de profil personnalisée avec vos stats",
           "usage": ""
+        },
+        {
+          "name": "leaderboard",
+          "description": "Consultez les classements du serveur (Messages, Vocal, Arcade, Streak, Soirées)",
+          "usage": ""
+        },
+        {
+          "name": "daily",
+          "description": "Réclamez votre récompense quotidienne (argent & XP aléatoires)",
+          "usage": ""
         }
       ]
     },

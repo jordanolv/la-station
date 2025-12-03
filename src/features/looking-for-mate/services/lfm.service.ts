@@ -15,8 +15,11 @@ export interface CreateLFMRequestDTO {
   game: string;
   numberOfMates: number;
   rank?: string;
+  gameMode?: string;
+  type?: string;
   sessionTime?: string;
   description?: string;
+  gameRoleId?: string;
 }
 
 export class LFMService {
@@ -161,9 +164,14 @@ export class LFMService {
   createLFMEmbed(request: ILFMRequest, user: User, gameColor?: string, gameBanner?: string): EmbedBuilder {
     const progressBar = this.createProgressBar(request.interestedUsers?.length || 0, request.numberOfMates);
 
+    // Create title with game abbreviation and type
+    const gameAbbr = this.getGameAbbreviation(request.game);
+    const typeText = request.type || 'Casual';
+    const title = `Nouveau Lobby sur ${gameAbbr} en ${typeText}`;
+
     const embed = new EmbedBuilder()
       .setColor((gameColor as any) || '#5865F2')
-      .setTitle('Nouveau Lobby')
+      .setTitle(title)
       .setDescription(progressBar)
       .setAuthor({
         name: user.username,
@@ -184,15 +192,17 @@ export class LFMService {
       });
     }
 
-    // Game
-    fields.push({
-      name: '🎮 Game',
-      value: request.game,
-      inline: true
-    });
+    // Game Mode (for games like Rocket League: 2v2, 3v3, etc.)
+    if (request.gameMode) {
+      fields.push({
+        name: '⚽ Mode',
+        value: request.gameMode,
+        inline: true
+      });
+    }
 
-    // Rank if specified
-    if (request.rank && request.rank !== 'Casual' && request.rank !== 'Privé') {
+    // Rank if specified (only for Ranked type)
+    if (request.rank) {
       fields.push({
         name: '⭐ Rank',
         value: request.rank,
@@ -290,6 +300,20 @@ export class LFMService {
     ]);
 
     return { total, open, completed };
+  }
+
+  /**
+   * Get game abbreviation for display
+   */
+  private getGameAbbreviation(gameName: string): string {
+    const abbreviations: { [key: string]: string } = {
+      'League of Legends': 'LoL',
+      'Rocket League': 'RL',
+      'Valorant': 'Valo',
+      'Counter-Strike 2': 'CS2',
+    };
+
+    return abbreviations[gameName] || gameName;
   }
 }
 

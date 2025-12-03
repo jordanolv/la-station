@@ -266,12 +266,12 @@ export class PartyService {
       xpAmount: data.xpAmount || 0
     });
 
-    // Distribution des rewards AVANT l'archivage
-    if (data.attendedParticipants.length > 0 && (data.rewardAmount! > 0 || data.xpAmount! > 0)) {
-      console.log('[PARTY] Distribution des rewards en cours...');
+    // Distribution des rewards et incrémentation des stats AVANT l'archivage
+    if (data.attendedParticipants.length > 0) {
+      console.log('[PARTY] Distribution des rewards et stats en cours...');
       await this.distributeRewards(client, updatedEvent, data.attendedParticipants, data.rewardAmount || 0, data.xpAmount || 0);
     } else {
-      console.log('[PARTY] Aucune distribution de rewards (conditions non remplies)');
+      console.log('[PARTY] Aucun participant présent');
     }
 
     // Actions Discord APRÈS les rewards
@@ -319,7 +319,7 @@ export class PartyService {
 
 
   private async distributeRewards(client: BotClient, event: PartyEvent, attendedParticipants: string[], rewardAmount: number, xpAmount: number): Promise<void> {
-    if (attendedParticipants.length === 0 || (rewardAmount <= 0 && xpAmount <= 0)) return;
+    if (attendedParticipants.length === 0) return;
 
     const moneyPerParticipant = rewardAmount;
     const xpPerParticipant = xpAmount;
@@ -346,8 +346,8 @@ export class PartyService {
         }
 
         if (xpPerParticipant > 0) {
-          const mockMessage = { 
-            guild: { id: event.discord.guildId }, 
+          const mockMessage = {
+            guild: { id: event.discord.guildId },
             author: { id: participantId },
             react: () => Promise.resolve() // Mock react method pour éviter les erreurs
           };
@@ -357,6 +357,12 @@ export class PartyService {
           // Sauvegarder si seulement de l'argent mais pas d'XP
           await user.save();
         }
+
+        // Incrémenter le compteur de soirées participées
+        await GuildUserModel.findOneAndUpdate(
+          { discordId: participantId, guildId: event.discord.guildId },
+          { $inc: { 'stats.partyParticipated': 1 } }
+        );
       } catch (error) {
         console.error(`[PARTY] Erreur distribution ${participantId}:`, error);
       }

@@ -27,6 +27,12 @@ export class LFMRequest {
   rank?: string;
 
   @prop()
+  gameMode?: string; // For games like Rocket League: "2v2", "3v3", etc.
+
+  @prop()
+  type?: string; // "Casual", "Ranked", "Privé", "Aram", etc.
+
+  @prop()
   sessionTime?: string;
 
   @prop()
@@ -43,6 +49,9 @@ export class LFMRequest {
 
   @prop()
   threadId?: string; // Discord thread ID for the LFM discussion
+
+  @prop()
+  gameRoleId?: string; // Discord role ID for the game
 
   @prop({ type: () => [String], default: [] })
   interestedUsers!: string[]; // User IDs who expressed interest

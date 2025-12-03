@@ -1,0 +1,156 @@
+{
+  "games": [
+    {
+      "id": "lol",
+      "name": "League of Legends",
+      "emoji": "⚔️",
+      "color": "#c79b3b",
+      "banner": "https://cdn.discordapp.com/attachments/1360760238348964022/1445473517423431872/banner-lol.png?ex=6930799e&is=692f281e&hm=206c3c57bc86d512410eb2d1a400eb473b0108ced4f227389262287265ac5cdc&",
+      "partyModeField": {
+        "type": "mode_select",
+        "label": "Mode de jeu",
+        "options": [
+          { "label": "DuoQ", "value": "Duo", "slots": 2 },
+          { "label": "TrioQ", "value": "Trio", "slots": 3 },
+          { "label": "Five Stack", "value": "Five Stack", "slots": 5 }
+        ]
+      },
+      "privateDefaultSlots": 10,
+      "typeOptions": [
+        { "label": "Casual", "value": "Casual" },
+        { "label": "Aram", "value": "Aram" },
+        { "label": "Privé", "value": "Privé" },
+        { "label": "Ranked", "value": "Ranked" }
+      ],
+      "rankOptions": [
+        { "label": "Fer", "value": "Fer" },
+        { "label": "Bronze", "value": "Bronze" },
+        { "label": "Argent", "value": "Argent" },
+        { "label": "Or", "value": "Or" },
+        { "label": "Platine", "value": "Platine" },
+        { "label": "Diamant", "value": "Diamant" },
+        { "label": "Maître", "value": "Maître" },
+        { "label": "Grand Maître", "value": "Grand Maître" },
+        { "label": "Challenger", "value": "Challenger" }
+      ]
+    },
+    {
+      "id": "rocket-league",
+      "name": "Rocket League",
+      "emoji": "🚗",
+      "color": "#088dce",
+      "banner": "https://cdn.discordapp.com/attachments/1360760238348964022/1445475071648071751/banner-rl.png?ex=69307b10&is=692f2990&hm=6cf4ccf7582952fe1cfb9e52d2fd41f618004784c06fc7b17ddc322f167c0630&",
+      "partyModeField": {
+        "type": "mode_select",
+        "label": "Mode de jeu",
+        "options": [
+          { "label": "2v2", "value": "2v2", "slots": 2 },
+          { "label": "3v3", "value": "3v3", "slots": 3 }
+        ]
+      },
+      "privateDefaultSlots": 6,
+      "typeOptions": [
+        { "label": "Casual", "value": "Casual" },
+        { "label": "Privé", "value": "Privé" },
+        { "label": "Ranked", "value": "Ranked" }
+      ],
+      "rankOptions": [
+        { "label": "Bronze", "value": "Bronze" },
+        { "label": "Argent", "value": "Argent" },
+        { "label": "Or", "value": "Or" },
+        { "label": "Platine", "value": "Platine" },
+        { "label": "Diamant", "value": "Diamant" },
+        { "label": "Champion", "value": "Champion" },
+        { "label": "Grand Champion", "value": "Grand Champion" },
+        { "label": "SSL", "value": "SSL" }
+      ]
+    },
+    {
+      "id": "valorant",
+      "name": "Valorant",
+      "emoji": "🎯",
+      "color": "#FF4655",
+      "banner": "https://example.com/valorant-banner.jpg",
+      "partyModeField": {
+        "type": "mode_select",
+        "label": "Mode de jeu",
+        "options": [
+          { "label": "DuoQ", "value": "Duo", "slots": 2 },
+          { "label": "TrioQ", "value": "Trio", "slots": 3 },
+          { "label": "Five Stack", "value": "Five Stack", "slots": 5 }
+        ]
+      },
+      "privateDefaultSlots": 10,
+      "typeOptions": [
+        { "label": "Casual", "value": "Casual" },
+        { "label": "Privé", "value": "Privé" },
+        { "label": "Ranked", "value": "Ranked" }
+      ],
+      "rankOptions": [
+        { "label": "Fer", "value": "Fer" },
+        { "label": "Bronze", "value": "Bronze" },
+        { "label": "Argent", "value": "Argent" },
+        { "label": "Or", "value": "Or" },
+        { "label": "Platine", "value": "Platine" },
+        { "label": "Diamant", "value": "Diamant" },
+        { "label": "Ascendant", "value": "Ascendant" },
+        { "label": "Immortel", "value": "Immortel" },
+        { "label": "Radiant", "value": "Radiant" }
+      ]
+    },
+    {
+      "id": "cs2",
+      "name": "Counter-Strike 2",
+      "emoji": "🔫",
+      "color": "#F7941D",
+      "banner": "https://example.com/cs2-banner.jpg",
+      "partyModeField": {
+        "type": "mode_select",
+        "label": "Mode de jeu",
+        "options": [
+          { "label": "DuoQ", "value": "Duo", "slots": 2 },
+          { "label": "TrioQ", "value": "Trio", "slots": 3 },
+          { "label": "Five Stack", "value": "Five Stack", "slots": 5 }
+        ]
+      },
+      "privateDefaultSlots": 10,
+      "typeOptions": [
+        { "label": "Casual", "value": "Casual" },
+        { "label": "Privé", "value": "Privé" },
+        { "label": "Ranked", "value": "Ranked" }
+      ],
+      "rankOptions": [
+        { "label": "Argent", "value": "Argent" },
+        { "label": "Nova", "value": "Nova" },
+        { "label": "AK", "value": "AK" },
+        { "label": "Aigle", "value": "Aigle" },
+        { "label": "Suprême", "value": "Suprême" },
+        { "label": "Global", "value": "Global" }
+      ]
+    }
+  ],
+  "customGame": {
+    "enabled": true,
+    "label": "🎮 Autre jeu (custom)",
+    "value": "custom",
+    "defaultConfig": {
+      "partyModeField": {
+        "type": "player_count",
+        "label": "Nombre de places (sans vous)",
+        "min": 1,
+        "max": 10
+      },
+      "typeOptions": [
+        { "label": "Casual", "value": "Casual" },
+        { "label": "Privé", "value": "Privé" },
+        { "label": "Ranked", "value": "Ranked" }
+      ],
+      "rankOptions": [
+        { "label": "Bas", "value": "Bas" },
+        { "label": "Moyen", "value": "Moyen" },
+        { "label": "Haut", "value": "Haut" },
+        { "label": "Très Haut", "value": "Très Haut" }
+      ]
+    }
+  }
+}
