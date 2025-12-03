@@ -6,6 +6,7 @@
       "emoji": "⚔️",
       "color": "#c79b3b",
       "banner": "https://cdn.discordapp.com/attachments/1360760238348964022/1445473517423431872/banner-lol.png?ex=6930799e&is=692f281e&hm=206c3c57bc86d512410eb2d1a400eb473b0108ced4f227389262287265ac5cdc&",
+      "roleId": "1445584453031165953",
       "partyModeField": {
         "type": "mode_select",
         "label": "Mode de jeu",
@@ -40,6 +41,7 @@
       "emoji": "🚗",
       "color": "#088dce",
       "banner": "https://cdn.discordapp.com/attachments/1360760238348964022/1445475071648071751/banner-rl.png?ex=69307b10&is=692f2990&hm=6cf4ccf7582952fe1cfb9e52d2fd41f618004784c06fc7b17ddc322f167c0630&",
+      "roleId": "1358219020142252258",
       "partyModeField": {
         "type": "mode_select",
         "label": "Mode de jeu",
@@ -71,6 +73,7 @@
       "emoji": "🎯",
       "color": "#FF4655",
       "banner": "https://example.com/valorant-banner.jpg",
+      "roleId": "",
       "partyModeField": {
         "type": "mode_select",
         "label": "Mode de jeu",
@@ -104,6 +107,7 @@
       "emoji": "🔫",
       "color": "#F7941D",
       "banner": "https://example.com/cs2-banner.jpg",
+      "roleId": "",
       "partyModeField": {
         "type": "mode_select",
         "label": "Mode de jeu",
@@ -132,9 +136,9 @@
       "id": "tft",
       "name": "Teamfight Tactics",
       "emoji": "♟️",
-      "color": "#c79b3b",
+      "color": "#a73ce4",
       "banner": "https://cdn.discordapp.com/attachments/1360760238348964022/1445792837328306328/banner-tft.png?ex=6931a301&is=69305181&hm=4596201effa1b6eeb31e02f3e7b04a46b0d92d14e7871a2accc6391f2e4e0869&",
-      "roleGameName": "League of Legends",
+      "roleId": "1445584453031165953",
       "partyModeField": {
         "type": "fixed_slots",
         "slots": 8
