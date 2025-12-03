@@ -24,6 +24,7 @@ export const CUSTOM_GAME_INPUT_ID = 'lfm-custom-game-input';
 export const FINAL_MODAL_ID_PREFIX = 'lfm-final-modal';
 export const MATES_INPUT_ID = 'lfm-mates';
 export const TIME_INPUT_ID = 'lfm-time';
+export const DESCRIPTION_INPUT_ID = 'lfm-description';
 
 // Store user selections
 interface UserSelection {
@@ -510,6 +511,17 @@ export default {
 
     components.push(new ActionRowBuilder<TextInputBuilder>().addComponents(timeInput));
 
+    // Add description input
+    const descriptionInput = new TextInputBuilder()
+      .setCustomId(DESCRIPTION_INPUT_ID)
+      .setLabel('Description (optionnel)')
+      .setStyle(TextInputStyle.Paragraph)
+      .setPlaceholder('Ajoutez des détails supplémentaires...')
+      .setRequired(false)
+      .setMaxLength(500);
+
+    components.push(new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput));
+
     modal.addComponents(...components);
     await interaction.showModal(modal);
   },
@@ -534,6 +546,7 @@ export default {
       userSelections.delete(interaction.user.id);
 
       const time = interaction.fields.getTextInputValue(TIME_INPUT_ID)?.trim() || undefined;
+      const description = interaction.fields.getTextInputValue(DESCRIPTION_INPUT_ID)?.trim() || undefined;
       const rank = selection.rank; // Already selected from rank select menu if Ranked
 
       const partyModeField = selection.gameConfig.partyModeField;
@@ -590,6 +603,7 @@ export default {
         numberOfMates: totalSlots,
         rank: rank,
         sessionTime: time,
+        description: description,
         gameMode: selection.gameMode,
         type: selection.type,
         gameRoleId: gameRoleId,
