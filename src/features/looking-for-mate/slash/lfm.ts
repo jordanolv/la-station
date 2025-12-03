@@ -268,6 +268,13 @@ export default {
       if (partyModeField && partyModeField.type === 'mode_select') {
         // Show game mode select menu first
         await this.showGameModeSelect(interaction, selection);
+      } else if (partyModeField && partyModeField.type === 'fixed_slots') {
+        // For fixed_slots games (like TFT), show rank select if Ranked, or go to modal
+        if (selectedType === 'Ranked') {
+          await this.showRankSelect(interaction, selection);
+        } else {
+          await this.showFinalModal(interaction, selection);
+        }
       } else {
         // For player_count games, show rank select if Ranked, or go to modal
         if (selectedType === 'Ranked') {
@@ -538,6 +545,9 @@ export default {
       } else if (selection.type === 'Aram') {
         // Aram is always 5v5
         totalSlots = 5;
+      } else if (partyModeField?.type === 'fixed_slots') {
+        // For fixed_slots games (like TFT), use the slots from config
+        totalSlots = partyModeField.slots || 8;
       } else if (partyModeField?.type === 'mode_select') {
         // Get slots from selected game mode (e.g., RL 2v2 = 2, 3v3 = 3)
         const gameModeOption = partyModeField.options?.find((opt) => opt.value === selection.gameMode);
@@ -573,17 +583,20 @@ export default {
       try {
         const ChatGamingItemModel = (await import('../../chat-gaming/models/chatGamingItem.model')).default;
 
+        // Use roleGameName if specified in config, otherwise use game name
+        const gameNameToSearch = selection.gameConfig.roleGameName || selection.game;
+
         // Try exact match first
         let chatGamingItem = await ChatGamingItemModel.findOne({
           guildId: interaction.guildId!,
-          name: selection.game
+          name: gameNameToSearch
         });
 
         // If not found, try case-insensitive search
         if (!chatGamingItem) {
           chatGamingItem = await ChatGamingItemModel.findOne({
             guildId: interaction.guildId!,
-            name: { $regex: new RegExp(`^${selection.game}$`, 'i') }
+            name: { $regex: new RegExp(`^${gameNameToSearch}$`, 'i') }
           });
         }
 

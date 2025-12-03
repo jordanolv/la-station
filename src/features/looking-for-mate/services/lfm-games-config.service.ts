@@ -17,11 +17,12 @@ export interface RankOption {
 }
 
 export interface PartyModeField {
-  type: 'player_count' | 'mode_select';
-  label: string;
+  type: 'player_count' | 'mode_select' | 'fixed_slots';
+  label?: string;
   min?: number;
   max?: number;
   options?: GameModeOption[];
+  slots?: number;
 }
 
 export interface GameConfig {
@@ -34,6 +35,7 @@ export interface GameConfig {
   privateDefaultSlots?: number;
   typeOptions: TypeOption[];
   rankOptions: RankOption[];
+  roleGameName?: string; // Name of the game to search for role in chat_gaming_items
 }
 
 export interface CustomGameConfig {

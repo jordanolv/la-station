@@ -311,6 +311,7 @@ export class LFMService {
       'Rocket League': 'RL',
       'Valorant': 'Valo',
       'Counter-Strike 2': 'CS2',
+      'Teamfight Tactics': 'TFT',
     };
 
     return abbreviations[gameName] || gameName;
