@@ -5,7 +5,9 @@ import { SuggestionsService } from '../../suggestions/services/suggestions.servi
 import { handleLFMButtonInteraction, handleLFMAcceptReject } from '../../looking-for-mate/events/lfm-interactions';
 import {
   GAME_SELECT_ID,
-  MODE_SELECT_ID,
+  TYPE_SELECT_ID,
+  RANK_SELECT_ID,
+  GAME_MODE_SELECT_ID,
   CUSTOM_GAME_MODAL_ID,
   FINAL_MODAL_ID_PREFIX,
 } from '../../looking-for-mate/slash/lfm';
@@ -86,10 +88,20 @@ export default {
           if (lfmCommand && typeof lfmCommand.handleGameSelect === 'function') {
             await lfmCommand.handleGameSelect(interaction, client);
           }
-        } else if (interaction.customId === MODE_SELECT_ID) {
+        } else if (interaction.customId === TYPE_SELECT_ID) {
           const lfmCommand = client.slashCommands.get('lfm');
-          if (lfmCommand && typeof lfmCommand.handleModeSelect === 'function') {
-            await lfmCommand.handleModeSelect(interaction, client);
+          if (lfmCommand && typeof lfmCommand.handleTypeSelect === 'function') {
+            await lfmCommand.handleTypeSelect(interaction, client);
+          }
+        } else if (interaction.customId === RANK_SELECT_ID) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleRankSelect === 'function') {
+            await lfmCommand.handleRankSelect(interaction, client);
+          }
+        } else if (interaction.customId === GAME_MODE_SELECT_ID) {
+          const lfmCommand = client.slashCommands.get('lfm');
+          if (lfmCommand && typeof lfmCommand.handleGameModeSelect === 'function') {
+            await lfmCommand.handleGameModeSelect(interaction, client);
           }
         }
       }
