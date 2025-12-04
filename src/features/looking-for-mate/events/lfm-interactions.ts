@@ -7,7 +7,7 @@ import {
   ActionRowBuilder,
 } from 'discord.js';
 import LFMService from '../services/lfm.service';
-import GameDBService from '../services/game-db.service';
+import LFMGamesConfigService from '../services/lfm-games-config.service';
 import { BotClient } from '../../../bot/client';
 
 /**
@@ -131,12 +131,13 @@ async function handleJoin(interaction: ButtonInteraction, requestId: string): Pr
     }
 
     // Update the message embed
-    const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
-    const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
+    const gameColor = LFMGamesConfigService.getGameColor(updatedRequest.game);
+    const gameBanner = LFMGamesConfigService.getGameBanner(updatedRequest.game);
+    console.log('[LFM Join] Game:', updatedRequest.game, 'Color:', gameColor, 'Banner:', gameBanner);
     const embed = LFMService.createLFMEmbed(updatedRequest, requestOwner, gameColor, gameBanner);
-    const buttons = LFMService.createLFMButtons(requestId, true); // Always show delete button for owner
+    const buttons = LFMService.createLFMButtons(requestId, true);
 
-    await interaction.editReply({
+    await interaction.message.edit({
       embeds: [embed],
       components: [buttons],
     });
@@ -228,8 +229,8 @@ async function handleJoin(interaction: ButtonInteraction, requestId: string): Pr
     const updatedRequest = await LFMService.addInterestedUser(requestId, interaction.user.id);
 
     if (updatedRequest) {
-      const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
-      const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
+      const gameColor = LFMGamesConfigService.getGameColor(updatedRequest.game);
+      const gameBanner = LFMGamesConfigService.getGameBanner(updatedRequest.game);
       const embed = LFMService.createLFMEmbed(updatedRequest, requestOwner, gameColor, gameBanner);
       const buttons = LFMService.createLFMButtons(requestId, true);
 
@@ -294,12 +295,12 @@ async function handleLeave(interaction: ButtonInteraction, requestId: string): P
 
   // Update the message embed
   const requestOwner = await interaction.client.users.fetch(request.userId);
-  const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
-  const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
+  const gameColor = LFMGamesConfigService.getGameColor(updatedRequest.game);
+  const gameBanner = LFMGamesConfigService.getGameBanner(updatedRequest.game);
   const embed = LFMService.createLFMEmbed(updatedRequest, requestOwner, gameColor, gameBanner);
   const buttons = LFMService.createLFMButtons(requestId, true);
 
-  await interaction.editReply({
+  await interaction.message.edit({
     embeds: [embed],
     components: [buttons],
   });
@@ -357,12 +358,11 @@ async function handleComplete(interaction: ButtonInteraction, requestId: string)
   }
 
   // Update the message embed
-  const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
-  const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
+  const gameColor = LFMGamesConfigService.getGameColor(updatedRequest.game);
+  const gameBanner = LFMGamesConfigService.getGameBanner(updatedRequest.game);
   const embed = LFMService.createLFMEmbed(updatedRequest, interaction.user, gameColor, gameBanner);
 
-  // Remove buttons
-  await interaction.editReply({
+  await interaction.message.edit({
     embeds: [embed],
     components: [],
   });
@@ -430,12 +430,11 @@ async function handleCancel(interaction: ButtonInteraction, requestId: string): 
   }
 
   // Update the message embed
-  const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
-  const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
+  const gameColor = LFMGamesConfigService.getGameColor(updatedRequest.game);
+  const gameBanner = LFMGamesConfigService.getGameBanner(updatedRequest.game);
   const embed = LFMService.createLFMEmbed(updatedRequest, interaction.user, gameColor, gameBanner);
 
-  // Remove buttons
-  await interaction.editReply({
+  await interaction.message.edit({
     embeds: [embed],
     components: [],
   });
@@ -578,8 +577,8 @@ export async function handleLFMAcceptReject(
       const channel = await client.channels.fetch(request.channelId!);
       if (channel?.isTextBased()) {
         const message = await channel.messages.fetch(request.messageId!);
-        const gameColor = await GameDBService.getGameColor(request.guildId, updatedRequest.game);
-        const gameBanner = await GameDBService.getGameBanner(request.guildId, updatedRequest.game);
+        const gameColor = LFMGamesConfigService.getGameColor(updatedRequest.game);
+        const gameBanner = LFMGamesConfigService.getGameBanner(updatedRequest.game);
         const embed = LFMService.createLFMEmbed(updatedRequest, interaction.user, gameColor, gameBanner);
         const buttons = LFMService.createLFMButtons(requestId, true);
 
