@@ -8,9 +8,21 @@ export const VOC_CONFIG_BUTTON_ID = 'voc-config-button';
 export const VOC_INVITE_USER_SELECT_ID = 'voc-invite-user-select';
 
 export class VocManagerService {
-  /**
-   * Récupère la configuration VocManager pour une guilde
-   */
+  private static readonly CITY_NAMES = [
+    'Paris', 'Tokyo', 'New York', 'London', 'Berlin', 'Rome', 'Madrid', 'Sydney',
+    'Dubai', 'Singapore', 'Seoul', 'Bangkok', 'Istanbul', 'Moscow', 'Toronto',
+    'Amsterdam', 'Barcelona', 'Vienna', 'Prague', 'Athens', 'Lisbon', 'Stockholm',
+    'Copenhagen', 'Oslo', 'Helsinki', 'Dublin', 'Brussels', 'Zurich', 'Montreal',
+    'Vancouver', 'Melbourne', 'Miami', 'Las Vegas', 'Los Angeles', 'Chicago', 'Jouy sous thelle',
+    'Boston', 'Seattle', 'San Francisco', 'Munich', 'Hamburg', 'Venice', 'Florence', 'Staky la pute',
+    'J\'ai un chronus', 'Hans cheat ou pas ?', 'Aram du midi', 'Problème mentaux', 'De droite ou de gauche ?',
+    'Team Gauche', 'Team Droite'
+  ];
+
+  private static getRandomCity(): string {
+    return this.CITY_NAMES[Math.floor(Math.random() * this.CITY_NAMES.length)];
+  }
+
   static async getVocManager(guildId: string): Promise<IVocManager | null> {
     const guild = await GuildModel.findOne({ guildId });
     return guild?.features?.vocManager || null;
@@ -237,10 +249,13 @@ export class VocManagerService {
         // Créer un nouveau canal vocal
         const username = newState.member?.user.username || 'Utilisateur';
         const channelNumber = vocManager.channelCount + 1;
+        const randomCity = this.getRandomCity();
 
-        let channelName = joinChannel.nameTemplate
+        let channelName = joinChannel.nameTemplate || '{city}';
+        channelName = channelName
           .replace('{username}', username)
           .replace('{user}', username)
+          .replace('{city}', randomCity)
           .replace('{count}', channelNumber.toString())
           .replace('{total}', channelNumber.toString());
         
