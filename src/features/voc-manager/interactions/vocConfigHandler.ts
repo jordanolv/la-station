@@ -77,9 +77,7 @@ export async function handleVocConfigButton(
 
     // Vérifier si le canal est privé (en regardant les permissions)
     const everyoneOverwrite = channel.permissionOverwrites.cache.get(guild.roles.everyone.id);
-    const isPrivate = everyoneOverwrite?.deny.has(PermissionFlagsBits.ViewChannel) ||
-                      everyoneOverwrite?.deny.has(PermissionFlagsBits.Connect) ||
-                      (everyoneOverwrite && !everyoneOverwrite.allow.has(PermissionFlagsBits.ViewChannel));
+    const isPrivate = everyoneOverwrite?.deny.has(PermissionFlagsBits.Connect) || false;
 
     // Créer le modal de configuration
     const modal = new ModalBuilder()

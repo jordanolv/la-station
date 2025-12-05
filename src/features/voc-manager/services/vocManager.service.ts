@@ -15,7 +15,7 @@ export class VocManagerService {
     'Copenhagen', 'Oslo', 'Helsinki', 'Dublin', 'Brussels', 'Zurich', 'Montreal',
     'Vancouver', 'Melbourne', 'Miami', 'Las Vegas', 'Los Angeles', 'Chicago', 'Jouy sous thelle',
     'Boston', 'Seattle', 'San Francisco', 'Munich', 'Hamburg', 'Venice', 'Florence', 'Staky la pute',
-    'J\'ai un chronus', 'Hans cheat ou pas ?', 'Aram du midi', 'Problème mentaux', 'De droite ou de gauche ?',
+    'J\'ai un chronus', 'Hans cheat ou pas ?', 'Aram du midi', 'De droite ou de gauche ?',
     'Team Gauche', 'Team Droite'
   ];
 
