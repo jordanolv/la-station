@@ -25,18 +25,18 @@ export function initializeCanvas() {
     initAgPsd(createCanvas as any);
     console.log('[Canvas] ✅ ag-psd initialized');
 
-    // Charger la police principale (Inter ou Helvetica)
-    const fontPaths = [
+    // Charger Helvetica Neue (utilisée par le PSD)
+    const helveticaPaths = [
       path.resolve(process.cwd(), 'src/assets/fonts/HelveticaNeueLTStd-Bd.otf'),
       path.resolve(process.cwd(), 'dist/assets/fonts/HelveticaNeueLTStd-Bd.otf'),
     ];
 
-    let fontLoaded = false;
-    for (const fontPath of fontPaths) {
+    let helveticaLoaded = false;
+    for (const fontPath of helveticaPaths) {
       try {
-        GlobalFonts.registerFromPath(fontPath, 'Inter');
-        console.log(`[Canvas] ✅ Font loaded from: ${fontPath}`);
-        fontLoaded = true;
+        GlobalFonts.registerFromPath(fontPath, 'HelveticaNeueLTStd-Bd');
+        console.log(`[Canvas] ✅ HelveticaNeueLTStd-Bd loaded from: ${fontPath}`);
+        helveticaLoaded = true;
         break;
       } catch (error) {
         // Essayer le chemin suivant
@@ -44,16 +44,33 @@ export function initializeCanvas() {
       }
     }
 
-    if (!fontLoaded) {
-      // Essayer de charger depuis @fontsource
+    if (!helveticaLoaded) {
+      console.warn('[Canvas] ⚠️  HelveticaNeueLTStd-Bd not found, text rendering may be affected');
+    }
+
+    // Charger Helvetica Neue Roman
+    const helveticaRomanPaths = [
+      path.resolve(process.cwd(), 'src/assets/fonts/helvetica-neue-lt-std-roman.otf'),
+      path.resolve(process.cwd(), 'dist/assets/fonts/helvetica-neue-lt-std-roman.otf'),
+    ];
+
+    for (const fontPath of helveticaRomanPaths) {
       try {
-        const ttfPath = require.resolve('@fontsource/inter/files/inter-latin-600-normal.ttf');
-        GlobalFonts.registerFromPath(ttfPath, 'Inter');
-        console.log(`[Canvas] ✅ Font loaded from @fontsource`);
-        fontLoaded = true;
+        GlobalFonts.registerFromPath(fontPath, 'HelveticaNeueLTStd-Roman');
+        console.log(`[Canvas] ✅ HelveticaNeueLTStd-Roman loaded from: ${fontPath}`);
+        break;
       } catch (error) {
-        console.warn('[Canvas] ⚠️  No custom font found, using system fonts');
+        continue;
       }
+    }
+
+    // Charger Inter depuis @fontsource (utilisé pour les overlays canvas)
+    try {
+      const interPath = require.resolve('@fontsource/inter/files/inter-latin-600-normal.ttf');
+      GlobalFonts.registerFromPath(interPath, 'Inter');
+      console.log(`[Canvas] ✅ Inter loaded from @fontsource`);
+    } catch (error) {
+      console.warn('[Canvas] ⚠️  Inter font not found');
     }
 
     // Charger les emojis si disponibles
