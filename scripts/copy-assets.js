@@ -28,13 +28,25 @@ function copyDir(src, dest) {
 
 console.log('📦 Copying static assets...\n');
 
-// Copier le dossier canva/
-const canvaSource = path.resolve(__dirname, '../canva');
-const canvaDest = path.resolve(__dirname, '../dist/canva');
+// Liste des dossiers à copier
+const assetsToCopy = [
+  { source: '../canva', dest: '../dist/canva', name: 'canva/' },
+  { source: '../src/assets', dest: '../dist/assets', name: 'src/assets/' }
+];
 
-if (fs.existsSync(canvaSource)) {
-  copyDir(canvaSource, canvaDest);
-  console.log('\n✅ Static assets copied successfully!');
-} else {
-  console.warn('⚠️  Warning: canva/ directory not found');
-}
+let copiedCount = 0;
+
+assetsToCopy.forEach(({ source, dest, name }) => {
+  const sourcePath = path.resolve(__dirname, source);
+  const destPath = path.resolve(__dirname, dest);
+
+  if (fs.existsSync(sourcePath)) {
+    console.log(`\n📁 Copying ${name}...`);
+    copyDir(sourcePath, destPath);
+    copiedCount++;
+  } else {
+    console.warn(`⚠️  Warning: ${name} directory not found`);
+  }
+});
+
+console.log(`\n✅ ${copiedCount} asset directories copied successfully!`);
