@@ -5,7 +5,7 @@
   "author": "Jordan.olv",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "build": "tsc && tsc-alias && node scripts/copy-assets.js",
     "start": "pm2 start src/index.ts --name la-station",
     "mg": "concurrently \"node -r @swc-node/register src/database/scripts/updateGuilds.ts\" \"node -r @swc-node/register src/database/scripts/updateUsers.ts\"",
     "watch": "nodemon --exec node -r @swc-node/register src/index.ts",
