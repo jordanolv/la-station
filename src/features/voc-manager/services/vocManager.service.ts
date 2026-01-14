@@ -291,7 +291,6 @@ export class VocManagerService {
             name: channelName,
             type: ChannelType.GuildVoice,
             parent: joinChannel.category,
-            topic: `${mountainInfo.description} • Altitude: ${mountainInfo.altitude}`,
           });
 
           // Déplacer l'utilisateur dans le nouveau canal
