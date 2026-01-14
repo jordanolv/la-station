@@ -8,19 +8,42 @@ export const VOC_CONFIG_BUTTON_ID = 'voc-config-button';
 export const VOC_INVITE_USER_SELECT_ID = 'voc-invite-user-select';
 
 export class VocManagerService {
-  private static readonly CITY_NAMES = [
-    'Paris', 'Tokyo', 'New York', 'London', 'Berlin', 'Rome', 'Madrid', 'Sydney',
-    'Dubai', 'Singapore', 'Seoul', 'Bangkok', 'Istanbul', 'Moscow', 'Toronto',
-    'Amsterdam', 'Barcelona', 'Vienna', 'Prague', 'Athens', 'Lisbon', 'Stockholm',
-    'Copenhagen', 'Oslo', 'Helsinki', 'Dublin', 'Brussels', 'Zurich', 'Montreal',
-    'Vancouver', 'Melbourne', 'Miami', 'Las Vegas', 'Los Angeles', 'Chicago', 'Jouy sous thelle',
-    'Boston', 'Seattle', 'San Francisco', 'Munich', 'Hamburg', 'Venice', 'Florence', 'Staky la pute',
-    'J\'ai un chronus', 'Hans cheat ou pas ?', 'Aram du midi', 'De droite ou de gauche ?',
-    'Team Gauche', 'Team Droite'
+  private static readonly MOUNTAIN_NAMES = [
+    // Montagnes d'Europe
+    '🇫🇷 Mont Blanc', '🇨🇭 Cervin', '🇨🇭 Mont Rose', '🇫🇷 Aiguille Verte', '🇫🇷 Grandes Jorasses',
+    '🇨🇭 Eiger', '🇨🇭 Jungfrau', '🇨🇭 Mönch', '🇨🇭 Mont Cervin', '🇮🇹 Monte Rosa',
+    '🇮🇹 Gran Paradiso', '🇨🇭 Piz Bernina', '🇮🇹 Ortles', '🇦🇹 Grossglockner', '🇩🇪 Zugspitze',
+    '🇸🇮 Triglav', '🇬🇷 Olympe', '🇬🇷 Parnasse', '🇬🇧 Ben Nevis', '🇬🇧 Snowdon',
+    '🇬🇧 Scafell Pike', '🇪🇸 Mulhacén', '🇪🇸 Pico de Aneto', '🇮🇹 Marmolada', '🇮🇹 Tofana',
+    '🇮🇹 Dolomites', '🇵🇱 Tatra', '🇵🇱 Rysy', '🇸🇰 Gerlachovský štít', '🇷🇴 Moldoveanu',
+
+    // Montagnes d'Asie
+    '🇳🇵 Everest', '🇵🇰 K2', '🇳🇵 Kangchenjunga', '🇳🇵 Lhotse', '🇳🇵 Makalu',
+    '🇳🇵 Cho Oyu', '🇳🇵 Dhaulagiri', '🇳🇵 Manaslu', '🇵🇰 Nanga Parbat', '🇳🇵 Annapurna',
+    '🇵🇰 Gasherbrum', '🇵🇰 Broad Peak', '🇨🇳 Shishapangma', '🇳🇵 Ama Dablam', '🇳🇵 Pumori',
+    '🇯🇵 Fuji', '🇲🇾 Mont Kinabalu', '🇮🇩 Puncak Jaya', '🇹🇷 Ararat', '🇮🇷 Damavand',
+
+    // Montagnes des Amériques
+    '🇺🇸 Denali', '🇨🇦 Mont Logan', '🇲🇽 Pico de Orizaba', '🇺🇸 Mont Saint Elias', '🇲🇽 Popocatépetl',
+    '🇺🇸 Mont Foraker', '🇲🇽 Iztaccíhuatl', '🇨🇦 Mont Lucania', '🇺🇸 Mont Whitney', '🇺🇸 Mont Rainier',
+    '🇦🇷 Aconcagua', '🇨🇱 Ojos del Salado', '🇦🇷 Monte Pissis', '🇵🇪 Huascarán', '🇪🇨 Chimborazo',
+    '🇪🇨 Cotopaxi', '🇧🇴 Illimani', '🇧🇴 Sajama', '🇦🇷 Mercedario', '🇦🇷 Tupungato',
+
+    // Montagnes d'Afrique
+    '🇹🇿 Kilimandjaro', '🇰🇪 Mont Kenya', '🇺🇬 Mont Stanley', '🇹🇿 Meru', '🇪🇹 Ras Dashen',
+    '🇷🇼 Mont Karisimbi', '🇺🇬 Mont Elgon', '🇲🇦 Toubkal', '🇨🇲 Mont Cameroun', '🇬🇶 Pico Basile',
+
+    // Montagnes d'Océanie
+    '🇳🇿 Aoraki', '🇳🇿 Mont Cook', '🇳🇿 Mont Tasman', '🇮🇩 Puncak Trikora', '🇮🇩 Puncak Mandala',
+    '🇳🇿 Mont Aspiring', '🇳🇿 Mont Ruapehu', '🇳🇿 Mont Taranaki', '🇦🇺 Mont Kosciuszko', '🇦🇺 Mont Bogong',
+
+    // Montagnes mythiques et célèbres
+    '🇦🇺 Ayers Rock', '🇿🇦 Table Mountain', '🇨🇭 Matterhorn', '🇪🇬 Mont Sinaï', '🇹🇷 Mont Ararat',
+    '🇬🇷 Mont Athos', '🇨🇳 Mont Kailash', '🇨🇳 Mont Wutai', '🇨🇳 Mont Emei', '🇨🇳 Mont Hengshan'
   ];
 
-  private static getRandomCity(): string {
-    return this.CITY_NAMES[Math.floor(Math.random() * this.CITY_NAMES.length)];
+  private static getRandomMountain(): string {
+    return this.MOUNTAIN_NAMES[Math.floor(Math.random() * this.MOUNTAIN_NAMES.length)];
   }
 
   static async getVocManager(guildId: string): Promise<IVocManager | null> {
@@ -249,13 +272,14 @@ export class VocManagerService {
         // Créer un nouveau canal vocal
         const username = newState.member?.user.username || 'Utilisateur';
         const channelNumber = vocManager.channelCount + 1;
-        const randomCity = this.getRandomCity();
+        const randomMountain = this.getRandomMountain();
 
-        let channelName = joinChannel.nameTemplate || '{city}';
+        let channelName = joinChannel.nameTemplate || '{mountain}';
         channelName = channelName
           .replace('{username}', username)
           .replace('{user}', username)
-          .replace('{city}', randomCity)
+          .replace('{mountain}', randomMountain)
+          .replace('{city}', randomMountain)
           .replace('{count}', channelNumber.toString())
           .replace('{total}', channelNumber.toString());
         
