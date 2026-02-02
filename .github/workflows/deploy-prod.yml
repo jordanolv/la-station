@@ -1,54 +1,58 @@
-name: 🚀 Deploy PROD to VPS
+name: 🚀 Deploy LaStation PROD to VPS
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🔐 Préparer la clé SSH
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }}
-          chmod 600 ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }}
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
           ssh-keyscan -p ${{ secrets.VPS_PORT }} -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 🚀 Déploiement SSH
+      - name: Deploy via SSH
         run: |
-          ssh -i ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }} \
-              -p ${{ secrets.VPS_PORT }} \
+          ssh -i ~/.ssh/vps_key \
               -o StrictHostKeyChecking=no \
+              -p ${{ secrets.VPS_PORT }} \
               ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            
             set -e
 
-            echo "✅ Connexion SSH réussie"
-            mkdir -p ~/projects/LaStationBot/prod
-            cd ~/projects/LaStationBot/prod
+            PROJECT_ROOT=~/projects/LaStationBot/prod
+            
+            echo "✅ Connected to VPS"
+
+            mkdir -p $PROJECT_ROOT
+            cd $PROJECT_ROOT
 
             if [ ! -d ".git" ]; then
-              echo "📁 Clonage initial"
-              git clone -b main https://github.com/jordanolv/la-station.git .
+              echo "📁 Initial clone"
+              git clone -b main https://${{ secrets.GH_TOKEN }}@github.com/jordanolv/la-station.git .
+            else
+              echo "📦 Git repo already present, pulling latest code"
+              git fetch origin
+              git reset --hard origin/main
             fi
 
-            echo "📥 Synchronisation avec origin/main"
-            git fetch --prune origin main
-            git reset --hard origin/main
-            git clean -fd
-
-            echo "🔧 Ajustement des droits"
-            chown -R deploy:deploy ~/projects/LaStationBot/prod
-
             echo "🛠 Backend – install & build"
-            npm install
+            npm ci
             npm run build
 
             echo "🛠 Frontend – install & build"
             cd src/frontend
-            npm install
+            npm ci
             npm run build
             cd ../..
 
@@ -57,5 +61,5 @@ jobs:
             pm2 start ecosystem.config.cjs
             pm2 save
 
-            echo "✅ Déploiement PROD terminé 🎉"
+            echo "✅ LaStationBot PROD deployment finished 🎉"
           EOF
