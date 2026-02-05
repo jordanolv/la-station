@@ -6,9 +6,14 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  NODE_VERSION: '22'
+
 jobs:
   deploy:
+    name: Deploy to VPS
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout code
@@ -24,18 +29,16 @@ jobs:
       - name: Deploy via SSH
         run: |
           ssh -i ~/.ssh/vps_key \
-              -o StrictHostKeyChecking=no \
               -p ${{ secrets.VPS_PORT }} \
               ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
-            
+
             set -e
 
-            PROJECT_ROOT=~/projects/LaStationBot/prod
-            
             echo "✅ Connected to VPS"
 
-            mkdir -p $PROJECT_ROOT
-            cd $PROJECT_ROOT
+            PROJECT_DIR=~/projects/theridge-bot/prod
+            mkdir -p $PROJECT_DIR
+            cd $PROJECT_DIR
 
             if [ ! -d ".git" ]; then
               echo "📁 Initial clone"
@@ -57,9 +60,8 @@ jobs:
             cd ../..
 
             echo "🚀 PM2 Reload all apps via ecosystem"
-            pm2 delete la-station-bot la-station-front || true
-            pm2 start ecosystem.config.cjs
+            pm2 reload ecosystem.config.cjs
             pm2 save
 
-            echo "✅ LaStationBot PROD deployment finished 🎉"
+            echo "✅ TheRidgeBot PROD deployment finished 🎉"
           EOF

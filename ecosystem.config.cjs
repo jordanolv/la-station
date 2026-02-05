@@ -2,16 +2,16 @@
 module.exports = {
   apps: [
     {
-      name: "la-station-bot",
+      name: "theridge-bot",
       script: "dist/index.js",
       env_file: ".env",
       env: { NODE_ENV: "production"},
     },
     {
-      name: "la-station-front",
+      name: "theridge-front",
       cwd: `${__dirname}/src/frontend/dist`,
-      script: "npx",
-      args: "serve -s . -l 3050",
+      script: "serve",
+      args: "-s . -l 3050",
       env: { NODE_ENV: "production" },
     },
   ],
