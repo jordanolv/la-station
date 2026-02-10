@@ -10,8 +10,8 @@ module.exports = {
     {
       name: "theridge-front",
       cwd: `${__dirname}/src/frontend/dist`,
-      script: "serve",
-      args: ["-s", ".", "-l", "3050"],
+      script: "npx",
+      args: ["serve", "-s", ".", "-l", "3050"],
       env: { NODE_ENV: "production" },
     },
   ],
