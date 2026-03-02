@@ -17,8 +17,12 @@ export class DiscordPartyService {
 
   static createEventEmbed(event: PartyEvent, roleId?: string): EmbedBuilder {
     const participantInfo = this.formatParticipants(event.participants, event.eventInfo.maxSlots);
-    
+
     const embed = new EmbedBuilder()
+      .setAuthor({
+        name: 'Événement Party',
+        iconURL: '🎉'
+      })
       .setTitle(`🎉 ${event.eventInfo.name}`)
       .addFields([
         { name: '🎮 Jeu', value: event.eventInfo.game, inline: true },
@@ -38,7 +42,7 @@ export class DiscordPartyService {
     if (event.eventInfo.description) {
       description += event.eventInfo.description;
     }
-    
+
     if (description) {
       embed.setDescription(description);
     }
