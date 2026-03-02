@@ -24,6 +24,9 @@ export class VocManagerConfig {
 
   @prop({ default: 0 })
   channelCount!: number;
+
+  @prop({ required: false })
+  notificationChannelId?: string;
 }
 
 // Créer le modèle (pour compatibilité avec l'ancien code qui l'utilise encore)
