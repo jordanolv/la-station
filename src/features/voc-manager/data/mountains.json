@@ -1,0 +1,2138 @@
+[
+  {
+    "id": "mont-blanc",
+    "name": "🇫🇷 Mont Blanc",
+    "description": "Le plus haut sommet des Alpes et d'Europe occidentale, véritable toit de l'Europe.",
+    "altitude": "4 808 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Mont_Blanc_oct_2004.JPG/800px-Mont_Blanc_oct_2004.JPG",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Blanc"
+  },
+  {
+    "id": "cervin",
+    "name": "🇨🇭 Cervin",
+    "description": "Pyramide emblématique des Alpes suisses, l'une des montagnes les plus photographiées au monde.",
+    "altitude": "4 478 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Matterhorn_from_Domh%C3%BCtte_-_2.jpg/800px-Matterhorn_from_Domh%C3%BCtte_-_2.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Cervin"
+  },
+  {
+    "id": "eiger",
+    "name": "🇨🇭 Eiger",
+    "description": "Célèbre pour sa face nord redoutable, l'un des trois sommets légendaires de l'Oberland bernois.",
+    "altitude": "3 970 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Eiger_Nordwand.jpg/800px-Eiger_Nordwand.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Eiger"
+  },
+  {
+    "id": "jungfrau",
+    "name": "🇨🇭 Jungfrau",
+    "description": "La \"Vierge\", sommet glaciaire des Alpes bernoises avec son célèbre chemin de fer.",
+    "altitude": "4 158 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Jungfrau_01.jpg/800px-Jungfrau_01.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Jungfrau"
+  },
+  {
+    "id": "monch",
+    "name": "🇨🇭 Mönch",
+    "description": "Le \"Moine\", complète la trilogie avec l'Eiger et la Jungfrau dans l'Oberland bernois.",
+    "altitude": "4 110 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/M%C3%B6nch_and_Jungfrau.jpg/800px-M%C3%B6nch_and_Jungfrau.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/M%C3%B6nch"
+  },
+  {
+    "id": "aiguille-verte",
+    "name": "🇫🇷 Aiguille Verte",
+    "description": "Sommet gracieux au-dessus de Chamonix, l'un des joyaux du massif du Mont-Blanc.",
+    "altitude": "4 122 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Aiguille_Verte.jpg/800px-Aiguille_Verte.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Aiguille_Verte"
+  },
+  {
+    "id": "grandes-jorasses",
+    "name": "🇫🇷 Grandes Jorasses",
+    "description": "Sommet impressionnant du massif du Mont-Blanc, défi majeur pour les alpinistes.",
+    "altitude": "4 208 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Grandes_Jorasses.jpg/800px-Grandes_Jorasses.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Grandes_Jorasses"
+  },
+  {
+    "id": "piz-bernina",
+    "name": "🇨🇭 Piz Bernina",
+    "description": "Seul sommet de plus de 4000m des Alpes orientales, dans les Grisons suisses.",
+    "altitude": "4 049 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Piz_Bernina.jpg/800px-Piz_Bernina.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Piz_Bernina"
+  },
+  {
+    "id": "monte-rosa",
+    "name": "🇮🇹 Monte Rosa",
+    "description": "Massif glaciaire monumental à la frontière italo-suisse, deuxième plus haut des Alpes.",
+    "altitude": "4 634 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Monte_Rosa.jpg/800px-Monte_Rosa.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Rose"
+  },
+  {
+    "id": "gran-paradiso",
+    "name": "🇮🇹 Gran Paradiso",
+    "description": "Seul sommet de plus de 4000m entièrement en Italie, dans les Alpes grées.",
+    "altitude": "4 061 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Gran_Paradiso.jpg/800px-Gran_Paradiso.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Grand_Paradis"
+  },
+  {
+    "id": "marmolada",
+    "name": "🇮🇹 Marmolada",
+    "description": "La \"Reine des Dolomites\", plus haut sommet de cet ensemble rocheux spectaculaire.",
+    "altitude": "3 343 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Marmolada.jpg/800px-Marmolada.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Marmolada"
+  },
+  {
+    "id": "tre-cime",
+    "name": "🇮🇹 Tre Cime",
+    "description": "Trois pics emblématiques des Dolomites, parmi les montagnes les plus reconnaissables.",
+    "altitude": "2 999 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Drei_Zinnen.jpg/800px-Drei_Zinnen.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Tre_Cime_di_Lavaredo"
+  },
+  {
+    "id": "grossglockner",
+    "name": "🇦🇹 Grossglockner",
+    "description": "Plus haute montagne d'Autriche, sommet majestueux des Alpes orientales.",
+    "altitude": "3 798 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Grossglockner_Gipfel.jpg/800px-Grossglockner_Gipfel.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Grossglockner"
+  },
+  {
+    "id": "zugspitze",
+    "name": "🇩🇪 Zugspitze",
+    "description": "Plus haut sommet d'Allemagne, à la frontière avec l'Autriche.",
+    "altitude": "2 962 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Zugspitze_Panorama.jpg/800px-Zugspitze_Panorama.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Zugspitze"
+  },
+  {
+    "id": "everest",
+    "name": "🇳🇵 Everest",
+    "description": "Le plus haut sommet du monde, le toit de la planète dans l'Himalaya.",
+    "altitude": "8 849 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/800px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Everest"
+  },
+  {
+    "id": "k2",
+    "name": "🇵🇰 K2",
+    "description": "Deuxième plus haut sommet au monde, considéré comme plus difficile que l'Everest.",
+    "altitude": "8 611 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/K2%2C_Mount_Godwin_Austen%2C_Chogori%2C_Savage_Mountain.jpg/800px-K2%2C_Mount_Godwin_Austen%2C_Chogori%2C_Savage_Mountain.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/K2"
+  },
+  {
+    "id": "kangchenjunga",
+    "name": "🇳🇵 Kangchenjunga",
+    "description": "Troisième plus haut sommet du monde, à la frontière du Népal et du Sikkim.",
+    "altitude": "8 586 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Kangchenjunga.jpg/800px-Kangchenjunga.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kangchenjunga"
+  },
+  {
+    "id": "lhotse",
+    "name": "🇳🇵 Lhotse",
+    "description": "Quatrième plus haut sommet, voisin de l'Everest et connecté par le col Sud.",
+    "altitude": "8 516 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Lhotse-fromChhukungRi.jpg/800px-Lhotse-fromChhukungRi.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Lhotse"
+  },
+  {
+    "id": "makalu",
+    "name": "🇳🇵 Makalu",
+    "description": "Cinquième plus haut sommet, pyramide isolée et majestueuse à l'est de l'Everest.",
+    "altitude": "8 485 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Makalu.jpg/800px-Makalu.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Makalu"
+  },
+  {
+    "id": "cho-oyu",
+    "name": "🇳🇵 Cho Oyu",
+    "description": "Sixième plus haut sommet, considéré comme le plus accessible des 8000m.",
+    "altitude": "8 188 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/ChoOyu-fromGokyo.jpg/800px-ChoOyu-fromGokyo.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Cho_Oyu"
+  },
+  {
+    "id": "dhaulagiri",
+    "name": "🇳🇵 Dhaulagiri",
+    "description": "Septième plus haut sommet, \"montagne blanche\" dominant la vallée de Kali Gandaki.",
+    "altitude": "8 167 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Dhaulagiri_mountain.jpg/800px-Dhaulagiri_mountain.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Dhaulagiri"
+  },
+  {
+    "id": "manaslu",
+    "name": "🇳🇵 Manaslu",
+    "description": "Huitième plus haut sommet, \"montagne de l'esprit\" dans l'Himalaya népalais.",
+    "altitude": "8 163 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Manaslu_Prakash.jpg/800px-Manaslu_Prakash.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Manaslu"
+  },
+  {
+    "id": "nanga-parbat",
+    "name": "🇵🇰 Nanga Parbat",
+    "description": "Neuvième plus haut sommet, la \"montagne tueuse\" à l'extrémité ouest de l'Himalaya.",
+    "altitude": "8 126 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Nanga_Parbat.jpg/800px-Nanga_Parbat.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Nanga_Parbat"
+  },
+  {
+    "id": "annapurna",
+    "name": "🇳🇵 Annapurna",
+    "description": "Premier sommet de 8000m gravi, l'un des plus dangereux de l'Himalaya.",
+    "altitude": "8 091 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Annapurna_I_ABC.jpg/800px-Annapurna_I_ABC.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Annapurna"
+  },
+  {
+    "id": "gasherbrum-i",
+    "name": "🇵🇰 Gasherbrum I",
+    "description": "Onzième plus haut sommet, \"belle montagne\" dans le Karakoram pakistanais.",
+    "altitude": "8 080 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Gasherbrum1.jpg/800px-Gasherbrum1.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Gasherbrum_I"
+  },
+  {
+    "id": "broad-peak",
+    "name": "🇵🇰 Broad Peak",
+    "description": "Douzième plus haut sommet, large plateau sommital dans le Karakoram.",
+    "altitude": "8 051 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Broad_Peak.jpg/800px-Broad_Peak.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Broad_Peak"
+  },
+  {
+    "id": "ama-dablam",
+    "name": "🇳🇵 Ama Dablam",
+    "description": "La \"Montagne-Mère\", l'une des plus belles du monde selon les alpinistes.",
+    "altitude": "6 812 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Ama_Dablam.jpg/800px-Ama_Dablam.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Ama_Dablam"
+  },
+  {
+    "id": "fuji",
+    "name": "🇯🇵 Fuji",
+    "description": "Volcan sacré et symbole du Japon, montagne la plus haute du pays.",
+    "altitude": "3 776 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Views_of_Mount_Fuji_from_%C5%8Cwakudani_20211202_143044.jpg/800px-Views_of_Mount_Fuji_from_%C5%8Cwakudani_20211202_143044.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Fuji"
+  },
+  {
+    "id": "kailash",
+    "name": "🇨🇳 Mont Kailash",
+    "description": "Montagne sacrée pour quatre religions, jamais gravie par respect des traditions.",
+    "altitude": "6 638 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Mount_Kailash.jpg/800px-Mount_Kailash.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Kailash"
+  },
+  {
+    "id": "damavand",
+    "name": "🇮🇷 Damavand",
+    "description": "Plus haut volcan d'Asie et point culminant du Moyen-Orient.",
+    "altitude": "5 610 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Mount_Damavand_in_winter.jpg/800px-Mount_Damavand_in_winter.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Damavand"
+  },
+  {
+    "id": "ararat",
+    "name": "🇹🇷 Ararat",
+    "description": "Montagne biblique où l'arche de Noé se serait échouée, point culminant de Turquie.",
+    "altitude": "5 137 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Ararat_and_Little_Ararat.jpg/800px-Ararat_and_Little_Ararat.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Ararat"
+  },
+  {
+    "id": "denali",
+    "name": "🇺🇸 Denali",
+    "description": "Plus haut sommet d'Amérique du Nord, anciennement appelé Mont McKinley.",
+    "altitude": "6 190 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Wonder_Lake_and_Denali.jpg/800px-Wonder_Lake_and_Denali.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Denali"
+  },
+  {
+    "id": "mont-logan",
+    "name": "🇨🇦 Mont Logan",
+    "description": "Plus haut sommet du Canada, deuxième d'Amérique du Nord après le Denali.",
+    "altitude": "5 959 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Mount_Logan.jpg/800px-Mount_Logan.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Logan"
+  },
+  {
+    "id": "pico-de-orizaba",
+    "name": "🇲🇽 Pico de Orizaba",
+    "description": "Plus haut volcan d'Amérique du Nord, point culminant du Mexique.",
+    "altitude": "5 636 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Citlalt%C3%A9petl.jpg/800px-Citlalt%C3%A9petl.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_d%27Orizaba"
+  },
+  {
+    "id": "popocatepetl",
+    "name": "🇲🇽 Popocatépetl",
+    "description": "Volcan actif emblématique du Mexique, visible depuis Mexico.",
+    "altitude": "5 426 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Popocat%C3%A9petl_por_amanalco.jpg/800px-Popocat%C3%A9petl_por_amanalco.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Popocat%C3%A9petl"
+  },
+  {
+    "id": "mont-rainier",
+    "name": "🇺🇸 Mont Rainier",
+    "description": "Volcan imposant de l'État de Washington, visible depuis Seattle.",
+    "altitude": "4 392 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Mount_Rainier_from_above_Myrtle_Falls_in_August.JPG/800px-Mount_Rainier_from_above_Myrtle_Falls_in_August.JPG",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Rainier"
+  },
+  {
+    "id": "mont-whitney",
+    "name": "🇺🇸 Mont Whitney",
+    "description": "Plus haut sommet des États-Unis continentaux hors Alaska.",
+    "altitude": "4 421 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Mount_Whitney_2003-03-25.jpg/800px-Mount_Whitney_2003-03-25.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Whitney"
+  },
+  {
+    "id": "aconcagua",
+    "name": "🇦🇷 Aconcagua",
+    "description": "Plus haut sommet des Amériques et de l'hémisphère Sud.",
+    "altitude": "6 961 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Aconcagua2016.jpg/800px-Aconcagua2016.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Aconcagua"
+  },
+  {
+    "id": "ojos-del-salado",
+    "name": "🇨🇱 Ojos del Salado",
+    "description": "Plus haut volcan actif du monde à la frontière Chili-Argentine.",
+    "altitude": "6 893 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Ojos_del_Salado.jpg/800px-Ojos_del_Salado.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Ojos_del_Salado"
+  },
+  {
+    "id": "chimborazo",
+    "name": "🇪🇨 Chimborazo",
+    "description": "Point le plus éloigné du centre de la Terre en raison du renflement équatorial.",
+    "altitude": "6 263 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Chimborazo.jpg/800px-Chimborazo.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Chimborazo"
+  },
+  {
+    "id": "cotopaxi",
+    "name": "🇪🇨 Cotopaxi",
+    "description": "L'un des volcans actifs les plus hauts du monde, cône presque parfait.",
+    "altitude": "5 897 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Cotopaxi_Volcano_Ecuador.jpg/800px-Cotopaxi_Volcano_Ecuador.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Cotopaxi"
+  },
+  {
+    "id": "huascaran",
+    "name": "🇵🇪 Huascarán",
+    "description": "Plus haut sommet tropical du monde, point culminant du Pérou.",
+    "altitude": "6 768 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Huascaran.jpg/800px-Huascaran.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Huascar%C3%A1n"
+  },
+  {
+    "id": "illimani",
+    "name": "🇧🇴 Illimani",
+    "description": "Montagne emblématique dominant La Paz, symbole de la Bolivie.",
+    "altitude": "6 438 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Illimani_mountain.jpg/800px-Illimani_mountain.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Illimani"
+  },
+  {
+    "id": "kilimandjaro",
+    "name": "🇹🇿 Kilimandjaro",
+    "description": "Plus haut sommet d'Afrique, volcan emblématique aux neiges éternelles.",
+    "altitude": "5 895 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Kilimanjaro_from_Moshi.jpg/800px-Kilimanjaro_from_Moshi.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kilimandjaro"
+  },
+  {
+    "id": "mont-kenya",
+    "name": "🇰🇪 Mont Kenya",
+    "description": "Deuxième plus haut sommet d'Afrique, ancien volcan éteint.",
+    "altitude": "5 199 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Mount_Kenya.jpg/800px-Mount_Kenya.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Kenya"
+  },
+  {
+    "id": "mont-stanley",
+    "name": "🇺🇬 Mont Stanley",
+    "description": "Plus haut sommet des monts Rwenzori, les \"Montagnes de la Lune\".",
+    "altitude": "5 109 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Margherita_Peak.jpg/800px-Margherita_Peak.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Stanley"
+  },
+  {
+    "id": "toubkal",
+    "name": "🇲🇦 Toubkal",
+    "description": "Plus haut sommet d'Afrique du Nord, dans le Haut Atlas marocain.",
+    "altitude": "4 167 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Toubkal_summit.jpg/800px-Toubkal_summit.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Toubkal"
+  },
+  {
+    "id": "ras-dashen",
+    "name": "🇪🇹 Ras Dashen",
+    "description": "Plus haut sommet d'Éthiopie, dans les montagnes du Simien.",
+    "altitude": "4 550 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Ras_Dashen.jpg/800px-Ras_Dashen.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Ras_Dashen"
+  },
+  {
+    "id": "table-mountain",
+    "name": "🇿🇦 Table Mountain",
+    "description": "Montagne emblématique du Cap, l'une des plus anciennes au monde.",
+    "altitude": "1 085 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Table_Mountain_DanieVDM.jpg/800px-Table_Mountain_DanieVDM.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Montagne_de_la_Table"
+  },
+  {
+    "id": "aoraki",
+    "name": "��🇿 Aoraki",
+    "description": "Plus haut sommet de Nouvelle-Zélande, montagne sacrée pour les Maoris.",
+    "altitude": "3 724 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Aoraki_Mount_Cook_from_Hooker_Valley.jpg/800px-Aoraki_Mount_Cook_from_Hooker_Valley.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Aoraki/Mont_Cook"
+  },
+  {
+    "id": "puncak-jaya",
+    "name": "🇮🇩 Puncak Jaya",
+    "description": "Plus haut sommet d'Océanie et le plus haut sommet insulaire du monde.",
+    "altitude": "4 884 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Puncak_Jaya.jpg/800px-Puncak_Jaya.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Puncak_Jaya"
+  },
+  {
+    "id": "mont-kosciuszko",
+    "name": "🇦🇺 Mont Kosciuszko",
+    "description": "Plus haut sommet d'Australie, dans les Alpes australiennes.",
+    "altitude": "2 228 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Mount_Kosciuszko.jpg/800px-Mount_Kosciuszko.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Kosciuszko"
+  },
+  {
+    "id": "olympe",
+    "name": "🇬🇷 Olympe",
+    "description": "Montagne sacrée, demeure des dieux de la Grèce antique.",
+    "altitude": "2 917 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Mount_Olympus_-_Greece.jpg/800px-Mount_Olympus_-_Greece.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Olympe"
+  },
+  {
+    "id": "mulhacen",
+    "name": "🇪🇸 Mulhacén",
+    "description": "Plus haut sommet de la péninsule Ibérique, dans la Sierra Nevada.",
+    "altitude": "3 479 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Mulhacen_desde_capileira.jpg/800px-Mulhacen_desde_capileira.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mulhac%C3%A9n"
+  },
+  {
+    "id": "ben-nevis",
+    "name": "🇬🇧 Ben Nevis",
+    "description": "Plus haut sommet de Grande-Bretagne et des îles Britanniques.",
+    "altitude": "1 345 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ben_Nevis_from_the_West_Highland_Way.jpg/800px-Ben_Nevis_from_the_West_Highland_Way.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Ben_Nevis"
+  },
+  {
+    "id": "triglav",
+    "name": "🇸🇮 Triglav",
+    "description": "Plus haut sommet de Slovénie, symbole national représenté sur le drapeau.",
+    "altitude": "2 864 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Triglav_from_Dolkova_spica.jpg/800px-Triglav_from_Dolkova_spica.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Triglav"
+  },
+  {
+    "id": "galdhopiggen",
+    "name": "🇳🇴 Galdhøpiggen",
+    "description": "Plus haut sommet de Norvège et de Scandinavie, dans le massif du Jotunheimen.",
+    "altitude": "2 469 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Galdh%C3%B8piggen.jpg/800px-Galdh%C3%B8piggen.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Galdh%C3%B8piggen"
+  },
+  {
+    "id": "hvannadalshnukur",
+    "name": "🇮🇸 Hvannadalshnúkur",
+    "description": "Plus haut sommet d'Islande, partie du volcan Öræfajökull.",
+    "altitude": "2 110 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Hvannadalshn%C3%BAkur.jpg/800px-Hvannadalshn%C3%BAkur.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Hvannadalshn%C3%BAkur"
+  },
+  {
+    "id": "elbrus",
+    "name": "🇷🇺 Elbrouz",
+    "description": "Plus haut sommet d'Europe selon la définition incluant le Caucase, volcan endormi aux deux sommets.",
+    "altitude": "5 642 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Elbrus_from_the_south.jpg/800px-Elbrus_from_the_south.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Elbrouz"
+  },
+  {
+    "id": "dykh-tau",
+    "name": "🇷🇺 Dykh-Tau",
+    "description": "Deuxième plus haut sommet du Caucase, défi majeur pour les alpinistes russes.",
+    "altitude": "5 205 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Dykh-Tau_and_Mzhaly.jpg/800px-Dykh-Tau_and_Mzhaly.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Dykh-Tau"
+  },
+  {
+    "id": "kazbek",
+    "name": "🇬🇪 Kazbek",
+    "description": "Volcan emblématique de Géorgie, sommet sacré dans la mythologie caucasienne.",
+    "altitude": "5 047 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Kazbek_Mountain_Georgia.jpg/800px-Kazbek_Mountain_Georgia.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kazbek"
+  },
+  {
+    "id": "vinson",
+    "name": "🇦🇶 Massif Vinson",
+    "description": "Plus haut sommet de l'Antarctique, dans les montagnes Ellsworth.",
+    "altitude": "4 892 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Vinson_massif_from_NW_at_ground_level-crop.jpg/800px-Vinson_massif_from_NW_at_ground_level-crop.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Massif_Vinson"
+  },
+  {
+    "id": "tirich-mir",
+    "name": "🇵🇰 Tirich Mir",
+    "description": "Plus haut sommet de l'Hindu Kush, massif montagneux d'Afghanistan et du Pakistan.",
+    "altitude": "7 708 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Tirich_Mir.jpg/800px-Tirich_Mir.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Tirich_Mir"
+  },
+  {
+    "id": "kommunizma",
+    "name": "🇹🇯 Pic Ismoïl Somoni",
+    "description": "Plus haut sommet du Tadjikistan et de l'ex-URSS, anciennement Pic Communisme.",
+    "altitude": "7 495 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Pic_communisme.jpg/800px-Pic_communisme.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_Ismoïl_Somoni"
+  },
+  {
+    "id": "khan-tengri",
+    "name": "🇰🇿 Khan Tengri",
+    "description": "\"Seigneur des Cieux\", pyramide de marbre rose aux confins du Kazakhstan, Kirghizistan et Chine.",
+    "altitude": "7 010 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Khan_Tengri.jpg/800px-Khan_Tengri.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Khan_Tengri"
+  },
+  {
+    "id": "gasherbrum-ii",
+    "name": "🇵🇰 Gasherbrum II",
+    "description": "Treizième plus haut sommet du monde, dans le Karakoram pakistanais.",
+    "altitude": "8 035 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Gasherbrum_II.jpg/800px-Gasherbrum_II.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Gasherbrum_II"
+  },
+  {
+    "id": "shishapangma",
+    "name": "🇨🇳 Shishapangma",
+    "description": "Quatorzième et dernier des 8000m, entièrement en territoire tibétain.",
+    "altitude": "8 027 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Shishapangma_from_the_north.jpg/800px-Shishapangma_from_the_north.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Shishapangma"
+  },
+  {
+    "id": "gyachung-kang",
+    "name": "🇳🇵 Gyachung Kang",
+    "description": "Plus haut sommet du monde entre les 7000m et 8000m, entre Cho Oyu et Everest.",
+    "altitude": "7 952 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Gyachung_Kang.jpg/800px-Gyachung_Kang.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Gyachung_Kang"
+  },
+  {
+    "id": "cerro-torre",
+    "name": "🇦🇷 Cerro Torre",
+    "description": "Aiguille de granite quasi-verticale en Patagonie, considérée parmi les plus difficiles à gravir.",
+    "altitude": "3 128 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Cerro_Torre_2005.jpg/800px-Cerro_Torre_2005.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Cerro_Torre"
+  },
+  {
+    "id": "fitz-roy",
+    "name": "🇦🇷 Fitz Roy",
+    "description": "Sommet iconique de Patagonie, symbole de la marque Patagonia, aux parois vertigineuses.",
+    "altitude": "3 405 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/FitzRoy_from_El_Chalten.jpg/800px-FitzRoy_from_El_Chalten.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Fitz_Roy"
+  },
+  {
+    "id": "mercedario",
+    "name": "🇦🇷 Mercedario",
+    "description": "Imposant volcan des Andes argentines, proche de l'Aconcagua.",
+    "altitude": "6 720 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Mercedario.jpg/800px-Mercedario.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mercedario"
+  },
+  {
+    "id": "mont-blanc-du-tacul",
+    "name": "🇫🇷 Mont Blanc du Tacul",
+    "description": "Sommet satellite du Mont Blanc, point de départ de nombreuses voies alpines légendaires.",
+    "altitude": "4 248 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Mont_Blanc_du_Tacul.jpg/800px-Mont_Blanc_du_Tacul.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Blanc_du_Tacul"
+  },
+  {
+    "id": "weisshorn",
+    "name": "🇨🇭 Weisshorn",
+    "description": "\"La montagne la plus noble des Alpes\" selon Tyndall, élégante pyramide de la vallée du Rhône.",
+    "altitude": "4 506 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Weisshorn.jpg/800px-Weisshorn.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Weisshorn"
+  },
+  {
+    "id": "dent-blanche",
+    "name": "🇨🇭 Dent Blanche",
+    "description": "Sommet majestueux du val d'Hérens, l'une des plus belles montagnes des Alpes valaisannes.",
+    "altitude": "4 357 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Dent_Blanche.jpg/800px-Dent_Blanche.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Dent_Blanche"
+  },
+  {
+    "id": "dom",
+    "name": "🇨🇭 Dom",
+    "description": "Plus haut sommet entièrement en Suisse, dans le massif des Mischabel.",
+    "altitude": "4 545 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Dom_from_Randa.jpg/800px-Dom_from_Randa.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Dom_(montagne)"
+  },
+  {
+    "id": "lyskamm",
+    "name": "🇨🇭 Lyskamm",
+    "description": "\"L'homme-mangeur\", crête effilée et dangereuse entre la Suisse et l'Italie.",
+    "altitude": "4 527 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Lyskamm.jpg/800px-Lyskamm.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Lyskamm"
+  },
+  {
+    "id": "dolomites-sass-pordoi",
+    "name": "🇮🇹 Sass Pordoi",
+    "description": "Plateau emblématique des Dolomites, sommet facilement accessible en téléphérique.",
+    "altitude": "2 950 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Sass_Pordoi.jpg/800px-Sass_Pordoi.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Sass_Pordoi"
+  },
+  {
+    "id": "mont-etna",
+    "name": "🇮🇹 Etna",
+    "description": "Plus haut volcan actif d'Europe, symbole de la Sicile en perpétuelle activité.",
+    "altitude": "3 357 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Etna_2021_eruption.jpg/800px-Etna_2021_eruption.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Etna"
+  },
+  {
+    "id": "teide",
+    "name": "🇪🇸 Teide",
+    "description": "Plus haut sommet d'Espagne et troisième volcan du monde, aux Canaries.",
+    "altitude": "3 715 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Teide_desde_Izana.jpg/800px-Teide_desde_Izana.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Teide"
+  },
+  {
+    "id": "mauna-kea",
+    "name": "🇺🇸 Mauna Kea",
+    "description": "Plus haut sommet du monde depuis la base océanique, haut lieu d'astronomie à Hawaï.",
+    "altitude": "4 205 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Mauna_Kea_from_Hilo.jpg/800px-Mauna_Kea_from_Hilo.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mauna_Kea"
+  },
+  {
+    "id": "vesuve",
+    "name": "🇮🇹 Vésuve",
+    "description": "Volcan légendaire qui a enseveli Pompéi, veille sur la baie de Naples.",
+    "altitude": "1 281 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Somma-Vesuvio_dal_golfo_di_Napoli.jpg/800px-Somma-Vesuvio_dal_golfo_di_Napoli.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/V%C3%A9suve"
+  },
+  {
+    "id": "mont-saint-helens",
+    "name": "🇺🇸 Mont St. Helens",
+    "description": "Volcan américain tristement célèbre pour son éruption catastrophique de 1980.",
+    "altitude": "2 549 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/MSH82_st_helens_from_harrys_ridge_04-26-82.jpg/800px-MSH82_st_helens_from_harrys_ridge_04-26-82.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Saint_Helens"
+  },
+  {
+    "id": "mont-shasta",
+    "name": "🇺🇸 Mont Shasta",
+    "description": "Stratovolcan majestueux de Californie, lieu mystique et spirituel pour de nombreuses traditions.",
+    "altitude": "4 322 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Mt_Shasta_from_south.jpg/800px-Mt_Shasta_from_south.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Shasta"
+  },
+  {
+    "id": "pico-bolivar",
+    "name": "🇻🇪 Pico Bolívar",
+    "description": "Plus haut sommet du Venezuela, dans la cordillère de Mérida.",
+    "altitude": "4 978 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Pico_Bolivar_Venezuela.jpg/800px-Pico_Bolivar_Venezuela.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pico_Bol%C3%ADvar"
+  },
+  {
+    "id": "mont-thor",
+    "name": "🇨🇦 Mont Thor",
+    "description": "Possède la plus grande falaise verticale de la Terre, sur l'île de Baffin au Canada.",
+    "altitude": "1 675 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Thor_Peak_Baffin_Island.jpg/800px-Thor_Peak_Baffin_Island.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Thor"
+  },
+  {
+    "id": "gangkhar-puensum",
+    "name": "🇧🇹 Gangkhar Puensum",
+    "description": "Plus haute montagne non gravie au monde, interdite d'escalade par le Bhoutan par respect spirituel.",
+    "altitude": "7 570 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Gangkhar_Puensum.jpg/800px-Gangkhar_Puensum.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Gangkhar_Puensum"
+  },
+  {
+    "id": "pico-duarte",
+    "name": "🇩🇴 Pico Duarte",
+    "description": "Plus haut sommet des Caraïbes, dans la cordillère Centrale de la République dominicaine.",
+    "altitude": "3 098 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Pico_Duarte.jpg/800px-Pico_Duarte.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pico_Duarte"
+  },
+  {
+    "id": "mont-wilhelm",
+    "name": "🇵🇬 Mont Wilhelm",
+    "description": "Plus haut sommet de Papouasie-Nouvelle-Guinée, l'un des plus hauts d'Océanie.",
+    "altitude": "4 509 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Mount_Wilhelm.jpg/800px-Mount_Wilhelm.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Wilhelm"
+  },
+  {
+    "id": "kinabalu",
+    "name": "🇲🇾 Kinabalu",
+    "description": "Plus haut sommet d'Asie du Sud-Est, montagne sacrée des Kadazan-Dusun à Bornéo.",
+    "altitude": "4 095 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Mount_Kinabalu-Jan04.JPG/800px-Mount_Kinabalu-Jan04.JPG",
+    "wiki": "https://fr.wikipedia.org/wiki/Kinabalu"
+  },
+  {
+    "id": "yu-shan",
+    "name": "🇹🇼 Yu Shan",
+    "description": "Plus haut sommet de Taïwan et de l'Asie orientale hors Chine et Asie centrale.",
+    "altitude": "3 952 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Yu-Shan-main-peak.jpg/800px-Yu-Shan-main-peak.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Yu_Shan"
+  },
+  {
+    "id": "apo",
+    "name": "🇵🇭 Mont Apo",
+    "description": "Plus haut sommet des Philippines, volcan endormi sur l'île de Mindanao.",
+    "altitude": "2 954 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Mount_Apo.jpg/800px-Mount_Apo.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Apo"
+  },
+  {
+    "id": "erebus",
+    "name": "🇦🇶 Erebus",
+    "description": "Volcan actif le plus austral du monde, en Antarctique, avec un lac de lave permanent.",
+    "altitude": "3 794 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Erebus_USGS.jpg/800px-Erebus_USGS.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Erebus"
+  },
+  {
+    "id": "barre-des-ecrins",
+    "name": "🇫🇷 Barre des Écrins",
+    "description": "Plus haut sommet du Dauphiné et du Parc national des Écrins, dans les Alpes du Sud.",
+    "altitude": "4 102 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Barre_des_%C3%89crins.jpg/800px-Barre_des_%C3%89crins.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Barre_des_%C3%89crins"
+  },
+  {
+    "id": "meije",
+    "name": "🇫🇷 Meije",
+    "description": "Sommet légendaire du massif des Écrins, dernier 4000m français à avoir été gravi en 1877.",
+    "altitude": "3 983 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Meije_depuis_plateau_de_Paris.jpg/800px-Meije_depuis_plateau_de_Paris.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Meije"
+  },
+  {
+    "id": "mont-pelvoux",
+    "name": "🇫🇷 Mont Pelvoux",
+    "description": "Massif imposant du Dauphiné, longtemps cru plus haut sommet des Alpes françaises.",
+    "altitude": "3 943 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Pelvoux.jpg/800px-Pelvoux.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Pelvoux"
+  },
+  {
+    "id": "ailefroide",
+    "name": "🇫🇷 Ailefroide",
+    "description": "Sommet de la chaîne des Écrins, point de départ de nombreuses courses alpines.",
+    "altitude": "3 954 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Ailefroide.jpg/800px-Ailefroide.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Ailefroide"
+  },
+  {
+    "id": "dome-de-neige",
+    "name": "🇫🇷 Dôme de Neige",
+    "description": "Sommet enneigé du massif des Écrins, parfait pour les raquettistes et skieurs de randonnée.",
+    "altitude": "4 015 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/D%C3%B4me_de_neige_des_%C3%89crins.jpg/800px-D%C3%B4me_de_neige_des_%C3%89crins.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/D%C3%B4me_de_neige_des_%C3%89crins"
+  },
+  {
+    "id": "pic-de-la-grave",
+    "name": "🇫🇷 Pic de la Grave",
+    "description": "Sommet dominant la célèbre station de ski de La Grave, hors-piste légendaire.",
+    "altitude": "3 569 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/La_Grave_village_and_La_Meije.jpg/800px-La_Grave_village_and_La_Meije.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/La_Grave"
+  },
+  {
+    "id": "mont-ventoux",
+    "name": "🇫🇷 Mont Ventoux",
+    "description": "\"Le Géant de Provence\", sommet mythique du cyclisme et des Préalpes.",
+    "altitude": "1 912 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Mont_Ventoux_depuis_Bédoin.jpg/800px-Mont_Ventoux_depuis_Bédoin.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Ventoux"
+  },
+  {
+    "id": "puy-de-dome",
+    "name": "🇫🇷 Puy de Dôme",
+    "description": "Volcan emblématique du Massif Central, classé à l'UNESCO, dominant Clermont-Ferrand.",
+    "altitude": "1 465 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Puy_de_D%C3%B4me_aerial_2013.jpg/800px-Puy_de_D%C3%B4me_aerial_2013.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Puy_de_D%C3%B4me"
+  },
+  {
+    "id": "plomb-du-cantal",
+    "name": "🇫🇷 Plomb du Cantal",
+    "description": "Plus haut sommet du Massif Central, ancienne caldeira volcanique dans le Cantal.",
+    "altitude": "1 855 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Plomb_du_Cantal.jpg/800px-Plomb_du_Cantal.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Plomb_du_Cantal"
+  },
+  {
+    "id": "signal-de-botrange",
+    "name": "🇫🇷 Mont Aigoual",
+    "description": "Point culminant des Cévennes, avec son observatoire météorologique centenaire.",
+    "altitude": "1 567 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Observatoire_du_mont_Aigoual.jpg/800px-Observatoire_du_mont_Aigoual.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Aigoual"
+  },
+  {
+    "id": "pic-du-midi",
+    "name": "🇫🇷 Pic du Midi de Bigorre",
+    "description": "Sommet pyrénéen avec son célèbre observatoire astronomique, fenêtre sur l'espace.",
+    "altitude": "2 877 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Pic_du_Midi_de_Bigorre.jpg/800px-Pic_du_Midi_de_Bigorre.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_du_Midi_de_Bigorre"
+  },
+  {
+    "id": "vignemale",
+    "name": "🇫🇷 Vignemale",
+    "description": "Plus haut sommet des Pyrénées françaises, avec le plus grand glacier pyrénéen.",
+    "altitude": "3 298 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Vignemale_et_glacier_d%27Ossoue.jpg/800px-Vignemale_et_glacier_d%27Ossoue.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Vignemale"
+  },
+  {
+    "id": "pic-du-canigou",
+    "name": "🇫🇷 Canigou",
+    "description": "Montagne sacrée des Catalans, symbole identitaire visible depuis toute la Catalogne.",
+    "altitude": "2 784 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Canigou_et_feux_de_la_saint_jean.jpg/800px-Canigou_et_feux_de_la_saint_jean.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Canigou"
+  },
+  {
+    "id": "pic-carlitte",
+    "name": "🇫🇷 Pic Carlit",
+    "description": "Plus haut sommet des Pyrénées-Orientales, entouré de lacs glaciaires.",
+    "altitude": "2 921 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Carlit_2006.jpg/800px-Carlit_2006.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_Carlit"
+  },
+  {
+    "id": "mont-d-or",
+    "name": "🇫🇷 Mont d'Or",
+    "description": "Sommet emblématique du Jura franco-suisse, avec vue panoramique sur les Alpes.",
+    "altitude": "1 463 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Mont_d%27Or_depuis_Pontarlier.jpg/800px-Mont_d%27Or_depuis_Pontarlier.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_d%27Or_(Doubs)"
+  },
+  {
+    "id": "grand-ballon",
+    "name": "🇫🇷 Grand Ballon",
+    "description": "Plus haut sommet des Vosges, dominant la plaine d'Alsace.",
+    "altitude": "1 424 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Grand_ballon_depuis_ferme_auberge_haag.jpg/800px-Grand_ballon_depuis_ferme_auberge_haag.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Grand_Ballon"
+  },
+  {
+    "id": "mont-pelat",
+    "name": "🇫🇷 Mont Pelat",
+    "description": "Plus haut sommet des Alpes de Haute-Provence, dans le parc du Mercantour.",
+    "altitude": "3 051 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Mont_Pelat.jpg/800px-Mont_Pelat.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Pelat"
+  },
+  {
+    "id": "argentera",
+    "name": "🇫🇷 Argentera",
+    "description": "Plus haut sommet du Mercantour et des Alpes-Maritimes, aux confins franco-italiens.",
+    "altitude": "3 297 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Argentera.jpg/800px-Argentera.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Argentera"
+  },
+  {
+    "id": "aiguille-du-midi",
+    "name": "🇫🇷 Aiguille du Midi",
+    "description": "Sommet mythique de Chamonix, accessible en téléphérique, porte d'entrée du mont Blanc.",
+    "altitude": "3 842 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Aiguille_du_Midi_2.jpg/800px-Aiguille_du_Midi_2.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Aiguille_du_Midi"
+  },
+  {
+    "id": "aiguille-du-dru",
+    "name": "🇫🇷 Aiguille du Dru",
+    "description": "Flèche de granite au-dessus de Chamonix, l'une des faces les plus impressionnantes des Alpes.",
+    "altitude": "3 754 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Aiguille_du_Dru_2.jpg/800px-Aiguille_du_Dru_2.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Aiguille_du_Dru"
+  },
+  {
+    "id": "aiguille-du-chardonnet",
+    "name": "🇫🇷 Aiguille du Chardonnet",
+    "description": "Sommet du massif du Mont-Blanc offrant un panorama exceptionnel sur les glaciers.",
+    "altitude": "3 824 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Chardonnet.jpg/800px-Chardonnet.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Aiguille_du_Chardonnet"
+  },
+  {
+    "id": "tour-ronde",
+    "name": "🇫🇷 Tour Ronde",
+    "description": "Sommet frontière entre France et Italie, magnifique point de vue sur le massif du Mont-Blanc.",
+    "altitude": "3 792 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Tour_Ronde.jpg/800px-Tour_Ronde.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Tour_Ronde"
+  },
+  {
+    "id": "grand-combin",
+    "name": "🇨🇭 Grand Combin",
+    "description": "Massif glaciaire imposant du Valais, aux confins suisso-italiens.",
+    "altitude": "4 314 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Grand_Combin.jpg/800px-Grand_Combin.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Grand_Combin"
+  },
+  {
+    "id": "pointe-gnifetti",
+    "name": "🇮🇹 Pointe Gnifetti",
+    "description": "Sommet du massif du Mont Rose abritant le refuge le plus haut d'Europe à 4559m.",
+    "altitude": "4 554 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Pointe_Gnifetti_and_Capanna_Margherita.jpg/800px-Pointe_Gnifetti_and_Capanna_Margherita.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pointe_Gnifetti"
+  },
+  {
+    "id": "dent-du-geant",
+    "name": "🇫🇷 Dent du Géant",
+    "description": "Spectaculaire \"dent\" de granite sur la frontière franco-italienne, défi des grimpeurs.",
+    "altitude": "4 013 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Dent_du_G%C3%A9ant.jpg/800px-Dent_du_G%C3%A9ant.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Dent_du_G%C3%A9ant"
+  },
+  {
+    "id": "mont-collon",
+    "name": "🇨🇭 Mont Collon",
+    "description": "Sommet de la haute route Chamonix-Zermatt, étape phare des skieurs de randonnée.",
+    "altitude": "3 637 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Mont_Collon.jpg/800px-Mont_Collon.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Collon"
+  },
+  {
+    "id": "pigne-d-arolla",
+    "name": "🇨🇭 Pigne d'Arolla",
+    "description": "Sommet emblématique de la haute route Chamonix-Zermatt, accessible aux skieurs.",
+    "altitude": "3 796 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Pigne_d_Arolla.jpg/800px-Pigne_d_Arolla.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pigne_d%27Arolla"
+  },
+  {
+    "id": "mont-pourri",
+    "name": "🇫🇷 Mont Pourri",
+    "description": "Sommet dominant les stations des Arcs et Peisey-Nancroix en Tarentaise.",
+    "altitude": "3 779 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Mont_Pourri.jpg/800px-Mont_Pourri.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Pourri"
+  },
+  {
+    "id": "grande-casse",
+    "name": "🇫🇷 Grande Casse",
+    "description": "Plus haut sommet du Parc national de la Vanoise, toit de la Tarentaise.",
+    "altitude": "3 855 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Grande_Casse_from_Lac_de_la_Leisse.jpg/800px-Grande_Casse_from_Lac_de_la_Leisse.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Grande_Casse"
+  },
+  {
+    "id": "grande-motte",
+    "name": "🇫🇷 Grande Motte",
+    "description": "Sommet glaciaire de la Vanoise, accessible par le téléphérique de Tignes.",
+    "altitude": "3 653 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Grande_Motte_Tignes.jpg/800px-Grande_Motte_Tignes.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Grande_Motte_(Savoie)"
+  },
+  {
+    "id": "mont-iseran",
+    "name": "🇫🇷 Pointe de l'Iseran",
+    "description": "Sommet dominant le col de l'Iseran, plus haut col routier des Alpes.",
+    "altitude": "3 996 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Col_de_l%27Iseran.jpg/800px-Col_de_l%27Iseran.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pointe_de_l%27Iseran"
+  },
+  {
+    "id": "belledonne",
+    "name": "🇫🇷 Grand Pic de Belledonne",
+    "description": "Sommet dominant Grenoble, symbole de la chaîne de Belledonne visible depuis la ville.",
+    "altitude": "2 977 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Grand_pic_de_belledonne.jpg/800px-Grand_pic_de_belledonne.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Grand_pic_de_Belledonne"
+  },
+  {
+    "id": "grand-veymont",
+    "name": "🇫🇷 Grand Veymont",
+    "description": "Plus haut sommet du Vercors, plateau calcaire aux falaises abruptes.",
+    "altitude": "2 341 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Grand_Veymont.jpg/800px-Grand_Veymont.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Grand_Veymont"
+  },
+  {
+    "id": "mont-aiguille",
+    "name": "🇫🇷 Mont Aiguille",
+    "description": "\"Mont inaccessible\", étrange mesa du Vercors, berceau de l'alpinisme en 1492.",
+    "altitude": "2 086 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Mont_Aiguille.jpg/800px-Mont_Aiguille.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Aiguille"
+  },
+  {
+    "id": "devoluy",
+    "name": "🇫🇷 Pic de Bure",
+    "description": "Plus haut sommet du Dévoluy, observatoire de radioastronomie majeur.",
+    "altitude": "2 709 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Pic_de_Bure.jpg/800px-Pic_de_Bure.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_de_Bure"
+  },
+  {
+    "id": "pic-aneto",
+    "name": "🇪🇸 Aneto",
+    "description": "Plus haut sommet des Pyrénées et d'Espagne continentale, le \"toit des Pyrénées\".",
+    "altitude": "3 404 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Aneto_desde_la_Maladeta.jpg/800px-Aneto_desde_la_Maladeta.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Aneto"
+  },
+  {
+    "id": "mont-perdu",
+    "name": "🇫🇷 Mont Perdu",
+    "description": "Troisième plus haut sommet des Pyrénées, classé UNESCO, cœur du canyon d'Ordesa.",
+    "altitude": "3 348 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Monte_Perdido.jpg/800px-Monte_Perdido.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Perdu"
+  },
+  {
+    "id": "pico-de-ossau",
+    "name": "🇫🇷 Pic du Midi d'Ossau",
+    "description": "Emblème des Pyrénées béarnaises, \"dent\" volcanique reconnaissable entre toutes.",
+    "altitude": "2 884 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Midi_d_ossau.jpg/800px-Midi_d_ossau.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_du_Midi_d%27Ossau"
+  },
+  {
+    "id": "balaitous",
+    "name": "🇫🇷 Balaitous",
+    "description": "Sommet pyrénéen réputé difficile, le plus à l'ouest des 3000m des Pyrénées.",
+    "altitude": "3 144 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Balaitous.jpg/800px-Balaitous.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Balaitous"
+  },
+  {
+    "id": "puy-mary",
+    "name": "🇫🇷 Puy Mary",
+    "description": "Ancien volcan du Massif Central, centre de la \"grande étoile volcanique\" du Cantal.",
+    "altitude": "1 787 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Puy_Mary.jpg/800px-Puy_Mary.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Puy_Mary"
+  },
+  {
+    "id": "sancy",
+    "name": "🇫🇷 Puy de Sancy",
+    "description": "Plus haut sommet du Massif Central et d'Auvergne, source de la Dordogne.",
+    "altitude": "1 886 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Puy_de_Sancy.jpg/800px-Puy_de_Sancy.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Puy_de_Sancy"
+  },
+  {
+    "id": "mezenc",
+    "name": "🇫🇷 Mont Mézenc",
+    "description": "Plus haut sommet du Velay et du Vivarais, au cœur du Parc naturel des Monts d'Ardèche.",
+    "altitude": "1 753 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Mont_M%C3%A9zenc.jpg/800px-Mont_M%C3%A9zenc.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_M%C3%A9zenc"
+  },
+  {
+    "id": "lozere",
+    "name": "🇫🇷 Mont Lozère",
+    "description": "Plus haut sommet du département de la Lozère, massif granitique au cœur des Cévennes.",
+    "altitude": "1 699 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Mont_Loz%C3%A8re.jpg/800px-Mont_Loz%C3%A8re.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Loz%C3%A8re"
+  },
+  {
+    "id": "sainte-victoire",
+    "name": "🇫🇷 Montagne Sainte-Victoire",
+    "description": "Montagne emblématique peinte par Cézanne, symbole de la Provence.",
+    "altitude": "1 011 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/MontagneSainteVictoire.jpg/800px-MontagneSainteVictoire.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Montagne_Sainte-Victoire"
+  },
+  {
+    "id": "massif-du-chenaillet",
+    "name": "🇫🇷 Mont Genèvre",
+    "description": "Col le plus ancien de France, au cœur des Alpes du Sud entre France et Italie.",
+    "altitude": "2 876 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Montgen%C3%A8vre.jpg/800px-Montgen%C3%A8vre.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Montgènevre"
+  },
+  {
+    "id": "mont-cinto",
+    "name": "🇫🇷 Monte Cinto",
+    "description": "Plus haut sommet de Corse, dominant l'île de Beauté.",
+    "altitude": "2 706 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/MonteCinto.jpg/800px-MonteCinto.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Monte_Cinto"
+  },
+  {
+    "id": "monte-rotondo",
+    "name": "🇫🇷 Monte Rotondo",
+    "description": "Deuxième plus haut sommet de Corse, cœur sauvage de l'île.",
+    "altitude": "2 622 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Monte_Rotondo.jpg/800px-Monte_Rotondo.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Monte_Rotondo"
+  },
+  {
+    "id": "pic-d-aneto",
+    "name": "🇫🇷 Pic de Néouvielle",
+    "description": "Massif granitique des Pyrénées, cœur du parc naturel régional du même nom.",
+    "altitude": "3 091 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Lac_de_Cap-de-Long.jpg/800px-Lac_de_Cap-de-Long.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Massif_de_Néouvielle"
+  },
+  {
+    "id": "aiguilles-rouges",
+    "name": "🇫🇷 Aiguilles Rouges",
+    "description": "Massif face au Mont Blanc, réserve naturelle nationale aux vues imprenables sur Chamonix.",
+    "altitude": "2 965 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Aiguilles_Rouges.jpg/800px-Aiguilles_Rouges.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Aiguilles_Rouges"
+  },
+  {
+    "id": "tour-du-lion",
+    "name": "🇫🇷 Dôme de Chasseforêt",
+    "description": "Plus haut sommet de la Vanoise avec sa calotte glaciaire préservée.",
+    "altitude": "3 586 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/D%C3%B4me_de_Chassefor%C3%AAt.jpg/800px-D%C3%B4me_de_Chassefor%C3%AAt.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/D%C3%B4me_de_Chassefor%C3%AAt"
+  },
+  {
+    "id": "pic-blanc",
+    "name": "🇫🇷 Pic Blanc",
+    "description": "Sommet emblématique d'Alpe d'Huez, haut lieu du cyclisme et du ski.",
+    "altitude": "3 330 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Pic_Blanc_Alpe_d%27Huez.jpg/800px-Pic_Blanc_Alpe_d%27Huez.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_Blanc"
+  },
+  {
+    "id": "muzelle",
+    "name": "🇫🇷 Les Muzelle",
+    "description": "Sommet des Écrins dominant le lac du même nom, joyau du parc national.",
+    "altitude": "3 465 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Les_Muzelle.jpg/800px-Les_Muzelle.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Les_Muzelle"
+  },
+  {
+    "id": "roche-faurio",
+    "name": "🇫🇷 Roche Faurio",
+    "description": "Sommet du parc des Écrins offrant une vue plongeante sur le glacier de la Pilatte.",
+    "altitude": "3 730 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Roche_Faurio.jpg/800px-Roche_Faurio.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Roche_Faurio"
+  },
+  {
+    "id": "mont-charvin",
+    "name": "🇫🇷 Mont Charvin",
+    "description": "Belvédère naturel entre les Aravis et le Mont-Blanc, sommet apprécié des randonneurs.",
+    "altitude": "2 409 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Mont_Charvin.jpg/800px-Mont_Charvin.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Charvin"
+  },
+  {
+    "id": "pointe-percee",
+    "name": "🇫🇷 Pointe Percée",
+    "description": "Plus haut sommet du massif des Aravis, traversé par la fameuse \"via ferrata\".",
+    "altitude": "2 750 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Pointe_Perc%C3%A9e.jpg/800px-Pointe_Perc%C3%A9e.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pointe_Perc%C3%A9e"
+  },
+  {
+    "id": "tete-rousse",
+    "name": "🇫🇷 Tête Rousse",
+    "description": "Refuge emblématique sur la voie normale du Mont Blanc, étape incontournable.",
+    "altitude": "3 167 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/T%C3%AAte_Rousse_et_refuge.jpg/800px-T%C3%AAte_Rousse_et_refuge.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/T%C3%AAte_Rousse"
+  },
+  {
+    "id": "pic-de-la-lauziere",
+    "name": "🇫🇷 Pic de la Lauzière",
+    "description": "Sommet sauvage de Tarentaise, massif méconnu entre Isère et Arc.",
+    "altitude": "2 829 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Pic_de_la_Lauzi%C3%A8re.jpg/800px-Pic_de_la_Lauzi%C3%A8re.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_de_la_Lauzi%C3%A8re"
+  },
+  {
+    "id": "belukha",
+    "name": "🇷🇺 Belukha",
+    "description": "Plus haut sommet de Sibérie et de l'Altaï russe, montagne sacrée des chamans.",
+    "altitude": "4 506 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Belukha_mountain.jpg/800px-Belukha_mountain.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Belukha"
+  },
+  {
+    "id": "klyuchevskaya",
+    "name": "🇷🇺 Klyuchevskaya Sopka",
+    "description": "Plus haut volcan actif d'Eurasie, au Kamtchatka, en éruption quasi permanente.",
+    "altitude": "4 750 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Klyuchevskoy_volcano.jpg/800px-Klyuchevskoy_volcano.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Klioutche%C3%BCska%C3%AF%C3%A0_Sopka"
+  },
+  {
+    "id": "narodna",
+    "name": "🇷🇺 Narodnaya",
+    "description": "Plus haut sommet de l'Oural, frontière naturelle entre l'Europe et l'Asie.",
+    "altitude": "1 895 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Narodnaya.jpg/800px-Narodnaya.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Narodnaya"
+  },
+  {
+    "id": "kebnekaise",
+    "name": "🇸🇪 Kebnekaise",
+    "description": "Plus haut sommet de Suède, dans la Laponie suédoise aux aurores boréales.",
+    "altitude": "2 096 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Kebnekaise.jpg/800px-Kebnekaise.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kebnekaise"
+  },
+  {
+    "id": "halti",
+    "name": "🇫🇮 Halti",
+    "description": "Plus haut sommet de Finlande, dans la Laponie finlandaise à la frontière norvégienne.",
+    "altitude": "1 324 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Halti.jpg/800px-Halti.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Halti"
+  },
+  {
+    "id": "snaefell",
+    "name": "🇮🇲 Snaefell",
+    "description": "Plus haut sommet de l'île de Man, d'où l'on peut voir six pays par beau temps.",
+    "altitude": "621 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Snaefell_summit.jpg/800px-Snaefell_summit.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Snaefell_(île_de_Man)"
+  },
+  {
+    "id": "musala",
+    "name": "🇧🇬 Musala",
+    "description": "Plus haut sommet des Balkans et de Bulgarie, dans le massif du Rila.",
+    "altitude": "2 925 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Musala_peak.jpg/800px-Musala_peak.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Moussala"
+  },
+  {
+    "id": "moldoveanu",
+    "name": "🇷🇴 Moldoveanu",
+    "description": "Plus haut sommet de Roumanie, dans les Carpates méridionales.",
+    "altitude": "2 544 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Moldoveanu.jpg/800px-Moldoveanu.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Moldoveanu"
+  },
+  {
+    "id": "rysy",
+    "name": "🇵🇱 Rysy",
+    "description": "Plus haut sommet de Pologne, dans les Hautes Tatras à la frontière slovaque.",
+    "altitude": "2 499 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Rysy_od_strony_Czarnego_Stawu.jpg/800px-Rysy_od_strony_Czarnego_Stawu.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Rysy"
+  },
+  {
+    "id": "gerlachovsky",
+    "name": "🇸🇰 Gerlachovský štít",
+    "description": "Plus haut sommet des Carpates et de Slovaquie, dans les Hautes Tatras.",
+    "altitude": "2 654 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Gerlachovsky_stit.jpg/800px-Gerlachovsky_stit.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Gerlachovsky_%C5%A1t%C3%ADt"
+  },
+  {
+    "id": "snezka",
+    "name": "🇨🇿 Sněžka",
+    "description": "Plus haut sommet des monts des Géants et de la République tchèque.",
+    "altitude": "1 603 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Sn%C4%9B%C5%BEka_from_Czech_side.jpg/800px-Sn%C4%9B%C5%BEka_from_Czech_side.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Sn%C4%9B%C5%BEka"
+  },
+  {
+    "id": "koritnik",
+    "name": "🇦🇱 Korab",
+    "description": "Plus haut sommet d'Albanie et de Macédoine du Nord, dans les Alpes dinariques.",
+    "altitude": "2 764 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Korab_peak.jpg/800px-Korab_peak.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Korab"
+  },
+  {
+    "id": "bobotov-kuk",
+    "name": "🇲🇪 Bobotov Kuk",
+    "description": "Plus haut sommet du Monténégro, dans le massif du Durmitor classé à l'UNESCO.",
+    "altitude": "2 523 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Bobotov_kuk.jpg/800px-Bobotov_kuk.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Bobotov_Kuk"
+  },
+  {
+    "id": "dinara",
+    "name": "🇭🇷 Dinara",
+    "description": "Plus haut sommet de Croatie, qui donne son nom aux Alpes dinariques.",
+    "altitude": "1 831 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Dinara.jpg/800px-Dinara.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Dinara"
+  },
+  {
+    "id": "lomnicky",
+    "name": "🇸🇰 Lomnický štít",
+    "description": "Deuxième plus haut sommet des Tatras, accessible par téléphérique avec son observatoire.",
+    "altitude": "2 634 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Lomnicky_stit.jpg/800px-Lomnicky_stit.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Lomnick%C3%BD_%C5%A1t%C3%ADt"
+  },
+  {
+    "id": "monte-titano",
+    "name": "🇸🇲 Monte Titano",
+    "description": "Sommet emblématique de Saint-Marin, l'un des plus petits États du monde.",
+    "altitude": "749 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/San_Marino_-_Tre_Cime.jpg/800px-San_Marino_-_Tre_Cime.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Monte_Titano"
+  },
+  {
+    "id": "pic-de-font-blanca",
+    "name": "🇦🇩 Pic de Font Blanca",
+    "description": "Plus haut sommet d'Andorre, dans les Pyrénées orientales.",
+    "altitude": "2 904 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Pic_de_Font_Blanca.jpg/800px-Pic_de_Font_Blanca.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_de_Font_Blanca"
+  },
+  {
+    "id": "pico-ruivo",
+    "name": "🇵🇹 Pico Ruivo",
+    "description": "Plus haut sommet de Madère, île volcanique atlantique au climat subtropical.",
+    "altitude": "1 862 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Pico_Ruivo.jpg/800px-Pico_Ruivo.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pico_Ruivo"
+  },
+  {
+    "id": "torre",
+    "name": "🇵🇹 Torre",
+    "description": "Plus haut sommet du Portugal continental, dans la Serra da Estrela.",
+    "altitude": "1 993 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Torre_Serra_Estrela.jpg/800px-Torre_Serra_Estrela.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Torre_(Serra_da_Estrela)"
+  },
+  {
+    "id": "snowdon",
+    "name": "🏴󠁧󠁢󠁷󠁬󠁳󠁿 Snowdon",
+    "description": "Plus haut sommet du Pays de Galles et d'Angleterre-Galles, symbole de la nation galloise.",
+    "altitude": "1 085 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Snowdon_from_Llyn_Llydaw.jpg/800px-Snowdon_from_Llyn_Llydaw.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Snowdon"
+  },
+  {
+    "id": "scafell-pike",
+    "name": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 Scafell Pike",
+    "description": "Plus haut sommet d'Angleterre, dans le Lake District au nord-ouest.",
+    "altitude": "978 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Scafell_Pike_from_Great_End.jpg/800px-Scafell_Pike_from_Great_End.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Scafell_Pike"
+  },
+  {
+    "id": "carrantuohill",
+    "name": "🇮🇪 Carrauntoohil",
+    "description": "Plus haut sommet d'Irlande, dans le massif de Macgillycuddy's Reeks.",
+    "altitude": "1 038 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Carrauntoohil.jpg/800px-Carrauntoohil.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Carrauntoohil"
+  },
+  {
+    "id": "high-willhays",
+    "name": "🇬🇧 High Willhays",
+    "description": "Plus haut sommet du Devon et du sud de l'Angleterre, dans le Dartmoor.",
+    "altitude": "621 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/High_Willhays.jpg/800px-High_Willhays.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/High_Willhays"
+  },
+  {
+    "id": "mont-ida",
+    "name": "🇬🇷 Mont Ida",
+    "description": "Plus haut sommet de Crète, montagne sacrée où Zeus aurait grandi selon la mythologie.",
+    "altitude": "2 456 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Mount_Ida_Crete.jpg/800px-Mount_Ida_Crete.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Ida_(Cr%C3%A8te)"
+  },
+  {
+    "id": "taygete",
+    "name": "🇬🇷 Taygète",
+    "description": "Chaîne montagneuse du Péloponnèse dominant Sparte, refuge des Maniotes.",
+    "altitude": "2 407 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Taygetos_Mountain.jpg/800px-Taygetos_Mountain.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Taygète"
+  },
+  {
+    "id": "mont-ida-turquie",
+    "name": "🇹🇷 Kaz Dağı",
+    "description": "L'antique Mont Ida de Troie, où Pâris jugea les déesses selon la mythologie grecque.",
+    "altitude": "1 774 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Kaz_Dagi.jpg/800px-Kaz_Dagi.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kaz_Da%C4%9F%C4%B1"
+  },
+  {
+    "id": "jabal-toubkal",
+    "name": "🇸🇦 Jabal Sawda",
+    "description": "Plus haut sommet d'Arabie Saoudite, dans les montagnes Asir au sud-ouest.",
+    "altitude": "3 002 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Jabal_Sawda.jpg/800px-Jabal_Sawda.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Jabal_Sawda"
+  },
+  {
+    "id": "jabal-an-nabi-shuayb",
+    "name": "🇾🇪 Jabal an-Nabi Shu'ayb",
+    "description": "Plus haut sommet du Yémen et de la péninsule Arabique.",
+    "altitude": "3 666 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Jabal_an-Nabi_Shuayb.jpg/800px-Jabal_an-Nabi_Shuayb.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Djabal_an-Nabi_Chou%27ayb"
+  },
+  {
+    "id": "qurnat-as-sawda",
+    "name": "🇱🇧 Qurnat as Sawda'",
+    "description": "Plus haut sommet du Liban, dans le massif du Mont-Liban.",
+    "altitude": "3 088 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Qurnat_as_Sawda.jpg/800px-Qurnat_as_Sawda.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Qurnat_as_Sawda%27"
+  },
+  {
+    "id": "mount-hermon",
+    "name": "🇸🇾 Mont Hermon",
+    "description": "Sommet sacré pour trois religions, aux confins de la Syrie, du Liban et d'Israël.",
+    "altitude": "2 814 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mount_Hermon_from_the_south.jpg/800px-Mount_Hermon_from_the_south.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Hermon"
+  },
+  {
+    "id": "jabal-shams",
+    "name": "🇴🇲 Jabal Shams",
+    "description": "\"Montagne du Soleil\", plus haut sommet d'Oman et de la péninsule d'Arabie orientale.",
+    "altitude": "3 009 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Jabal_Shams_Canyon.jpg/800px-Jabal_Shams_Canyon.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Jabal_Shams"
+  },
+  {
+    "id": "mont-sinai",
+    "name": "🇪🇬 Mont Sinaï",
+    "description": "Montagne biblique où Moïse reçut les dix commandements selon la tradition abrahamique.",
+    "altitude": "2 285 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Mount_Sinai_2005.jpg/800px-Mount_Sinai_2005.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Sina%C3%AF"
+  },
+  {
+    "id": "pic-marguerite",
+    "name": "🇨🇩 Pic Marguerite",
+    "description": "Plus haut sommet des Ruwenzori et du Congo, aux sources légendaires du Nil.",
+    "altitude": "5 109 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Ruwenzori_Mountains.jpg/800px-Ruwenzori_Mountains.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_Marguerite"
+  },
+  {
+    "id": "mont-cameroun",
+    "name": "🇨🇲 Mont Cameroun",
+    "description": "Plus haut sommet d'Afrique centrale et de l'ouest, volcan actif sur le golfe de Guinée.",
+    "altitude": "4 040 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Cameroon_Mountain.jpg/800px-Cameroon_Mountain.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Cameroun"
+  },
+  {
+    "id": "pico-basile",
+    "name": "🇬🇶 Pico Basile",
+    "description": "Plus haut sommet de Guinée équatoriale, volcan sur l'île de Bioko.",
+    "altitude": "3 011 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Pico_Basile.jpg/800px-Pico_Basile.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pico_Basile"
+  },
+  {
+    "id": "mont-binga",
+    "name": "🇲🇿 Mont Binga",
+    "description": "Plus haut sommet du Mozambique et du Zimbabwe, dans les monts Chimanimani.",
+    "altitude": "2 436 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Chimanimani_mountains.jpg/800px-Chimanimani_mountains.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Binga"
+  },
+  {
+    "id": "thabana-ntlenyana",
+    "name": "🇱🇸 Thabana Ntlenyana",
+    "description": "Plus haut sommet du Lesotho et d'Afrique australe hors Afrique du Sud.",
+    "altitude": "3 482 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Thabana_Ntlenyana.jpg/800px-Thabana_Ntlenyana.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Thabana_Ntlenyana"
+  },
+  {
+    "id": "pico-de-teide-canaries",
+    "name": "🇪🇸 Roque de los Muchachos",
+    "description": "Plus haut sommet de La Palma aux Canaries, site du grand télescope Canaries.",
+    "altitude": "2 426 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Roque_de_los_Muchachos.jpg/800px-Roque_de_los_Muchachos.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Roque_de_los_Muchachos"
+  },
+  {
+    "id": "cerro-chirripo",
+    "name": "🇨🇷 Cerro Chirripó",
+    "description": "Plus haut sommet d'Amérique centrale et du Costa Rica, dans la cordillère de Talamanca.",
+    "altitude": "3 821 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Cerro_Chirripo.jpg/800px-Cerro_Chirripo.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Cerro_Chirrip%C3%B3"
+  },
+  {
+    "id": "volcan-tajumulco",
+    "name": "🇬🇹 Tajumulco",
+    "description": "Plus haut sommet d'Amérique centrale et du Guatemala, volcan actif des Cuchumatanes.",
+    "altitude": "4 202 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Tajumulco_volcano.jpg/800px-Tajumulco_volcano.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Tajumulco"
+  },
+  {
+    "id": "pico-de-orizaba-mx",
+    "name": "🇲🇽 Iztaccíhuatl",
+    "description": "\"La femme endormie\", volcan mexicain dont la silhouette évoque une femme allongée.",
+    "altitude": "5 230 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Iztaccihuatl_and_Popocatepetl.jpg/800px-Iztaccihuatl_and_Popocatepetl.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Iztacc%C3%ADhuatl"
+  },
+  {
+    "id": "pico-bolivar-col",
+    "name": "🇨🇴 Nevado del Ruiz",
+    "description": "Volcan actif colombien, tristement célèbre pour la catastrophe de 1985 qui détruisit Armero.",
+    "altitude": "5 321 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Nevado_del_Ruiz.jpg/800px-Nevado_del_Ruiz.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Nevado_del_Ruiz"
+  },
+  {
+    "id": "pico-cristobal-colon",
+    "name": "🇨🇴 Pico Cristóbal Colón",
+    "description": "Plus haut sommet de Colombie et de la Sierra Nevada de Santa Marta, près des Caraïbes.",
+    "altitude": "5 700 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Pico_Cristobal_Colon.jpg/800px-Pico_Cristobal_Colon.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pico_Crist%C3%B3bal_Col%C3%B3n"
+  },
+  {
+    "id": "nevado-sajama",
+    "name": "🇧🇴 Nevado Sajama",
+    "description": "Plus haut sommet de Bolivie, volcan endormi dominant l'altiplano andin.",
+    "altitude": "6 542 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Nevado_Sajama.jpg/800px-Nevado_Sajama.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Nevado_Sajama"
+  },
+  {
+    "id": "mont-roraima",
+    "name": "🇻🇪 Mont Roraima",
+    "description": "Tepui mythique au sommet plat, inspirateur de \"Le Monde Perdu\" de Conan Doyle.",
+    "altitude": "2 810 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Roraima_from_south.jpg/800px-Roraima_from_south.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Roraima"
+  },
+  {
+    "id": "cerro-acotango",
+    "name": "🇨🇱 Ojos del Salado",
+    "description": "Volcan Llullaillaco à la frontière argentine-chilienne, le plus haut volcan actif.",
+    "altitude": "6 739 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Llullaillaco_Chile_Argentina.jpg/800px-Llullaillaco_Chile_Argentina.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Llullaillaco"
+  },
+  {
+    "id": "mont-cook-nz",
+    "name": "🇳🇿 Mont Ruapehu",
+    "description": "Volcan actif de Nouvelle-Zélande, site de ski et cadre du film \"Le Seigneur des Anneaux\".",
+    "altitude": "2 797 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Ruapehu_2004.jpg/800px-Ruapehu_2004.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Ruapehu"
+  },
+  {
+    "id": "mauna-loa",
+    "name": "🇺🇸 Mauna Loa",
+    "description": "Plus grand volcan du monde en volume, île d'Hawaï, en éruption régulière.",
+    "altitude": "4 169 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Mauna_Loa_from_Kona.jpg/800px-Mauna_Loa_from_Kona.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mauna_Loa"
+  },
+  {
+    "id": "mont-cook-tasmania",
+    "name": "🇦🇺 Mont Ossa",
+    "description": "Plus haut sommet de Tasmanie, cœur sauvage du parc national de Cradle Mountain.",
+    "altitude": "1 617 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Mount_Ossa_Tasmania.jpg/800px-Mount_Ossa_Tasmania.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Ossa_(Tasmanie)"
+  },
+  {
+    "id": "piton-des-neiges",
+    "name": "🇫🇷 Piton des Neiges",
+    "description": "Plus haut sommet de La Réunion et de l'océan Indien, ancien volcan endormi.",
+    "altitude": "3 070 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Piton_des_Neiges.jpg/800px-Piton_des_Neiges.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Piton_des_Neiges"
+  },
+  {
+    "id": "piton-de-la-fournaise",
+    "name": "🇫🇷 Piton de la Fournaise",
+    "description": "Volcan actif de La Réunion, l'un des plus actifs du monde, en éruption quasi permanente.",
+    "altitude": "2 632 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Piton_de_la_Fournaise_erupt.jpg/800px-Piton_de_la_Fournaise_erupt.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Piton_de_la_Fournaise"
+  },
+  {
+    "id": "mont-orohena",
+    "name": "🇫🇷 Mont Orohena",
+    "description": "Plus haut sommet de Polynésie française et de Tahiti, au cœur de l'île sacrée.",
+    "altitude": "2 241 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Mont_Orohena.jpg/800px-Mont_Orohena.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Or%C3%B4hena"
+  },
+  {
+    "id": "mont-panié",
+    "name": "🇫🇷 Mont Panié",
+    "description": "Plus haut sommet de Nouvelle-Calédonie, sanctuaire de biodiversité unique.",
+    "altitude": "1 628 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Mont_Pani%C3%A9.jpg/800px-Mont_Pani%C3%A9.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Pani%C3%A9"
+  },
+  {
+    "id": "mont-pelée",
+    "name": "🇫🇷 Montagne Pelée",
+    "description": "Volcan de Martinique, tristement célèbre pour sa catastrophique éruption de 1902.",
+    "altitude": "1 397 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Mont_Pelee_Martinique.jpg/800px-Mont_Pelee_Martinique.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Montagne_Pel%C3%A9e"
+  },
+  {
+    "id": "la-soufriere-guadeloupe",
+    "name": "🇫🇷 La Soufrière",
+    "description": "Volcan actif de Guadeloupe, plus haut sommet des Antilles françaises.",
+    "altitude": "1 467 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/La_Soufriere_Guadeloupe.jpg/800px-La_Soufriere_Guadeloupe.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/La_Soufri%C3%A8re_(Guadeloupe)"
+  },
+  {
+    "id": "mont-ross",
+    "name": "🇫🇷 Mont Ross",
+    "description": "Plus haut sommet des îles Kerguelen, archipel français au cœur de l'océan Indien austral.",
+    "altitude": "1 850 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Kerguelen_islands.jpg/800px-Kerguelen_islands.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Ross"
+  },
+  {
+    "id": "pik-pobedy",
+    "name": "🇰🇬 Pic Pobeda",
+    "description": "\"Pic de la Victoire\", plus haut sommet du Kirghizistan, l'un des plus difficiles d'Asie.",
+    "altitude": "7 439 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Peak_Pobeda.jpg/800px-Peak_Pobeda.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_Pobeda"
+  },
+  {
+    "id": "muztagh-ata",
+    "name": "🇨🇳 Muztagh Ata",
+    "description": "\"Père des montagnes de glace\", dôme glaciaire du Pamir chinois, accessible aux skieurs.",
+    "altitude": "7 546 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Muztagh_Ata.jpg/800px-Muztagh_Ata.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Muztagh_Ata"
+  },
+  {
+    "id": "bogda-feng",
+    "name": "🇨🇳 Bogda Feng",
+    "description": "Sommet sacré du Tian Shan oriental, dominant l'oasis de Turpan en Chine.",
+    "altitude": "5 445 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Bogda_Feng.jpg/800px-Bogda_Feng.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Bogda_Feng"
+  },
+  {
+    "id": "uluru",
+    "name": "🇦🇺 Uluru",
+    "description": "Monolithe sacré des Anangu, symbole spirituel de l'Australie, anciennement Ayers Rock.",
+    "altitude": "863 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Uluru_Australia.jpg/800px-Uluru_Australia.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Uluru"
+  },
+  {
+    "id": "asgard",
+    "name": "🇨🇦 Mont Asgard",
+    "description": "Tour de granite mythique de l'île de Baffin, site du célèbre saut en parachute de James Bond.",
+    "altitude": "2 011 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Mount_Asgard.jpg/800px-Mount_Asgard.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Asgard"
+  },
+  {
+    "id": "mont-waddington",
+    "name": "🇨🇦 Mont Waddington",
+    "description": "Plus haut sommet entièrement en Colombie-Britannique, \"Mystère de la Côte\".",
+    "altitude": "4 019 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Mount_Waddington.jpg/800px-Mount_Waddington.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Waddington"
+  },
+  {
+    "id": "nanga-parbat-rupal",
+    "name": "🇵🇰 Face Rupal",
+    "description": "La plus haute paroi du monde sur le Nanga Parbat, 4500m de dénivelée d'un seul tenant.",
+    "altitude": "8 126 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Rupal_Face_Nanga_Parbat.jpg/800px-Rupal_Face_Nanga_Parbat.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Nanga_Parbat"
+  },
+  {
+    "id": "nun-kun",
+    "name": "🇮🇳 Nun",
+    "description": "Plus haut sommet du Cachemire indien, massif Nun Kun dans le Zanskar.",
+    "altitude": "7 135 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Nun_Kun_Massif.jpg/800px-Nun_Kun_Massif.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Nun_(montagne)"
+  },
+  {
+    "id": "kanchenjunga-south",
+    "name": "🇮🇳 Kanchenjunga Sud",
+    "description": "Sommet du massif du Kangchenjunga côté Sikkim, au cœur du Bengale-Occidental indien.",
+    "altitude": "8 476 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Kangchenjunga_from_sandakphu.jpg/800px-Kangchenjunga_from_sandakphu.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kangchenjunga"
+  },
+  {
+    "id": "stok-kangri",
+    "name": "🇮🇳 Stok Kangri",
+    "description": "Sommet emblématique du Ladakh, l'un des plus hauts accessibles aux trekkeurs.",
+    "altitude": "6 153 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Stok_Kangri.jpg/800px-Stok_Kangri.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Stok_Kangri"
+  },
+  {
+    "id": "nanda-devi",
+    "name": "🇮🇳 Nanda Devi",
+    "description": "Plus haut sommet entièrement indien, déesse protectrice de l'Uttarakhand.",
+    "altitude": "7 816 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Nanda_Devi.jpg/800px-Nanda_Devi.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Nanda_Devi"
+  },
+  {
+    "id": "kamet",
+    "name": "🇮🇳 Kamet",
+    "description": "Troisième plus haut sommet indien, dans le Garhwal himalayen aux sources du Gange.",
+    "altitude": "7 756 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Kamet.jpg/800px-Kamet.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kamet"
+  },
+  {
+    "id": "mount-cook-india",
+    "name": "🇮🇳 Kedarnath",
+    "description": "Sommet sacré de l'Himalaya indien, lieu de pèlerinage hindou majeur.",
+    "altitude": "6 940 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Kedarnath_Peak.jpg/800px-Kedarnath_Peak.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kedarnath_(sommet)"
+  },
+  {
+    "id": "mustagh-tower",
+    "name": "🇵🇰 Mustagh Tower",
+    "description": "Tour de granite vertigineuse du Karakoram, l'une des plus belles montagnes du monde.",
+    "altitude": "7 273 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Mustagh_Tower.jpg/800px-Mustagh_Tower.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mustagh_Tower"
+  },
+  {
+    "id": "trango-tower",
+    "name": "🇵🇰 Grande Tour de Trango",
+    "description": "La plus haute falaise verticale du monde, monument de granite au Karakoram.",
+    "altitude": "6 286 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Trango_Towers.jpg/800px-Trango_Towers.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Tours_de_Trango"
+  },
+  {
+    "id": "rakaposhi",
+    "name": "🇵🇰 Rakaposhi",
+    "description": "\"Montagne brillante\" du Karakoram, visible depuis la route du Karakoram Highway.",
+    "altitude": "7 788 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Rakaposhi.jpg/800px-Rakaposhi.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Rakaposhi"
+  },
+  {
+    "id": "ultar-sar",
+    "name": "🇵🇰 Ultar Sar",
+    "description": "Sommet imposant dominant le village de Karimabad en vallée du Hunza.",
+    "altitude": "7 388 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Ultar_Sar.jpg/800px-Ultar_Sar.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Ultar_Sar"
+  },
+  {
+    "id": "kongur-tagh",
+    "name": "🇨🇳 Kongur Tagh",
+    "description": "Plus haut sommet du Pamir chinois, massif isolé du Xinjiang.",
+    "altitude": "7 719 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Kongur_Tagh.jpg/800px-Kongur_Tagh.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kongur_Tagh"
+  },
+  {
+    "id": "mount-grosvenor",
+    "name": "🇨🇳 Minya Konka",
+    "description": "\"Roi des Sichuanais\", plus haut sommet hors Himalaya-Karakoram, dans le Sichuan.",
+    "altitude": "7 556 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Minya_Konka.jpg/800px-Minya_Konka.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Minya_Konka"
+  },
+  {
+    "id": "namcha-barwa",
+    "name": "🇨🇳 Namcha Barwa",
+    "description": "Sommet secret du Tibet oriental, longtemps le plus haut non cartographié, dominant le grand canyon du Yarlung.",
+    "altitude": "7 782 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Namcha_Barwa.jpg/800px-Namcha_Barwa.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Namcha_Barwa"
+  },
+  {
+    "id": "mount-kenya-batian",
+    "name": "🇰🇪 Batian",
+    "description": "Pic principal du Mont Kenya, second d'Afrique, nommé d'après un chef maasaï.",
+    "altitude": "5 199 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Mount_Kenya_Batian.jpg/800px-Mount_Kenya_Batian.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Kenya"
+  },
+  {
+    "id": "mount-meru",
+    "name": "🇹🇿 Mont Méru",
+    "description": "Volcan dormant voisin du Kilimandjaro, deuxième plus haut sommet de Tanzanie.",
+    "altitude": "4 562 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Mount_Meru_Tanzania.jpg/800px-Mount_Meru_Tanzania.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_M%C3%A9ru_(Tanzanie)"
+  },
+  {
+    "id": "mount-elgon",
+    "name": "🇺🇬 Mont Elgon",
+    "description": "Massif volcanique éteint à la frontière Kenya-Ouganda, avec ses grottes de sel.",
+    "altitude": "4 321 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Mount_Elgon.jpg/800px-Mount_Elgon.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Elgon"
+  },
+  {
+    "id": "semien-ras-dashen",
+    "name": "🇪🇹 Monts Siemen",
+    "description": "Massif des hautes terres éthiopiennes, refuge du babouin gélada et du loup d'Éthiopie.",
+    "altitude": "4 550 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Simien_Mountains.jpg/800px-Simien_Mountains.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Monts_Siemen"
+  },
+  {
+    "id": "mount-speke",
+    "name": "🇺🇬 Mont Speke",
+    "description": "Sommet des Ruwenzori nommé d'après l'explorateur Speke, dans les \"Montagnes de la Lune\".",
+    "altitude": "4 890 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Ruwenzori_Range.jpg/800px-Ruwenzori_Range.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Speke"
+  },
+  {
+    "id": "volcan-nyiragongo",
+    "name": "🇨🇩 Nyiragongo",
+    "description": "Volcan actif du Congo avec le plus grand lac de lave du monde, menaçant Goma.",
+    "altitude": "3 470 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Nyiragongo_crater.jpg/800px-Nyiragongo_crater.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Nyiragongo"
+  },
+  {
+    "id": "drakensberg-thabana",
+    "name": "🇿🇦 Injasuti",
+    "description": "Plus haut sommet d'Afrique du Sud dans le Drakensberg, mur de basalte spectaculaire.",
+    "altitude": "3 459 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Drakensberg_Mountains.jpg/800px-Drakensberg_Mountains.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Drakensberg"
+  },
+  {
+    "id": "mount-mulanje",
+    "name": "🇲🇼 Mont Mulanje",
+    "description": "Massif de granit du Malawi, \"île dans le ciel\" dominant les plantations de thé.",
+    "altitude": "3 002 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Mount_Mulanje.jpg/800px-Mount_Mulanje.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Mulanje"
+  },
+  {
+    "id": "mount-karisimbi",
+    "name": "🇷🇼 Karisimbi",
+    "description": "Plus haut sommet du Rwanda et des Virunga, habitat des gorilles de montagne.",
+    "altitude": "4 507 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Karisimbi.jpg/800px-Karisimbi.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Karisimbi"
+  },
+  {
+    "id": "mount-hanang",
+    "name": "🇹🇿 Mont Hanang",
+    "description": "Volcan éteint de Tanzanie, quatrième plus haut sommet du pays, terre sacrée des Datoga.",
+    "altitude": "3 418 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Mount_Hanang.jpg/800px-Mount_Hanang.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Hanang"
+  },
+  {
+    "id": "mount-olympus-cyprus",
+    "name": "🇨🇾 Mont Olympe",
+    "description": "Plus haut sommet de Chypre, dans le massif du Troodos, avec sa station de ski.",
+    "altitude": "1 952 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Mount_Olympus_Cyprus.jpg/800px-Mount_Olympus_Cyprus.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Olympe_(Chypre)"
+  },
+  {
+    "id": "jaya-wijaya",
+    "name": "🇮🇩 Puncak Mandala",
+    "description": "Deuxième plus haut sommet d'Indonésie en Papouasie, l'un des rares glaciers tropicaux.",
+    "altitude": "4 760 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Papua_highlands.jpg/800px-Papua_highlands.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Puncak_Mandala"
+  },
+  {
+    "id": "mount-wilhelm-png",
+    "name": "🇵🇬 Mont Giluwe",
+    "description": "Deuxième plus haut sommet de Papouasie-Nouvelle-Guinée, bouclier volcanique.",
+    "altitude": "4 368 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Mount_Giluwe.jpg/800px-Mount_Giluwe.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Giluwe"
+  },
+  {
+    "id": "mount-balbi",
+    "name": "🇵🇬 Mont Balbi",
+    "description": "Plus haut sommet de Bougainville, volcan actif de l'archipel Salomon.",
+    "altitude": "2 715 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Bougainville_Island.jpg/800px-Bougainville_Island.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Balbi"
+  },
+  {
+    "id": "mount-victoria-myanmar",
+    "name": "🇲🇲 Mont Victoria",
+    "description": "Plus haut sommet du Myanmar, montagne sacrée des Chin dans les monts Arakan.",
+    "altitude": "3 053 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Mount_Victoria_Myanmar.jpg/800px-Mount_Victoria_Myanmar.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Victoria_(Myanmar)"
+  },
+  {
+    "id": "fansipan",
+    "name": "🇻🇳 Fansipan",
+    "description": "\"Toit de l'Indochine\", plus haut sommet du Vietnam, accessible par téléphérique depuis Sapa.",
+    "altitude": "3 143 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Fansipan_Summit.jpg/800px-Fansipan_Summit.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Fansipan"
+  },
+  {
+    "id": "doi-inthanon",
+    "name": "🇹🇭 Doi Inthanon",
+    "description": "Plus haut sommet de Thaïlande, \"Toit de la Thaïlande\", sanctuaire d'oiseaux.",
+    "altitude": "2 565 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Doi_Inthanon.jpg/800px-Doi_Inthanon.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Doi_Inthanon"
+  },
+  {
+    "id": "gunung-rinjani",
+    "name": "🇮🇩 Gunung Rinjani",
+    "description": "Volcan actif de Lombok avec son lac de cratère Segara Anak, deuxième volcan d'Indonésie.",
+    "altitude": "3 726 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Rinjani_from_Sembalun.jpg/800px-Rinjani_from_Sembalun.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Rinjani"
+  },
+  {
+    "id": "gunung-kerinci",
+    "name": "🇮🇩 Gunung Kerinci",
+    "description": "Plus haut volcan d'Indonésie à Sumatra, dans le parc national Kerinci Seblat.",
+    "altitude": "3 805 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Mount_Kerinci.jpg/800px-Mount_Kerinci.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kerinci"
+  },
+  {
+    "id": "gunung-semeru",
+    "name": "🇮🇩 Gunung Semeru",
+    "description": "Plus haut sommet de Java, \"Mahameru\", montagne sacrée de l'hindouisme javanais.",
+    "altitude": "3 676 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Mount_Semeru.jpg/800px-Mount_Semeru.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Semeru"
+  },
+  {
+    "id": "gunung-agung",
+    "name": "🇮🇩 Gunung Agung",
+    "description": "\"Grande Montagne\", sommet sacré de Bali, centre spirituel de l'île des dieux.",
+    "altitude": "3 031 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Gunung_Agung.jpg/800px-Gunung_Agung.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Agung"
+  },
+  {
+    "id": "pinatubo",
+    "name": "🇵🇭 Pinatubo",
+    "description": "Volcan philippin dont l'éruption de 1991 fut la plus puissante du XXe siècle.",
+    "altitude": "1 486 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Pinatubo_91eruption_clark_air_base.jpg/800px-Pinatubo_91eruption_clark_air_base.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pinatubo"
+  },
+  {
+    "id": "mount-cook-japan",
+    "name": "🇯🇵 Ontake",
+    "description": "Volcan sacré du Japon, tragiquement entré en éruption surprise en 2014.",
+    "altitude": "3 067 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Ontakesan_2014.jpg/800px-Ontakesan_2014.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Ontake"
+  },
+  {
+    "id": "tateyama",
+    "name": "🇯🇵 Tateyama",
+    "description": "Montagne sacrée des Alpes japonaises, l'une des trois montagnes saintes du Japon.",
+    "altitude": "3 015 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Tateyama.jpg/800px-Tateyama_from_Murodo.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Tateyama"
+  },
+  {
+    "id": "hakusan",
+    "name": "🇯🇵 Hakusan",
+    "description": "\"Montagne blanche\", l'une des trois montagnes saintes du Japon, dans le Hokuriku.",
+    "altitude": "2 702 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Hakusan.jpg/800px-Hakusan.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Hakusan"
+  },
+  {
+    "id": "paektu",
+    "name": "🇰🇵 Paektu",
+    "description": "Volcan mythique à la frontière sino-coréenne, berceau légendaire de la nation coréenne.",
+    "altitude": "2 744 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Paektu_Mountain.jpg/800px-Paektu_Mountain.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Paektu"
+  },
+  {
+    "id": "hallasan",
+    "name": "🇰🇷 Hallasan",
+    "description": "Volcan éteint de l'île de Jeju, plus haut sommet de Corée du Sud, classé UNESCO.",
+    "altitude": "1 950 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Halla-san.jpg/800px-Halla-san.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Hallasan"
+  },
+  {
+    "id": "mount-cook-mongolia",
+    "name": "🇲🇳 Khüiten",
+    "description": "Plus haut sommet de Mongolie, dans les Monts Altaï, à la frontière chinoise.",
+    "altitude": "4 374 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Khuiten_Peak.jpg/800px-Khuiten_Peak.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Kh%C3%BCiten"
+  },
+  {
+    "id": "mount-cook-kazakhstan",
+    "name": "🇰🇿 Khan Tengri Kazakh",
+    "description": "Pic Talgar, plus haut sommet du Kazakhstan hors Tian Shan central.",
+    "altitude": "5 017 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Talgar_Peak.jpg/800px-Talgar_Peak.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_Talgar"
+  },
+  {
+    "id": "citlaltepetl",
+    "name": "🇲🇽 Citlaltépetl",
+    "description": "\"Étoile de la montagne\" en nahuatl, aussi connu comme Pico de Orizaba, volcan mexicain.",
+    "altitude": "5 636 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Citlalt%C3%A9petl.jpg/800px-Citlalt%C3%A9petl.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pic_d%27Orizaba"
+  },
+  {
+    "id": "volcan-san-pedro",
+    "name": "🇬🇹 Volcán San Pedro",
+    "description": "Volcan dominant le lac Atitlán au Guatemala, l'un des plus beaux paysages d'Amérique centrale.",
+    "altitude": "3 020 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/San_Pedro_Volcano_Guatemala.jpg/800px-San_Pedro_Volcano_Guatemala.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Volcan_San_Pedro"
+  },
+  {
+    "id": "cerro-chirripo-panama",
+    "name": "🇵🇦 Volcán Barú",
+    "description": "Plus haut sommet du Panama, d'où l'on peut voir les deux océans par temps clair.",
+    "altitude": "3 475 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Volcan_Baru_Panama.jpg/800px-Volcan_Baru_Panama.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Volc%C3%A1n_Bar%C3%BA"
+  },
+  {
+    "id": "el-pico-turquino",
+    "name": "🇨🇺 Pico Turquino",
+    "description": "Plus haut sommet de Cuba, dans la Sierra Maestra où Castro mena sa révolution.",
+    "altitude": "1 974 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Pico_Turquino.jpg/800px-Pico_Turquino.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Pico_Turquino"
+  },
+  {
+    "id": "blue-mountain-peak",
+    "name": "🇯🇲 Blue Mountain Peak",
+    "description": "Plus haut sommet de Jamaïque, berceau du célèbre café Blue Mountain.",
+    "altitude": "2 256 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Blue_Mountain_Peak_Jamaica.jpg/800px-Blue_Mountain_Peak_Jamaica.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Blue_Mountain_Peak"
+  },
+  {
+    "id": "cerro-el-avila",
+    "name": "🇻🇪 Cerro El Ávila",
+    "description": "Montagne emblématique dominant Caracas, parc national accessible par téléphérique.",
+    "altitude": "2 765 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Cerro_El_%C3%81vila.jpg/800px-Cerro_El_%C3%81vila.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Cerro_El_%C3%81vila"
+  },
+  {
+    "id": "volcan-cotopaxi-ecuador",
+    "name": "🇪🇨 Tungurahua",
+    "description": "\"Gorge de Feu\", volcan actif d'Équateur, l'un des plus dangereux des Andes.",
+    "altitude": "5 023 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Tungurahua_Eruption.jpg/800px-Tungurahua_Eruption.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Tungurahua"
+  },
+  {
+    "id": "nevado-del-huila",
+    "name": "🇨🇴 Nevado del Huila",
+    "description": "Plus haut volcan actif de Colombie, dominant le massif colombien.",
+    "altitude": "5 364 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Nevado_del_Huila.jpg/800px-Nevado_del_Huila.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Nevado_del_Huila"
+  },
+  {
+    "id": "cerro-san-valentin",
+    "name": "🇨🇱 Cerro San Valentín",
+    "description": "Plus haut sommet de Patagonie chilienne, dans le champ de glace nord.",
+    "altitude": "4 058 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Cerro_San_Valentin.jpg/800px-Cerro_San_Valentin.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Cerro_San_Valent%C3%ADn"
+  },
+  {
+    "id": "monte-sarmiento",
+    "name": "🇨🇱 Monte Sarmiento",
+    "description": "Sommet mythique de la Terre de Feu, première ascension en 2002, brumes permanentes.",
+    "altitude": "2 404 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Monte_Sarmiento.jpg/800px-Monte_Sarmiento.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Monte_Sarmiento"
+  },
+  {
+    "id": "volcan-villarrica",
+    "name": "🇨🇱 Villarrica",
+    "description": "L'un des volcans les plus actifs d'Amérique du Sud, dans la Araucanía chilienne.",
+    "altitude": "2 847 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Villarrica_Volcano.jpg/800px-Villarrica_Volcano.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Villarrica_(volcan)"
+  },
+  {
+    "id": "mount-erebus-secondary",
+    "name": "🇦🇶 Mont Sidley",
+    "description": "Plus haut sommet d'Antarctique hors péninsule, volcan éteint de la Terre Marie Byrd.",
+    "altitude": "4 285 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mount_Sidley.jpg/800px-Mount_Sidley.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Sidley"
+  },
+  {
+    "id": "mount-jackson",
+    "name": "🇦🇶 Mont Jackson",
+    "description": "Plus haut sommet de la péninsule Antarctique, dans les monts Sentinel.",
+    "altitude": "3 184 m",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Antarctic_Peninsula_mountains.jpg/800px-Antarctic_Peninsula_mountains.jpg",
+    "wiki": "https://fr.wikipedia.org/wiki/Mont_Jackson"
+  }
+]

@@ -118,15 +118,26 @@ export class BirthdayCron {
 
             // Envoi de l'embed
             const age = nowParis.getFullYear() - bdParis.getFullYear();
+
+            // Récupérer l'avatar de l'utilisateur
+            const discordUser = await this.client.users.fetch(user.discordId).catch(() => null);
+            const avatarUrl = discordUser?.displayAvatarURL({ size: 256 });
+
             const embed = new EmbedBuilder()
               .setTitle('🎉 Joyeux Anniversaire ! 🎉')
               .setDescription(
                 `Toute l'équipe souhaite un joyeux anniversaire à <@${user.discordId}> ! 🎂\n\n` +
                 `Aujourd'hui, ${user.name} souffle sa ${age}ème bougie !`
               )
-              .setColor(0xdac1ff) // Utilisation d'une couleur par défaut
+              .setColor(0xdac1ff)
               .setImage('https://c.tenor.com/GscosXEDKhcAAAAd/tenor.gif')
-              .setTimestamp(nowParis);
+              .setTimestamp(nowParis)
+              .setFooter({ text: `🎂 ${age} ans aujourd'hui !` });
+
+            // Ajouter le thumbnail avec l'avatar si disponible
+            if (avatarUrl) {
+              embed.setThumbnail(avatarUrl);
+            }
 
             await textChannel.send({ embeds: [embed] });
             await LogService.success(this.client as any, guildId, `Message d'anniversaire envoyé pour ${user.name}`, {
