@@ -82,6 +82,29 @@ export class UserService {
     );
   }
 
+  static async getVoiceStatsLast14Days(discordId: string, guildId: string): Promise<{ date: Date; time: number }[]> {
+    const user = await GuildUserModel.findOne({ discordId, guildId });
+    if (!user) return [];
+
+    const fourteenDaysAgo = new Date();
+    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+    fourteenDaysAgo.setHours(0, 0, 0, 0);
+
+    const dailyStats = new Map<string, number>();
+    user.stats.voiceHistory.forEach(entry => {
+      const entryDate = new Date(entry.date);
+      entryDate.setHours(0, 0, 0, 0);
+      if (entryDate >= fourteenDaysAgo) {
+        const dateKey = entryDate.toISOString().split('T')[0];
+        dailyStats.set(dateKey, (dailyStats.get(dateKey) || 0) + entry.time);
+      }
+    });
+
+    return Array.from(dailyStats.entries())
+      .map(([date, time]) => ({ date: new Date(date), time }))
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+  }
+
   static async getVoiceStatsLast7Days(discordId: string, guildId: string) {
     const user = await GuildUserModel.findOne({ discordId, guildId });
     if (!user) return [];

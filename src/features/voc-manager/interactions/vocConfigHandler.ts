@@ -13,7 +13,8 @@ import {
   LabelBuilder,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { VocManagerService, VOC_CONFIG_BUTTON_ID, VOC_INVITE_USER_SELECT_ID } from '../services/vocManager.service';
+import { VOC_CONFIG_BUTTON_ID, VOC_INVITE_USER_SELECT_ID } from '../constants/vocManager.constants';
+import { ChannelService } from '../services/channel.service';
 
 export const VOC_CONFIG_MODAL_ID = 'voc-config-modal';
 export const VOC_NAME_INPUT_ID = 'voc-name-input';
@@ -231,7 +232,7 @@ export async function handleVocConfigModal(
         }
       }
 
-      await VocManagerService.updateConfigMessage(
+      await ChannelService.updateConfigMessage(
         channelId,
         guildId,
         ownerId,
