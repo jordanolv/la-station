@@ -533,10 +533,10 @@ export default {
         unlocked: unlockedIds.has(m.id)
       }));
 
-      // TODO: Récupérer les vraies données d'activité vocale des 7 derniers jours
-      const weeklyActivity = [0, 0, 0, 0, 0, 0, 0]; // Placeholder
+      const weeklyActivity = await UserService.getVoiceStatsLast14Days(interaction.user.id, interaction.guildId!);
 
       // Générer l'image de profil
+      const xpProgress = calculateXpProgress(profileData.level, profileData.experience);
       const cardBuffer = await ProfileCardService.generateCard({
         pseudo: interaction.user.username,
         bio: profileData.bio,
@@ -549,7 +549,8 @@ export default {
         avatarUrl: profileData.avatarUrl,
         roles: roles.map(r => ({ name: r.name, color: r.color })),
         weeklyActivity,
-        mountains: mountainsData
+        mountains: mountainsData,
+        xp: xpProgress
       });
       const attachment = new AttachmentBuilder(cardBuffer, { name: 'profile-card.png' });
 
