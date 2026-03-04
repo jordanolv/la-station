@@ -37,7 +37,7 @@ export default {
 
       try {
         // Note: Ceci est un exemple. Vous devrez adapter cette partie à votre système de stockage
-        // Vous pourriez avoir un modèle GuildModel ou utiliser une autre méthode de stockage
+        // Vous pourriez avoir un modèle AppConfigModel ou utiliser une autre méthode de stockage
         // Pour l'instant, nous simulons la mise à jour
         
         console.log(`[Admin] Canal de logs défini à ${channel.name} (${channel.id}) pour le serveur ${message.guild.name}`);

@@ -1,6 +1,5 @@
-import { IGlobalUser } from '../models/global-user.model';
-import { IGuildUser } from '../models/guild-user.model';
-import { IBirthday } from '../models/birthdayConfig.model';
+import { IUser } from '../models/user.model';
+import { IBirthday } from '../models/birthday-config.model';
 
 // ===== ERRORS =====
 export class UserError extends Error {
@@ -29,19 +28,13 @@ export class NotFoundError extends UserError {
 }
 
 // ===== USER DTOs =====
-export interface CreateGlobalUserDTO {
-  id: string;
-  name: string;
-}
-
-export interface CreateGuildUserDTO {
+export interface CreateUserDTO {
   discordId: string;
   name: string;
-  guildId: string;
   birthday?: Date;
 }
 
-export interface UpdateGuildUserDTO {
+export interface UpdateUserDTO {
   name?: string;
   birthday?: Date;
   profil?: {
@@ -57,7 +50,6 @@ export interface UpdateGuildUserDTO {
 
 export interface SetBirthdayDTO {
   discordId: string;
-  guildId: string;
   birthday: Date;
 }
 
@@ -71,7 +63,6 @@ export interface UpdateBirthdayConfigDTO {
 export interface UserProfileResponseDTO {
   discordId: string;
   name: string;
-  guildId: string;
   profil: {
     money: number;
     exp: number;
@@ -93,7 +84,6 @@ export interface UserProfileResponseDTO {
 }
 
 export interface BirthdayConfigResponseDTO {
-  guildId: string;
   channel: string;
   enabled: boolean;
 }
@@ -129,7 +119,6 @@ export interface BirthdaySearchCriteria {
 export interface BirthdayUser {
   discordId: string;
   name: string;
-  guildId: string;
   birthday: Date;
   age?: number;
 }
@@ -137,19 +126,16 @@ export interface BirthdayUser {
 // ===== STATS TYPES =====
 export interface VoiceSessionDTO {
   discordId: string;
-  guildId: string;
   duration: number; // en millisecondes
 }
 
 export interface MessageStatDTO {
   discordId: string;
-  guildId: string;
   messageCount: number;
 }
 
 export interface UserStatsUpdateDTO {
   discordId: string;
-  guildId: string;
   voiceTime?: number;
   messageCount?: number;
 }

@@ -39,11 +39,11 @@ export default {
 
       switch (feature) {
         case 'logs':
-          result = await adminService.setLogsChannel(client, interaction.guild.id, channel.id);
+          result = await adminService.setLogsChannel(client, channel.id);
           break;
 
         case 'birthday':
-          result = await adminService.setBirthdayChannel(client, interaction.guild.id, channel.id);
+          result = await adminService.setBirthdayChannel(client, channel.id);
           break;
 
         default:

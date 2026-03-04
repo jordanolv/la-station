@@ -251,9 +251,9 @@ export class ProfileCardService {
 
     // Supprime les emotes custom Discord (:nom:) et les emojis unicode des noms de rôles
     const cleanRoleName = (name: string): string =>
-      name
-        .replace(/<a?:[^:]+:\d+>/g, '') // emotes Discord custom
-        .replace(/[\u{1F000}-\u{1FFFF}|\u{2600}-\u{27BF}|\u{1F300}-\u{1F9FF}]/gu, '') // emojis unicode
+      this.sanitizeText(name)
+        .replace(/<a?:[^:]+:\d+>/g, '')
+        .replace(/[\u{1F000}-\u{1FFFF}|\u{2600}-\u{27BF}|\u{1F300}-\u{1F9FF}]/gu, '')
         .trim();
 
     const dotRadius = badgeHeight * 0.18;
@@ -649,8 +649,19 @@ export class ProfileCardService {
     return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
   }
 
-  private static escapeXml(text: string): string {
+  private static sanitizeText(text: string): string {
     return text
+      .replace(/[\u3164\uFFA0\u115F\u1160]/g, '')        // Hangul fillers
+      .replace(/[\u200B-\u200F\u2060\uFEFF]/g, '')        // Zero-width / BOM / word joiner
+      .replace(/[\u00AD\u034F\u17B4\u17B5]/g, '')         // Soft hyphen, combining grapheme, Khmer
+      .replace(/[\u2028\u2029]/g, '')                      // Line/paragraph separators
+      .replace(/[\u2800]/g, '')                            // Braille blank
+      .replace(/[\u180E\u061C\u2066-\u2069]/g, '')        // Mongolian vowel, bidi isolates
+      .trim();
+  }
+
+  private static escapeXml(text: string): string {
+    return this.sanitizeText(text)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')

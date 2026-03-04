@@ -17,9 +17,8 @@ type DurationInput = {
 
 type VoiceImportEntry = DurationInput & {
   discordId: string;
-  guildId: string;
   username?: string;
-  date?: string; // facultatif : date à associer dans voiceHistory
+  date?: string;
 };
 
 function parseArgs(): { file: string } {
@@ -97,8 +96,8 @@ async function importVoiceStats(entries: VoiceImportEntry[]): Promise<void> {
 
   for (const entry of entries) {
     const seconds = toSeconds(entry);
-    if (!entry.discordId || !entry.guildId) {
-      console.warn(`[IGNORÉ] discordId ou guildId manquant: ${JSON.stringify(entry)}`);
+    if (!entry.discordId) {
+      console.warn(`[IGNORÉ] discordId manquant: ${JSON.stringify(entry)}`);
       continue;
     }
 
@@ -109,18 +108,17 @@ async function importVoiceStats(entries: VoiceImportEntry[]): Promise<void> {
 
     const date = normalizeDate(entry.date);
 
-    const existing = await repo.findGuildUserById(entry.discordId, entry.guildId);
-    const user = existing || await repo.createGuildUser({
+    const existing = await repo.findUserById(entry.discordId);
+    const user = existing || await repo.createUser({
       discordId: entry.discordId,
-      name: entry.username || 'Unknown User',
-      guildId: entry.guildId
+      name: entry.username || 'Unknown User'
     });
 
     if (entry.username && user.name !== entry.username) {
       user.name = entry.username;
     }
 
-    const addedSeconds = StatsService.applyVoiceSegmentsToGuildUser(
+    const addedSeconds = StatsService.applyVoiceSegmentsToUser(
       user,
       [{ date, seconds }],
       existing ? 'append' : 'replace'
@@ -135,7 +133,7 @@ async function importVoiceStats(entries: VoiceImportEntry[]): Promise<void> {
     user.infos.updatedAt = new Date();
     await user.save();
 
-    console.log(`[OK] ${entry.guildId}/${entry.discordId} +${(addedSeconds / 3600).toFixed(2)}h (${addedSeconds}s)`);
+    console.log(`[OK] ${entry.discordId} +${(addedSeconds / 3600).toFixed(2)}h (${addedSeconds}s)`);
   }
 }
 

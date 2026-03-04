@@ -1,29 +1,29 @@
-import { 
-  Client, 
-  Guild, 
-  GuildMember, 
-  Role, 
-  TextChannel, 
+import {
+  Client,
+  GuildMember,
+  Role,
+  TextChannel,
   ChannelType,
-  PermissionsBitField 
+  PermissionsBitField
 } from 'discord.js';
 import { LogService } from '../../../shared/logs/logs.service';
 import { UserRepository } from '../../user/services/user.repository';
+import { getGuildId } from '../../../shared/guild';
 
 export class AdminService {
 
   // ===== CHANNEL CONFIGURATION =====
-  async setLogsChannel(client: Client, guildId: string, channelId: string): Promise<{
+  async setLogsChannel(client: Client, channelId: string): Promise<{
     success: boolean;
     message: string;
   }> {
     try {
-      const validation = await this.validateChannel(client, guildId, channelId);
+      const validation = await this.validateChannel(client, channelId);
       if (!validation.isValid) {
         return { success: false, message: validation.error! };
       }
 
-      await LogService.setLogsChannel(guildId, channelId);
+      await LogService.setLogsChannel(channelId);
       
       return {
         success: true,
@@ -38,21 +38,18 @@ export class AdminService {
     }
   }
 
-  async setBirthdayChannel(client: Client, guildId: string, channelId: string): Promise<{
+  async setBirthdayChannel(client: Client, channelId: string): Promise<{
     success: boolean;
     message: string;
   }> {
     try {
-      const validation = await this.validateChannel(client, guildId, channelId);
+      const validation = await this.validateChannel(client, channelId);
       if (!validation.isValid) {
         return { success: false, message: validation.error! };
       }
 
       const userRepo = new UserRepository();
-      await userRepo.updateBirthdayConfig(guildId, { 
-        channel: channelId, 
-        enabled: true 
-      });
+      await userRepo.updateBirthdayConfig({ channel: channelId, enabled: true });
       
       return {
         success: true,
@@ -70,7 +67,6 @@ export class AdminService {
   // ===== ROLE MANAGEMENT =====
   async assignRoleToUsersWithRoles(
     client: Client,
-    guildId: string,
     targetRoleId: string,
     requiredRoleIds: string[]
   ): Promise<{
@@ -83,24 +79,21 @@ export class AdminService {
     };
   }> {
     try {
-      const guild = client.guilds.cache.get(guildId);
+      const guild = client.guilds.cache.get(getGuildId());
       if (!guild) {
         return { success: false, message: '❌ Serveur non trouvé' };
       }
 
-      // Valider le rôle cible
       const targetRole = guild.roles.cache.get(targetRoleId);
       if (!targetRole) {
         return { success: false, message: '❌ Rôle cible non trouvé' };
       }
 
-      // Valider les rôles requis
       const requiredRoles = requiredRoleIds.map(id => guild.roles.cache.get(id)).filter(Boolean) as Role[];
       if (requiredRoles.length !== requiredRoleIds.length) {
         return { success: false, message: '❌ Un ou plusieurs rôles requis non trouvés' };
       }
 
-      // Vérifier les permissions du bot
       const botMember = guild.members.me;
       if (!botMember || !botMember.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
         return { success: false, message: '❌ Le bot n\'a pas la permission de gérer les rôles' };
@@ -110,23 +103,19 @@ export class AdminService {
         return { success: false, message: '❌ Le rôle cible est trop élevé dans la hiérarchie' };
       }
 
-      // Récupérer tous les membres
       await guild.members.fetch();
-      
+
       let processed = 0;
       let assigned = 0;
       let errors = 0;
 
       for (const [, member] of guild.members.cache) {
-        if (member.user.bot) continue; // Ignorer les bots
-        
+        if (member.user.bot) continue;
         processed++;
 
         try {
-          // Vérifier si le membre a déjà le rôle cible
           if (member.roles.cache.has(targetRoleId)) continue;
 
-          // Vérifier si le membre a au moins un des rôles requis
           const hasRequiredRole = requiredRoles.some(role => member.roles.cache.has(role.id));
           
           if (hasRequiredRole) {
@@ -153,38 +142,18 @@ export class AdminService {
     }
   }
 
-  // ===== LOGS MANAGEMENT =====
-  async toggleLogs(guildId: string, enabled: boolean): Promise<{
-    success: boolean;
-    message: string;
-  }> {
-    try {
-      // Note: Cette fonctionnalité dépend de comment vous stockez les settings de logs
-      // Pour l'instant, on assume que LogService a une méthode pour ça
-      
-      const status = enabled ? 'activés' : 'désactivés';
-      
-      return {
-        success: true,
-        message: `✅ Les logs ont été ${status} avec succès!`
-      };
-    } catch (error) {
-      console.error('Error toggling logs:', error);
-      return {
-        success: false,
-        message: '❌ Erreur lors de la modification des paramètres de logs'
-      };
-    }
+  async toggleLogs(enabled: boolean): Promise<{ success: boolean; message: string }> {
+    const status = enabled ? 'activés' : 'désactivés';
+    return { success: true, message: `✅ Les logs ont été ${status} avec succès!` };
   }
 
-  // ===== VALIDATION HELPERS =====
-  private async validateChannel(client: Client, guildId: string, channelId: string): Promise<{
+  private async validateChannel(client: Client, channelId: string): Promise<{
     isValid: boolean;
     error?: string;
     channel?: TextChannel;
   }> {
     try {
-      const guild = client.guilds.cache.get(guildId);
+      const guild = client.guilds.cache.get(getGuildId());
       if (!guild) {
         return { isValid: false, error: '❌ Serveur non trouvé' };
       }
@@ -218,7 +187,6 @@ export class AdminService {
     }
   }
 
-  // ===== PERMISSION HELPERS =====
   static hasManageGuildPermission(member: GuildMember): boolean {
     return member.permissions.has(PermissionsBitField.Flags.ManageGuild);
   }
@@ -227,8 +195,7 @@ export class AdminService {
     return member.permissions.has(PermissionsBitField.Flags.ManageRoles);
   }
 
-  // ===== SERVER INFO =====
-  async getServerInfo(client: Client, guildId: string): Promise<{
+  async getServerInfo(client: Client): Promise<{
     name: string;
     memberCount: number;
     channelCount: number;
@@ -240,16 +207,14 @@ export class AdminService {
     };
   } | null> {
     try {
-      const guild = client.guilds.cache.get(guildId);
+      const guild = client.guilds.cache.get(getGuildId());
       if (!guild) return null;
 
       await guild.members.fetch();
 
-      // Récupérer les infos des features
-      const logsChannelId = await LogService.getLogsChannelId(guildId);
-      
+      const logsChannelId = await LogService.getLogsChannelId();
       const userRepo = new UserRepository();
-      const birthdayConfig = await userRepo.getBirthdayConfig(guildId);
+      const birthdayConfig = await userRepo.getBirthdayConfig();
 
       return {
         name: guild.name,

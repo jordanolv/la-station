@@ -1,14 +1,15 @@
-import GuildModel from '../../discord/models/guild.model';
+import AppConfigModel from '../../discord/models/app-config.model';
+import { getGuildId } from '../../../shared/guild';
 import { ArcadeGameName } from '../types/arcade.types';
 
 export class ArcadeStatsService {
   /**
    * Incrémente le nombre total de parties pour un jeu dans une guilde
    */
-  static async incrementGameCount(guildId: string, gameName: ArcadeGameName) {
+  static async incrementGameCount(gameName: ArcadeGameName) {
     const field = `features.arcade.${gameName}.stats.totalGames`;
-    return GuildModel.findOneAndUpdate(
-      { guildId },
+    return AppConfigModel.findOneAndUpdate(
+      {},
       { $inc: { [field]: 1 } },
       { new: true, upsert: true }
     );
@@ -17,16 +18,16 @@ export class ArcadeStatsService {
   /**
    * Récupère les statistiques d'un jeu pour une guilde
    */
-  static async getGameStats(guildId: string, gameName: ArcadeGameName) {
-    const guild = await GuildModel.findOne({ guildId });
+  static async getGameStats(gameName: ArcadeGameName) {
+    const guild = await AppConfigModel.findOne({});
     return guild?.features?.arcade?.[gameName]?.stats?.totalGames || 0;
   }
 
   /**
    * Récupère toutes les statistiques arcade d'une guilde
    */
-  static async getAllStats(guildId: string) {
-    const guild = await GuildModel.findOne({ guildId });
+  static async getAllStats() {
+    const guild = await AppConfigModel.findOne({});
     if (!guild?.features?.arcade) {
       return { shifumi: 0, puissance4: 0, morpion: 0, battle: 0 };
     }
@@ -42,18 +43,18 @@ export class ArcadeStatsService {
   /**
    * Vérifie si un jeu est activé dans une guilde
    */
-  static async isGameEnabled(guildId: string, gameName: ArcadeGameName): Promise<boolean> {
-    const guild = await GuildModel.findOne({ guildId });
+  static async isGameEnabled(gameName: ArcadeGameName): Promise<boolean> {
+    const guild = await AppConfigModel.findOne({});
     return guild?.features?.arcade?.[gameName]?.enabled ?? true;
   }
 
   /**
    * Active ou désactive un jeu dans une guilde
    */
-  static async toggleGame(guildId: string, gameName: ArcadeGameName, enabled: boolean) {
+  static async toggleGame(gameName: ArcadeGameName, enabled: boolean) {
     const field = `features.arcade.${gameName}.enabled`;
-    return GuildModel.findOneAndUpdate(
-      { guildId },
+    return AppConfigModel.findOneAndUpdate(
+      {},
       { $set: { [field]: enabled } },
       { new: true, upsert: true }
     );

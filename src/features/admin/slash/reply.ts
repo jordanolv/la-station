@@ -1,4 +1,5 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, ChannelType, TextChannel } from 'discord.js';
+import {
+  MessageFlags, SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, ChannelType, TextChannel } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 
 export default {
@@ -28,7 +29,7 @@ export default {
 
   async execute(interaction: ChatInputCommandInteraction, client: BotClient) {
     try {
-      await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
       const channelId = interaction.options.getString('channel-id', true);
       const messageId = interaction.options.getString('message-id', true);
