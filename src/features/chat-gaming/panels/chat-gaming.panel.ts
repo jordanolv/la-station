@@ -71,60 +71,92 @@ export const chatGamingPanel: ConfigPanel = {
         ),
       );
 
-    // ── Container 2 : liste des jeux ──────────────────────────────────────────
-    const listContainer = new ContainerBuilder()
-      .setAccentColor(0x5865f2)
-      .addSectionComponents(
-        new SectionBuilder()
-          .addTextDisplayComponents(
-            new TextDisplayBuilder().setContent(`### 🕹️ Jeux (${games.length})`),
-          )
-          .setButtonAccessory(
-            new ButtonBuilder()
-              .setCustomId(panelCustomId(PANEL_ID, 'create_game'))
-              .setLabel('➕ Créer')
-              .setStyle(ButtonStyle.Primary),
-          ),
-      );
+    // ── Container 2+ : liste des jeux (max 8 par container) ──────────────────
+    const GAMES_PER_CONTAINER = 8;
+    const gameContainers: ContainerBuilder[] = [];
 
-    if (games.length > 0) {
-      listContainer.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
-      for (const game of games) {
-        const meta = `-# 🎨 ${game.color ?? '#55CCFC'}${game.image ? ' · 🖼️ image' : ''}`;
-        listContainer.addSectionComponents(
+    if (games.length === 0) {
+      const emptyContainer = new ContainerBuilder()
+        .setAccentColor(0x5865f2)
+        .addSectionComponents(
           new SectionBuilder()
             .addTextDisplayComponents(
-              new TextDisplayBuilder().setContent(
-                `**${game.name}**${game.description ? `\n-# ${game.description}` : ''}\n${meta}`,
-              ),
+              new TextDisplayBuilder().setContent(`### 🕹️ Jeux (0)`),
             )
             .setButtonAccessory(
               new ButtonBuilder()
-                .setCustomId(panelCustomId(PANEL_ID, `edit_game:${game._id.toString()}`))
-                .setLabel('✏️ Éditer')
-                .setStyle(ButtonStyle.Secondary),
+                .setCustomId(panelCustomId(PANEL_ID, 'create_game'))
+                .setLabel('➕ Créer')
+                .setStyle(ButtonStyle.Primary),
             ),
+        )
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent('-# *Aucun jeu créé*'),
         );
-      }
-      listContainer.addSeparatorComponents(new SeparatorBuilder().setDivider(false));
-      listContainer.addActionRowComponents(
-        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-          new StringSelectMenuBuilder()
-            .setCustomId(panelCustomId(PANEL_ID, 'delete_game_select'))
-            .setPlaceholder('🗑️ Supprimer un jeu...')
-            .addOptions(games.map(g => ({
-              label: g.name,
-              value: g._id.toString(),
-            }))),
-        ),
-      );
+      gameContainers.push(emptyContainer);
     } else {
-      listContainer.addTextDisplayComponents(
-        new TextDisplayBuilder().setContent('-# *Aucun jeu créé*'),
-      );
+      for (let i = 0; i < games.length; i += GAMES_PER_CONTAINER) {
+        const chunk = games.slice(i, i + GAMES_PER_CONTAINER);
+        const isFirst = i === 0;
+        const isLast = i + GAMES_PER_CONTAINER >= games.length;
+
+        const container = new ContainerBuilder().setAccentColor(0x5865f2);
+
+        if (isFirst) {
+          container.addSectionComponents(
+            new SectionBuilder()
+              .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`### 🕹️ Jeux (${games.length})`),
+              )
+              .setButtonAccessory(
+                new ButtonBuilder()
+                  .setCustomId(panelCustomId(PANEL_ID, 'create_game'))
+                  .setLabel('➕ Créer')
+                  .setStyle(ButtonStyle.Primary),
+              ),
+          );
+        }
+
+        container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+
+        for (const game of chunk) {
+          const meta = `-# 🎨 ${game.color ?? '#55CCFC'}${game.image ? ' · 🖼️ image' : ''}`;
+          container.addSectionComponents(
+            new SectionBuilder()
+              .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                  `**${game.name}**${game.description ? `\n-# ${game.description}` : ''}\n${meta}`,
+                ),
+              )
+              .setButtonAccessory(
+                new ButtonBuilder()
+                  .setCustomId(panelCustomId(PANEL_ID, `edit_game:${game._id.toString()}`))
+                  .setLabel('✏️ Éditer')
+                  .setStyle(ButtonStyle.Secondary),
+              ),
+          );
+        }
+
+        if (isLast) {
+          container.addSeparatorComponents(new SeparatorBuilder().setDivider(false));
+          container.addActionRowComponents(
+            new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+              new StringSelectMenuBuilder()
+                .setCustomId(panelCustomId(PANEL_ID, 'delete_game_select'))
+                .setPlaceholder('🗑️ Supprimer un jeu...')
+                .addOptions(games.map(g => ({
+                  label: g.name,
+                  value: g._id.toString(),
+                }))),
+            ),
+          );
+        }
+
+        gameContainers.push(container);
+      }
     }
 
-    return [configContainer, listContainer];
+    return [configContainer, ...gameContainers];
   },
 
   async handleButton(interaction: ButtonInteraction, client: BotClient): Promise<void> {
