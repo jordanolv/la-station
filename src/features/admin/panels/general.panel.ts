@@ -21,6 +21,7 @@ import { ConfigPanel, panelCustomId } from '../../config-panel/services/config-p
 import { ConfigPanelService } from '../../config-panel/services/config-panel.service';
 import { AppConfigService } from '../../discord/services/app-config.service';
 import { LogService } from '../../../shared/logs/logs.service';
+import { VoiceConfigRepository } from '../../voice/repositories/voice-config.repository';
 
 const PANEL_ID = 'general';
 const ACCENT = 0xdac1ff;
@@ -40,6 +41,8 @@ export const generalPanel: ConfigPanel = {
     const prefix = appConfig.config?.prefix ?? '!';
     const primaryColor = appConfig.config?.colors?.get('primary') ?? '#dac1ff';
     const channels = appConfig.config?.channels ?? {};
+    const voiceConfig = await VoiceConfigRepository.get();
+    const notifMountainId = voiceConfig?.notificationChannelId;
 
     const configContainer = new ContainerBuilder()
       .setAccentColor(ACCENT)
@@ -106,6 +109,29 @@ export const generalPanel: ConfigPanel = {
       }
     }
 
+    const mountainStatus = notifMountainId ? `✅ Activé — <#${notifMountainId}>` : '❌ Désactivé';
+    channelsContainer.addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`### 🏔️ Notifications montagne\n${mountainStatus}`),
+    );
+    channelsContainer.addActionRowComponents(
+      new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+        new ChannelSelectMenuBuilder()
+          .setCustomId(panelCustomId(PANEL_ID, 'select_notification_mountain'))
+          .setPlaceholder('Choisir : Notifications montagne')
+          .setChannelTypes(ChannelType.GuildText),
+      ),
+    );
+    if (notifMountainId) {
+      channelsContainer.addActionRowComponents(
+        new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId(panelCustomId(PANEL_ID, 'clear_notification_mountain'))
+            .setLabel('Retirer Notifications montagne')
+            .setStyle(ButtonStyle.Danger),
+        ),
+      );
+    }
+
     return [configContainer, channelsContainer];
   },
 
@@ -115,6 +141,20 @@ export const generalPanel: ConfigPanel = {
     const clearMatch = action.match(/^clear_(.+)$/);
     if (clearMatch) {
       const channelKey = clearMatch[1];
+
+      if (channelKey === 'notification_mountain') {
+        const config = await AppConfigService.getOrCreateConfig();
+        if (config.features?.voice) {
+          config.features.voice.notificationChannelId = undefined;
+          config.markModified('features.voice');
+          await config.save();
+        }
+        await interaction.reply({ content: '🗑️ 🏔️ **Notifications montagne** retiré.', flags: MessageFlags.Ephemeral });
+        LogService.info(client, 'Salon **Notifications montagne** retiré.', { title: '⚙️ Config mise à jour', feature: 'Général' }).catch(() => {});
+        await ConfigPanelService.refreshPanel(client, PANEL_ID);
+        return;
+      }
+
       const def = CHANNEL_KEYS.find((ck) => ck.key === channelKey);
       if (!def) return;
 
@@ -180,10 +220,25 @@ export const generalPanel: ConfigPanel = {
     if (!match) return;
 
     const channelKey = match[1];
+    const channelId = interaction.values[0];
+
+    if (channelKey === 'notification_mountain') {
+      const config = await AppConfigService.getOrCreateConfig();
+      config.features = config.features ?? {};
+      config.features.voice = config.features.voice ?? { enabled: false, joinChannels: [], createdChannels: [], channelCount: 0 };
+      config.features.voice.notificationChannelId = channelId;
+      config.markModified('features.voice');
+      await config.save();
+
+      await interaction.reply({ content: `✅ 🏔️ **Notifications montagne** → <#${channelId}>`, ephemeral: true });
+      LogService.info(client, `Salon **Notifications montagne** configuré : <#${channelId}>`, { title: '⚙️ Config mise à jour', feature: 'Général' }).catch(() => {});
+      await ConfigPanelService.refreshPanel(client, PANEL_ID);
+      return;
+    }
+
     const def = CHANNEL_KEYS.find((ck) => ck.key === channelKey);
     if (!def) return;
 
-    const channelId = interaction.values[0];
     const appConfig = await AppConfigService.getOrCreateConfig();
     if (!appConfig.config.channels) appConfig.config.channels = {};
     (appConfig.config.channels as any)[channelKey] = channelId;

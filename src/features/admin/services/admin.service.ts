@@ -9,6 +9,7 @@ import {
 import { LogService } from '../../../shared/logs/logs.service';
 import { UserRepository } from '../../user/services/user.repository';
 import { getGuildId } from '../../../shared/guild';
+import ConfigPanelModel from '../../config-panel/models/config-panel.model';
 
 export class AdminService {
 
@@ -23,7 +24,7 @@ export class AdminService {
         return { success: false, message: validation.error! };
       }
 
-      await LogService.setLogsChannel(channelId);
+      await ConfigPanelModel.updateOne({}, { $set: { forumChannelId: channelId } }, { upsert: true });
       
       return {
         success: true,
@@ -212,7 +213,7 @@ export class AdminService {
 
       await guild.members.fetch();
 
-      const logsChannelId = await LogService.getLogsChannelId();
+      const logsChannelId = await LogService.getLogsThreadId();
       const userRepo = new UserRepository();
       const birthdayConfig = await userRepo.getBirthdayConfig();
 
