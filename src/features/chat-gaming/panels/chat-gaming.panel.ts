@@ -8,6 +8,8 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ChannelSelectMenuBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
   ChannelType,
   ButtonInteraction,
   ChannelSelectMenuInteraction,
@@ -103,15 +105,19 @@ export const chatGamingPanel: ConfigPanel = {
                 .setStyle(ButtonStyle.Secondary),
             ),
         );
-        listContainer.addActionRowComponents(
-          new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId(panelCustomId(PANEL_ID, `delete_game:${game._id.toString()}`))
-              .setLabel('🗑️ Supprimer')
-              .setStyle(ButtonStyle.Danger),
-          ),
-        );
       }
+      listContainer.addSeparatorComponents(new SeparatorBuilder().setDivider(false));
+      listContainer.addActionRowComponents(
+        new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+          new StringSelectMenuBuilder()
+            .setCustomId(panelCustomId(PANEL_ID, 'delete_game_select'))
+            .setPlaceholder('🗑️ Supprimer un jeu...')
+            .addOptions(games.map(g => ({
+              label: g.name,
+              value: g._id.toString(),
+            }))),
+        ),
+      );
     } else {
       listContainer.addTextDisplayComponents(
         new TextDisplayBuilder().setContent('-# *Aucun jeu créé*'),
@@ -130,6 +136,7 @@ export const chatGamingPanel: ConfigPanel = {
         appConfig.features.chatGaming = { enabled: false, channelId: '' } as any;
       }
       appConfig.features.chatGaming!.enabled = !appConfig.features.chatGaming!.enabled;
+      appConfig.markModified('features.chatGaming');
       await appConfig.save();
 
       const now = appConfig.features.chatGaming!.enabled;
@@ -237,8 +244,13 @@ export const chatGamingPanel: ConfigPanel = {
       return;
     }
 
-    if (action.startsWith('delete_game:')) {
-      const gameId = action.split(':')[1];
+  },
+
+  async handleSelectMenu(interaction: ChannelSelectMenuInteraction | StringSelectMenuInteraction, client: BotClient): Promise<void> {
+    const action = interaction.customId.split(':').slice(2).join(':');
+
+    if (action === 'delete_game_select') {
+      const gameId = interaction.values[0];
       try {
         await ChatGamingService.deleteGame(client, gameId);
         await interaction.reply({ content: '✅ Jeu supprimé.', flags: MessageFlags.Ephemeral });
@@ -246,10 +258,9 @@ export const chatGamingPanel: ConfigPanel = {
       } catch (err) {
         await interaction.reply({ content: '❌ Erreur lors de la suppression.', flags: MessageFlags.Ephemeral });
       }
+      return;
     }
-  },
 
-  async handleSelectMenu(interaction: ChannelSelectMenuInteraction, client: BotClient): Promise<void> {
     const channelId = interaction.values[0];
     const appConfig = await AppConfigService.getOrCreateConfig();
 
