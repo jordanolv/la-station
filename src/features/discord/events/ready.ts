@@ -1,6 +1,26 @@
 import { Events, ActivityType } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { StatsService } from '../../stats/services/stats.service';
+import { VoiceService } from '../../voice/services/voice.service';
+import { panelRegistry } from '../../config-panel/services/config-panel.registry';
+import { ConfigPanelService } from '../../config-panel/services/config-panel.service';
+import { LogService } from '../../../shared/logs/logs.service';
+import { generalPanel } from '../../admin/panels/general.panel';
+import { logsPanel } from '../../admin/panels/logs.panel';
+import { birthdayPanel } from '../../user/panels/birthday.panel';
+import { levelingPanel } from '../../leveling/panels/leveling.panel';
+import { voicePanel } from '../../voice/panels/voice.panel';
+import { partyPanel } from '../../party/panels/party.panel';
+import { chatGamingPanel } from '../../chat-gaming/panels/chat-gaming.panel';
+import { arcadePanel } from '../../arcade/panels/arcade.panel';
+
+panelRegistry.register(generalPanel);
+panelRegistry.register(logsPanel);
+panelRegistry.register(birthdayPanel);
+panelRegistry.register(levelingPanel);
+panelRegistry.register(voicePanel);
+panelRegistry.register(partyPanel);
+panelRegistry.register(chatGamingPanel);
+panelRegistry.register(arcadePanel);
 
 export default {
   name: Events.ClientReady,
@@ -22,9 +42,14 @@ export default {
 
     setStatus();
     setInterval(setStatus, 8000);
-    StatsService.rehydrateActiveSessions(client);
+    VoiceService.rehydrate(client);
+    await ConfigPanelService.init(client).catch((err) =>
+      console.error('[ConfigPanel] Erreur init:', err),
+    );
+    LogService.init(client).catch((err) =>
+      console.error('[LogService] Erreur init:', err),
+    );
 
-    // Send deployment notification to owner
     const ownerDiscordId = process.env.OWNER_DISCORD_ID;
     if (ownerDiscordId) {
       try {

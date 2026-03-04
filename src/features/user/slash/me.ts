@@ -16,12 +16,13 @@ import {
   AttachmentBuilder
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { UserService } from '../services/guildUser.service';
-import UserMountainsModel from '../../voc-manager/models/userMountains.model';
-import { VocManagerService } from '../../voc-manager/services/vocManager.service';
+import { UserService } from '../services/user.service';
+import { getGuildId } from '../../../shared/guild';
+import UserMountainsModel from '../../mountain/models/user-mountains.model';
+import { MountainService } from '../../mountain/services/mountain.service';
 import { ProfileCardService } from '../services/profileCard.service';
 
-type GuildUserDoc = NonNullable<Awaited<ReturnType<typeof UserService.getGuildUserByDiscordId>>>;
+type UserDoc = NonNullable<Awaited<ReturnType<typeof UserService.getUserByDiscordId>>>;
 
 function calculateXpProgress(level: number, experience: number): { current: number; required: number; percent: number } {
   const xpForCurrentLevel = 5 * (level ** 2) + 110 * level + 100;
@@ -70,22 +71,22 @@ type ProfileData = {
 
 function getProfileData(
   discordUser: { username: string; displayAvatarURL: (options?: { size?: number; extension?: string }) => string },
-  guildUser: GuildUserDoc
+  user: UserDoc
 ): ProfileData {
-  const level = guildUser?.profil?.lvl ?? 0;
-  const experience = guildUser?.profil?.exp ?? 0;
-  const money = guildUser?.profil?.money ?? 0;
-  const totalMessages = guildUser?.stats?.totalMsg ?? 0;
-  const voiceTime = guildUser?.stats?.voiceTime ?? 0;
-  const dailyStreak = guildUser?.stats?.dailyStreak ?? 0;
+  const level = user?.profil?.lvl ?? 0;
+  const experience = user?.profil?.exp ?? 0;
+  const money = user?.profil?.money ?? 0;
+  const totalMessages = user?.stats?.totalMsg ?? 0;
+  const voiceTime = user?.stats?.voiceTime ?? 0;
+  const dailyStreak = user?.stats?.dailyStreak ?? 0;
 
   const { current, required, percent } = calculateXpProgress(level, experience);
   const xpText = `${current.toLocaleString('fr-FR')}/${required.toLocaleString('fr-FR')} XP (${Math.round(percent * 100)}%)`;
 
-  const bio = guildUser?.bio && guildUser.bio.trim().length > 0 ? guildUser.bio : 'Aucune bio définie.';
-  const birthday = guildUser?.infos?.birthDate ? formatDateFR(guildUser.infos.birthDate) : '-';
-  const joined = guildUser?.infos?.registeredAt ? formatDateFR(guildUser.infos.registeredAt) : '-';
-  const lastActive = guildUser?.stats?.lastActivityDate ? formatDateFR(guildUser.stats.lastActivityDate) : '-';
+  const bio = user?.bio && user.bio.trim().length > 0 ? user.bio : 'Aucune bio définie.';
+  const birthday = user?.infos?.birthDate ? formatDateFR(user.infos.birthDate) : '-';
+  const joined = user?.infos?.registeredAt ? formatDateFR(user.infos.registeredAt) : '-';
+  const lastActive = user?.stats?.lastActivityDate ? formatDateFR(user.stats.lastActivityDate) : '-';
   const avatarUrl = discordUser.displayAvatarURL({ size: 256, extension: 'png' });
 
   return {
@@ -111,7 +112,7 @@ function buildStatsEmbed(
   data: ProfileData,
   unlockedMountains: { mountainId: string; unlockedAt: Date }[]
 ): EmbedBuilder {
-  const totalMountains = VocManagerService.getAllMountains().length;
+  const totalMountains = MountainService.getAll().length;
   const mountainProgress = totalMountains > 0
     ? Math.round((unlockedMountains.length / totalMountains) * 100)
     : 0;
@@ -242,7 +243,7 @@ function getBadges(data: ProfileData): string[] {
 
 // Formatter les montagnes avec emojis
 function formatMountains(unlockedMountains: { mountainId: string; unlockedAt: Date }[]): string {
-  const allMountains = VocManagerService.getAllMountains();
+  const allMountains = MountainService.getAll();
   const unlockedIds = new Set(unlockedMountains.map(m => m.mountainId));
 
   return allMountains.slice(0, 8).map(mountain => {
@@ -259,7 +260,7 @@ function buildStatsContainer(
   data: ProfileData,
   unlockedMountains: { mountainId: string; unlockedAt: Date }[]
 ): ContainerBuilder {
-  const totalMountains = VocManagerService.getAllMountains().length;
+  const totalMountains = MountainService.getAll().length;
   const mountainProgress = totalMountains > 0
     ? Math.round((unlockedMountains.length / totalMountains) * 100)
     : 0;
@@ -405,7 +406,7 @@ function buildAchievementsContainer(
 ): ContainerBuilder {
   const badges = getBadges(data);
   const mountains = formatMountains(unlockedMountains);
-  const totalMountains = VocManagerService.getAllMountains().length;
+  const totalMountains = MountainService.getAll().length;
 
   return new ContainerBuilder()
     .setAccentColor(0xf39c12)
@@ -488,18 +489,9 @@ export default {
     .setDescription('Afficher vos informations personnelles'),
   async execute(interaction: ChatInputCommandInteraction, _client: BotClient) {
     try {
-      if (!interaction.guildId || !interaction.guild) {
-        await interaction.reply({
-          content: '❌ Cette commande ne peut être utilisée que dans un serveur.',
-          flags: MessageFlags.Ephemeral
-        });
-        return;
-      }
-
-      // Defer la réponse car la génération d'image peut prendre du temps
       await interaction.deferReply();
 
-      const user = await UserService.getGuildUserByDiscordId(interaction.user.id, interaction.guildId);
+      const user = await UserService.getUserByDiscordId(interaction.user.id);
 
       if (!user) {
         await interaction.editReply({
@@ -526,14 +518,14 @@ export default {
       const profileData = getProfileData(interaction.user, user);
 
       // Préparer les données des montagnes
-      const allMountains = VocManagerService.getAllMountains();
+      const allMountains = MountainService.getAll();
       const unlockedIds = new Set(unlockedMountains.map(m => m.mountainId));
       const mountainsData = allMountains.map(m => ({
         name: m.name,
         unlocked: unlockedIds.has(m.id)
       }));
 
-      const weeklyActivity = await UserService.getVoiceStatsLast14Days(interaction.user.id, interaction.guildId!);
+      const weeklyActivity = await UserService.getVoiceStatsLast14Days(interaction.user.id);
 
       // Générer l'image de profil
       const xpProgress = calculateXpProgress(profileData.level, profileData.experience);

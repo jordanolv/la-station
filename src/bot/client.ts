@@ -18,6 +18,8 @@ export class BotClient extends Client {
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildInvites,
+        GatewayIntentBits.GuildModeration,
       ],
       partials: [
         Partials.Channel,
@@ -46,8 +48,10 @@ export class BotClient extends Client {
     return BotClient._instance;
   }
   
-  // Méthode utilitaire pour récupérer une guild
-  public static getGuild(id: string) {
-    return BotClient.getInstance().guilds.cache.get(id);
+  // Méthode utilitaire pour récupérer la guild unique du bot
+  public static getGuild() {
+    const guildId = process.env.GUILD_ID;
+    if (!guildId) throw new Error('GUILD_ID manquant dans .env');
+    return BotClient.getInstance().guilds.cache.get(guildId);
   }
 }

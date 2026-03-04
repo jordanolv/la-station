@@ -1,17 +1,9 @@
-// ecosystem.config.cjs
 module.exports = {
   apps: [
     {
-      name: "theridge-bot",
+      name: "la-station-bot",
       script: "dist/index.js",
       env_file: ".env",
-      env: { NODE_ENV: "production"},
-    },
-    {
-      name: "theridge-front",
-      cwd: `${__dirname}/src/frontend/dist`,
-      script: "npx",
-      args: ["serve", "-s", ".", "-l", "3050", "--cors"],
       env: { NODE_ENV: "production" },
     },
   ],

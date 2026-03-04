@@ -1,5 +1,4 @@
 import { startBot } from './bot/start';
-import { startApiServer } from './api/start';
 import dotenv from 'dotenv';
 import chalk from 'chalk';
 
@@ -11,19 +10,7 @@ async function main() {
     console.log(chalk.cyan.bold('          🚀 DÉMARRAGE DE LA STATION'));
     console.log(chalk.cyan('═'.repeat(60)));
 
-    // Démarrer le bot et l'API en parallèle pour gagner du temps
-    const API_PORT = process.env.API_PORT ? parseInt(process.env.API_PORT) : 3051;
-
-    const [botClient] = await Promise.all([
-      startBot(),
-      // L'API démarre après que le bot soit initialisé via BotClient.getInstance()
-      new Promise<void>(resolve => {
-        setTimeout(() => {
-          startApiServer(API_PORT);
-          resolve();
-        }, 100); // Petit délai pour s'assurer que le bot est bien init
-      })
-    ]);
+    const botClient = await startBot();
 
     console.log(chalk.cyan('═'.repeat(60)));
     console.log(chalk.green.bold('          ✅ LA STATION EST EN LIGNE'));

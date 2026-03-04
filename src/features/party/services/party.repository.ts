@@ -1,9 +1,9 @@
-import PartyEventModel, { PartyEvent } from '../models/partyEvent.model';
+import PartyEventModel, { PartyEvent } from '../models/party-event.model';
 import { NotFoundError } from './party.types';
 import { Types } from 'mongoose';
 
 export class PartyRepository {
-  
+
   async findById(eventId: string): Promise<PartyEvent | null> {
     if (!Types.ObjectId.isValid(eventId)) {
       return null;
@@ -11,9 +11,9 @@ export class PartyRepository {
     return PartyEventModel.findById(eventId);
   }
 
-  async findByGuild(guildId: string): Promise<PartyEvent[]> {
+  async findAll(): Promise<PartyEvent[]> {
     return PartyEventModel
-      .find({ 'discord.guildId': guildId })
+      .find({})
       .sort({ 'eventInfo.dateTime': 1 });
   }
 
@@ -35,8 +35,8 @@ export class PartyRepository {
     }
 
     const updatedEvent = await PartyEventModel.findByIdAndUpdate(
-      eventId, 
-      updates, 
+      eventId,
+      updates,
       { new: true }
     );
 
@@ -47,12 +47,21 @@ export class PartyRepository {
     return updatedEvent;
   }
 
-  async updateDiscordInfo(eventId: string, messageId?: string, threadId?: string, roleId?: string): Promise<PartyEvent> {
+  async updateDiscordInfo(
+    eventId: string,
+    messageId?: string,
+    threadId?: string,
+    roleId?: string,
+    announcementMessageId?: string,
+    announcementChannelId?: string,
+  ): Promise<PartyEvent> {
     const updateData: any = {};
-    
+
     if (messageId) updateData['discord.messageId'] = messageId;
     if (threadId) updateData['discord.threadId'] = threadId;
     if (roleId) updateData['discord.roleId'] = roleId;
+    if (announcementMessageId) updateData['discord.announcementMessageId'] = announcementMessageId;
+    if (announcementChannelId) updateData['discord.announcementChannelId'] = announcementChannelId;
 
     return this.update(eventId, updateData);
   }
@@ -106,36 +115,26 @@ export class PartyRepository {
     return PartyEventModel.findOne({ 'discord.channelId': channelId });
   }
 
-  async findActiveEvents(guildId: string): Promise<PartyEvent[]> {
+  async findActiveEvents(): Promise<PartyEvent[]> {
     return PartyEventModel
-      .find({ 
-        'discord.guildId': guildId,
-        'status': { $in: ['pending', 'started'] }
-      })
+      .find({ 'status': { $in: ['pending', 'started'] } })
       .sort({ 'eventInfo.dateTime': 1 });
   }
 
-  async findPastEvents(guildId: string, limit: number = 10): Promise<PartyEvent[]> {
+  async findPastEvents(limit: number = 10): Promise<PartyEvent[]> {
     return PartyEventModel
-      .find({ 
-        'discord.guildId': guildId,
-        'status': 'ended'
-      })
+      .find({ 'status': 'ended' })
       .sort({ 'endedAt': -1 })
       .limit(limit);
   }
 
-  async countEventsByUser(guildId: string, userId: string): Promise<number> {
-    return PartyEventModel.countDocuments({
-      'discord.guildId': guildId,
-      'createdBy': userId
-    });
+  async countEventsByUser(userId: string): Promise<number> {
+    return PartyEventModel.countDocuments({ 'createdBy': userId });
   }
 
-  async findEventsByDateRange(guildId: string, startDate: Date, endDate: Date): Promise<PartyEvent[]> {
+  async findEventsByDateRange(startDate: Date, endDate: Date): Promise<PartyEvent[]> {
     return PartyEventModel
       .find({
-        'discord.guildId': guildId,
         'eventInfo.dateTime': {
           $gte: startDate,
           $lte: endDate

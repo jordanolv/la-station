@@ -1,19 +1,15 @@
 import { ChatInputCommandInteraction, User } from 'discord.js';
-import { UserService } from '../../user/services/guildUser.service';
+import { UserService } from '../../user/services/user.service';
 import { ArcadeStatsService } from './arcade-stats.service';
 import { ArcadeGameName } from '../types/arcade.types';
+import { getGuildId } from '../../../shared/guild';
 
 export class ArcadeValidationService {
-  /**
-   * Vérifie si un jeu est activé dans la guilde
-   */
   static async checkGameEnabled(
     interaction: ChatInputCommandInteraction,
     gameName: ArcadeGameName
   ): Promise<boolean> {
-    if (!interaction.guildId) return true;
-
-    const isEnabled = await ArcadeStatsService.isGameEnabled(interaction.guildId, gameName);
+    const isEnabled = await ArcadeStatsService.isGameEnabled(gameName);
 
     if (!isEnabled) {
       const gameNames: Record<ArcadeGameName, string> = {
@@ -33,15 +29,11 @@ export class ArcadeValidationService {
     return true;
   }
 
-  /**
-   * Vérifie que l'adversaire est valide
-   */
   static async checkOpponentValid(
     interaction: ChatInputCommandInteraction,
     challenger: User,
     opponent: User
   ): Promise<boolean> {
-    // Vérifier qu'on ne joue pas contre soi-même
     if (opponent.id === challenger.id) {
       await interaction.reply({
         content: '❌ Vous ne pouvez pas jouer contre vous-même !',
@@ -50,7 +42,6 @@ export class ArcadeValidationService {
       return false;
     }
 
-    // Vérifier qu'on ne joue pas contre un bot
     if (opponent.bot) {
       await interaction.reply({
         content: '❌ Vous ne pouvez pas jouer contre un bot !',
@@ -62,9 +53,6 @@ export class ArcadeValidationService {
     return true;
   }
 
-  /**
-   * Vérifie que les deux joueurs ont assez de RidgeCoins
-   */
   static async checkRidgeCoins(
     interaction: ChatInputCommandInteraction,
     challenger: User,
@@ -73,16 +61,8 @@ export class ArcadeValidationService {
   ): Promise<boolean> {
     if (bet <= 0) return true;
 
-    if (!interaction.guildId) {
-      await interaction.reply({
-        content: '❌ Cette commande ne peut être utilisée que dans un serveur.',
-        flags: ['Ephemeral']
-      });
-      return false;
-    }
-
-    const challengerMoney = await UserService.getGuildUserMoney(challenger.id, interaction.guildId);
-    const opponentMoney = await UserService.getGuildUserMoney(opponent.id, interaction.guildId);
+    const challengerMoney = await UserService.getUserMoney(challenger.id);
+    const opponentMoney = await UserService.getUserMoney(opponent.id);
 
     if (challengerMoney < bet) {
       await interaction.reply({
@@ -103,9 +83,6 @@ export class ArcadeValidationService {
     return true;
   }
 
-  /**
-   * Effectue toutes les validations de base pour un jeu PvP
-   */
   static async validatePvPGame(
     interaction: ChatInputCommandInteraction,
     challenger: User,
@@ -113,21 +90,9 @@ export class ArcadeValidationService {
     bet: number,
     gameName: ArcadeGameName
   ): Promise<boolean> {
-    // Vérifier si le jeu est activé
-    if (!await this.checkGameEnabled(interaction, gameName)) {
-      return false;
-    }
-
-    // Vérifier l'adversaire
-    if (!await this.checkOpponentValid(interaction, challenger, opponent)) {
-      return false;
-    }
-
-    // Vérifier les RidgeCoins
-    if (!await this.checkRidgeCoins(interaction, challenger, opponent, bet)) {
-      return false;
-    }
-
+    if (!await this.checkGameEnabled(interaction, gameName)) return false;
+    if (!await this.checkOpponentValid(interaction, challenger, opponent)) return false;
+    if (!await this.checkRidgeCoins(interaction, challenger, opponent, bet)) return false;
     return true;
   }
 }

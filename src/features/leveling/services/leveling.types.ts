@@ -3,7 +3,6 @@ export interface UpdateLevelingConfigDTO {
   enabled?: boolean;
   taux?: number;
   notifLevelUp?: boolean;
-  channelNotif?: string | null;
 }
 
 export interface LevelUpResult {

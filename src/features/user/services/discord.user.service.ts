@@ -8,6 +8,7 @@ import {
 } from 'discord.js';
 import { BirthdayNotificationDTO } from './user.types';
 import { emojis } from '../../../utils/emojis';
+import { getGuildId } from '../../../shared/guild';
 
 export class DiscordUserService {
 
@@ -76,13 +77,13 @@ export class DiscordUserService {
   }
 
   // ===== CHANNEL VALIDATION =====
-  async validateBirthdayChannel(client: Client, guildId: string, channelId: string): Promise<{
+  async validateBirthdayChannel(client: Client, channelId: string): Promise<{
     isValid: boolean;
     error?: string;
     channel?: TextChannel;
   }> {
     try {
-      const guild = client.guilds.cache.get(guildId);
+      const guild = client.guilds.cache.get(getGuildId());
       if (!guild) {
         return { isValid: false, error: 'Serveur non trouvé' };
       }

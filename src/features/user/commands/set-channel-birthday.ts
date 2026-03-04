@@ -1,7 +1,8 @@
 import { Message, TextChannel } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import GuildModel from '../../discord/models/guild.model';
+import AppConfigModel from '../../discord/models/app-config.model';
 import { EmbedBuilder } from '../../../shared/EmbedBuilder';
+import { getGuildId } from '../../../shared/guild';
 
 export default {
   name: 'set-channel-birthday',
@@ -10,13 +11,6 @@ export default {
   
   async execute(message: Message, args: string[], client: BotClient) {
     try {
-      if (!message.guild) {
-        return message.reply({
-          embeds: [EmbedBuilder.error('Cette commande ne peut être utilisée que dans un serveur.')]
-        });
-      }
-
-      // Vérifier les permissions
       if (!message.member?.permissions.has('ManageGuild')) {
         return message.reply({
           embeds: [EmbedBuilder.error('Vous n\'avez pas les permissions nécessaires pour utiliser cette commande.')]
@@ -38,13 +32,11 @@ export default {
       }
 
       try {
-        // Récupérer ou créer la configuration d'anniversaire pour cette guilde
-        let guild = await GuildModel.findOne({ guildId: message.guild.id });
-        
+        let guild = await AppConfigModel.findOne({});
+
         if (!guild) {
-          guild = new GuildModel({
-            guildId: message.guild.id,
-            name: message.guild.name,
+          guild = new AppConfigModel({
+            name: message.guild?.name,
             features: {
               birthday: {
                 enabled: true,
@@ -64,7 +56,7 @@ export default {
         // Enregistrer la mise à jour
         await guild.save();
         
-        console.log(`[User] Canal d'anniversaire défini à ${channel.name} (${channel.id}) pour le serveur ${message.guild.name}`);
+        console.log(`[User] Canal d'anniversaire défini à ${channel.name} (${channel.id})`);
         
         const reply = await message.reply({
           embeds: [EmbedBuilder.success(`Le salon ${channel} a été défini comme salon d'anniversaire!`, 'Configuration mise à jour')]

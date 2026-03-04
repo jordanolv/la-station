@@ -1,11 +1,11 @@
 import { Events, Message } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { StatsService } from '../../stats/services/stats.service';
-import { GuildService } from '../services/guild.service';
-import { SuggestionsService } from '../../suggestions/services/suggestions.service';
+import { AppConfigService } from '../services/app-config.service';
 import { LevelingService } from '@/features/leveling/services/leveling.service';
-import { ChatGamingService } from '../../chat-gaming/services/chatGaming.service';
-import { UserService } from '../../user/services/guildUser.service';
+import { ChatGamingService } from '../../chat-gaming/services/chat-gaming.service';
+import { UserService } from '../../user/services/user.service';
+import { getGuildId } from '../../../shared/guild';
 
 export default {
   name: Events.MessageCreate,
@@ -13,27 +13,20 @@ export default {
 
   async execute(client: BotClient, message: Message) {
     try {
-      // Ignorer les messages des bots
       if (message.author?.bot) return;
-      
-      // Ignorer les messages en DM
       if (!message.guild) return;
-      
-      // Récupérer la guild
-      const guildData = await GuildService.getOrCreateGuild(message.guild.id, message.guild.name);
-      if(!guildData) return;
-      
-      // Traiter les commandes préfixées
-      const prefix = guildData.config.prefix; 
-      
+
+      const guildData = await AppConfigService.getOrCreateConfig();
+      if (!guildData) return;
+
+      const prefix = guildData.config.prefix;
+
       if (message.content.startsWith(prefix)) {
         const args = message.content.slice(prefix.length).trim().split(/ +/);
         const commandName = args.shift()?.toLowerCase();
-        
         if (!commandName) return;
-        
+
         const command = client.commands.get(commandName);
-        
         if (command) {
           try {
             await command.execute(message, args, client);
@@ -43,29 +36,14 @@ export default {
           }
         }
       }
-      
-      // Vérifier si le message est dans un channel de suggestions
-      await SuggestionsService.handleChannelMessage(message);
-      
-      // Mettre à jour les statistiques de l'utilisateur (messages)
-      await StatsService.incrementMessageCount(
-        client,
-        message.author.id,
-        message.guild.id,
-        message.author.username
-      );
 
-      // Mettre à jour la daily streak
-      await UserService.updateDailyStreak(message.author.id, message.guild.id);
-
-      // Gérer le système de leveling
+      await StatsService.incrementMessageCount(client, message.author.id, message.author.username);
+      await UserService.updateDailyStreak(message.author.id);
       await LevelingService.giveXpToUser(client, message);
-
-      // Vérifier et rappeler le rôle gaming si nécessaire
       await ChatGamingService.checkAndRemindGamingRole(message);
 
     } catch (error) {
       console.error('Erreur dans l\'événement messageCreate:', error);
     }
   }
-}; 
+};

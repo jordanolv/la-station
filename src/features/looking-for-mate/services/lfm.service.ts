@@ -11,7 +11,6 @@ import GameDBService from './game-db.service';
 export interface CreateLFMRequestDTO {
   userId: string;
   username: string;
-  guildId: string;
   game: string;
   numberOfMates: number;
   rank?: string;
@@ -23,54 +22,36 @@ export interface CreateLFMRequestDTO {
 }
 
 export class LFMService {
-  /**
-   * Create a new LFM request
-   */
   async createRequest(data: CreateLFMRequestDTO): Promise<ILFMRequest> {
-    // Cancel any existing open requests from the same user in the same guild
-    await this.cancelUserRequests(data.userId, data.guildId);
+    await this.cancelUserRequests(data.userId);
 
     const request = await LFMRequestModel.create({
       ...data,
       status: 'open',
       createdAt: new Date(),
-      interestedUsers: [data.userId], // Auto-add creator to the lobby
+      interestedUsers: [data.userId],
     });
 
     return request;
   }
 
-  /**
-   * Get an active LFM request by ID
-   */
   async getRequest(requestId: string): Promise<ILFMRequest | null> {
     return LFMRequestModel.findById(requestId);
   }
 
-  /**
-   * Get all open LFM requests for a guild
-   */
-  async getOpenRequests(guildId: string): Promise<ILFMRequest[]> {
+  async getOpenRequests(): Promise<ILFMRequest[]> {
     return LFMRequestModel.find({
-      guildId,
       status: 'open',
     }).sort({ createdAt: -1 });
   }
 
-  /**
-   * Get user's active requests in a guild
-   */
-  async getUserActiveRequests(userId: string, guildId: string): Promise<ILFMRequest[]> {
+  async getUserActiveRequests(userId: string): Promise<ILFMRequest[]> {
     return LFMRequestModel.find({
       userId,
-      guildId,
       status: { $in: ['open', 'in_progress'] },
     });
   }
 
-  /**
-   * Add a user to the interested users list
-   */
   async addInterestedUser(requestId: string, userId: string): Promise<ILFMRequest | null> {
     return LFMRequestModel.findByIdAndUpdate(
       requestId,
@@ -82,9 +63,6 @@ export class LFMService {
     );
   }
 
-  /**
-   * Remove a user from the interested users list
-   */
   async removeInterestedUser(requestId: string, userId: string): Promise<ILFMRequest | null> {
     return LFMRequestModel.findByIdAndUpdate(
       requestId,
@@ -96,9 +74,6 @@ export class LFMService {
     );
   }
 
-  /**
-   * Update request status
-   */
   async updateStatus(
     requestId: string,
     status: 'open' | 'in_progress' | 'completed' | 'cancelled'
@@ -113,9 +88,6 @@ export class LFMService {
     );
   }
 
-  /**
-   * Update message ID for a request
-   */
   async updateMessageInfo(
     requestId: string,
     messageId: string,
@@ -134,14 +106,10 @@ export class LFMService {
     );
   }
 
-  /**
-   * Cancel all active requests from a user in a guild
-   */
-  async cancelUserRequests(userId: string, guildId: string): Promise<void> {
+  async cancelUserRequests(userId: string): Promise<void> {
     await LFMRequestModel.updateMany(
       {
         userId,
-        guildId,
         status: { $in: ['open', 'in_progress'] },
       },
       {
@@ -151,25 +119,17 @@ export class LFMService {
     );
   }
 
-  /**
-   * Delete a request
-   */
   async deleteRequest(requestId: string): Promise<void> {
     await LFMRequestModel.findByIdAndDelete(requestId);
   }
 
-  /**
-   * Create Discord embed for LFM request
-   */
   createLFMEmbed(request: ILFMRequest, user: User, gameColor?: string, gameBanner?: string): EmbedBuilder {
     const progressBar = this.createProgressBar(request.interestedUsers?.length || 0, request.numberOfMates);
 
-    // Create title with game abbreviation and type
     const gameAbbr = this.getGameAbbreviation(request.game);
     const typeText = request.type || 'Casual';
     const title = `Nouveau Lobby sur ${gameAbbr} en ${typeText}`;
 
-    // Build description with optional description text above progress bar
     let description = '';
     if (request.description) {
       description += `${request.description}\n\n`;
@@ -187,10 +147,8 @@ export class LFMService {
       })
       .setThumbnail(user.displayAvatarURL({ size: 256 }));
 
-    // Add fields
     const fields: Array<{ name: string; value: string; inline: boolean }> = [];
 
-    // Session time
     if (request.sessionTime) {
       fields.push({
         name: '🕐 Heure',
@@ -199,7 +157,6 @@ export class LFMService {
       });
     }
 
-    // Game Mode (for games like Rocket League: 2v2, 3v3, etc.)
     if (request.gameMode) {
       fields.push({
         name: '⚽ Mode',
@@ -208,7 +165,6 @@ export class LFMService {
       });
     }
 
-    // Rank if specified (only for Ranked type)
     if (request.rank) {
       fields.push({
         name: '⭐ Rank',
@@ -219,12 +175,10 @@ export class LFMService {
 
     embed.addFields(fields);
 
-    // Add game banner if available
     if (gameBanner) {
       embed.setImage(gameBanner);
     }
 
-    // Add interested users list
     if (request.interestedUsers && request.interestedUsers.length > 0) {
       const interestedList = request.interestedUsers
         .map((id, index) => `${index + 1}. <@${id}>`)
@@ -240,9 +194,6 @@ export class LFMService {
     return embed;
   }
 
-  /**
-   * Create a progress bar for the number of interested users
-   */
   private createProgressBar(current: number, total: number): string {
     const filled = Math.min(current, total);
     const empty = Math.max(total - current, 0);
@@ -251,13 +202,9 @@ export class LFMService {
     return `${filledBar}${emptyBar} **${current}/${total}**`;
   }
 
-  /**
-   * Create action row with buttons for LFM request
-   */
   createLFMButtons(requestId: string, isOwner: boolean = false): ActionRowBuilder<ButtonBuilder> {
     const row = new ActionRowBuilder<ButtonBuilder>();
 
-    // Always show join/leave buttons
     row.addComponents(
       new ButtonBuilder()
         .setCustomId(`lfm_join_${requestId}`)
@@ -271,7 +218,6 @@ export class LFMService {
         .setEmoji('👋')
     );
 
-    // Add delete button for owner
     if (isOwner) {
       row.addComponents(
         new ButtonBuilder()
@@ -284,34 +230,25 @@ export class LFMService {
     return row;
   }
 
-  /**
-   * Check if user has reached their request limit
-   */
-  async hasReachedLimit(userId: string, guildId: string, limit: number = 3): Promise<boolean> {
-    const activeRequests = await this.getUserActiveRequests(userId, guildId);
+  async hasReachedLimit(userId: string, limit: number = 3): Promise<boolean> {
+    const activeRequests = await this.getUserActiveRequests(userId);
     return activeRequests.length >= limit;
   }
 
-  /**
-   * Get requests statistics for a guild
-   */
-  async getGuildStats(guildId: string): Promise<{
+  async getStats(): Promise<{
     total: number;
     open: number;
     completed: number;
   }> {
     const [total, open, completed] = await Promise.all([
-      LFMRequestModel.countDocuments({ guildId }),
-      LFMRequestModel.countDocuments({ guildId, status: 'open' }),
-      LFMRequestModel.countDocuments({ guildId, status: 'completed' }),
+      LFMRequestModel.countDocuments({}),
+      LFMRequestModel.countDocuments({ status: 'open' }),
+      LFMRequestModel.countDocuments({ status: 'completed' }),
     ]);
 
     return { total, open, completed };
   }
 
-  /**
-   * Get game abbreviation for display
-   */
   private getGameAbbreviation(gameName: string): string {
     const abbreviations: { [key: string]: string } = {
       'League of Legends': 'LoL',

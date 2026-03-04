@@ -11,8 +11,9 @@ import {
 import { ChallengeService } from '../services/challenge.service';
 import { BattleService } from '../services/battle.service';
 import { ArcadeStatsService } from '../services/arcade-stats.service';
-import { UserService } from '../../user/services/guildUser.service';
+import { UserService } from '../../user/services/user.service';
 import { ArcadeValidationService } from '../services/arcade-validation.service';
+import { getGuildId } from '../../../shared/guild';
 
 interface BattleGame {
   player1: User;
@@ -228,26 +229,18 @@ export default {
     const ropeVisual = this.getRopeVisual(game.ropePosition, game.player1, game.player2);
     let victoryMsg = `🏆 **${winner.username}** a tiré la corde jusqu'au bout et remporte la battle !`;
 
-    // Gérer les RidgeCoins et statistiques
-    if (interaction.guildId) {
-      try {
-        // Enregistrer les stats utilisateurs
-        await UserService.recordArcadeWin(winner.id, interaction.guildId, 'battle');
-        await UserService.recordArcadeLoss(loser.id, interaction.guildId, 'battle');
+    try {
+      await UserService.recordArcadeWin(winner.id, 'battle');
+      await UserService.recordArcadeLoss(loser.id, 'battle');
+      await ArcadeStatsService.incrementGameCount('battle');
 
-        // Incrémenter le compteur global de parties
-        await ArcadeStatsService.incrementGameCount(interaction.guildId, 'battle');
-
-        // Transférer les RidgeCoins si mise > 0
-        if (game.bet > 0) {
-          await UserService.updateGuildUserMoney(loser.id, interaction.guildId, -game.bet);
-          await UserService.updateGuildUserMoney(winner.id, interaction.guildId, game.bet);
-
-          victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
-        }
-      } catch (error) {
-        console.error('Erreur lors de la fin de partie:', error);
+      if (game.bet > 0) {
+        await UserService.updateUserMoney(loser.id, -game.bet);
+        await UserService.updateUserMoney(winner.id, game.bet);
+        victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
       }
+    } catch (error) {
+      console.error('Erreur lors de la fin de partie:', error);
     }
 
     const finalEmbed = new EmbedBuilder()

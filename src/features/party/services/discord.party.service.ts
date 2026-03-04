@@ -1,13 +1,14 @@
 import { ChannelType, EmbedBuilder, ForumChannel, ThreadChannel } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { PartyEvent } from '../models/partyEvent.model';
+import { getGuildId } from '../../../shared/guild';
+import { PartyEvent } from '../models/party-event.model';
 import { DiscordError } from './party.types';
 
 export class DiscordPartyService {
   
-  static async getGuildAndChannel(client: BotClient, guildId: string, channelId: string): Promise<{ guild: any; channel: any }> {
+  static async getGuildAndChannel(client: BotClient, channelId: string): Promise<{ guild: any; channel: any }> {
     try {
-      const guild = await client.guilds.fetch(guildId);
+      const guild = await client.guilds.fetch(getGuildId());
       const channel = await guild.channels.fetch(channelId);
       return { guild, channel };
     } catch (error) {
@@ -15,20 +16,19 @@ export class DiscordPartyService {
     }
   }
 
-  static createEventEmbed(event: PartyEvent, roleId?: string): EmbedBuilder {
-    const participantInfo = this.formatParticipants(event.participants, event.eventInfo.maxSlots);
+  static createEventEmbed(event: PartyEvent, roleId?: string, participantNames?: Map<string, string>): EmbedBuilder {
+    const ts = Math.floor(new Date(event.eventInfo.dateTime).getTime() / 1000);
+    const participantCount = `${event.participants.length}/${event.eventInfo.maxSlots}`;
+    const participantList = event.participants.length > 0
+      ? event.participants.map(id => participantNames?.get(id) ?? `<@${id}>`).join(', ')
+      : '*Aucun participant pour le moment*';
 
     const embed = new EmbedBuilder()
-      .setAuthor({
-        name: 'Événement Party',
-        iconURL: '🎉'
-      })
       .setTitle(`🎉 ${event.eventInfo.name}`)
       .addFields([
         { name: '🎮 Jeu', value: event.eventInfo.game, inline: true },
-        { name: '📅 Date', value: new Date(event.eventInfo.dateTime).toLocaleDateString('fr-FR'), inline: true },
-        { name: '⏰ Heure', value: new Date(event.eventInfo.dateTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }), inline: true },
-        { name: `👥 Participants (${participantInfo.count})`, value: participantInfo.list, inline: false }
+        { name: '📅 Date & Heure', value: `<t:${ts}:F>`, inline: true },
+        { name: `👥 Participants (${participantCount})`, value: participantList, inline: false },
       ])
       .setColor(event.eventInfo.color ? parseInt(event.eventInfo.color.replace('#', ''), 16) : 0xFF6B6B)
       .setFooter({ text: 'Réagissez avec 🎉 pour participer à cet événement !' })
@@ -150,7 +150,7 @@ export class DiscordPartyService {
   static async archiveThread(client: BotClient, event: PartyEvent): Promise<void> {
     try {
       if (!event.discord.threadId) return;
-      
+
       const thread = await client.channels.fetch(event.discord.threadId) as ThreadChannel;
       if (thread?.isThread() && !thread.name.startsWith('[END]')) {
         await thread.setName(`[END] ${thread.name}`).catch(() => {});
@@ -161,16 +161,28 @@ export class DiscordPartyService {
     }
   }
 
-  static async sendAnnouncementMessage(
-    client: BotClient, 
-    event: PartyEvent, 
-    announcementChannelId: string, 
-    threadUrl: string, 
-    roleId?: string,
-    gameImageUrl?: string
-  ): Promise<void> {
+  static async deleteThread(client: BotClient, event: PartyEvent): Promise<void> {
     try {
-      const { guild } = await this.getGuildAndChannel(client, event.discord.guildId, event.discord.channelId);
+      if (!event.discord.threadId) return;
+      const thread = await client.channels.fetch(event.discord.threadId) as ThreadChannel;
+      if (thread?.isThread()) {
+        await thread.delete('Soirée supprimée').catch(() => {});
+      }
+    } catch (error) {
+      console.error('[DISCORD] Erreur suppression thread:', error);
+    }
+  }
+
+  static async sendAnnouncementMessage(
+    client: BotClient,
+    event: PartyEvent,
+    announcementChannelId: string,
+    threadUrl: string,
+    roleId?: string,
+    gameImageUrl?: string,
+  ): Promise<string | undefined> {
+    try {
+      const { guild } = await this.getGuildAndChannel(client, event.discord.channelId);
       const announcementChannel = await guild.channels.fetch(announcementChannelId);
       
       if (!announcementChannel?.isTextBased()) {
@@ -202,9 +214,24 @@ export class DiscordPartyService {
         messageOptions.content = `<@&${roleId}>`;
       }
 
-      await announcementChannel.send(messageOptions);
+      const sent = await announcementChannel.send(messageOptions);
+      return sent.id;
     } catch (error) {
       console.error('[DISCORD] Erreur envoi annonce:', error);
+      return undefined;
+    }
+  }
+
+  static async deleteAnnouncementMessage(client: BotClient, event: PartyEvent): Promise<void> {
+    try {
+      if (!event.discord.announcementChannelId || !event.discord.announcementMessageId) return;
+      const { guild } = await this.getGuildAndChannel(client, event.discord.channelId);
+      const channel = await guild.channels.fetch(event.discord.announcementChannelId);
+      if (!channel?.isTextBased()) return;
+      const msg = await (channel as any).messages.fetch(event.discord.announcementMessageId).catch(() => null);
+      if (msg) await msg.delete().catch(() => {});
+    } catch (error) {
+      console.error('[DISCORD] Erreur suppression annonce:', error);
     }
   }
 
