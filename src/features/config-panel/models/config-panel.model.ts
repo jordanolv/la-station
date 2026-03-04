@@ -6,6 +6,9 @@ class PanelEntry {
 
   @prop({ required: true })
   messageId!: string;
+
+  @prop({ type: () => [String], default: [] })
+  messageIds?: string[];
 }
 
 @modelOptions({ options: { allowMixed: 0 } })
