@@ -1,7 +1,6 @@
 import {
-  CreateGlobalUserDTO,
-  CreateGuildUserDTO,
-  UpdateGuildUserDTO,
+  CreateUserDTO,
+  UpdateUserDTO,
   SetBirthdayDTO,
   UpdateBirthdayConfigDTO,
   VoiceSessionDTO,
@@ -24,35 +23,8 @@ export class UserValidator {
     }
   }
 
-  // ===== GLOBAL USER VALIDATION =====
-  static validateCreateGlobalUser(data: CreateGlobalUserDTO): ValidationResult {
-    const errors: string[] = [];
-
-    if (!data.id || data.id.trim().length === 0) {
-      errors.push('L\'ID Discord est requis');
-    }
-
-    if (data.id && (data.id.length < 17 || data.id.length > 19)) {
-      errors.push('L\'ID Discord doit contenir entre 17 et 19 caractères');
-    }
-
-    if (!/^\d+$/.test(data.id)) {
-      errors.push('L\'ID Discord ne doit contenir que des chiffres');
-    }
-
-    if (!data.name || data.name.trim().length === 0) {
-      errors.push('Le nom d\'utilisateur est requis');
-    }
-
-    if (data.name && data.name.length > 32) {
-      errors.push('Le nom d\'utilisateur ne peut pas dépasser 32 caractères');
-    }
-
-    return this.createValidationResult(errors.length === 0, errors);
-  }
-
-  // ===== GUILD USER VALIDATION =====
-  static validateCreateGuildUser(data: CreateGuildUserDTO): ValidationResult {
+  // ===== USER VALIDATION =====
+  static validateCreateUser(data: CreateUserDTO): ValidationResult {
     const errors: string[] = [];
 
     // Validate Discord ID
@@ -71,10 +43,6 @@ export class UserValidator {
     }
 
     // Validate guild ID
-    const guildIdValidation = this.validateGuildId(data.guildId);
-    if (!guildIdValidation.isValid) {
-      errors.push(...guildIdValidation.errors);
-    }
 
     // Validate birthday if provided
     if (data.birthday) {
@@ -87,7 +55,7 @@ export class UserValidator {
     return this.createValidationResult(errors.length === 0, errors);
   }
 
-  static validateUpdateGuildUser(data: UpdateGuildUserDTO): ValidationResult {
+  static validateUpdateUser(data: UpdateUserDTO): ValidationResult {
     const errors: string[] = [];
 
     if (data.name !== undefined) {
@@ -137,11 +105,6 @@ export class UserValidator {
     const discordIdValidation = this.validateDiscordId(data.discordId);
     if (!discordIdValidation.isValid) {
       errors.push(...discordIdValidation.errors);
-    }
-
-    const guildIdValidation = this.validateGuildId(data.guildId);
-    if (!guildIdValidation.isValid) {
-      errors.push(...guildIdValidation.errors);
     }
 
     const birthdayValidation = this.validateBirthday(data.birthday);
@@ -208,11 +171,6 @@ export class UserValidator {
       errors.push(...discordIdValidation.errors);
     }
 
-    const guildIdValidation = this.validateGuildId(data.guildId);
-    if (!guildIdValidation.isValid) {
-      errors.push(...guildIdValidation.errors);
-    }
-
     if (data.duration < 0) {
       errors.push('La durée ne peut pas être négative');
     }
@@ -232,11 +190,6 @@ export class UserValidator {
       errors.push(...discordIdValidation.errors);
     }
 
-    const guildIdValidation = this.validateGuildId(data.guildId);
-    if (!guildIdValidation.isValid) {
-      errors.push(...guildIdValidation.errors);
-    }
-
     if (data.messageCount < 0) {
       errors.push('Le nombre de messages ne peut pas être négatif');
     }
@@ -254,11 +207,6 @@ export class UserValidator {
     const discordIdValidation = this.validateDiscordId(data.discordId);
     if (!discordIdValidation.isValid) {
       errors.push(...discordIdValidation.errors);
-    }
-
-    const guildIdValidation = this.validateGuildId(data.guildId);
-    if (!guildIdValidation.isValid) {
-      errors.push(...guildIdValidation.errors);
     }
 
     if (data.voiceTime !== undefined && data.voiceTime < 0) {
@@ -286,24 +234,6 @@ export class UserValidator {
 
     if (discordId && !/^\d+$/.test(discordId)) {
       errors.push('L\'ID Discord ne doit contenir que des chiffres');
-    }
-
-    return this.createValidationResult(errors.length === 0, errors);
-  }
-
-  static validateGuildId(guildId: string): ValidationResult {
-    const errors: string[] = [];
-
-    if (!guildId || guildId.trim().length === 0) {
-      errors.push('L\'ID de la guilde est requis');
-    }
-
-    if (guildId && (guildId.length < 17 || guildId.length > 19)) {
-      errors.push('L\'ID de la guilde doit contenir entre 17 et 19 caractères');
-    }
-
-    if (guildId && !/^\d+$/.test(guildId)) {
-      errors.push('L\'ID de la guilde ne doit contenir que des chiffres');
     }
 
     return this.createValidationResult(errors.length === 0, errors);

@@ -64,12 +64,7 @@ export default {
       });
 
       const adminService = new AdminService();
-      const result = await adminService.assignRoleToUsersWithRoles(
-        client,
-        message.guild.id,
-        targetRole.id,
-        sourceRoleIds
-      );
+      const result = await adminService.assignRoleToUsersWithRoles(client, targetRole.id, sourceRoleIds);
 
       if (!result.success) {
         return statusMessage.edit({

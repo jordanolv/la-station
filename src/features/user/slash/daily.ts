@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import GuildUserModel from '../models/guild-user.model';
+import UserModel from '../models/user.model';
 
 // Configuration des récompenses maximales
 const MAX_MONEY = 100;
@@ -20,20 +20,10 @@ export default {
 
   async execute(interaction: ChatInputCommandInteraction, _client: BotClient) {
     try {
-      if (!interaction.guildId) {
-        await interaction.reply({
-          content: '❌ Cette commande ne peut être utilisée que dans un serveur.',
-          ephemeral: true
-        });
-        return;
-      }
-
       await interaction.deferReply();
 
-      // Récupérer l'utilisateur
-      let user = await GuildUserModel.findOne({
-        discordId: interaction.user.id,
-        guildId: interaction.guildId
+      let user = await UserModel.findOne({
+        discordId: interaction.user.id
       });
 
       if (!user) {
@@ -70,12 +60,8 @@ export default {
       const moneyReward = randomUpTo(MAX_MONEY);
       const xpReward = randomUpTo(MAX_XP);
 
-      // Mettre à jour l'utilisateur
-      user = await GuildUserModel.findOneAndUpdate(
-        {
-          discordId: interaction.user.id,
-          guildId: interaction.guildId
-        },
+      user = await UserModel.findOneAndUpdate(
+        { discordId: interaction.user.id },
         {
           $inc: {
             'profil.money': moneyReward,

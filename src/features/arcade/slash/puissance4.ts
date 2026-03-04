@@ -11,8 +11,9 @@ import {
 import { ChallengeService } from '../services/challenge.service';
 import { Puissance4Service, Puissance4Cell } from '../services/puissance4.service';
 import { ArcadeStatsService } from '../services/arcade-stats.service';
-import { UserService } from '../../user/services/guildUser.service';
+import { UserService } from '../../user/services/user.service';
 import { ArcadeValidationService } from '../services/arcade-validation.service';
+import { getGuildId } from '../../../shared/guild';
 
 interface Puissance4Game {
   grid: Puissance4Cell[][];
@@ -233,26 +234,18 @@ export default {
       loser = result === 'player1' ? game.player2 : game.player1;
       victoryMsg = `🏆 **${winner.username}** remporte la partie !`;
 
-      // Gérer les RidgeCoins et statistiques
-      if (interaction.guildId) {
-        try {
-          // Enregistrer les stats utilisateurs
-          await UserService.recordArcadeWin(winner.id, interaction.guildId, 'puissance4');
-          await UserService.recordArcadeLoss(loser.id, interaction.guildId, 'puissance4');
+      try {
+        await UserService.recordArcadeWin(winner.id, 'puissance4');
+        await UserService.recordArcadeLoss(loser.id, 'puissance4');
+        await ArcadeStatsService.incrementGameCount('puissance4');
 
-          // Incrémenter le compteur global de parties
-          await ArcadeStatsService.incrementGameCount(interaction.guildId, 'puissance4');
-
-          // Transférer les RidgeCoins si mise > 0
-          if (game.bet > 0) {
-            await UserService.updateGuildUserMoney(loser.id, interaction.guildId, -game.bet);
-            await UserService.updateGuildUserMoney(winner.id, interaction.guildId, game.bet);
-
-            victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
-          }
-        } catch (error) {
-          console.error('Erreur lors de la fin de partie:', error);
+        if (game.bet > 0) {
+          await UserService.updateUserMoney(loser.id, -game.bet);
+          await UserService.updateUserMoney(winner.id, game.bet);
+          victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
         }
+      } catch (error) {
+        console.error('Erreur lors de la fin de partie:', error);
       }
     }
 

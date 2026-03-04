@@ -62,11 +62,7 @@ export default {
    */
   async showGameSelect(interaction: ChatInputCommandInteraction) {
     // Check if user has too many active requests
-    const hasLimit = await LFMService.hasReachedLimit(
-      interaction.user.id,
-      interaction.guildId!,
-      3
-    );
+    const hasLimit = await LFMService.hasReachedLimit(interaction.user.id, 3);
 
     if (hasLimit) {
       await interaction.reply({
@@ -598,7 +594,6 @@ export default {
       const request = await LFMService.createRequest({
         userId: interaction.user.id,
         username: interaction.user.username,
-        guildId: interaction.guildId!,
         game: selection.game,
         numberOfMates: totalSlots,
         rank: rank,

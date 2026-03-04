@@ -31,7 +31,7 @@ export default {
       const enableLogs = args[0].toLowerCase() === 'true';
       
       const adminService = new AdminService();
-      const result = await adminService.toggleLogs(message.guild.id, enableLogs);
+      const result = await adminService.toggleLogs(enableLogs);
       
       const reply = await message.reply({
         content: result.message

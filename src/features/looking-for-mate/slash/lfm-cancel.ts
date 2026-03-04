@@ -73,8 +73,8 @@ export default {
       await LFMService.updateStatus(requestId, 'cancelled');
 
       // Update the message
-      const gameColor = await GameDBService.getGameColor(interaction.guildId!, request.game);
-      const gameBanner = await GameDBService.getGameBanner(interaction.guildId!, request.game);
+      const gameColor = await GameDBService.getGameColor(request.game);
+      const gameBanner = await GameDBService.getGameBanner(request.game);
       const updatedEmbed = LFMService.createLFMEmbed(request, await interaction.client.users.fetch(request.userId), gameColor, gameBanner);
 
       try {

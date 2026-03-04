@@ -11,8 +11,9 @@ import {
 import { ChallengeService } from '../services/challenge.service';
 import { MorpionService, MorpionCell } from '../services/morpion.service';
 import { ArcadeStatsService } from '../services/arcade-stats.service';
-import { UserService } from '../../user/services/guildUser.service';
+import { UserService } from '../../user/services/user.service';
 import { ArcadeValidationService } from '../services/arcade-validation.service';
+import { getGuildId } from '../../../shared/guild';
 
 interface MorpionGame {
   grid: MorpionCell[][];
@@ -310,26 +311,18 @@ export default {
       loser = result === 'player1' ? game.player2 : game.player1;
       victoryMsg = `🏆 **${winner.username}** remporte la partie !`;
 
-      // Gérer les RidgeCoins et statistiques
-      if (interaction.guildId) {
-        try {
-          // Enregistrer les stats utilisateurs
-          await UserService.recordArcadeWin(winner.id, interaction.guildId, 'morpion');
-          await UserService.recordArcadeLoss(loser.id, interaction.guildId, 'morpion');
+      try {
+        await UserService.recordArcadeWin(winner.id, 'morpion');
+        await UserService.recordArcadeLoss(loser.id, 'morpion');
+        await ArcadeStatsService.incrementGameCount('morpion');
 
-          // Incrémenter le compteur global de parties
-          await ArcadeStatsService.incrementGameCount(interaction.guildId, 'morpion');
-
-          // Transférer les RidgeCoins si mise > 0
-          if (game.bet > 0) {
-            await UserService.updateGuildUserMoney(loser.id, interaction.guildId, -game.bet);
-            await UserService.updateGuildUserMoney(winner.id, interaction.guildId, game.bet);
-
-            victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
-          }
-        } catch (error) {
-          console.error('Erreur lors de la fin de partie:', error);
+        if (game.bet > 0) {
+          await UserService.updateUserMoney(loser.id, -game.bet);
+          await UserService.updateUserMoney(winner.id, game.bet);
+          victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
         }
+      } catch (error) {
+        console.error('Erreur lors de la fin de partie:', error);
       }
     }
 

@@ -1,25 +1,28 @@
 import { Client } from 'discord.js';
 import { UserCronManager } from '../../features/user/cron';
 import { TestCronManager } from '../../features/test/cron';
+import { PartyCronManager } from '../../features/party/cron';
 import { BaseCronManager, IStartStoppable } from './base-cron-manager';
+import { LogsDayCron } from './logs-day.cron';
 
 export class CronManager extends BaseCronManager {
     private userCronManager: UserCronManager;
     private testCronManager: TestCronManager;
+    private partyCronManager: PartyCronManager;
+    private logsDayCron: LogsDayCron;
 
     constructor(client: Client) {
         super(client, 'global');
-        
-        // Initialisation des gestionnaires de crons de chaque feature
+
         this.userCronManager = new UserCronManager(client);
         this.testCronManager = new TestCronManager(client);
-        
+        this.partyCronManager = new PartyCronManager(client);
+        this.logsDayCron = new LogsDayCron(client);
+
         this.addCron(this.userCronManager);
         this.addCron(this.testCronManager);
-        
-        // Ajoutez ici d'autres gestionnaires de crons au fur et à mesure
-        // Exemple: this.vocCronManager = new VocCronManager(client);
-        // this.addCron(this.vocCronManager);
+        this.addCron(this.partyCronManager);
+        this.addCron(this.logsDayCron);
     }
 
     /**

@@ -4,8 +4,6 @@ import { prop, getModelForClass, index, DocumentType } from '@typegoose/typegoos
  * Looking For Mate Request Model
  * Stores game party/mate searching requests from users
  */
-@index({ guildId: 1, status: 1 })
-@index({ userId: 1, guildId: 1 })
 @index({ createdAt: 1 }, { expireAfterSeconds: 86400 }) // Auto-delete after 24h
 export class LFMRequest {
   @prop({ required: true })
@@ -14,8 +12,6 @@ export class LFMRequest {
   @prop({ required: true })
   username!: string;
 
-  @prop({ required: true })
-  guildId!: string;
 
   @prop({ required: true })
   game!: string;

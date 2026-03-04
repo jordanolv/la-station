@@ -1,8 +1,9 @@
 import { Message, EmbedBuilder, TextChannel } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import GuildUserModel from '../models/guild-user.model';
-import GuildModel from '../../discord/models/guild.model';
+import UserModel from '../models/user.model';
+import AppConfigModel from '../../discord/models/app-config.model';
 import { toZonedTime } from 'date-fns-tz';
+import { getGuildId } from '../../../shared/guild';
 
 export default {
   name: 'recheck-birthdays',
@@ -11,13 +12,6 @@ export default {
   
   async execute(message: Message, args: string[], client: BotClient) {
     try {
-      if (!message.guild) {
-        return message.reply({
-          content: '❌ Cette commande ne peut être utilisée que dans un serveur.'
-        });
-      }
-
-      // Vérifier les permissions
       if (!message.member?.permissions.has('ManageGuild')) {
         return message.reply({
           content: '❌ Vous n\'avez pas les permissions nécessaires pour utiliser cette commande.'
@@ -29,8 +23,7 @@ export default {
       const day = today.getDate();
       const month = today.getMonth() + 1;
       
-      // Vérifier la configuration des anniversaires
-      const guild = await GuildModel.findOne({ guildId: message.guild.id });
+      const guild = await AppConfigModel.findOne({});
       const birthdayConfig = guild?.features?.birthday;
       
       if (!birthdayConfig || !birthdayConfig.enabled) {
@@ -39,9 +32,7 @@ export default {
         });
       }
 
-      // Trouver les utilisateurs dont c'est l'anniversaire aujourd'hui
-      const users = await GuildUserModel.find({
-        guildId: message.guild.id,
+      const users = await UserModel.find({
         'infos.birthDate': { $exists: true, $ne: null }
       }).exec();
       

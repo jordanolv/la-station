@@ -60,11 +60,6 @@ export class PartyUtils {
       errors.push('Le channel est requis');
     }
 
-    // Validation du guild
-    if (!data.discord.guildId) {
-      errors.push('L\'ID du serveur est requis');
-    }
-
     // Validation du créateur
     if (!data.createdBy) {
       errors.push('L\'ID du créateur est requis');

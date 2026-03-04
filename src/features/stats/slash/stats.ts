@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import GuildUserModel from '../../user/models/guild-user.model';
+import UserModel from '../../user/models/user.model';
 import { BotClient } from '../../../bot/client';
 
 /**
@@ -114,24 +114,10 @@ export default {
     try {
       // Récupérer l'utilisateur cible (l'auteur de la commande par défaut)
       const targetUser = interaction.options.getUser('utilisateur') || interaction.user;
-      const guildId = interaction.guildId;
-      
-      if (!guildId) {
-        await interaction.reply({
-          content: '❌ Cette commande ne peut être utilisée que dans un serveur.',
-          ephemeral: true
-        });
-        return;
-      }
-      
-      // Afficher un message de chargement
+
       await interaction.deferReply();
-      
-      // Récupérer les données de l'utilisateur
-      const guildUser = await GuildUserModel.findOne({
-        discordId: targetUser.id,
-        guildId: guildId
-      });
+
+      const guildUser = await UserModel.findOne({ discordId: targetUser.id });
       
       if (!guildUser) {
         await interaction.editReply({

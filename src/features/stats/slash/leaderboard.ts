@@ -8,7 +8,7 @@ import {
   ButtonInteraction,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import GuildUserModel from '../../user/models/guild-user.model';
+import UserModel from '../../user/models/user.model';
 
 export const LEADERBOARD_TYPE = {
   MESSAGES: 'messages',
@@ -45,7 +45,6 @@ async function showLeaderboard(
   type: LeaderboardType,
   isUpdate: boolean = false
 ) {
-  const guildId = interaction.guildId!;
   const userId = interaction.user.id;
 
   let title = '';
@@ -60,7 +59,7 @@ async function showLeaderboard(
       emoji = '💬';
       sortField = 'stats.totalMsg';
       formatValue = (val) => `${val.toLocaleString()} msg`;
-      users = await GuildUserModel.find({ guildId })
+      users = await UserModel.find({})
         .sort({ 'stats.totalMsg': -1 })
         .limit(10)
         .lean();
@@ -71,7 +70,7 @@ async function showLeaderboard(
       emoji = '🎤';
       sortField = 'stats.voiceTime';
       formatValue = (val) => formatVoiceTime(val);
-      users = await GuildUserModel.find({ guildId })
+      users = await UserModel.find({})
         .sort({ 'stats.voiceTime': -1 })
         .limit(10)
         .lean();
@@ -83,7 +82,7 @@ async function showLeaderboard(
       sortField = 'stats.arcade';
       formatValue = (val) => `${val} victoires`;
       // On va calculer le total des victoires arcade
-      users = await GuildUserModel.find({ guildId }).lean();
+      users = await UserModel.find({}).lean();
       users = users
         .map((user: any) => ({
           ...user,
@@ -101,7 +100,7 @@ async function showLeaderboard(
       emoji = '🔥';
       sortField = 'stats.dailyStreak';
       formatValue = (val) => `${val} jours`;
-      users = await GuildUserModel.find({ guildId })
+      users = await UserModel.find({})
         .sort({ 'stats.dailyStreak': -1 })
         .limit(10)
         .lean();
@@ -112,7 +111,7 @@ async function showLeaderboard(
       emoji = '🎉';
       sortField = 'stats.partyParticipated';
       formatValue = (val) => `${val} soirées`;
-      users = await GuildUserModel.find({ guildId })
+      users = await UserModel.find({})
         .sort({ 'stats.partyParticipated': -1 })
         .limit(10)
         .lean();
@@ -129,10 +128,10 @@ async function showLeaderboard(
   let userPosition = -1;
   let userValue = 0;
 
-  const userDoc = await GuildUserModel.findOne({ discordId: userId, guildId });
+  const userDoc = await UserModel.findOne({ discordId: userId });
 
   if (type === LEADERBOARD_TYPE.ARCADE) {
-    const allUsers = await GuildUserModel.find({ guildId }).lean();
+    const allUsers = await UserModel.find({}).lean();
     const sortedUsers = allUsers
       .map((user: any) => ({
         ...user,
@@ -149,7 +148,7 @@ async function showLeaderboard(
                 (userDoc?.stats?.arcade?.morpion?.wins || 0) +
                 (userDoc?.stats?.arcade?.battle?.wins || 0);
   } else {
-    const allUsers = await GuildUserModel.find({ guildId })
+    const allUsers = await UserModel.find({})
       .sort({ [sortField]: -1 })
       .lean();
     userPosition = allUsers.findIndex((u: any) => u.discordId === userId) + 1;

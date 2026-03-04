@@ -2,13 +2,15 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import {
   ActionRowBuilder,
   ChatInputCommandInteraction,
+  MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
-import { UserService } from '../services/guildUser.service';
+import { UserService } from '../services/user.service';
 import { formatDate } from '../../../shared/utils/date-format';
+import { getGuildId } from '../../../shared/guild';
 import { emojis } from '../../../utils/emojis';
 
 
@@ -57,17 +59,9 @@ export default {
     .setDescription('Configurer votre profil (bio et anniversaire).'),
 
   async execute(interaction: ChatInputCommandInteraction) {
-    if (!interaction.guildId) {
-      await interaction.reply({
-        content: '❌ Cette commande doit être utilisée dans un serveur.',
-        ephemeral: true,
-      });
-      return;
-    }
+    const user = await UserService.getUserByDiscordId(interaction.user.id);
 
-    const guildUser = await UserService.getGuildUserByDiscordId(interaction.user.id, interaction.guildId);
-
-    if (!guildUser) {
+    if (!user) {
       await interaction.reply({
         content: '❌ Utilisateur introuvable dans la base. Réessayez plus tard.',
         ephemeral: true,
@@ -86,11 +80,11 @@ export default {
       .setRequired(false)
       .setMaxLength(500);
 
-    if (guildUser.bio) {
-      bioInput.setValue(guildUser.bio);
+    if (user.bio) {
+      bioInput.setValue(user.bio);
     }
 
-    const birthValue = buildDateString(guildUser.infos?.birthDate);
+    const birthValue = buildDateString(user.infos?.birthDate);
 
     const birthdayInput = new TextInputBuilder()
       .setCustomId(BIRTHDAY_INPUT_ID)
@@ -113,20 +107,12 @@ export default {
   },
 
   async handleModal(interaction: ModalSubmitInteraction) {
-    if (!interaction.guildId) {
-      await interaction.reply({
-        content: '❌ Cette action doit être réalisée dans un serveur.',
-        ephemeral: true,
-      });
-      return;
-    }
-
     const bioRaw = interaction.fields.getTextInputValue(BIO_INPUT_ID)?.trim() ?? '';
     const birthdayRaw = interaction.fields.getTextInputValue(BIRTHDAY_INPUT_ID)?.trim() ?? '';
 
-    const guildUser = await UserService.getGuildUserByDiscordId(interaction.user.id, interaction.guildId);
+    const user = await UserService.getUserByDiscordId(interaction.user.id);
 
-    if (!guildUser) {
+    if (!user) {
       await interaction.reply({
         content: '❌ Utilisateur introuvable dans la base. Réessayez plus tard.',
         ephemeral: true,
@@ -136,18 +122,18 @@ export default {
 
     const { date: birthDate, error } = validateBirthday(birthdayRaw);
     if (error) {
-      await interaction.reply({ content: error, ephemeral: true });
+      await interaction.reply({ content: error, flags: MessageFlags.Ephemeral });
       return;
     }
-    guildUser.bio = bioRaw.length > 0 ? bioRaw : undefined;
-    guildUser.infos = guildUser.infos || { registeredAt: new Date(), updatedAt: new Date() };
-    guildUser.infos.birthDate = birthDate ?? undefined;
-    guildUser.infos.updatedAt = new Date();
+    user.bio = bioRaw.length > 0 ? bioRaw : undefined;
+    user.infos = user.infos || { registeredAt: new Date(), updatedAt: new Date() };
+    user.infos.birthDate = birthDate ?? undefined;
+    user.infos.updatedAt = new Date();
 
-    await guildUser.save();
+    await user.save();
 
     const birthDisplay = birthDate ? formatDate(birthDate) : 'Non défini';
-    const bioDisplay = guildUser.bio ?? 'Aucune bio définie.';
+    const bioDisplay = user.bio ?? 'Aucune bio définie.';
 
     await interaction.reply({
       content: `✅ Profil mis à jour !\n• **Bio:** ${bioDisplay}\n• **Anniversaire:** ${birthDisplay}`,
