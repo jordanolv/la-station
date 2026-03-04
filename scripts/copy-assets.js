@@ -32,7 +32,8 @@ console.log('📦 Copying static assets...\n');
 const assetsToCopy = [
   { source: '../canva', dest: '../dist/canva', name: 'canva/' },
   { source: '../src/assets', dest: '../dist/assets', name: 'src/assets/' },
-  { source: '../src/features/voc-manager/data', dest: '../dist/features/voc-manager/data', name: 'src/features/voc-manager/data/' }
+  { source: '../src/features/voc-manager/data', dest: '../dist/features/voc-manager/data', name: 'src/features/voc-manager/data/' },
+  { source: '../src/features/mountain/data', dest: '../dist/features/mountain/data', name: 'src/features/mountain/data/' }
 ];
 
 let copiedCount = 0;
