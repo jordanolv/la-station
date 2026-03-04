@@ -53,12 +53,6 @@ jobs:
             npm ci
             npm run build
 
-            echo "🛠 Frontend – install & build"
-            cd src/frontend
-            npm ci
-            npm run build
-            cd ../..
-
             echo "🚀 PM2 Reload all apps via ecosystem"
             pm2 reload ecosystem.config.cjs
             pm2 save
