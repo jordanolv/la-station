@@ -6,6 +6,7 @@ const DEFAULT_VOICE_CONFIG: IVoiceConfig = {
   joinChannels: [],
   createdChannels: [],
   channelCount: 0,
+  notificationChannelId: undefined,
 };
 
 export class VoiceConfigRepository {
