@@ -1,4 +1,5 @@
 import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
+import type { MountainRarity } from '../types/mountain.types';
 
 export class UnlockedMountain {
   @prop({ required: true })
@@ -6,6 +7,9 @@ export class UnlockedMountain {
 
   @prop({ required: true })
   unlockedAt!: Date;
+
+  @prop({ type: () => String, default: 'common' })
+  rarity?: MountainRarity;
 }
 
 export class UserMountains {
@@ -14,6 +18,18 @@ export class UserMountains {
 
   @prop({ type: () => [UnlockedMountain], default: [] })
   unlockedMountains!: UnlockedMountain[];
+
+  /** Tickets de pack disponibles à ouvrir */
+  @prop({ default: 0 })
+  packTickets!: number;
+
+  /** Fragments accumulés (pour convertir en tickets) */
+  @prop({ default: 0 })
+  fragments!: number;
+
+  /** Secondes de vocal trackées pour le prochain ticket (remet à 0 à chaque ticket obtenu) */
+  @prop({ default: 0 })
+  vocSecondsAccumulated!: number;
 }
 
 const UserMountainsModel = getModelForClass(UserMountains, {

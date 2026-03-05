@@ -115,7 +115,7 @@ export class LogService {
     try {
       const thread = await this.getLogsThread(client);
       if (!thread) return;
-      const label = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const label = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' });
       await thread.send({ content: `\n─────────────────────────────\n📅 **${label.charAt(0).toUpperCase() + label.slice(1)}**\n─────────────────────────────` });
     } catch (error) {
       console.error('[LogService] Erreur séparateur de jour:', error);

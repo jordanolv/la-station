@@ -2,24 +2,42 @@ import { EmbedBuilder, TextChannel, VoiceChannel } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { VoicePlugin, VoiceSession } from '../../voice/services/voice-session.service';
-import { VoiceConfigRepository } from '../../voice/repositories/voice-config.repository';
-import { MOUNTAIN_REQUIRED_SECONDS } from '../constants/mountain.constants';
+import { MountainConfigRepository } from '../repositories/mountain-config.repository';
+import { MOUNTAIN_REQUIRED_SECONDS, MOUNTAIN_TICKET_SECONDS, RARITY_CONFIG } from '../constants/mountain.constants';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
 import { MountainService, MountainInfo } from './mountain.service';
+import type { MountainRarity } from '../types/mountain.types';
+import { LogService } from '../../../shared/logs/logs.service';
+
+const LOG_FEATURE = '⛰️ Mountain';
+
+export interface MountainSessionResult {
+  mountain: MountainInfo;
+  rarity: MountainRarity;
+  emoji: string;
+  label: string;
+  color: number;
+  unlocked: boolean;
+  isNew: boolean;
+  totalUnlocked?: number;
+  fragmentsGained?: number;
+  totalFragments?: number;
+  ticketsGained?: number;
+}
 
 /**
  * Plugin montagne pour le voice manager.
  *
- * Réagit aux événements de session vocale pour :
- *  - Assigner une montagne aléatoire à chaque channel créé
- *  - Débloquer une montagne si l'utilisateur reste assez longtemps
- *  - Envoyer les embeds / notifications
+ * - Assigne une montagne aléatoire à chaque channel créé
+ * - À la déconnexion : débloque si l'user est resté ≥ MOUNTAIN_REQUIRED_SECONDS
+ * - À la déconnexion : attribue des tickets en fonction du temps vocal cumulé
+ * - Tout est calculé au session end, aucun timer en cours de session
  */
 export class MountainPlugin implements VoicePlugin {
   private channelMountains = new Map<string, string>();
 
   onBeforeChannelCreate(_userId: string) {
-    const mountain = MountainService.getRandom();
+    const mountain = MountainService.getRandomByPackWeight();
     return {
       templateVars: { mountain: mountain?.name ?? 'Vocal' },
       metadata: { mountainId: mountain?.id ?? null },
@@ -30,7 +48,7 @@ export class MountainPlugin implements VoicePlugin {
     channel: VoiceChannel,
     _userId: string,
     metadata: Record<string, unknown>,
-    _client: BotClient,
+    client: BotClient,
   ): Promise<void> {
     const mountainId = metadata.mountainId as string | null;
     if (!mountainId) return;
@@ -38,36 +56,87 @@ export class MountainPlugin implements VoicePlugin {
     this.channelMountains.set(channel.id, mountainId);
 
     const mountain = MountainService.getById(mountainId);
-    if (mountain) {
-      await this.postMountainEmbed(channel, mountain);
+    if (!mountain) return;
+
+    await this.postMountainEmbed(channel, mountain);
+
+    const rarity = MountainService.getRarity(mountain);
+    if (rarity === 'epic' || rarity === 'legendary') {
+      const { emoji, label } = RARITY_CONFIG[rarity];
+      const notifChannel = await this.getNotificationChannel(client);
+      if (notifChannel) {
+        await notifChannel.send(
+          `${emoji} Une montagne **${label}** est apparue ! **${mountain.name}** (${mountain.altitude}) — connecte-toi vite pour la débloquer ! <#${channel.id}>`,
+        );
+      }
     }
   }
 
-  async onSessionEnd(session: VoiceSession, client: BotClient): Promise<void> {
+  async onSessionEnd(session: VoiceSession, client: BotClient): Promise<Record<string, unknown> | void> {
     const mountainId = this.channelMountains.get(session.channelId);
     if (!mountainId) return;
-
-    if (session.durationSeconds < MOUNTAIN_REQUIRED_SECONDS) {
-      console.log(
-        `[MountainPlugin] user=${session.userId} ${session.durationSeconds}s < ${MOUNTAIN_REQUIRED_SECONDS}s requis`,
-      );
-      return;
-    }
-
-    const result = await UserMountainsRepository.unlock(session.userId, mountainId);
-    if (!result) {
-      console.log(`[MountainPlugin] ${mountainId} déjà débloqué pour ${session.userId}`);
-      return;
-    }
 
     const mountain = MountainService.getById(mountainId);
     if (!mountain) return;
 
-    console.log(
-      `[MountainPlugin] ${mountainId} débloqué pour ${session.userId} (${result.totalUnlocked}/${MountainService.count})`,
+    const rarity = MountainService.getRarity(mountain);
+    const { emoji, label, color } = RARITY_CONFIG[rarity];
+
+    // Tickets : 1 par tranche de MOUNTAIN_TICKET_SECONDS actifs
+    let vocTicketsGained = 0;
+    if (session.activeSeconds >= MOUNTAIN_TICKET_SECONDS) {
+      const fullIntervals = Math.floor(session.activeSeconds / MOUNTAIN_TICKET_SECONDS);
+      const vocResult = await UserMountainsRepository.addVocSeconds(session.userId, fullIntervals * MOUNTAIN_TICKET_SECONDS);
+      vocTicketsGained = vocResult.ticketsGained;
+    }
+
+    // Pas assez de temps actif → on retourne quand même la montagne du channel sans unlock
+    if (session.activeSeconds < MOUNTAIN_REQUIRED_SECONDS) {
+      return {
+        mountain: {
+          mountain, rarity, emoji, label, color,
+          unlocked: false, isNew: false,
+          ticketsGained: vocTicketsGained,
+        } satisfies MountainSessionResult,
+      };
+    }
+
+    const result = await UserMountainsRepository.unlock(session.userId, mountainId, rarity);
+
+    if (!result) {
+      const { fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
+      const { newFragments, ticketsGained: fragTickets } = await UserMountainsRepository.addFragments(session.userId, fragmentsOnDuplicate);
+      const totalTickets = vocTicketsGained + fragTickets;
+
+      await LogService.info(client,
+        `<@${session.userId}> a obtenu un doublon : **${mountain.name}** ${emoji} ${label}\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${totalTickets > 0 ? `\n→ +${totalTickets} 🎟️ ticket${totalTickets > 1 ? 's' : ''}` : ''}`,
+        { feature: LOG_FEATURE, title: '🔁 Montagne en double' },
+      );
+
+      return {
+        mountain: {
+          mountain, rarity, emoji, label, color,
+          unlocked: true, isNew: false,
+          fragmentsGained: fragmentsOnDuplicate,
+          totalFragments: newFragments,
+          ticketsGained: totalTickets,
+        } satisfies MountainSessionResult,
+      };
+    }
+
+    await LogService.success(client,
+      `<@${session.userId}> a débloqué **${mountain.name}** ${emoji} ${label} (${mountain.altitude})\nProgression : \`${result.totalUnlocked}/${MountainService.count}\`${vocTicketsGained > 0 ? `\n→ +${vocTicketsGained} 🎟️ ticket${vocTicketsGained > 1 ? 's' : ''}` : ''}`,
+      { feature: LOG_FEATURE, title: '🏔️ Montagne débloquée' },
     );
 
-    await this.sendUnlockNotification(client, session, mountain, result.totalUnlocked);
+    return {
+      mountain: {
+        mountain, rarity, emoji, label, color,
+        unlocked: true, isNew: true,
+        totalUnlocked: result.totalUnlocked,
+        ticketsGained: vocTicketsGained,
+      } satisfies MountainSessionResult,
+    };
   }
 
   onChannelDeleted(channelId: string): void {
@@ -78,17 +147,21 @@ export class MountainPlugin implements VoicePlugin {
 
   private async postMountainEmbed(channel: VoiceChannel, mountain: MountainInfo): Promise<void> {
     try {
+      const rarity = MountainService.getRarity(mountain);
+      const { emoji, label, color } = RARITY_CONFIG[rarity];
+
       const embed = new EmbedBuilder()
-        .setColor('#8B4513')
+        .setColor(color)
         .setTitle(`⛰️ ${mountain.name}`)
         .setDescription(mountain.description)
         .addFields(
           { name: '📏 Altitude', value: mountain.altitude, inline: true },
+          { name: '✨ Rareté', value: `${emoji} ${label}`, inline: true },
           { name: '🔗 En savoir plus', value: `[Wikipédia](${mountain.wiki})`, inline: true },
         )
         .setImage(mountain.image)
         .setTimestamp()
-        .setFooter({ text: '🏔️ Restez 30 minutes pour débloquer cette montagne !' });
+        .setFooter({ text: `🏔️ Restez ${Math.floor(MOUNTAIN_REQUIRED_SECONDS / 60)} minutes pour débloquer cette montagne !` });
 
       await channel.send({ embeds: [embed] });
     } catch (err) {
@@ -96,39 +169,16 @@ export class MountainPlugin implements VoicePlugin {
     }
   }
 
-  private async sendUnlockNotification(
-    client: BotClient,
-    session: VoiceSession,
-    mountain: MountainInfo,
-    totalUnlocked: number,
-  ): Promise<void> {
-    try {
-      const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
-      if (!guild) return;
+  private async getNotificationChannel(client: BotClient): Promise<TextChannel | null> {
+    const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
+    if (!guild) return null;
 
-      const voiceConfig = await VoiceConfigRepository.get();
-      if (!voiceConfig?.notificationChannelId) return;
+    const config = await MountainConfigRepository.get();
+    if (!config?.notificationChannelId) return null;
 
-      const channel = await guild.channels.fetch(voiceConfig.notificationChannelId).catch(() => null);
-      if (!channel?.isTextBased()) return;
+    const channel = await guild.channels.fetch(config.notificationChannelId).catch(() => null);
+    if (!channel?.isTextBased()) return null;
 
-      const embed = new EmbedBuilder()
-        .setColor('#FFD700')
-        .setTitle('🏔️ Nouvelle montagne débloquée !')
-        .setDescription(`<@${session.userId}> a débloqué **${mountain.name}** !`)
-        .addFields(
-          { name: '📏 Altitude', value: mountain.altitude, inline: true },
-          { name: '📊 Progression', value: `${totalUnlocked}/${MountainService.count} montagnes`, inline: true },
-        )
-        .setThumbnail(mountain.image)
-        .setFooter({ text: 'Continuez à explorer pour débloquer toutes les montagnes !' })
-        .setTimestamp();
-
-      await (channel as TextChannel).send({ embeds: [embed] }).catch(err => {
-        console.error('[MountainPlugin] Erreur envoi notification:', err);
-      });
-    } catch (err) {
-      console.error('[MountainPlugin] Erreur notification:', err);
-    }
+    return channel as TextChannel;
   }
 }
