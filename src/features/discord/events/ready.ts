@@ -12,6 +12,8 @@ import { voicePanel } from '../../voice/panels/voice.panel';
 import { partyPanel } from '../../party/panels/party.panel';
 import { chatGamingPanel } from '../../chat-gaming/panels/chat-gaming.panel';
 import { arcadePanel } from '../../arcade/panels/arcade.panel';
+import { mountainPanel } from '../../mountain/panels/mountain.panel';
+import { MountainSpawnService } from '../../mountain/services/mountain-spawn.service';
 
 panelRegistry.register(generalPanel);
 panelRegistry.register(logsPanel);
@@ -21,6 +23,7 @@ panelRegistry.register(voicePanel);
 panelRegistry.register(partyPanel);
 panelRegistry.register(chatGamingPanel);
 panelRegistry.register(arcadePanel);
+panelRegistry.register(mountainPanel);
 
 export default {
   name: Events.ClientReady,
@@ -43,6 +46,9 @@ export default {
     setStatus();
     setInterval(setStatus, 8000);
     VoiceService.rehydrate(client);
+    MountainSpawnService.rehydrate(client).catch((err) =>
+      console.error('[MountainSpawn] Erreur réhydratation:', err),
+    );
     await ConfigPanelService.init(client).catch((err) =>
       console.error('[ConfigPanel] Erreur init:', err),
     );

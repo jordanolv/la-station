@@ -15,6 +15,7 @@ import { BotClient } from '../../../bot/client';
 import { ConfigPanel, panelCustomId } from '../../config-panel/services/config-panel.registry';
 import { ConfigPanelService } from '../../config-panel/services/config-panel.service';
 import { VoiceService } from '../services/voice.service';
+import { VoiceConfigRepository } from '../repositories/voice-config.repository';
 
 const PANEL_ID = 'voice';
 const ACCENT_ON = 0x57f287;
@@ -30,8 +31,8 @@ export const voicePanel: ConfigPanel = {
     const config = await VoiceService.getOrCreateConfig();
     const enabled = config.enabled ?? false;
     const joinChannels = config.joinChannels ?? [];
+    const notifChannelId = config.notificationChannelId;
 
-    // ── Container 1 : configuration ───────────────────────────────────────────
     const configContainer = new ContainerBuilder()
       .setAccentColor(enabled ? ACCENT_ON : ACCENT_OFF)
       .addTextDisplayComponents(new TextDisplayBuilder().setContent('# 🔊 Salons Vocaux'))
@@ -47,9 +48,22 @@ export const voicePanel: ConfigPanel = {
               .setLabel(enabled ? 'Désactiver' : 'Activer')
               .setStyle(enabled ? ButtonStyle.Danger : ButtonStyle.Success),
           ),
+      )
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+          `### 📢 Channel de notification\n${notifChannelId ? `<#${notifChannelId}>` : '-# *Non configuré — les récaps de session ne seront pas envoyés*'}`,
+        ),
+      )
+      .addActionRowComponents(
+        new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+          new ChannelSelectMenuBuilder()
+            .setCustomId(panelCustomId(PANEL_ID, 'set_notif_channel'))
+            .setPlaceholder('Définir le channel de notification')
+            .setChannelTypes(ChannelType.GuildText),
+        ),
       );
 
-    // ── Container 2 : liste des salons join-to-create ─────────────────────────
     const listContainer = new ContainerBuilder()
       .setAccentColor(0x5865f2)
       .addTextDisplayComponents(
@@ -129,6 +143,14 @@ export const voicePanel: ConfigPanel = {
       await VoiceService.addJoinChannel(channelId, categoryId);
       await interaction.reply({
         content: `✅ Salon join-to-create ajouté : <#${channelId}>`,
+        ephemeral: true,
+      });
+    }
+
+    if (action === 'set_notif_channel') {
+      await VoiceConfigRepository.setNotificationChannel(channelId);
+      await interaction.reply({
+        content: `✅ Channel de notification défini : <#${channelId}>`,
         ephemeral: true,
       });
     }

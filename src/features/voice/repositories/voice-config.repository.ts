@@ -87,4 +87,14 @@ export class VoiceConfigRepository {
     await config.save();
     return config.features.voice;
   }
+
+  static async setNotificationChannel(channelId: string | null): Promise<IVoiceConfig> {
+    const config = await AppConfigService.getOrCreateConfig();
+    config.features = config.features ?? {};
+    config.features.voice = config.features.voice ?? { ...DEFAULT_VOICE_CONFIG };
+    config.features.voice.notificationChannelId = channelId ?? undefined;
+    config.markModified('features.voice');
+    await config.save();
+    return config.features.voice;
+  }
 }

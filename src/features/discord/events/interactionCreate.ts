@@ -23,7 +23,12 @@ import {
   panelRegistry,
 } from '../../config-panel/services/config-panel.registry';
 import { MONEY_MODAL_PREFIX } from '../../admin/slash/money';
-
+import { handlePackButton } from '../../mountain/slash/pack';
+import { MountainSpawnService, SPAWN_BUTTON_PREFIX } from '../../mountain/services/mountain-spawn.service';
+import {
+  INV_BUTTON_PREFIX,
+  handleInventaireButton,
+} from '../../mountain/slash/inventaire';
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
 async function routeToPanelSelectMenu(
@@ -96,6 +101,12 @@ export default {
           }
         } else if (interaction.customId.startsWith(VOC_CONFIG_BUTTON_ID)) {
           await handleVocConfigButton(interaction, client);
+        } else if (interaction.customId.startsWith('mountain:pack:')) {
+          await handlePackButton(interaction, client);
+        } else if (interaction.customId.startsWith(SPAWN_BUTTON_PREFIX + ':')) {
+          await MountainSpawnService.handleClaim(interaction, client);
+        } else if (interaction.customId.startsWith(INV_BUTTON_PREFIX + ':')) {
+          await handleInventaireButton(interaction, client);
         }
       }
 
