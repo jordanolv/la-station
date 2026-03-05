@@ -11,7 +11,7 @@ import { StatsService, VoiceHistorySegment } from './stats.service';
  * et persiste le temps vocal en DB avec un split par jour.
  */
 export class StatsPlugin implements VoicePlugin {
-  async onSessionEnd(session: VoiceSession, client: BotClient): Promise<void> {
+  async onSessionEnd(session: VoiceSession, client: BotClient): Promise<Record<string, unknown> | void> {
     if (session.activeSeconds <= 0) return;
 
     const segments = this.buildDailySegments(session.activePeriods);
