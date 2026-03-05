@@ -26,7 +26,6 @@ export class VoiceConfig {
 
   @prop()
   notificationChannelId?: string;
-
 }
 
 export const VoiceConfigModel = getModelForClass(VoiceConfig, {

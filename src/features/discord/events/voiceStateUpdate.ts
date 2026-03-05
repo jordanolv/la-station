@@ -3,6 +3,7 @@ import { BotClient } from '../../../bot/client';
 import { VoiceService } from '../../voice/services/voice.service';
 import { UserService } from '../../user/services/user.service';
 import { LogService } from '../../../shared/logs/logs.service';
+import { VoiceConfigRepository } from '../../voice/repositories/voice-config.repository';
 
 export default {
   name: Events.VoiceStateUpdate,
@@ -26,7 +27,14 @@ export default {
       } else if (isMoving) {
         await VoiceService.handleLeave(client, oldState, newState);
         await VoiceService.handleJoin(client, oldState, newState);
-        await LogService.logVoiceMove(client, oldState, newState);
+
+        const vocConfig = await VoiceConfigRepository.get();
+        const isJoinToCreateFlow =
+          vocConfig?.joinChannels.some(c => c.id === oldState.channelId) &&
+          vocConfig?.createdChannels.includes(newState.channelId ?? '');
+        if (!isJoinToCreateFlow) {
+          await LogService.logVoiceMove(client, oldState, newState);
+        }
       } else {
         VoiceService.handleVoiceStateChange(oldState, newState);
         await LogService.logVoiceStateChange(client, oldState, newState);
