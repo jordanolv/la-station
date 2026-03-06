@@ -6,7 +6,6 @@ import {
   TextDisplayBuilder,
   SeparatorBuilder,
   SectionBuilder,
-  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
@@ -74,7 +73,7 @@ function buildRevealEmbed(
   totalFragments: number,
   ticketsLeft: number,
   ticketsFromFragments: number,
-): { embed: EmbedBuilder; row: ActionRowBuilder<ButtonBuilder> } {
+): { embed: EmbedBuilder } {
   const { emoji, label, color } = RARITY_CONFIG[rarity];
 
   let resultText: string;
@@ -99,15 +98,7 @@ function buildRevealEmbed(
     .setImage(mountainImage)
     .setFooter({ text: `🎟️ Il te reste ${ticketsLeft} ticket${ticketsLeft > 1 ? 's' : ''}` });
 
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId(PACK_BUTTON_OPEN)
-      .setLabel('Ouvrir un autre')
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(ticketsLeft === 0),
-  );
-
-  return { embed, row };
+  return { embed };
 }
 
 function buildFragmentBar(fragments: number): string {
@@ -116,6 +107,12 @@ function buildFragmentBar(fragments: number): string {
 }
 
 export async function handlePackButton(interaction: ButtonInteraction, _client: BotClient): Promise<void> {
+  const originalUserId = interaction.message.interactionMetadata?.user.id ?? interaction.message.author?.id;
+  if (interaction.user.id !== originalUserId) {
+    await interaction.reply({ content: "❌ Ce n'est pas ton pack !", flags: MessageFlags.Ephemeral });
+    return;
+  }
+
   if (interaction.customId === PACK_BUTTON_OPEN) {
     await openPack(interaction);
   }
@@ -158,7 +155,7 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
 
   const doc = await UserMountainsRepository.getOrCreate(userId);
 
-  const { embed, row } = buildRevealEmbed(
+  const { embed } = buildRevealEmbed(
     mountain.name,
     mountain.altitude,
     mountain.image,
@@ -172,7 +169,6 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
 
   await interaction.reply({
     embeds: [embed],
-    components: [row],
   });
 }
 
