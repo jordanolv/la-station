@@ -31,6 +31,26 @@ export class MountainSpawnCron {
       chalk.yellow('   ├─ 🌄 Mountain Spawn') +
         chalk.gray(` • minuit ${TZ}, max ${SPAWN_MAX_PER_DAY} spawn(s)/jour, fenêtre ${SPAWN_HOUR_START}h-${SPAWN_HOUR_END}h`),
     );
+    this.resumeOrPlanToday().catch(() => {});
+  }
+
+  private async resumeOrPlanToday(): Promise<void> {
+    const config = await MountainConfigRepository.get();
+    const schedule = config?.spawnSchedule ?? [];
+    const now = Date.now();
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayDates = schedule.map((d) => new Date(d)).filter((d) => d >= todayStart);
+    const remaining = todayDates.filter((d) => d.getTime() > now);
+
+    if (todayDates.length > 0) {
+      // Schedule existant pour aujourd'hui, on reprend les spawns restants
+      this.scheduleFromDates(remaining);
+    } else {
+      // Aucun schedule pour aujourd'hui (redémarrage après minuit sans cron)
+      await this.planDay();
+    }
   }
 
   public stop(): void {
