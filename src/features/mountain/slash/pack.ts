@@ -173,7 +173,6 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
   await interaction.reply({
     embeds: [embed],
     components: [row],
-    flags: MessageFlags.Ephemeral,
   });
 }
 
@@ -190,7 +189,7 @@ export default {
 
     await interaction.reply({
       components: [container],
-      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+      flags: MessageFlags.IsComponentsV2,
     });
   },
 
