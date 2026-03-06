@@ -3,7 +3,7 @@ import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { VoicePlugin, VoiceSession } from '../../voice/services/voice-session.service';
 import { MountainConfigRepository } from '../repositories/mountain-config.repository';
-import { MOUNTAIN_REQUIRED_SECONDS, MOUNTAIN_TICKET_SECONDS, RARITY_CONFIG } from '../constants/mountain.constants';
+import { MOUNTAIN_REQUIRED_SECONDS, RARITY_CONFIG } from '../constants/mountain.constants';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
 import { MountainService, MountainInfo } from './mountain.service';
 import type { MountainRarity } from '../types/mountain.types';
@@ -82,11 +82,10 @@ export class MountainPlugin implements VoicePlugin {
     const rarity = MountainService.getRarity(mountain);
     const { emoji, label, color } = RARITY_CONFIG[rarity];
 
-    // Tickets : 1 par tranche de MOUNTAIN_TICKET_SECONDS actifs
+    // Tickets : accumulation cross-sessions via vocSecondsAccumulated en BDD
     let vocTicketsGained = 0;
-    if (session.activeSeconds >= MOUNTAIN_TICKET_SECONDS) {
-      const fullIntervals = Math.floor(session.activeSeconds / MOUNTAIN_TICKET_SECONDS);
-      const vocResult = await UserMountainsRepository.addVocSeconds(session.userId, fullIntervals * MOUNTAIN_TICKET_SECONDS);
+    if (session.activeSeconds > 0) {
+      const vocResult = await UserMountainsRepository.addVocSeconds(session.userId, session.activeSeconds);
       vocTicketsGained = vocResult.ticketsGained;
     }
 
