@@ -45,8 +45,8 @@ export default {
 
     setStatus();
     setInterval(setStatus, 8000);
-    VoiceService.rehydrate(client);
-    MountainSpawnService.rehydrate(client).catch((err) =>
+    await VoiceService.rehydrate(client);
+    await MountainSpawnService.rehydrate(client).catch((err) =>
       console.error('[MountainSpawn] Erreur réhydratation:', err),
     );
     await ConfigPanelService.init(client).catch((err) =>

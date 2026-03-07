@@ -3,6 +3,7 @@ import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { LogService } from '../../../shared/logs/logs.service';
 import { VoiceConfigRepository } from '../repositories/voice-config.repository';
+import { VoiceSessionRepository } from '../repositories/voice-session.repository';
 import { VOICE_XP_PER_MINUTE, VOICE_MONEY_PER_MINUTE, VOICE_MIN_ACTIVE_SECONDS } from '../constants/voice.constants';
 import UserModel from '../../user/models/user.model';
 import { LevelingService } from '../../leveling/services/leveling.service';
@@ -49,6 +50,8 @@ interface InternalSession {
   channelName: string;
   activePeriods: ActivePeriod[];
   currentActiveStart: number | null;
+  /** Cumul des secondes actives (utilisé après réhydratation quand activePeriods est vide) */
+  totalActiveSeconds?: number;
 }
 
 // ─── Service ────────────────────────────────────────────────────────────────
@@ -76,7 +79,7 @@ export class VoiceSessionService {
 
   // ─── Session lifecycle ────────────────────────────────────────────────────
 
-  private static startSession(userId: string, channelId: string, channelName: string, active: boolean, client: BotClient): void {
+  private static async startSession(userId: string, channelId: string, channelName: string, active: boolean, client: BotClient): Promise<void> {
     const now = Date.now();
     const session: InternalSession = {
       startedAt: now,
@@ -86,6 +89,16 @@ export class VoiceSessionService {
       currentActiveStart: active ? now : null,
     };
     this.sessions.set(userId, session);
+
+    await VoiceSessionRepository.upsert({
+      userId,
+      guildId: getGuildId(),
+      channelId,
+      channelName,
+      startedAt: new Date(session.startedAt),
+      totalActiveSeconds: 0,
+      currentActiveStart: session.currentActiveStart ? new Date(session.currentActiveStart) : null,
+    });
     console.log(`[VoiceSession] Session démarrée: user=${userId} channel=${channelId} active=${active}`);
 
     for (const plugin of this.plugins) {
@@ -106,11 +119,18 @@ export class VoiceSessionService {
     }
 
     const durationSeconds = Math.floor((now - session.startedAt) / 1000);
-    const activeSeconds = session.activePeriods.reduce(
+    const periodsSeconds = session.activePeriods.reduce(
       (acc, p) => acc + Math.floor((p.endedAt - p.startedAt) / 1000),
       0,
     );
+    const currentPeriodSeconds = session.currentActiveStart !== null
+      ? Math.floor((now - session.currentActiveStart) / 1000)
+      : 0;
+    const activeSeconds = (session.totalActiveSeconds ?? 0) + periodsSeconds + currentPeriodSeconds;
 
+    VoiceSessionRepository.deleteByUserId(userId).catch(err =>
+      console.error('[VoiceSession] Erreur suppression session DB:', err),
+    );
     console.log(`[VoiceSession] Session terminée: user=${userId} durée=${durationSeconds}s actif=${activeSeconds}s`);
 
     return {
@@ -125,15 +145,45 @@ export class VoiceSessionService {
     };
   }
 
-  private static pauseSession(session: InternalSession): void {
+  private static async pauseSession(userId: string, session: InternalSession): Promise<void> {
     if (session.currentActiveStart === null) return;
-    session.activePeriods.push({ startedAt: session.currentActiveStart, endedAt: Date.now() });
+    const now = Date.now();
+    session.activePeriods.push({ startedAt: session.currentActiveStart, endedAt: now });
     session.currentActiveStart = null;
+
+    const totalActiveSeconds = session.activePeriods.reduce(
+      (acc, p) => acc + Math.floor((p.endedAt - p.startedAt) / 1000),
+      0,
+    );
+    await VoiceSessionRepository.upsert({
+      userId,
+      guildId: getGuildId(),
+      channelId: session.channelId,
+      channelName: session.channelName,
+      startedAt: new Date(session.startedAt),
+      totalActiveSeconds,
+      currentActiveStart: null,
+    });
   }
 
-  private static resumeSession(session: InternalSession): void {
+  private static async resumeSession(userId: string, session: InternalSession): Promise<void> {
     if (session.currentActiveStart !== null) return;
-    session.currentActiveStart = Date.now();
+    const now = Date.now();
+    session.currentActiveStart = now;
+
+    const totalActiveSeconds = session.activePeriods.reduce(
+      (acc, p) => acc + Math.floor((p.endedAt - p.startedAt) / 1000),
+      0,
+    );
+    await VoiceSessionRepository.upsert({
+      userId,
+      guildId: getGuildId(),
+      channelId: session.channelId,
+      channelName: session.channelName,
+      startedAt: new Date(session.startedAt),
+      totalActiveSeconds,
+      currentActiveStart: new Date(now),
+    });
   }
 
   // ─── Event handlers ───────────────────────────────────────────────────────
@@ -146,7 +196,7 @@ export class VoiceSessionService {
     const active = this.isActiveState(newState);
     const channelName = newState.channel?.name ?? newState.channelId;
 
-    this.startSession(userId, newState.channelId, channelName, active, client);
+    await this.startSession(userId, newState.channelId, channelName, active, client);
 
     const vocConfig = await VoiceConfigRepository.get();
     const isJoinChannel = vocConfig?.joinChannels.some(c => c.id === newState.channelId);
@@ -219,7 +269,7 @@ export class VoiceSessionService {
     }
   }
 
-  static handleVoiceStateChange(oldState: VoiceState, newState: VoiceState): void {
+  static async handleVoiceStateChange(oldState: VoiceState, newState: VoiceState): Promise<void> {
     if (newState.member?.user.bot) return;
 
     const userId = newState.id;
@@ -229,39 +279,87 @@ export class VoiceSessionService {
     if (oldState.channelId !== newState.channelId && newState.channelId) {
       session.channelId = newState.channelId;
       session.channelName = newState.channel?.name ?? newState.channelId;
+      await VoiceSessionRepository.upsert({
+        userId,
+        guildId: getGuildId(),
+        channelId: session.channelId,
+        channelName: session.channelName,
+        startedAt: new Date(session.startedAt),
+        totalActiveSeconds: session.activePeriods.reduce(
+          (acc, p) => acc + Math.floor((p.endedAt - p.startedAt) / 1000),
+          0,
+        ),
+        currentActiveStart: session.currentActiveStart ? new Date(session.currentActiveStart) : null,
+      }).catch(() => {});
     }
 
     const wasActive = this.isActiveState(oldState);
     const isActive = this.isActiveState(newState);
 
     if (wasActive && !isActive) {
-      this.pauseSession(session);
+      await this.pauseSession(userId, session);
     } else if (!wasActive && isActive) {
-      this.resumeSession(session);
+      await this.resumeSession(userId, session);
     }
   }
 
   // ─── Rehydration ──────────────────────────────────────────────────────────
 
-  static rehydrate(client: BotClient): void {
+  static async rehydrate(client: BotClient): Promise<void> {
     const guild = client.guilds.cache.get(getGuildId());
     if (!guild) return;
 
     let count = 0;
-    guild.voiceStates.cache.forEach(state => {
-      if (!state.channelId || state.member?.user.bot) return;
-      if (!this.isTrackableChannel(state)) return;
+    for (const [, state] of guild.voiceStates.cache) {
+      if (!state.channelId || state.member?.user.bot) continue;
+      if (!this.isTrackableChannel(state)) continue;
 
+      const userId = state.id;
       const active = this.isActiveState(state);
       const channelName = state.channel?.name ?? state.channelId;
-      this.startSession(state.id, state.channelId, channelName, active, client);
-      count++;
 
-      console.log(
-        `[VoiceSession] Réhydratée: ${state.member?.user.tag || state.id} ` +
-        `channel=${channelName} active=${active}`,
-      );
-    });
+      const persisted = await VoiceSessionRepository.getByUserId(userId);
+      const now = Date.now();
+      const guildId = getGuildId();
+
+      if (persisted) {
+        const startedAt = persisted.startedAt.getTime();
+        let totalActiveSeconds = persisted.totalActiveSeconds;
+        if (persisted.currentActiveStart) {
+          totalActiveSeconds += Math.floor((now - persisted.currentActiveStart.getTime()) / 1000);
+        }
+        const currentActiveStart = active ? now : null;
+        const session: InternalSession = {
+          startedAt,
+          channelId: state.channelId,
+          channelName,
+          activePeriods: [],
+          currentActiveStart,
+          totalActiveSeconds,
+        };
+        this.sessions.set(userId, session);
+        await VoiceSessionRepository.upsert({
+          userId,
+          guildId,
+          channelId: state.channelId,
+          channelName,
+          startedAt: new Date(startedAt),
+          totalActiveSeconds,
+          currentActiveStart: currentActiveStart ? new Date(currentActiveStart) : null,
+        });
+        console.log(
+          `[VoiceSession] Réhydratée: ${state.member?.user.tag || userId} ` +
+          `channel=${channelName} active=${active} (timer préservé)`,
+        );
+      } else {
+        await this.startSession(userId, state.channelId, channelName, active, client);
+        console.log(
+          `[VoiceSession] Réhydratée: ${state.member?.user.tag || userId} ` +
+          `channel=${channelName} active=${active}`,
+        );
+      }
+      count++;
+    }
 
     if (count > 0) {
       console.log(`[VoiceSession] ${count} session(s) réhydratée(s)`);
