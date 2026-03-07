@@ -19,7 +19,7 @@ const LOG_FEATURE = '⛰️ Mountain Spawn';
 export const SPAWN_BUTTON_PREFIX = 'mountain:spawn:claim';
 
 export class MountainSpawnService {
-  private static claimedSpawns = new Set<string>(); // messageId already claimed
+  private static claimedSpawns = new Set<string>();
 
   static async rehydrate(client: BotClient): Promise<void> {
     const config = await MountainConfigRepository.get();

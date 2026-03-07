@@ -36,7 +36,7 @@ export default {
           await LogService.logVoiceMove(client, oldState, newState);
         }
       } else {
-        VoiceService.handleVoiceStateChange(oldState, newState);
+        await VoiceService.handleVoiceStateChange(oldState, newState);
         await LogService.logVoiceStateChange(client, oldState, newState);
       }
     } catch (error) {

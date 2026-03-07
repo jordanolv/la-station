@@ -75,13 +75,13 @@ export class VoiceService {
     return VoiceSessionService.handleLeave(client, oldState, newState);
   }
 
-  static handleVoiceStateChange(oldState: VoiceState, newState: VoiceState): void {
-    VoiceSessionService.handleVoiceStateChange(oldState, newState);
+  static handleVoiceStateChange(oldState: VoiceState, newState: VoiceState): Promise<void> {
+    return VoiceSessionService.handleVoiceStateChange(oldState, newState);
   }
 
   // ─── Rehydration ───────────────────────────────────────────────────────────
 
-  static rehydrate(client: BotClient): void {
-    VoiceSessionService.rehydrate(client);
+  static rehydrate(client: BotClient): Promise<void> {
+    return VoiceSessionService.rehydrate(client);
   }
 }
