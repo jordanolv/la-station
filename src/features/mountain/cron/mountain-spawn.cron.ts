@@ -46,6 +46,9 @@ export class MountainSpawnCron {
 
     if (todayDates.length === 0) {
       await this.planDay();
+    } else {
+      const remaining = todayDates.filter((d) => d.getTime() > Date.now());
+      this.scheduleFromDates(remaining);
     }
   }
 

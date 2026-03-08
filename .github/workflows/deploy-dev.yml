@@ -1,52 +1,61 @@
-name: 🚀 Deploy DEV to VPS
+name: 🚀 Deploy The Ridge Bot DEV to VPS
 
 on:
   push:
     branches:
-      - test
+      - dev
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22'
 
 jobs:
   deploy:
+    name: Deploy to VPS
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 15
+
     steps:
-      - name: 🔐 Préparer la clé SSH
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }}
-          chmod 600 ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }}
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/vps_key
+          chmod 600 ~/.ssh/vps_key
           ssh-keyscan -p ${{ secrets.VPS_PORT }} -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 🚀 Déploiement SSH
+      - name: Deploy via SSH
         run: |
-          ssh -i ~/.ssh/${{ secrets.VPS_SSH_KEY_NAME }} -p ${{ secrets.VPS_PORT }} -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
-            echo "✅ Connexion SSH réussie"
+          ssh -i ~/.ssh/vps_key \
+              -p ${{ secrets.VPS_PORT }} \
+              ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
 
-            mkdir -p ~/projects/LaStationBot/dev
-            cd ~/projects/LaStationBot/dev
+            set -e
+
+            echo "✅ Connected to VPS"
+
+            PROJECT_DIR=~/projects/theridge-bot/dev
+            mkdir -p $PROJECT_DIR
+            cd $PROJECT_DIR
 
             if [ ! -d ".git" ]; then
-              echo "📁 Clonage initial"
-              git clone -b dev https://github.com/jordanolv/la-station.git .
+              echo "📁 Initial clone"
+              git clone -b dev https://${{ secrets.GH_TOKEN }}@github.com/jordanolv/la-station.git .
+            else
+              echo "📦 Git repo already present, pulling latest code"
+              git fetch origin
+              git reset --hard origin/dev
             fi
 
-            echo "📥 Pull du dernier code"
-            git config --global --add safe.directory /home/deploy/projects/LaStationBot/dev
-            git reset --hard
-            git clean -fd
-            git pull origin dev
-
-            echo "🔧 Droits"
-            chown -R deploy:deploy ~/projects/LaStationBot/dev
-
-            echo "🛠 Backend - Installation & Build"
-            npm install
+            echo "🛠 Backend – install & build"
+            npm ci
             npm run build
 
-            echo "🚀 PM2 Restart"
-            pm2 delete la-station-bot-dev || true
-            pm2 start ecosystem.config.cjs
+            echo "🚀 PM2 Reload all apps via ecosystem"
+            pm2 reload ecosystem.config.cjs
             pm2 save
 
-            echo "✅ Déploiement DEV terminé 🎉"
+            echo "✅ TheRidgeBot DEV deployment finished 🎉"
           EOF
