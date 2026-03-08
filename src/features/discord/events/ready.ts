@@ -13,6 +13,7 @@ import { partyPanel } from '../../party/panels/party.panel';
 import { chatGamingPanel } from '../../chat-gaming/panels/chat-gaming.panel';
 import { arcadePanel } from '../../arcade/panels/arcade.panel';
 import { mountainPanel } from '../../mountain/panels/mountain.panel';
+import { activityRolesPanel } from '../../activity-roles/panels/activity-roles.panel';
 
 panelRegistry.register(generalPanel);
 panelRegistry.register(logsPanel);
@@ -23,6 +24,7 @@ panelRegistry.register(partyPanel);
 panelRegistry.register(chatGamingPanel);
 panelRegistry.register(arcadePanel);
 panelRegistry.register(mountainPanel);
+panelRegistry.register(activityRolesPanel);
 
 export default {
   name: Events.ClientReady,
