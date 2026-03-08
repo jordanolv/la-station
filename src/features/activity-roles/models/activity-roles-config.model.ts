@@ -25,8 +25,8 @@ export class ActivityRolesConfig {
 
   // ─── Seuils (% du classement) ─────────────────────────────────────────────
 
-  /** % max pour le rôle actif (ex: 20 = top 20%) */
-  @prop({ default: 20 })
+  /** % max pour le rôle actif (ex: 10 = top 10%) */
+  @prop({ default: 10 })
   activeThresholdPercent!: number;
 
   /** % max pour le rôle présent (ex: 60 = top 21-60%) */

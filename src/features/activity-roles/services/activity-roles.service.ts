@@ -39,7 +39,7 @@ export class ActivityRolesService {
 
     console.log(`[ActivityRoles] ${scores.length} users avec du temps vocal cette semaine:`, scores.map(s => `${s.userId}=${formatDuration(s.seconds)}`));
 
-    const total = scores.length;
+    const total = users.length;
     const { podiumRoleId, activeRoleId, regularRoleId, inactiveRoleId, activeThresholdPercent, regularThresholdPercent } = config;
     console.log(`[ActivityRoles] Config rôles — podium:${podiumRoleId} actif:${activeRoleId} présent:${regularRoleId} inactif:${inactiveRoleId}`);
 
