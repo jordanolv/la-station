@@ -1,23 +1,28 @@
 import {
-  SlashCommandBuilder,
   ChatInputCommandInteraction,
   ButtonInteraction,
   ContainerBuilder,
   TextDisplayBuilder,
   SeparatorBuilder,
   SectionBuilder,
+  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
   MessageFlags,
 } from 'discord.js';
-import { BotClient } from '../../../bot/client';
-import { UserMountainsRepository } from '../repositories/user-mountains.repository';
-import { MountainService } from '../services/mountain.service';
-import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../constants/mountain.constants';
+import { BotClient } from '../../../../bot/client';
+import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
+import { MountainService } from '../../services/mountain.service';
+import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/mountain.constants';
 
 export const PACK_BUTTON_OPEN = 'mountain:pack:open';
 export const PACK_BUTTON_CONVERT = 'mountain:pack:convert';
+
+function buildFragmentBar(fragments: number): string {
+  const filled = Math.round((fragments / FRAGMENTS_PER_TICKET) * 10);
+  return '🟧'.repeat(filled) + '⬛'.repeat(10 - filled);
+}
 
 function buildPackInfoContainer(tickets: number, fragments: number): ContainerBuilder {
   const fragBar = buildFragmentBar(fragments);
@@ -101,23 +106,6 @@ function buildRevealEmbed(
   return { embed };
 }
 
-function buildFragmentBar(fragments: number): string {
-  const filled = Math.round((fragments / FRAGMENTS_PER_TICKET) * 10);
-  return '🟧'.repeat(filled) + '⬛'.repeat(10 - filled);
-}
-
-export async function handlePackButton(interaction: ButtonInteraction, _client: BotClient): Promise<void> {
-  const originalUserId = interaction.message.interactionMetadata?.user.id ?? interaction.message.author?.id;
-  if (interaction.user.id !== originalUserId) {
-    await interaction.reply({ content: "❌ Ce n'est pas ton pack !", flags: MessageFlags.Ephemeral });
-    return;
-  }
-
-  if (interaction.customId === PACK_BUTTON_OPEN) {
-    await openPack(interaction);
-  }
-}
-
 async function openPack(interaction: ButtonInteraction): Promise<void> {
   const userId = interaction.user.id;
 
@@ -167,27 +155,37 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
     ticketsFromFragments,
   );
 
-  await interaction.reply({
-    embeds: [embed],
-  });
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(PACK_BUTTON_OPEN)
+      .setLabel('Ouvrir un autre pack')
+      .setStyle(ButtonStyle.Success)
+      .setDisabled(doc.packTickets === 0),
+  );
+
+  await interaction.reply({ embeds: [embed], components: [row] });
 }
 
-export default {
-  data: new SlashCommandBuilder()
-    .setName('pack')
-    .setDescription('Ouvre tes packs de montagnes ou consulte ton solde de tickets'),
+export async function handlePackButton(interaction: ButtonInteraction, _client: BotClient): Promise<void> {
+  const originalUserId = interaction.message.interactionMetadata?.user.id ?? interaction.message.author?.id;
+  if (interaction.user.id !== originalUserId) {
+    await interaction.reply({ content: "❌ Ce n'est pas ton pack !", flags: MessageFlags.Ephemeral });
+    return;
+  }
 
-  async execute(interaction: ChatInputCommandInteraction, _client: BotClient): Promise<void> {
-    const userId = interaction.user.id;
-    const doc = await UserMountainsRepository.getOrCreate(userId);
+  if (interaction.customId === PACK_BUTTON_OPEN) {
+    await openPack(interaction);
+  }
+}
 
-    const container = buildPackInfoContainer(doc.packTickets, doc.fragments);
+export async function executePack(interaction: ChatInputCommandInteraction, _client: BotClient): Promise<void> {
+  const userId = interaction.user.id;
+  const doc = await UserMountainsRepository.getOrCreate(userId);
 
-    await interaction.reply({
-      components: [container],
-      flags: MessageFlags.IsComponentsV2,
-    });
-  },
+  const container = buildPackInfoContainer(doc.packTickets, doc.fragments);
 
-  handleButtonInteraction: handlePackButton,
-};
+  await interaction.reply({
+    components: [container],
+    flags: MessageFlags.IsComponentsV2,
+  });
+}

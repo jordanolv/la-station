@@ -1,5 +1,4 @@
 import {
-  SlashCommandBuilder,
   ChatInputCommandInteraction,
   ButtonInteraction,
   ContainerBuilder,
@@ -11,11 +10,11 @@ import {
   ButtonStyle,
   MessageFlags,
 } from 'discord.js';
-import { BotClient } from '../../../bot/client';
-import { UserMountainsRepository } from '../repositories/user-mountains.repository';
-import { MountainService } from '../services/mountain.service';
-import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../constants/mountain.constants';
-import type { MountainRarity } from '../types/mountain.types';
+import { BotClient } from '../../../../bot/client';
+import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
+import { MountainService } from '../../services/mountain.service';
+import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/mountain.constants';
+import type { MountainRarity } from '../../types/mountain.types';
 
 export const INV_BUTTON_PREFIX = 'mountain:inv';
 
@@ -166,23 +165,17 @@ export async function handleInventaireButton(
   }
 }
 
-export default {
-  data: new SlashCommandBuilder()
-    .setName('inv')
-    .setDescription('Consulte ta collection de montagnes débloquées'),
+export async function executeInv(interaction: ChatInputCommandInteraction, _client: BotClient): Promise<void> {
+  const userId = interaction.user.id;
+  const [doc, unlocked] = await Promise.all([
+    UserMountainsRepository.getOrCreate(userId),
+    UserMountainsRepository.getUnlocked(userId),
+  ]);
 
-  async execute(interaction: ChatInputCommandInteraction, _client: BotClient): Promise<void> {
-    const userId = interaction.user.id;
-    const [doc, unlocked] = await Promise.all([
-      UserMountainsRepository.getOrCreate(userId),
-      UserMountainsRepository.getUnlocked(userId),
-    ]);
+  const containers = buildInventoryContainer(userId, unlocked, doc.packTickets, doc.fragments, 0);
 
-    const containers = buildInventoryContainer(userId, unlocked, doc.packTickets, doc.fragments, 0);
-
-    await interaction.reply({
-      components: containers,
-      flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
-    });
-  },
-};
+  await interaction.reply({
+    components: containers,
+    flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+  });
+}
