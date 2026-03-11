@@ -8,8 +8,12 @@ export type VoiceHistorySegment = {
 
 export type VoiceHistoryMergeMode = 'append' | 'replace';
 
+const MSG_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
+const MSG_POINTS = 450; // 1 slot 30min valide
+
 export class StatsService {
   private static userRepo = new UserRepository();
+  private static lastValidMessage = new Map<string, number>(); // userId → timestamp ms
 
   // ─── Voice stats persistence ──────────────────────────────────────────────
 
@@ -72,25 +76,44 @@ export class StatsService {
     }
 
     guildUser.stats.voiceHistory.sort((a, b) => a.date.getTime() - b.date.getTime());
-    if (guildUser.stats.voiceHistory.length > 100) {
-      guildUser.stats.voiceHistory = guildUser.stats.voiceHistory.slice(-100);
-    }
 
+    guildUser.stats.activityPoints = (guildUser.stats.activityPoints ?? 0) + addedSeconds;
     guildUser.infos.updatedAt = new Date();
     return addedSeconds;
   }
 
   // ─── Messages ─────────────────────────────────────────────────────────────
 
-  static async incrementMessageCount(client: any, userId: string, username: string): Promise<void> {
+  static async incrementMessageCount(_client: any, userId: string, username: string): Promise<void> {
     try {
+      const now = Date.now();
+      const today = this.normalizeDate(new Date());
+      const lastMsg = this.lastValidMessage.get(userId) ?? 0;
+      const isValidSlot = now - lastMsg >= MSG_COOLDOWN_MS;
+
+      if (isValidSlot) this.lastValidMessage.set(userId, now);
+
       const guildUser = await this.userRepo.findUserById(userId);
 
       if (guildUser) {
-        await this.userRepo.updateUser(userId, { stats: { totalMsg: guildUser.stats.totalMsg + 1 } });
+        guildUser.stats.totalMsg += 1;
+        const existing = guildUser.stats.messageHistory.find(e => this.isSameDay(e.date, today));
+        if (existing) {
+          existing.count += 1;
+        } else {
+          guildUser.stats.messageHistory.push({ date: today, count: 1 } as any);
+          guildUser.stats.messageHistory.sort((a, b) => a.date.getTime() - b.date.getTime());
+        }
+        if (isValidSlot) {
+          guildUser.stats.activityPoints = (guildUser.stats.activityPoints ?? 0) + MSG_POINTS;
+        }
+        guildUser.infos.updatedAt = new Date();
+        await guildUser.save();
       } else {
         const newUser = await this.userRepo.createUser({ discordId: userId, name: username || 'Unknown User' });
         newUser.stats.totalMsg = 1;
+        newUser.stats.messageHistory = [{ date: today, count: 1 }] as any;
+        if (isValidSlot) newUser.stats.activityPoints = MSG_POINTS;
         await newUser.save();
       }
     } catch (error) {

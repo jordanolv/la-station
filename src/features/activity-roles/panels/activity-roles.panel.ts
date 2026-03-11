@@ -138,7 +138,7 @@ export const activityRolesPanel: ConfigPanel = {
 
     if (id === 'run_now') {
       await interaction.deferReply({ ephemeral: true });
-      await ActivityRolesService.run(client, true);
+      await ActivityRolesService.run(client);
       await interaction.editReply({ content: '✅ Rotation des rôles effectuée.' });
       return;
     }

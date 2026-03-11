@@ -76,6 +76,10 @@ class UserStats {
 
   @prop()
   lastDailyClaimDate?: Date;
+
+  /** Points d'activité de la semaine en cours (voc + messages), reset chaque lundi */
+  @prop({ default: 0 })
+  activityPoints!: number;
 }
 
 class UserInfos {

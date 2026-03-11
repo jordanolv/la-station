@@ -23,12 +23,12 @@ import {
   panelRegistry,
 } from '../../config-panel/services/config-panel.registry';
 import { MONEY_MODAL_PREFIX } from '../../admin/slash/money';
-import { handlePackButton } from '../../mountain/slash/pack';
+import { handlePackButton } from '../../mountain/slash/subcommands/pack';
 import { MountainSpawnService, SPAWN_BUTTON_PREFIX } from '../../mountain/services/mountain-spawn.service';
 import {
   INV_BUTTON_PREFIX,
   handleInventaireButton,
-} from '../../mountain/slash/inventaire';
+} from '../../mountain/slash/subcommands/inv';
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
 async function routeToPanelSelectMenu(
