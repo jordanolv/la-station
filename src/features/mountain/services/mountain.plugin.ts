@@ -44,7 +44,7 @@ export class MountainPlugin implements VoicePlugin {
   onBeforeChannelCreate(_userId: string) {
     const mountain = MountainService.getRandomByPackWeight();
     return {
-      templateVars: { mountain: mountain?.name ?? 'Vocal' },
+      templateVars: { mountain: mountain ? `${mountain.flag} ${mountain.name}` : 'Vocal' },
       metadata: { mountainId: mountain?.id ?? null },
     };
   }
