@@ -38,7 +38,11 @@ export class MountainPlugin implements VoicePlugin {
 
   async init(): Promise<void> {
     const stored = await MountainConfigRepository.getActiveChannelMountains();
-    this.channelMountains = new Map(stored);
+    for (const [channelId, mountainId] of stored) {
+      if (!this.channelMountains.has(channelId)) {
+        this.channelMountains.set(channelId, mountainId);
+      }
+    }
   }
 
   onBeforeChannelCreate(_userId: string) {

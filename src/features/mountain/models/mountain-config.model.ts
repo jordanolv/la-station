@@ -13,8 +13,8 @@ export class MountainConfig {
   @prop({ type: () => [Date], default: [] })
   spawnSchedule!: Date[];
 
-  @prop({ type: String, default: new Map() })
-  activeChannelMountains!: Map<string, string>;
+  @prop({ type: Object, default: {} })
+  activeChannelMountains!: Record<string, string>;
 }
 
 const MountainConfigModel = getModelForClass(MountainConfig, {

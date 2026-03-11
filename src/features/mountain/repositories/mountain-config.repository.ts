@@ -5,7 +5,7 @@ const DEFAULTS: IMountainConfig = {
   spawnChannelId: undefined,
   notificationChannelId: undefined,
   spawnSchedule: [],
-  activeChannelMountains: new Map(),
+  activeChannelMountains: {},
 };
 
 export class MountainConfigRepository {
@@ -45,21 +45,23 @@ export class MountainConfigRepository {
   }
 
   static async setChannelMountain(channelId: string, mountainId: string): Promise<void> {
-    const doc = await this.getOrCreate();
-    doc.activeChannelMountains.set(channelId, mountainId);
-    doc.markModified('activeChannelMountains');
-    await doc.save();
+    await MountainConfigModel.updateOne(
+      {},
+      { $set: { [`activeChannelMountains.${channelId}`]: mountainId } },
+      { upsert: true },
+    );
   }
 
   static async deleteChannelMountain(channelId: string): Promise<void> {
-    const doc = await this.getOrCreate();
-    doc.activeChannelMountains.delete(channelId);
-    doc.markModified('activeChannelMountains');
-    await doc.save();
+    await MountainConfigModel.updateOne(
+      {},
+      { $unset: { [`activeChannelMountains.${channelId}`]: '' } },
+    );
   }
 
   static async getActiveChannelMountains(): Promise<Map<string, string>> {
     const doc = await this.get();
-    return doc?.activeChannelMountains ?? new Map();
+    const obj = (doc?.activeChannelMountains ?? {}) as Record<string, string>;
+    return new Map(Object.entries(obj));
   }
 }
