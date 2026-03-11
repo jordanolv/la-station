@@ -71,6 +71,8 @@ function buildPackInfoContainer(tickets: number, fragments: number): ContainerBu
 function buildRevealEmbed(
   mountainName: string,
   altitude: string,
+  flag: string,
+  country: string,
   mountainImage: string,
   rarity: ReturnType<typeof MountainService.getRarity>,
   isDuplicate: boolean,
@@ -78,8 +80,9 @@ function buildRevealEmbed(
   totalFragments: number,
   ticketsLeft: number,
   ticketsFromFragments: number,
-): { embed: EmbedBuilder } {
+): EmbedBuilder {
   const { emoji, label, color } = RARITY_CONFIG[rarity];
+  const displayName = mountainName.charAt(0).toUpperCase() + mountainName.slice(1);
 
   let resultText: string;
   if (isDuplicate) {
@@ -88,22 +91,20 @@ function buildRevealEmbed(
       resultText += `\n🎟️ **+${ticketsFromFragments} ticket${ticketsFromFragments > 1 ? 's' : ''}** bonus !`;
     }
   } else {
-    resultText = `**Nouvelle montagne débloquée !** ✅`;
+    resultText = '**Nouvelle montagne débloquée !** ✅';
   }
 
-  const embed = new EmbedBuilder()
+  return new EmbedBuilder()
     .setColor(color)
-    .setTitle(`${emoji} Pack ouvert !`)
+    .setTitle(`${emoji} ${displayName}`)
     .addFields(
-      { name: '⛰️ Montagne', value: mountainName, inline: true },
+      { name: '🏳️ Pays', value: `${flag} ${country}`, inline: true },
       { name: '📏 Altitude', value: altitude, inline: true },
       { name: '✨ Rareté', value: `${emoji} **${label}**`, inline: true },
     )
     .setDescription(resultText)
     .setImage(mountainImage)
     .setFooter({ text: `🎟️ Il te reste ${ticketsLeft} ticket${ticketsLeft > 1 ? 's' : ''}` });
-
-  return { embed };
 }
 
 async function openPack(interaction: ButtonInteraction): Promise<void> {
@@ -143,9 +144,11 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
 
   const doc = await UserMountainsRepository.getOrCreate(userId);
 
-  const { embed } = buildRevealEmbed(
+  const embed = buildRevealEmbed(
     mountain.name,
     mountain.altitude,
+    mountain.flag,
+    mountain.country,
     mountain.image,
     rarity,
     isDuplicate,

@@ -1,6 +1,8 @@
 [
   {
     "id": "le-faux-verger",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Le Faux Verger",
     "description": "Sommet culminant à 985 m.",
     "altitude": "985 m",
@@ -9,6 +11,8 @@
   },
   {
     "id": "sarapo",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Sarapo",
     "description": "Le Sarapo ou Nevado Sarapo est une montagne située dans la cordillère Huayhuash, dans les Andes, au Pérou. Elle s'élève à 6 143 m d'altitude (ou 6 127 m selon certaines sources).",
     "altitude": "6 127 m",
@@ -17,6 +21,8 @@
   },
   {
     "id": "rohnenspitze",
+    "flag": "🇩🇪",
+    "country": "Allemagne",
     "name": "Rohnenspitze",
     "description": "La Rohnenspitze (aussi Ronenspitze ou Rhonenspitze) est une montagne culminant à 1 990 m d'altitude dans les Alpes d'Allgäu.",
     "altitude": "1 990 m",
@@ -25,6 +31,8 @@
   },
   {
     "id": "aggenstein",
+    "flag": "🇩🇪",
+    "country": "Allemagne",
     "name": "Aggenstein",
     "description": "L'Aggenstein est un sommet des Alpes, à 1 985 m ou 1 986 m, dans les Alpes d'Allgäu, et en particulier dans les montagnes de Tannheim, entre l'Autriche (Land du Tyrol) et l'Allemagne (Bavière).",
     "altitude": "1 986 m",
@@ -33,6 +41,8 @@
   },
   {
     "id": "hinter-fiescherhorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Hinter Fiescherhorn",
     "description": "Sommet culminant à 4 025 m.",
     "altitude": "4 025 m",
@@ -41,6 +51,8 @@
   },
   {
     "id": "san-francisco",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "San Francisco",
     "description": "Sommet culminant à 6 016 m.",
     "altitude": "6 016 m",
@@ -49,6 +61,8 @@
   },
   {
     "id": "tete-de-l-estrop",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "tête de l'Estrop",
     "description": "Sommet culminant à 2 961 m.",
     "altitude": "2 961 m",
@@ -57,6 +71,8 @@
   },
   {
     "id": "pic-de-cambales",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pic de Cambalès",
     "description": "Sommet culminant à 2 965 m.",
     "altitude": "2 965 m",
@@ -65,6 +81,8 @@
   },
   {
     "id": "dents-de-morcles",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "dents de Morcles",
     "description": "Sommet culminant à 2 969 m.",
     "altitude": "2 969 m",
@@ -73,6 +91,8 @@
   },
   {
     "id": "saltoro-kangri",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Saltoro Kangri",
     "description": "Sommet culminant à 7 742 m.",
     "altitude": "7 742 m",
@@ -81,6 +101,8 @@
   },
   {
     "id": "namcha-barwa",
+    "flag": "🇨🇳",
+    "country": "Chine",
     "name": "Namcha Barwa",
     "description": "Sommet culminant à 7 782 m.",
     "altitude": "7 782 m",
@@ -89,6 +111,8 @@
   },
   {
     "id": "monte-tamaro",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Monte Tamaro",
     "description": "Sommet culminant à 1 962 m.",
     "altitude": "1 962 m",
@@ -97,6 +121,8 @@
   },
   {
     "id": "mont-vuarat",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Mont Vuarat",
     "description": "Sommet culminant à 985 m.",
     "altitude": "985 m",
@@ -105,6 +131,8 @@
   },
   {
     "id": "tour-de-don",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Tour de Don",
     "description": "Sommet culminant à 1 998 m.",
     "altitude": "1 998 m",
@@ -113,6 +141,8 @@
   },
   {
     "id": "gross-fiescherhorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Gross Fiescherhorn",
     "description": "Sommet culminant à 4 049 m.",
     "altitude": "4 049 m",
@@ -121,6 +151,8 @@
   },
   {
     "id": "mont-makihata",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Makihata",
     "description": "Sommet culminant à 1 967 m.",
     "altitude": "1 967 m",
@@ -129,6 +161,8 @@
   },
   {
     "id": "mont-reynolds",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Reynolds",
     "description": "Sommet culminant à 9 125 m.",
     "altitude": "9 125 m",
@@ -137,6 +171,8 @@
   },
   {
     "id": "jovis-tholus",
+    "flag": "🌌",
+    "country": "Espace",
     "name": "Jovis Tholus",
     "description": "Sommet culminant à 2 990 m.",
     "altitude": "2 990 m",
@@ -145,6 +181,8 @@
   },
   {
     "id": "felskinn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Felskinn",
     "description": "Felskinn est une station suisse de sport d'hiver, situé à 2989m d'altitude dans la station de Saas-Fee (Alpes valaisannes). Il s'agit d'une station intermédiaire dans l'ascension du col de Mittelallalin par les remontées",
     "altitude": "2 989 m",
@@ -153,6 +191,8 @@
   },
   {
     "id": "helgrindur",
+    "flag": "🇮🇸",
+    "country": "Islande",
     "name": "Helgrindur",
     "description": "Le Helgrindur est un volcan d'Islande situé dans la péninsule de Snæfellnes.",
     "altitude": "988 m",
@@ -161,6 +201,8 @@
   },
   {
     "id": "mont-kinabalu",
+    "flag": "🇲🇾",
+    "country": "Malaisie",
     "name": "mont Kinabalu",
     "description": "Sommet culminant à 4 095 m.",
     "altitude": "4 095 m",
@@ -169,6 +211,8 @@
   },
   {
     "id": "red-slate-mountain",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "Red Slate Mountain",
     "description": "Sommet culminant à 4 013 m.",
     "altitude": "4 013 m",
@@ -177,6 +221,8 @@
   },
   {
     "id": "himalchuli",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Himalchuli",
     "description": "L'Himalchuli, qui culmine à 7 893 m, est le dix-huitième plus haut sommet du monde. Il est situé au Népal dans la chaîne de l'Himalaya, dans le Mansiri Himal, non loin du Manaslu.",
     "altitude": "7 893 m",
@@ -185,6 +231,8 @@
   },
   {
     "id": "sasso-delle-none",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "Sasso delle None",
     "description": "Sommet culminant à 2 968 m.",
     "altitude": "2 968 m",
@@ -193,6 +241,8 @@
   },
   {
     "id": "pic-bonanza",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "pic Bonanza",
     "description": "Sommet culminant à 9 516 m.",
     "altitude": "9 516 m",
@@ -201,6 +251,8 @@
   },
   {
     "id": "mont-du-lac-des-cygnes",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "mont du Lac des Cygnes",
     "description": "Sommet culminant à 980 m.",
     "altitude": "980 m",
@@ -209,6 +261,8 @@
   },
   {
     "id": "pic-de-sallfort",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Pic de Sallfort",
     "description": "Sommet culminant à 994 m.",
     "altitude": "994 m",
@@ -217,6 +271,8 @@
   },
   {
     "id": "pic-palas",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pic Palas",
     "description": "Sommet culminant à 2 974 m.",
     "altitude": "2 974 m",
@@ -225,6 +281,8 @@
   },
   {
     "id": "cime-guilie",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "cime Guilié",
     "description": "Sommet culminant à 2 999 m.",
     "altitude": "2 999 m",
@@ -233,6 +291,8 @@
   },
   {
     "id": "vanil-des-artses",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Vanil des Artses",
     "description": "Sommet culminant à 1 992 m.",
     "altitude": "1 992 m",
@@ -241,6 +301,8 @@
   },
   {
     "id": "mont-torrage",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "mont Torrage",
     "description": "Sommet culminant à 1 971 m.",
     "altitude": "1 971 m",
@@ -249,6 +311,8 @@
   },
   {
     "id": "mont-silverthrone",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "mont Silverthrone",
     "description": "Sommet culminant à 4 029 m.",
     "altitude": "4 029 m",
@@ -257,6 +321,8 @@
   },
   {
     "id": "cerro-el-plata",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Cerro El Plata",
     "description": "Sommet culminant à 5 968 m.",
     "altitude": "5 968 m",
@@ -265,6 +331,8 @@
   },
   {
     "id": "grunhorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Grünhorn",
     "description": "Le Grünhorn est un sommet culminant à 4 044 m d'altitude dans les Alpes bernoises. Il est également appelé Gross Grünhorn ou Grosses Grünhorn pour le distinguer du Kleines Grünhorn, situé quelques centaines de mètres au",
     "altitude": "4 043 m",
@@ -273,6 +341,8 @@
   },
   {
     "id": "ighil-m-goun",
+    "flag": "🇲🇦",
+    "country": "Maroc",
     "name": "Ighil M'Goun",
     "description": "Sommet culminant à 4 068 m.",
     "altitude": "4 068 m",
@@ -281,6 +351,8 @@
   },
   {
     "id": "schonalmjoch",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Schönalmjoch",
     "description": "Le Schönalmjoch est une montagne culminant à 1 986 m d'altitude dans le massif des Karwendel en Autriche.",
     "altitude": "1 986 m",
@@ -289,6 +361,8 @@
   },
   {
     "id": "mont-shuisho",
+    "flag": "🇹🇼",
+    "country": "Taïwan",
     "name": "mont Shuishō",
     "description": "Sommet culminant à 2 986 m.",
     "altitude": "2 986 m",
@@ -297,6 +371,8 @@
   },
   {
     "id": "medicine-lake",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "Medicine Lake",
     "description": "Sommet culminant à 7 921 m.",
     "altitude": "7 921 m",
@@ -305,6 +381,8 @@
   },
   {
     "id": "zwolferkogel",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Zwölferkogel",
     "description": "Sommet culminant à 2 988 m.",
     "altitude": "2 988 m",
@@ -313,6 +391,8 @@
   },
   {
     "id": "mont-kaikoma",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Kaikoma",
     "description": "Sommet culminant à 2 967 m.",
     "altitude": "2 967 m",
@@ -321,6 +401,8 @@
   },
   {
     "id": "siula-grande",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Siula Grande",
     "description": "Sommet culminant à 6 344 m.",
     "altitude": "6 344 m",
@@ -329,6 +411,8 @@
   },
   {
     "id": "hoher-peissenberg",
+    "flag": "🇩🇪",
+    "country": "Allemagne",
     "name": "Hoher Peissenberg",
     "description": "Sommet culminant à 988 m.",
     "altitude": "988 m",
@@ -337,6 +421,8 @@
   },
   {
     "id": "les-ordons",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Les Ordons",
     "description": "Sommet culminant à 995 m.",
     "altitude": "995 m",
@@ -345,6 +431,8 @@
   },
   {
     "id": "mont-ahuna",
+    "flag": "🇨🇲",
+    "country": "Cameroun",
     "name": "mont Ahuna",
     "description": "Sommet culminant à 4 000 m.",
     "altitude": "4 000 m",
@@ -353,6 +441,8 @@
   },
   {
     "id": "allalinhorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Allalinhorn",
     "description": "L'Allalinhorn est un sommet des Alpes valaisannes qui fait partie du massif des Mischabels.",
     "altitude": "4 027 m",
@@ -361,6 +451,8 @@
   },
   {
     "id": "stuc-a-chroin",
+    "flag": "🇬🇧",
+    "country": "Royaume-Uni",
     "name": "Stùc a' Chroin",
     "description": "Sommet culminant à 975 m.",
     "altitude": "975 m",
@@ -369,6 +461,8 @@
   },
   {
     "id": "volcan-antofagasta",
+    "flag": "🇨🇱",
+    "country": "Chili",
     "name": "volcan Antofagasta",
     "description": "Sommet culminant à 4 000 m.",
     "altitude": "4 000 m",
@@ -377,6 +471,8 @@
   },
   {
     "id": "slide-mountain",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "Slide Mountain",
     "description": "Sommet culminant à 9 702 m.",
     "altitude": "9 702 m",
@@ -385,6 +481,8 @@
   },
   {
     "id": "cascade-mountain",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "Cascade Mountain",
     "description": "Sommet culminant à 2 998 m.",
     "altitude": "2 998 m",
@@ -393,6 +491,8 @@
   },
   {
     "id": "jannu",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Jannu",
     "description": "Le Jannu ou Kumbhakarna, à 7 710 m d'altitude, est un prolongement de la longue arête occidentale du Kangchenjunga. C'est un sommet imposant et très raide avec une face Nord haute de 3 000 m qui présente des voies d'asce",
     "altitude": "7 711 m",
@@ -401,6 +501,8 @@
   },
   {
     "id": "tirich-mir",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Tirich Mir",
     "description": "Sommet culminant à 7 708 m.",
     "altitude": "7 708 m",
@@ -409,6 +511,8 @@
   },
   {
     "id": "gyachung-kang",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Gyachung Kang",
     "description": "Sommet culminant à 7 952 m.",
     "altitude": "7 952 m",
@@ -417,6 +521,8 @@
   },
   {
     "id": "pic-eagle",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "pic Eagle",
     "description": "Sommet culminant à 7 783 m.",
     "altitude": "7 783 m",
@@ -425,6 +531,8 @@
   },
   {
     "id": "pic-mitre",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "pic Mitre",
     "description": "Sommet culminant à 6 010 m.",
     "altitude": "6 010 m",
@@ -433,6 +541,8 @@
   },
   {
     "id": "hozomeen-mountain",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "Hozomeen Mountain",
     "description": "Sommet culminant à 8 071 m.",
     "altitude": "8 071 m",
@@ -441,6 +551,8 @@
   },
   {
     "id": "nevado-coropuna",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Nevado Coropuna",
     "description": "Sommet culminant à 6 425 m.",
     "altitude": "6 425 m",
@@ -449,6 +561,8 @@
   },
   {
     "id": "cordillere-azanaques",
+    "flag": "🇧🇴",
+    "country": "Bolivie",
     "name": "cordillère Azanaques",
     "description": "Sommet culminant à 4 039 m.",
     "altitude": "4 039 m",
@@ -457,6 +571,8 @@
   },
   {
     "id": "chopicalqui",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Chopicalqui",
     "description": "Le Chopicalqui est un sommet andin d'une altitude de 6 354 m, situé dans la cordillère Blanche, dans la province de Yungay au Pérou.",
     "altitude": "6 354 m",
@@ -465,6 +581,8 @@
   },
   {
     "id": "paramakatoi",
+    "flag": "🇬🇾",
+    "country": "Guyana",
     "name": "Paramakatoi",
     "description": "Paramakatoi est une petite communauté indigène de la région de Potaro-Siparuni au Guyana, vivant dans la sierra de Pacaraima.",
     "altitude": "988 m",
@@ -473,6 +591,8 @@
   },
   {
     "id": "monte-san-valentin",
+    "flag": "🇨🇱",
+    "country": "Chili",
     "name": "Monte San Valentin",
     "description": "Sommet culminant à 4 058 m.",
     "altitude": "4 058 m",
@@ -481,6 +601,8 @@
   },
   {
     "id": "mont-kephart",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Kephart",
     "description": "Sommet culminant à 6 217 m.",
     "altitude": "6 217 m",
@@ -489,6 +611,8 @@
   },
   {
     "id": "mont-angeles",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "mont Angeles",
     "description": "Sommet culminant à 6 454 m.",
     "altitude": "6 454 m",
@@ -497,6 +621,8 @@
   },
   {
     "id": "illampu",
+    "flag": "🇧🇴",
+    "country": "Bolivie",
     "name": "Illampu",
     "description": "Le Nevado Illampu est une montagne des Andes située dans la partie septentrionale de la cordillère Orientale.",
     "altitude": "6 485 m",
@@ -505,6 +631,8 @@
   },
   {
     "id": "mont-poromoi",
+    "flag": "🇵🇬",
+    "country": "Papouasie-Nouvelle-Guinée",
     "name": "mont Poromoi",
     "description": "Sommet culminant à 992 m.",
     "altitude": "992 m",
@@ -513,6 +641,8 @@
   },
   {
     "id": "pico-polaco",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Pico Polaco",
     "description": "Sommet culminant à 5 950 m.",
     "altitude": "5 950 m",
@@ -521,6 +651,8 @@
   },
   {
     "id": "cerro-general-belgrano",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Cerro General Belgrano",
     "description": "Sommet culminant à 6 250 m.",
     "altitude": "6 250 m",
@@ -529,6 +661,8 @@
   },
   {
     "id": "monte-fontainhas",
+    "flag": "🇵🇹",
+    "country": "Portugal",
     "name": "Monte Fontainhas",
     "description": "Sommet culminant à 976 m.",
     "altitude": "976 m",
@@ -537,6 +671,8 @@
   },
   {
     "id": "kamet",
+    "flag": "🇮🇳",
+    "country": "Inde",
     "name": "Kamet",
     "description": "Le Kamet est par son élévation le deuxième sommet du Garhwal, derrière la Nanda Devi (7 816 m), en Inde. Il a été la première montagne de l'Himalaya de plus de 25 000 pieds (7 620 m) à être gravie.",
     "altitude": "7 756 m",
@@ -545,6 +681,8 @@
   },
   {
     "id": "schesaplana",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Schesaplana",
     "description": "La Schesaplana est un sommet des Alpes, à 2 965 m, point culminant du Rätikon, marquant la frontière entre l'Autriche (Vorarlberg) et la Suisse (canton des Grisons).",
     "altitude": "2 965 m",
@@ -553,6 +691,8 @@
   },
   {
     "id": "artesonraju",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Artesonraju",
     "description": "L'Artesonraju est l'un des quelque cinquante pics de la Cordillère Blanche dans les Andes péruviennes. Il est situé dans la région d'Ancash près de la ville de Caraz, dans le parc national de Huascarán.",
     "altitude": "6 025 m",
@@ -561,6 +701,8 @@
   },
   {
     "id": "imja-tse",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Imja Tse",
     "description": "Sommet culminant à 6 189 m.",
     "altitude": "6 189 m",
@@ -569,6 +711,8 @@
   },
   {
     "id": "azufral",
+    "flag": "🇨🇴",
+    "country": "Colombie",
     "name": "Azufral",
     "description": "L'Azufral ou Azufral de Túquerres est un stratovolcan de Colombie. Il est situé dans le département de Nariño, au sud-ouest du pays, dans la cordillère Occidentale des Andes colombiennes.",
     "altitude": "4 070 m",
@@ -577,6 +721,8 @@
   },
   {
     "id": "nevado-de-cachi",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Nevado de Cachi",
     "description": "Sommet culminant à 6 380 m.",
     "altitude": "6 380 m",
@@ -585,6 +731,8 @@
   },
   {
     "id": "aracar",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Aracar",
     "description": "Le volcan Aracar, est un stratovolcan actif mais au repos actuellement, qui se trouve dans la province argentine de Salta (département de Los Andes). Son altitude est de 6 095 mètres.",
     "altitude": "6 082 m",
@@ -593,6 +741,8 @@
   },
   {
     "id": "cnoc-na-peiste",
+    "flag": "🇮🇪",
+    "country": "Irlande",
     "name": "Cnoc na Péiste",
     "description": "Sommet culminant à 988 m.",
     "altitude": "988 m",
@@ -601,6 +751,8 @@
   },
   {
     "id": "berchtesgadener-hochthron",
+    "flag": "🇩🇪",
+    "country": "Allemagne",
     "name": "Berchtesgadener Hochthron",
     "description": "Sommet culminant à 1 972 m.",
     "altitude": "1 972 m",
@@ -609,6 +761,8 @@
   },
   {
     "id": "punta-perrucchetti",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "Punta Perrucchetti",
     "description": "Sommet culminant à 4 020 m.",
     "altitude": "4 020 m",
@@ -617,6 +771,8 @@
   },
   {
     "id": "otake",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "Otake",
     "description": "Sommet culminant à 979 m.",
     "altitude": "979 m",
@@ -625,6 +781,8 @@
   },
   {
     "id": "mont-whyte",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "mont Whyte",
     "description": "Sommet culminant à 2 983 m.",
     "altitude": "2 983 m",
@@ -633,6 +791,8 @@
   },
   {
     "id": "men-tsunmo",
+    "flag": "🇨🇳",
+    "country": "Chine",
     "name": "Men Tsunmo",
     "description": "Sommet culminant à 6 054 m.",
     "altitude": "6 054 m",
@@ -641,6 +801,8 @@
   },
   {
     "id": "ranrapalca",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Ranrapalca",
     "description": "Le Ranrapalca (quechua : Ranrapallqa)  est un sommet péruvien de 6 162 mètres d'altitude. Il est situé dans la cordillère Blanche, dans la région d'Ancash.",
     "altitude": "6 162 m",
@@ -649,6 +811,8 @@
   },
   {
     "id": "torrenthorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Torrenthorn",
     "description": "Le Torrenthorn est un sommet des Alpes bernoises, en Suisse, situé dans le canton du Valais, qui culmine à 2 997 m d'altitude.",
     "altitude": "2 998 m",
@@ -657,6 +821,8 @@
   },
   {
     "id": "durrenhorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Dürrenhorn",
     "description": "Le Dürrenhorn, ou Dirruhorn, est un sommet des Alpes valaisannes qui culmine à 4 034 mètres dans le massif des Mischabels.",
     "altitude": "4 035 m",
@@ -665,6 +831,8 @@
   },
   {
     "id": "pic-maiden",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "pic Maiden",
     "description": "Sommet culminant à 7 823 m.",
     "altitude": "7 823 m",
@@ -673,6 +841,8 @@
   },
   {
     "id": "mont-diller",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Diller",
     "description": "Sommet culminant à 9 085 m.",
     "altitude": "9 085 m",
@@ -681,6 +851,8 @@
   },
   {
     "id": "b-schie-er",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "B'schießer",
     "description": "Le Bschießer (ou B’schießer, ou Bscheißer en tyrolien) est une montagne culminant à 1 998 ou 2 000 m d'altitude dans les Alpes d'Allgäu, sur la frontière entre l'Allemagne et l'Autriche.",
     "altitude": "1 998 m",
@@ -689,6 +861,8 @@
   },
   {
     "id": "ngadi-chuli",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Ngadi Chuli",
     "description": "Sommet culminant à 7 871 m.",
     "altitude": "7 871 m",
@@ -697,6 +871,8 @@
   },
   {
     "id": "cerro-nacimientos-del-cazaredo",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Cerro Nacimientos del Cazaredo",
     "description": "Sommet culminant à 6 436 m.",
     "altitude": "6 436 m",
@@ -705,6 +881,8 @@
   },
   {
     "id": "mont-waddington",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "mont Waddington",
     "description": "Sommet culminant à 4 019 m.",
     "altitude": "4 019 m",
@@ -713,6 +891,8 @@
   },
   {
     "id": "puy-de-la-nugere",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "puy de la Nugère",
     "description": "Sommet culminant à 994 m.",
     "altitude": "994 m",
@@ -721,6 +901,8 @@
   },
   {
     "id": "kronberg",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Kronberg",
     "description": "Sommet culminant à 983 m.",
     "altitude": "983 m",
@@ -729,6 +911,8 @@
   },
   {
     "id": "tocllaraju",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Tocllaraju",
     "description": "Le Tocllaraju (du quechua tuqlla « piège » et rahu « neige, glace, sommet enneigé », soit « sommet enneigé avec des pièges ») est une montagne qui s'élève à 6 034 m d'altitude dans la cordillère Blanche, dans les Andes p",
     "altitude": "6 032 m",
@@ -737,6 +921,8 @@
   },
   {
     "id": "pomerape",
+    "flag": "🇧🇴",
+    "country": "Bolivie",
     "name": "Pomerape",
     "description": "Le Pomerape est un stratovolcan qui se trouve à la frontière entre la Bolivie (département d'Oruro) et le Chili (région d'Arica et Parinacota), dans les Andes. Il a une altitude de 6 222 mètres et constitue avec le volca",
     "altitude": "6 282 m",
@@ -745,6 +931,8 @@
   },
   {
     "id": "gasherbrum-iv",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Gasherbrum IV",
     "description": "Sommet culminant à 7 932 m.",
     "altitude": "7 932 m",
@@ -753,6 +941,8 @@
   },
   {
     "id": "pharilapcha",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Pharilapcha",
     "description": "Le Pharilapcha (également Phari Lapcha) est une montagne de l'Himalaya située dans la partie ouest du massif montagneux de Mahalangur Himal, dans la région de Khumbu au Nord-Est du Népal.",
     "altitude": "6 017 m",
@@ -761,6 +951,8 @@
   },
   {
     "id": "taennchel",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Taennchel",
     "description": "Le Taennchel (prononcé [tɛnçəl]) est un sommet du massif des Vosges culminant à 989 mètres. Il s'élève dans l'Est de la France, dans le département du Haut-Rhin (région Grand Est), à mi-chemin entre Strasbourg au nord et",
     "altitude": "992 m",
@@ -769,6 +961,8 @@
   },
   {
     "id": "el-capitan",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "El Capitan",
     "description": "Sommet culminant à 8 064 m.",
     "altitude": "8 064 m",
@@ -777,6 +971,8 @@
   },
   {
     "id": "mont-cameroun",
+    "flag": "🇨🇲",
+    "country": "Cameroun",
     "name": "mont Cameroun",
     "description": "Sommet culminant à 4 095 m.",
     "altitude": "4 095 m",
@@ -785,6 +981,8 @@
   },
   {
     "id": "montagne-terrace",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "montagne Terrace",
     "description": "Sommet culminant à 8 002 m.",
     "altitude": "8 002 m",
@@ -793,6 +991,8 @@
   },
   {
     "id": "otgontenger",
+    "flag": "🇲🇳",
+    "country": "Mongolie",
     "name": "Otgontenger",
     "description": "L'Otgontenger (en mongol Отгонтэнгэр, littéralement « ciel jeune ») est le point culminant des monts Khangaï en Mongolie. Il culmine à 4 008 mètres d'altitude.",
     "altitude": "4 008 m",
@@ -801,6 +1001,8 @@
   },
   {
     "id": "nuptse",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Nuptse",
     "description": "Le Nuptse est un sommet népalais dans la région de Khumbu situé au sud-ouest de l'Everest. Son nom signifie en tibétain « Sommet de l'Ouest ».",
     "altitude": "7 861 m",
@@ -809,6 +1011,8 @@
   },
   {
     "id": "rosengartenspitze",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "Rosengartenspitze",
     "description": "Sommet culminant à 2 981 m.",
     "altitude": "2 981 m",
@@ -817,6 +1021,8 @@
   },
   {
     "id": "ma-a-sowa",
+    "flag": "🇧🇹",
+    "country": "Bhoutan",
     "name": "Mała Sowa",
     "description": "Sommet culminant à 972 m.",
     "altitude": "972 m",
@@ -825,6 +1031,8 @@
   },
   {
     "id": "chomo-lonzo",
+    "flag": "🇨🇳",
+    "country": "Chine",
     "name": "Chomo Lonzo",
     "description": "Sommet culminant à 7 804 m.",
     "altitude": "7 804 m",
@@ -833,6 +1041,8 @@
   },
   {
     "id": "saser-kangri",
+    "flag": "🇮🇳",
+    "country": "Inde",
     "name": "Saser Kangri",
     "description": "Sommet culminant à 7 672 m.",
     "altitude": "7 672 m",
@@ -841,6 +1051,8 @@
   },
   {
     "id": "mont-ritter",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Ritter",
     "description": "Sommet culminant à 4 010 m.",
     "altitude": "4 010 m",
@@ -849,6 +1061,8 @@
   },
   {
     "id": "menalo",
+    "flag": "🇬🇷",
+    "country": "Grèce",
     "name": "Ménalo",
     "description": "Le Ménale (grec moderne : Μαίναλο, grec ancien : Μαίναλος ou Μαίναλον, romanisé : Maínalos ou Maínalon ; latin : Maenalus) est une montagne du Péloponnèse, située en Arcadie, en Grèce. Sa cime principale, connue sous les",
     "altitude": "1 981 m",
@@ -857,6 +1071,8 @@
   },
   {
     "id": "pic-keele",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "pic Keele",
     "description": "Sommet culminant à 2 972 m.",
     "altitude": "2 972 m",
@@ -865,6 +1081,8 @@
   },
   {
     "id": "el-fraile",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "El Fraile",
     "description": "Sommet culminant à 6 068 m.",
     "altitude": "6 068 m",
@@ -873,6 +1091,8 @@
   },
   {
     "id": "mont-tsurugi",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Tsurugi",
     "description": "Sommet culminant à 2 999 m.",
     "altitude": "2 999 m",
@@ -881,6 +1101,8 @@
   },
   {
     "id": "litlkorsnestinden",
+    "flag": "🇳🇴",
+    "country": "Norvège",
     "name": "Litlkorsnestinden",
     "description": "Litlkorsnestinden est une montagne sur l'île d'Austvågøya, dans la commune de Hadsel, dans le comté de Nordland, en Norvège.",
     "altitude": "980 m",
@@ -889,6 +1111,8 @@
   },
   {
     "id": "schilthorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Schilthorn",
     "description": "Le Schilthorn est un sommet de 2 969 mètres d'altitude des Alpes bernoises en Suisse, à proximité du village alpin de Mürren.",
     "altitude": "2 970 m",
@@ -897,6 +1121,8 @@
   },
   {
     "id": "puy-de-rent",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "puy de Rent",
     "description": "Sommet culminant à 1 996 m.",
     "altitude": "1 996 m",
@@ -905,6 +1131,8 @@
   },
   {
     "id": "pointe-d-uble",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pointe d'Uble",
     "description": "Sommet culminant à 1 963 m.",
     "altitude": "1 963 m",
@@ -913,6 +1141,8 @@
   },
   {
     "id": "copa",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Copa",
     "description": "Sommet culminant à 6 222 m.",
     "altitude": "6 222 m",
@@ -921,6 +1151,8 @@
   },
   {
     "id": "copahue",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Copahue",
     "description": "Le Copahue est un stratovolcan situé à la frontière entre l'Argentine et le Chili.",
     "altitude": "2 997 m",
@@ -929,6 +1161,8 @@
   },
   {
     "id": "mont-bogong",
+    "flag": "🇦🇺",
+    "country": "Australie",
     "name": "mont Bogong",
     "description": "Sommet culminant à 1 986 m.",
     "altitude": "1 986 m",
@@ -937,6 +1171,8 @@
   },
   {
     "id": "kasprowy-wierch",
+    "flag": "🇵🇱",
+    "country": "Pologne",
     "name": "Kasprowy Wierch",
     "description": "Sommet culminant à 1 987 m.",
     "altitude": "1 987 m",
@@ -945,6 +1181,8 @@
   },
   {
     "id": "hochgerach",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Hochgerach",
     "description": "Le Hochgerach est un sommet montagneux des Alpes situé dans le Voralberg, en Autriche. Culminant à 1 985 m d'altitude, elle fait partie d'une suite de montagnes délimitant les vallées du Walgau et du Laternsertal.",
     "altitude": "1 984 m",
@@ -953,6 +1191,8 @@
   },
   {
     "id": "kramerspitz",
+    "flag": "🇩🇪",
+    "country": "Allemagne",
     "name": "Kramerspitz",
     "description": "Le Kramerspitz est un sommet des Alpes, à 1 985 m d'altitude, dans les Alpes d'Ammergau, en Allemagne (Bavière).",
     "altitude": "1 985 m",
@@ -961,6 +1201,8 @@
   },
   {
     "id": "denali",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "Denali",
     "description": "Sommet culminant à 6 190 m.",
     "altitude": "6 190 m",
@@ -969,6 +1211,8 @@
   },
   {
     "id": "rasac",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Rasac",
     "description": "Le Rasac (qui signifie « crapaud » en langue quechua) est un sommet de la cordillère Huayhuash. Il est situé à la limite des régions d'Ancash et de Lima au centre-ouest du Pérou.",
     "altitude": "6 017 m",
@@ -977,6 +1221,8 @@
   },
   {
     "id": "hoher-dachstein",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Hoher Dachstein",
     "description": "Sommet culminant à 2 995 m.",
     "altitude": "2 995 m",
@@ -985,6 +1231,8 @@
   },
   {
     "id": "la-tsavre",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "La Tsavre",
     "description": "Sommet culminant à 2 977 m.",
     "altitude": "2 977 m",
@@ -993,6 +1241,8 @@
   },
   {
     "id": "ovcar",
+    "flag": "🇷🇸",
+    "country": "Serbie",
     "name": "Ovčar",
     "description": "Le mont Ovčar (en serbe cyrillique : Овчар) est une montagne de l'ouest de la Serbie. Il s'élève à une altitude de 985 m.",
     "altitude": "985 m",
@@ -1001,6 +1251,8 @@
   },
   {
     "id": "mont-niblock",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "mont Niblock",
     "description": "Sommet culminant à 2 976 m.",
     "altitude": "2 976 m",
@@ -1009,6 +1261,8 @@
   },
   {
     "id": "pico-da-neblina",
+    "flag": "🇧🇷",
+    "country": "Brésil",
     "name": "Pico da Neblina",
     "description": "Sommet culminant à 2 994 m.",
     "altitude": "2 994 m",
@@ -1017,6 +1271,8 @@
   },
   {
     "id": "pic-d-ardiden",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pic d'Ardiden",
     "description": "Sommet culminant à 2 988 m.",
     "altitude": "2 988 m",
@@ -1025,6 +1281,8 @@
   },
   {
     "id": "ahornspitze",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Ahornspitze",
     "description": "L'Ahornspitze est une montagne qui s’élève à 2 973 m d’altitude dans les Alpes de Zillertal, en Autriche.",
     "altitude": "2 973 m",
@@ -1033,6 +1291,8 @@
   },
   {
     "id": "ober-gabelhorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Ober Gabelhorn",
     "description": "Sommet culminant à 4 063 m.",
     "altitude": "4 063 m",
@@ -1041,6 +1301,8 @@
   },
   {
     "id": "hinteres-sonnwendjoch",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Hinteres Sonnwendjoch",
     "description": "Sommet culminant à 1 986 m.",
     "altitude": "1 986 m",
@@ -1049,6 +1311,8 @@
   },
   {
     "id": "gro-er-weitschartenkopf",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Großer Weitschartenkopf",
     "description": "Sommet culminant à 1 979 m.",
     "altitude": "1 979 m",
@@ -1057,6 +1321,8 @@
   },
   {
     "id": "mont-mbapit",
+    "flag": "🇨🇲",
+    "country": "Cameroun",
     "name": "mont Mbapit",
     "description": "Sommet culminant à 1 988 m.",
     "altitude": "1 988 m",
@@ -1065,6 +1331,8 @@
   },
   {
     "id": "sassopiatto",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "Sassopiatto",
     "description": "Le Sassopiatto (littéralement « Pierre plate ») en italien ou Plattkofel en allemand est un sommet des Alpes, à 2 964 m, dans les Dolomites, et en particulier dans le chaînon du Sassolungo, en Italie (Trentin-Haut-Adige)",
     "altitude": "2 964 m",
@@ -1073,6 +1341,8 @@
   },
   {
     "id": "pic-sacajawea",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "pic Sacajawea",
     "description": "Sommet culminant à 9 838 m.",
     "altitude": "9 838 m",
@@ -1081,6 +1351,8 @@
   },
   {
     "id": "pointe-bazillac",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pointe Bazillac",
     "description": "Sommet culminant à 2 975 m.",
     "altitude": "2 975 m",
@@ -1089,6 +1361,8 @@
   },
   {
     "id": "chimborazo",
+    "flag": "🇪🇨",
+    "country": "Équateur",
     "name": "Chimborazo",
     "description": "Sommet culminant à 6 263 m.",
     "altitude": "6 263 m",
@@ -1097,6 +1371,8 @@
   },
   {
     "id": "kulm",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Kulm",
     "description": "Sommet culminant à 975 m.",
     "altitude": "975 m",
@@ -1105,6 +1381,8 @@
   },
   {
     "id": "tarso-yega",
+    "flag": "🇹🇩",
+    "country": "Tchad",
     "name": "Tarso Yega",
     "description": "Sommet culminant à 2 972 m.",
     "altitude": "2 972 m",
@@ -1113,6 +1391,8 @@
   },
   {
     "id": "bubuli-motin",
+    "flag": "🇵🇬",
+    "country": "Papouasie-Nouvelle-Guinée",
     "name": "Bubuli Motin",
     "description": "Sommet culminant à 6 000 m.",
     "altitude": "6 000 m",
@@ -1121,6 +1401,8 @@
   },
   {
     "id": "klabat",
+    "flag": "🇮🇩",
+    "country": "Indonésie",
     "name": "Klabat",
     "description": "Le Klabat, en indonésien Gunung Klabat, est un volcan d'Indonésie situé dans le Nord de Sulawesi. Culminant à 1 995 mètres d'altitude, c'est le volcan le plus élevé de Sulawesi.",
     "altitude": "1 995 m",
@@ -1129,6 +1411,8 @@
   },
   {
     "id": "tacora",
+    "flag": "🇨🇱",
+    "country": "Chili",
     "name": "Tacora",
     "description": "Le Tacora est un stratovolcan du Chili.",
     "altitude": "5 988 m",
@@ -1137,6 +1421,8 @@
   },
   {
     "id": "pilot-rock",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "Pilot Rock",
     "description": "Sommet culminant à 6 224 m.",
     "altitude": "6 224 m",
@@ -1145,6 +1431,8 @@
   },
   {
     "id": "sabancaya",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Sabancaya",
     "description": "Le Sabancaya est un stratovolcan des Andes péruviennes surmonté d'une calotte glaciaire. Avec une altitude de 5 967 m, c'est le septième volcan actif le plus élevé du monde, après le Nevados Ojos del Salado (6 864 m, Arg",
     "altitude": "5 976 m",
@@ -1153,6 +1441,8 @@
   },
   {
     "id": "mont-baden-powell",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Baden-Powell",
     "description": "Sommet culminant à 9 407 m.",
     "altitude": "9 407 m",
@@ -1161,6 +1451,8 @@
   },
   {
     "id": "gurla-mandhata",
+    "flag": "🇨🇳",
+    "country": "Chine",
     "name": "Gurla Mandhata",
     "description": "Sommet culminant à 7 694 m.",
     "altitude": "7 694 m",
@@ -1169,6 +1461,8 @@
   },
   {
     "id": "pic-de-l-aigle",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pic de l'Aigle",
     "description": "Sommet culminant à 993 m.",
     "altitude": "993 m",
@@ -1177,6 +1471,8 @@
   },
   {
     "id": "pumasillo",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Pumasillo",
     "description": "Le Pumasillo, version hispanisée du quechua Pumasillu, qui vient de puma et sillu, littéralement « griffe de puma », est une montagne de la cordillère de Vilcabamba, une section des Andes péruviennes. Le Pumasillo a une",
     "altitude": "5 991 m",
@@ -1185,6 +1481,8 @@
   },
   {
     "id": "cholatse",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Cholatse",
     "description": "Le Cholatse est un sommet népalais dans la région de Khumbu. Ce sommet est aussi appelé Jobo Lhaptshan.",
     "altitude": "6 440 m",
@@ -1193,6 +1491,8 @@
   },
   {
     "id": "weissmies",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Weissmies",
     "description": "Le Weissmies est un sommet de  4 017 mètres d'altitude des Alpes valaisannes en Suisse. Avec le  Fletschhorn (3 986 mètres) et le Lagginhorn (4 010 mètres), il forme un chaînon de trois sommets, à l'est de la vallée de S",
     "altitude": "4 013 m",
@@ -1201,6 +1501,8 @@
   },
   {
     "id": "piz-turettas",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Piz Turettas",
     "description": "Sommet culminant à 2 963 m.",
     "altitude": "2 963 m",
@@ -1209,6 +1511,8 @@
   },
   {
     "id": "mont-genyen",
+    "flag": "🇨🇳",
+    "country": "Chine",
     "name": "mont Genyen",
     "description": "Sommet culminant à 6 204 m.",
     "altitude": "6 204 m",
@@ -1217,6 +1521,8 @@
   },
   {
     "id": "southern-highlands",
+    "flag": "🇵🇬",
+    "country": "Papouasie-Nouvelle-Guinée",
     "name": "Southern Highlands",
     "description": "Sommet culminant à 2 961 m.",
     "altitude": "2 961 m",
@@ -1225,6 +1531,8 @@
   },
   {
     "id": "mont-bessou",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "mont Bessou",
     "description": "Sommet culminant à 976 m.",
     "altitude": "976 m",
@@ -1233,6 +1541,8 @@
   },
   {
     "id": "pic-de-tenneverge",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pic de Tenneverge",
     "description": "Sommet culminant à 2 985 m.",
     "altitude": "2 985 m",
@@ -1241,6 +1551,8 @@
   },
   {
     "id": "mont-sunflower",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Sunflower",
     "description": "Sommet culminant à 4 039 m.",
     "altitude": "4 039 m",
@@ -1249,6 +1561,8 @@
   },
   {
     "id": "pic-de-hourgade",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pic de Hourgade",
     "description": "Sommet culminant à 2 964 m.",
     "altitude": "2 964 m",
@@ -1257,6 +1571,8 @@
   },
   {
     "id": "mont-piyashiri",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Piyashiri",
     "description": "Sommet culminant à 987 m.",
     "altitude": "987 m",
@@ -1265,6 +1581,8 @@
   },
   {
     "id": "butte-clagett",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "butte Clagett",
     "description": "Sommet culminant à 8 041 m.",
     "altitude": "8 041 m",
@@ -1273,6 +1591,8 @@
   },
   {
     "id": "mont-miroir",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "mont Miroir",
     "description": "Sommet culminant à 982 m.",
     "altitude": "982 m",
@@ -1281,6 +1601,8 @@
   },
   {
     "id": "pic-echo",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "pic Echo",
     "description": "Sommet culminant à 9 570 m.",
     "altitude": "9 570 m",
@@ -1289,6 +1611,8 @@
   },
   {
     "id": "mont-ishikari",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Ishikari",
     "description": "Sommet culminant à 1 967 m.",
     "altitude": "1 967 m",
@@ -1297,6 +1621,8 @@
   },
   {
     "id": "mont-deception",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Deception",
     "description": "Sommet culminant à 7 788 m.",
     "altitude": "7 788 m",
@@ -1305,6 +1631,8 @@
   },
   {
     "id": "montagne-sepulcher",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "montagne Sepulcher",
     "description": "Sommet culminant à 9 642 m.",
     "altitude": "9 642 m",
@@ -1313,6 +1641,8 @@
   },
   {
     "id": "mont-michael",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Michael",
     "description": "Sommet culminant à 990 m.",
     "altitude": "990 m",
@@ -1321,6 +1651,8 @@
   },
   {
     "id": "pizzo-carbonara",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "Pizzo Carbonara",
     "description": "Sommet culminant à 1 979 m.",
     "altitude": "1 979 m",
@@ -1329,6 +1661,8 @@
   },
   {
     "id": "le-morclan",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "le Morclan",
     "description": "Sommet culminant à 1 970 m.",
     "altitude": "1 970 m",
@@ -1337,6 +1671,8 @@
   },
   {
     "id": "sairecabur",
+    "flag": "🇨🇱",
+    "country": "Chili",
     "name": "Sairecabur",
     "description": "Le Sairecabur est un complexe volcanique d'Amérique du Sud, à la frontière du Chili et de la Bolivie, entre les volcans Licancabur et Putana près de San Pedro de Atacama et de la laguna Verde. Le sommet principal, le Cer",
     "altitude": "5 980 m",
@@ -1345,6 +1681,8 @@
   },
   {
     "id": "socompa",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Socompa",
     "description": "Le Socompa est un stratovolcan endormi, qui se trouve à la frontière entre la région d'Antofagasta au Chili et la province argentine de Salta (département de Los Andes).",
     "altitude": "6 051 m",
@@ -1353,6 +1691,8 @@
   },
   {
     "id": "aiguille-de-bionnassay",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "aiguille de Bionnassay",
     "description": "Sommet culminant à 4 052 m.",
     "altitude": "4 052 m",
@@ -1361,6 +1701,8 @@
   },
   {
     "id": "nanda-devi",
+    "flag": "🇮🇳",
+    "country": "Inde",
     "name": "Nanda Devi",
     "description": "Sommet culminant à 7 816 m.",
     "altitude": "7 816 m",
@@ -1369,6 +1711,8 @@
   },
   {
     "id": "pic-desolation",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "pic Desolation",
     "description": "Sommet culminant à 6 102 m.",
     "altitude": "6 102 m",
@@ -1377,6 +1721,8 @@
   },
   {
     "id": "huandoy",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Huandoy",
     "description": "Le Huandoy est une montagne enneigée du Pérou avec quatre pics disposés en forme de fourneau. Le plus haut des pics culmine à 6 395 mètres d'altitude.",
     "altitude": "6 395 m",
@@ -1385,6 +1731,8 @@
   },
   {
     "id": "mont-takamagahara",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Takamagahara",
     "description": "Sommet culminant à 1 979 m.",
     "altitude": "1 979 m",
@@ -1393,6 +1741,8 @@
   },
   {
     "id": "ben-lomond",
+    "flag": "🇬🇧",
+    "country": "Royaume-Uni",
     "name": "Ben Lomond",
     "description": "Sommet culminant à 974 m.",
     "altitude": "974 m",
@@ -1401,6 +1751,8 @@
   },
   {
     "id": "pic-de-chateau-renard",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pic de Château Renard",
     "description": "Sommet culminant à 2 989 m.",
     "altitude": "2 989 m",
@@ -1409,6 +1761,8 @@
   },
   {
     "id": "gasherbrum-i",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Gasherbrum I",
     "description": "Sommet culminant à 8 080 m.",
     "altitude": "8 080 m",
@@ -1417,6 +1771,8 @@
   },
   {
     "id": "mont-elden",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Elden",
     "description": "Sommet culminant à 9 301 m.",
     "altitude": "9 301 m",
@@ -1425,6 +1781,8 @@
   },
   {
     "id": "mont-fourpeaked",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Fourpeaked",
     "description": "Sommet culminant à 1 999 m.",
     "altitude": "1 999 m",
@@ -1433,6 +1791,8 @@
   },
   {
     "id": "pic-wheeler",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "pic Wheeler",
     "description": "Sommet culminant à 4 011 m.",
     "altitude": "4 011 m",
@@ -1441,6 +1801,8 @@
   },
   {
     "id": "montagne-merrill",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "montagne Merrill",
     "description": "Sommet culminant à 997 m.",
     "altitude": "997 m",
@@ -1449,6 +1811,8 @@
   },
   {
     "id": "mont-logan",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "mont Logan",
     "description": "Sommet culminant à 5 959 m.",
     "altitude": "5 959 m",
@@ -1457,6 +1821,8 @@
   },
   {
     "id": "pic-cecil",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "pic Cecil",
     "description": "Sommet culminant à 1 978 m.",
     "altitude": "1 978 m",
@@ -1465,6 +1831,8 @@
   },
   {
     "id": "almerhorn",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Almerhorn",
     "description": "L'Almerhorn est une montagne qui s’élève à 2 985 m d’altitude dans les Hohe Tauern, en Autriche.",
     "altitude": "2 986 m",
@@ -1473,6 +1841,8 @@
   },
   {
     "id": "mont-zuqualla",
+    "flag": "🇪🇹",
+    "country": "Éthiopie",
     "name": "mont Zuqualla",
     "description": "Sommet culminant à 2 998 m.",
     "altitude": "2 998 m",
@@ -1481,6 +1851,8 @@
   },
   {
     "id": "piz-zupo",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Piz Zupò",
     "description": "Sommet culminant à 3 995 m.",
     "altitude": "3 995 m",
@@ -1489,6 +1861,8 @@
   },
   {
     "id": "pico-31-de-marco",
+    "flag": "🇸🇹",
+    "country": "São Tomé-et-Príncipe",
     "name": "Pico 31 de Março",
     "description": "Sommet culminant à 2 973 m.",
     "altitude": "2 973 m",
@@ -1497,6 +1871,8 @@
   },
   {
     "id": "ancohuma",
+    "flag": "🇧🇴",
+    "country": "Bolivie",
     "name": "Ancohuma",
     "description": "L'Ancohuma (de l'aymara Janq'u Uma) est un sommet bolivien situé dans les Andes. Montagne essentiellement glaciaire, l'Ancohuma est situé dans la partie septentrionale de la cordillère Orientale et est le troisième plus",
     "altitude": "6 425 m",
@@ -1505,6 +1881,8 @@
   },
   {
     "id": "hohe-veitsch",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Hohe Veitsch",
     "description": "Sommet culminant à 1 981 m.",
     "altitude": "1 981 m",
@@ -1513,6 +1891,8 @@
   },
   {
     "id": "storskrymten",
+    "flag": "🇳🇴",
+    "country": "Norvège",
     "name": "Storskrymten",
     "description": "Le Storskrymten est une montagne en Norvège culminant à 1 985 mètres. Le sommet est un tripoint de trois comtés et trois municipalités : municipalité d’Oppdal (comté de Trøndelag), municipalité de Sunndal (comté de Møre",
     "altitude": "1 985 m",
@@ -1521,6 +1901,8 @@
   },
   {
     "id": "scex-rouge",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Scex Rouge",
     "description": "Sommet culminant à 2 972 m.",
     "altitude": "2 972 m",
@@ -1529,6 +1911,8 @@
   },
   {
     "id": "colline-factory",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "colline Factory",
     "description": "Sommet culminant à 9 527 m.",
     "altitude": "9 527 m",
@@ -1537,6 +1921,8 @@
   },
   {
     "id": "torre",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Torre",
     "description": "Sommet culminant à 1 993 m.",
     "altitude": "1 993 m",
@@ -1545,6 +1931,8 @@
   },
   {
     "id": "mont-chubetsu",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Chūbetsu",
     "description": "Sommet culminant à 1 963 m.",
     "altitude": "1 963 m",
@@ -1553,6 +1941,8 @@
   },
   {
     "id": "djebel-ouanoukrim",
+    "flag": "🇲🇦",
+    "country": "Maroc",
     "name": "djebel Ouanoukrim",
     "description": "Sommet culminant à 4 089 m.",
     "altitude": "4 089 m",
@@ -1561,6 +1951,8 @@
   },
   {
     "id": "gasherbrum-ii",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Gasherbrum II",
     "description": "Sommet culminant à 8 034 m.",
     "altitude": "8 034 m",
@@ -1569,6 +1961,8 @@
   },
   {
     "id": "santa-cruz",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Santa Cruz",
     "description": "Sommet culminant à 6 259 m.",
     "altitude": "6 259 m",
@@ -1577,6 +1971,8 @@
   },
   {
     "id": "scafell-pike",
+    "flag": "🇬🇧",
+    "country": "Royaume-Uni",
     "name": "Scafell Pike",
     "description": "Sommet culminant à 978 m.",
     "altitude": "978 m",
@@ -1585,6 +1981,8 @@
   },
   {
     "id": "gullfjellet",
+    "flag": "🇳🇴",
+    "country": "Norvège",
     "name": "Gullfjellet",
     "description": "Gullfjellet ou Gulfjellet  est la plus haute montagne de la commune de Bergen en Norvège. Située à la limite entre Bergen et la commune de Samnanger, elle culmine à 987 m d'altitude.",
     "altitude": "987 m",
@@ -1593,6 +1991,8 @@
   },
   {
     "id": "el-condor",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "El Cóndor",
     "description": "Sommet culminant à 6 373 m.",
     "altitude": "6 373 m",
@@ -1601,6 +2001,8 @@
   },
   {
     "id": "chearoco",
+    "flag": "🇧🇴",
+    "country": "Bolivie",
     "name": "Chearoco",
     "description": "Le Chearoco, Chiaraco ou Chiaroco (possiblement de l'aymara ch'iyara « noir » ou de juqhu « lieu boueux ») est une montagne de la cordillère Royale dans les Andes boliviennes. Il culmine à environ 6 127 m d'altitude.",
     "altitude": "6 104 m",
@@ -1609,6 +2011,8 @@
   },
   {
     "id": "hohgrat",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Hohgrat",
     "description": "Le Hohgrat, aussi appelé Groot, anciennement Grat, est un sommet des préalpes appenzelloises, en Suisse. Culminant à 996 mètres d'altitude, il s'agit du point culminant du canton de Thurgovie.",
     "altitude": "996 m",
@@ -1617,6 +2021,8 @@
   },
   {
     "id": "musa-dagh",
+    "flag": "🇹🇷",
+    "country": "Turquie",
     "name": "Musa Dagh",
     "description": "Sommet culminant à 997 m.",
     "altitude": "997 m",
@@ -1625,6 +2031,8 @@
   },
   {
     "id": "petacas",
+    "flag": "🇨🇴",
+    "country": "Colombie",
     "name": "Petacas",
     "description": "Le Petacas est un volcan de Colombie constitué d'un dôme de lave.",
     "altitude": "4 018 m",
@@ -1633,6 +2041,8 @@
   },
   {
     "id": "aragats",
+    "flag": "🇦🇲",
+    "country": "Arménie",
     "name": "Aragats",
     "description": "L'Aragats, en arménien : Արագած, en russe : Арагац, aussi appelé mont Aragats, Alagey, Aragatz ou encore Aragey, est un volcan éteint d'Arménie. Avec 4 095 mètres d'altitude, il constitue le point culminant de l'Arménie",
     "altitude": "4 090 m",
@@ -1641,6 +2051,8 @@
   },
   {
     "id": "suphan-dagi",
+    "flag": "🇹🇷",
+    "country": "Turquie",
     "name": "Süphan Daği",
     "description": "Sommet culminant à 4 058 m.",
     "altitude": "4 058 m",
@@ -1649,6 +2061,8 @@
   },
   {
     "id": "mont-ishizuchi",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Ishizuchi",
     "description": "Sommet culminant à 1 982 m.",
     "altitude": "1 982 m",
@@ -1657,6 +2071,8 @@
   },
   {
     "id": "chaupi-orco",
+    "flag": "🇧🇴",
+    "country": "Bolivie",
     "name": "Chaupi Orco",
     "description": "Sommet culminant à 6 044 m.",
     "altitude": "6 044 m",
@@ -1665,6 +2081,8 @@
   },
   {
     "id": "piz-bernina",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Piz Bernina",
     "description": "Sommet culminant à 4 048 m.",
     "altitude": "4 048 m",
@@ -1673,6 +2091,8 @@
   },
   {
     "id": "shishapangma",
+    "flag": "🇨🇳",
+    "country": "Chine",
     "name": "Shishapangma",
     "description": "Le Shishapangma ou Shisha Pangma (chinois traditionnel : 希夏邦马峰 ; pinyin : xīxiàbāngmǎ fēng), aussi appelé Gosainthan en sanskrit, est une montagne de Chine culminant à 8 027 mètres d'altitude dans la ville-préfecture de",
     "altitude": "8 027 m",
@@ -1681,6 +2101,8 @@
   },
   {
     "id": "aucanquilcha",
+    "flag": "🇨🇱",
+    "country": "Chili",
     "name": "Aucanquilcha",
     "description": "L'Aucanquilcha est un stratovolcan situé dans le Nord du Chili dans la région d'Antofagasta, près de la frontière avec la Bolivie. Il culmine à l'altitude de 6 176 m.",
     "altitude": "6 176 m",
@@ -1689,6 +2111,8 @@
   },
   {
     "id": "batura-sar",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Batura Sar",
     "description": "Sommet culminant à 7 795 m.",
     "altitude": "7 795 m",
@@ -1697,6 +2121,8 @@
   },
   {
     "id": "kitzbuheler-horn",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Kitzbüheler Horn",
     "description": "Sommet culminant à 1 996 m.",
     "altitude": "1 996 m",
@@ -1705,6 +2131,8 @@
   },
   {
     "id": "dent-du-geant",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "dent du Géant",
     "description": "Sommet culminant à 4 013 m.",
     "altitude": "4 013 m",
@@ -1713,6 +2141,8 @@
   },
   {
     "id": "rakaposhi",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Rakaposhi",
     "description": "Le Rakaposhi (littéralement « Mur brillant »), également connu sous le nom de Dumani (« La mère des brouillards »), est le 26e plus haut sommet du monde (11e du Pakistan). Il se trouve dans la vallée de Nagar, à environ",
     "altitude": "7 788 m",
@@ -1721,6 +2151,8 @@
   },
   {
     "id": "maistaller-berg",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Maistaller Berg",
     "description": "Sommet culminant à 998 m.",
     "altitude": "998 m",
@@ -1729,6 +2161,8 @@
   },
   {
     "id": "distaghil-sar",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Distaghil Sar",
     "description": "Sommet culminant à 7 885 m.",
     "altitude": "7 885 m",
@@ -1737,6 +2171,8 @@
   },
   {
     "id": "salbitschijen",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Salbitschijen",
     "description": "Le Salbitschijen est sommet culminant à 2 985 mètres d'altitude dans les Alpes uranaises, en Suisse.",
     "altitude": "2 981 m",
@@ -1745,6 +2181,8 @@
   },
   {
     "id": "kanjut-sar",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Kanjut Sar",
     "description": "Sommet culminant à 7 760 m.",
     "altitude": "7 760 m",
@@ -1753,6 +2191,8 @@
   },
   {
     "id": "mont-tehama",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Tehama",
     "description": "Sommet culminant à 9 239 m.",
     "altitude": "9 239 m",
@@ -1761,6 +2201,8 @@
   },
   {
     "id": "mont-chesau",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Mont Chesau",
     "description": "Sommet culminant à 984 m.",
     "altitude": "984 m",
@@ -1769,6 +2211,8 @@
   },
   {
     "id": "mont-lauro",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "mont Lauro",
     "description": "Sommet culminant à 987 m.",
     "altitude": "987 m",
@@ -1777,6 +2221,8 @@
   },
   {
     "id": "nevado-illimani",
+    "flag": "🇧🇴",
+    "country": "Bolivie",
     "name": "Nevado Illimani",
     "description": "Sommet culminant à 6 438 m.",
     "altitude": "6 438 m",
@@ -1785,6 +2231,8 @@
   },
   {
     "id": "aroser-rothorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Aroser Rothorn",
     "description": "Sommet culminant à 2 980 m.",
     "altitude": "2 980 m",
@@ -1793,6 +2241,8 @@
   },
   {
     "id": "huantsan",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Huantsan",
     "description": "Le Nevado Huantsan (Huantsan, Huantsán, Huantzan, Huantzán, graphies hispanisées du quechua Wantsan), ou Tunshu, est une montagne située dans la cordillère Blanche, un massif de la cordillère des Andes.",
     "altitude": "6 369 m",
@@ -1801,6 +2251,8 @@
   },
   {
     "id": "mont-isarog",
+    "flag": "🇵🇭",
+    "country": "Philippines",
     "name": "mont Isarog",
     "description": "Sommet culminant à 1 966 m.",
     "altitude": "1 966 m",
@@ -1809,6 +2261,8 @@
   },
   {
     "id": "mont-lemmon",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Lemmon",
     "description": "Sommet culminant à 9 171 m.",
     "altitude": "9 171 m",
@@ -1817,6 +2271,8 @@
   },
   {
     "id": "masherbrum",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Masherbrum",
     "description": "Le Masherbrum, également appelé K1, est un sommet du Pakistan situé dans le Karakoram.",
     "altitude": "7 821 m",
@@ -1825,6 +2281,8 @@
   },
   {
     "id": "gro-er-beerberg",
+    "flag": "🇩🇪",
+    "country": "Allemagne",
     "name": "Großer Beerberg",
     "description": "Sommet culminant à 983 m.",
     "altitude": "983 m",
@@ -1833,6 +2291,8 @@
   },
   {
     "id": "maat-mons",
+    "flag": "🌌",
+    "country": "Espace",
     "name": "Maat Mons",
     "description": "Sommet culminant à 8 000 m.",
     "altitude": "8 000 m",
@@ -1841,6 +2301,8 @@
   },
   {
     "id": "wildgrat",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Wildgrat",
     "description": "Le Wildgrat est une montagne qui s’élève à 2 971 m d’altitude dans les Alpes de l'Ötztal, en Autriche.",
     "altitude": "2 971 m",
@@ -1849,6 +2311,8 @@
   },
   {
     "id": "mont-fridtjof-nansen",
+    "flag": "🇦🇶",
+    "country": "Antarctique",
     "name": "mont Fridtjof Nansen",
     "description": "Sommet culminant à 4 070 m.",
     "altitude": "4 070 m",
@@ -1857,6 +2321,8 @@
   },
   {
     "id": "pic-pilot",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "pic Pilot",
     "description": "Sommet culminant à 5 991 m.",
     "altitude": "5 991 m",
@@ -1865,6 +2331,8 @@
   },
   {
     "id": "puy-de-tressous",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "puy de Tressous",
     "description": "Sommet culminant à 985 m.",
     "altitude": "985 m",
@@ -1873,6 +2341,8 @@
   },
   {
     "id": "pucajirca",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Pucajirca",
     "description": "Le Pucajirca ou Pucahirca (du quechua puka « rouge », et hirka « montagne », littéralement « montagne rouge ») est une montagne de la cordillère Blanche dans les Andes péruviennes. Elle s'élève à une altitude de 6 046 m.",
     "altitude": "6 046 m",
@@ -1881,6 +2351,8 @@
   },
   {
     "id": "klekovaca",
+    "flag": "🇧🇦",
+    "country": "Bosnie-Herzégovine",
     "name": "Klekovača",
     "description": "La Klekovača est une montagne située en Bosnie-Herzégovine. Son point culminant s'appelle Velika Klekovača et s'élève à 1 962 m.",
     "altitude": "1 962 m",
@@ -1889,6 +2361,8 @@
   },
   {
     "id": "caldeira-de-yellowstone",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "caldeira de Yellowstone",
     "description": "Sommet culminant à 9 203 m.",
     "altitude": "9 203 m",
@@ -1897,6 +2371,8 @@
   },
   {
     "id": "mont-kenashi",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Kenashi",
     "description": "Sommet culminant à 1 964 m.",
     "altitude": "1 964 m",
@@ -1905,6 +2381,8 @@
   },
   {
     "id": "aiguille-du-jardin",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "aiguille du Jardin",
     "description": "Sommet culminant à 4 035 m.",
     "altitude": "4 035 m",
@@ -1913,6 +2391,8 @@
   },
   {
     "id": "mont-fernow",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Fernow",
     "description": "Sommet culminant à 9 249 m.",
     "altitude": "9 249 m",
@@ -1921,6 +2401,8 @@
   },
   {
     "id": "sextener-rotwand",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "Sextener Rotwand",
     "description": "Sommet culminant à 2 965 m.",
     "altitude": "2 965 m",
@@ -1929,6 +2411,8 @@
   },
   {
     "id": "dent-de-corjon",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Dent de Corjon",
     "description": "Sommet culminant à 1 967 m.",
     "altitude": "1 967 m",
@@ -1937,6 +2421,8 @@
   },
   {
     "id": "pointe-de-marcelly",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pointe de Marcelly",
     "description": "Sommet culminant à 1 999 m.",
     "altitude": "1 999 m",
@@ -1945,6 +2431,8 @@
   },
   {
     "id": "mont-ossa",
+    "flag": "🇬🇷",
+    "country": "Grèce",
     "name": "mont Ossa",
     "description": "Sommet culminant à 1 978 m.",
     "altitude": "1 978 m",
@@ -1953,6 +2441,8 @@
   },
   {
     "id": "quitaraju",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Quitaraju",
     "description": "Quitaraju, ou Kitaraju (du quechua kita « réservoir » et rahu « neige, glace »), est un sommet de la cordillère Blanche dans les Andes au Pérou. Il s'élève à 6 040 m.",
     "altitude": "6 040 m",
@@ -1961,6 +2451,8 @@
   },
   {
     "id": "pic-hunza",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "pic Hunza",
     "description": "Sommet culminant à 6 270 m.",
     "altitude": "6 270 m",
@@ -1969,6 +2461,8 @@
   },
   {
     "id": "rothorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Rothorn",
     "description": "Sommet culminant à 2 998 m.",
     "altitude": "2 998 m",
@@ -1977,6 +2471,8 @@
   },
   {
     "id": "grand-paradis",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "Grand-Paradis",
     "description": "Sommet culminant à 4 061 m.",
     "altitude": "4 061 m",
@@ -1985,6 +2481,8 @@
   },
   {
     "id": "schwarzkopf",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Schwarzkopf",
     "description": "Sommet culminant à 2 996 m.",
     "altitude": "2 996 m",
@@ -1993,6 +2491,8 @@
   },
   {
     "id": "lobuche",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Lobuche",
     "description": "Le Lobuche ou Lobuje est une montagne himalayenne du Népal qui s'élève près du glacier du Khumbu et du village de Lobuche (en). Il culmine à 6 145 mètres d'altitude.",
     "altitude": "6 145 m",
@@ -2001,6 +2501,8 @@
   },
   {
     "id": "copiapo",
+    "flag": "🇨🇱",
+    "country": "Chili",
     "name": "Copiapó",
     "description": "Sommet culminant à 6 052 m.",
     "altitude": "6 052 m",
@@ -2009,6 +2511,8 @@
   },
   {
     "id": "lagginhorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Lagginhorn",
     "description": "Le Lagginhorn est une montagne des Alpes valaisannes. Avec le  Fletschhorn (3 993 mètres) et le Weissmies (4 023 mètres), il forme un chaînon de trois sommets, à l'est de la vallée de Saas.",
     "altitude": "4 010 m",
@@ -2017,6 +2521,8 @@
   },
   {
     "id": "mont-siguniang",
+    "flag": "🇨🇳",
+    "country": "Chine",
     "name": "mont Siguniang",
     "description": "Sommet culminant à 6 250 m.",
     "altitude": "6 250 m",
@@ -2025,6 +2531,8 @@
   },
   {
     "id": "chachani",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Chachani",
     "description": "Le Nevado Chachani est, avec 6 057 m d’altitude, le plus haut des volcans de la région d'Arequipa dans le Sud du Pérou. Nommé localement El Chachani il est situé à 22 km du centre ville d'Arequipa.",
     "altitude": "6 057 m",
@@ -2033,6 +2541,8 @@
   },
   {
     "id": "mont-starr-king",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Starr King",
     "description": "Sommet culminant à 9 096 m.",
     "altitude": "9 096 m",
@@ -2041,6 +2551,8 @@
   },
   {
     "id": "pic-mera",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "pic Mera",
     "description": "Sommet culminant à 6 476 m.",
     "altitude": "6 476 m",
@@ -2049,6 +2561,8 @@
   },
   {
     "id": "dome-de-rochefort",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "dôme de Rochefort",
     "description": "Sommet culminant à 4 015 m.",
     "altitude": "4 015 m",
@@ -2057,6 +2571,8 @@
   },
   {
     "id": "broad-peak",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Broad Peak",
     "description": "Sommet culminant à 8 051 m.",
     "altitude": "8 051 m",
@@ -2065,6 +2581,8 @@
   },
   {
     "id": "hiunchuli",
+    "flag": "🇳🇵",
+    "country": "Népal",
     "name": "Hiunchuli",
     "description": "Hiunchuli (हिउँचुली) est un pic de l'Himalaya dans le centre du Népal, à 6 434 mètres d'altitude.",
     "altitude": "6 441 m",
@@ -2073,6 +2591,8 @@
   },
   {
     "id": "mont-andrus",
+    "flag": "🇦🇶",
+    "country": "Antarctique",
     "name": "mont Andrus",
     "description": "Sommet culminant à 2 978 m.",
     "altitude": "2 978 m",
@@ -2081,6 +2601,8 @@
   },
   {
     "id": "chinchey",
+    "flag": "🇵🇪",
+    "country": "Pérou",
     "name": "Chinchey",
     "description": "Le Chinchey (en quechua Rurichinchay, littéralement « puma oculte ») est une montagne de la cordillère Blanche, dans la région d'Ancash, au Pérou. Elle possède cinq pics, dont le plus élevé — également appelé Chinchey —",
     "altitude": "6 309 m",
@@ -2089,6 +2611,8 @@
   },
   {
     "id": "pic-eccles",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "pic Eccles",
     "description": "Sommet culminant à 4 041 m.",
     "altitude": "4 041 m",
@@ -2097,6 +2621,8 @@
   },
   {
     "id": "pointe-de-fornet",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Pointe de Fornet",
     "description": "Sommet culminant à 2 989 m.",
     "altitude": "2 989 m",
@@ -2105,6 +2631,8 @@
   },
   {
     "id": "jeleni-hora",
+    "flag": "🇨🇿",
+    "country": "Tchéquie",
     "name": "Jelení hora",
     "description": "Sommet culminant à 993 m.",
     "altitude": "993 m",
@@ -2113,6 +2641,8 @@
   },
   {
     "id": "cousson",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Cousson",
     "description": "Le Cousson est une montagne culminant à 1 516 mètres d'altitude au sud de Digne-les-Bains, dans le massif des Trois-Évêchés. La montagne présente deux sommets principaux : le sommet de Cousson (44° 03′ 13″ N, 6° 14′ 24″",
     "altitude": "975 m",
@@ -2121,6 +2651,8 @@
   },
   {
     "id": "pic-barlow",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "pic Barlow",
     "description": "Sommet culminant à 9 609 m.",
     "altitude": "9 609 m",
@@ -2129,6 +2661,8 @@
   },
   {
     "id": "mont-amakazari",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Amakazari",
     "description": "Sommet culminant à 1 963 m.",
     "altitude": "1 963 m",
@@ -2137,6 +2671,8 @@
   },
   {
     "id": "lauteraarhorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Lauteraarhorn",
     "description": "Le Lauteraarhorn, culminant à 4 042 m d'altitude, est un sommet situé à l'extrémité est du massif de l'Aar-Gothard, dans les Alpes bernoises à la limite des communes de Grindelwald et de Guttannen. Il est le deuxième som",
     "altitude": "4 042 m",
@@ -2145,6 +2681,8 @@
   },
   {
     "id": "mont-higashiazuma",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Higashiazuma",
     "description": "Sommet culminant à 1 975 m.",
     "altitude": "1 975 m",
@@ -2153,6 +2691,8 @@
   },
   {
     "id": "les-droites",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Les Droites",
     "description": "Sommet culminant à 4 000 m.",
     "altitude": "4 000 m",
@@ -2161,6 +2701,8 @@
   },
   {
     "id": "barenkopf",
+    "flag": "🇩🇪",
+    "country": "Allemagne",
     "name": "Bärenkopf",
     "description": "Sommet culminant à 1 991 m.",
     "altitude": "1 991 m",
@@ -2169,6 +2711,8 @@
   },
   {
     "id": "gassan",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "Gassan",
     "description": "Sommet culminant à 1 984 m.",
     "altitude": "1 984 m",
@@ -2177,6 +2721,8 @@
   },
   {
     "id": "trois-monts-dewa",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "trois monts Dewa",
     "description": "Sommet culminant à 1 984 m.",
     "altitude": "1 984 m",
@@ -2185,6 +2731,8 @@
   },
   {
     "id": "pointe-giordani",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "pointe Giordani",
     "description": "Sommet culminant à 4 046 m.",
     "altitude": "4 046 m",
@@ -2193,6 +2741,8 @@
   },
   {
     "id": "mont-tallac",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "mont Tallac",
     "description": "Sommet culminant à 9 739 m.",
     "altitude": "9 739 m",
@@ -2201,6 +2751,8 @@
   },
   {
     "id": "antuco",
+    "flag": "🇨🇱",
+    "country": "Chili",
     "name": "Antuco",
     "description": "L'Antuco est un volcan du Chili constitué d'un stratovolcan s'élevant au sud-ouest de la Laguna de la Laja. Il est situé à l'intérieur du parc national Laguna del Laja.",
     "altitude": "2 969 m",
@@ -2209,6 +2761,8 @@
   },
   {
     "id": "pico-turquino",
+    "flag": "🇨🇺",
+    "country": "Cuba",
     "name": "Pico Turquino",
     "description": "Sommet culminant à 1 974 m.",
     "altitude": "1 974 m",
@@ -2217,6 +2771,8 @@
   },
   {
     "id": "los-patos",
+    "flag": "🇦🇷",
+    "country": "Argentine",
     "name": "Los Patos",
     "description": "Sommet culminant à 6 239 m.",
     "altitude": "6 239 m",
@@ -2225,6 +2781,8 @@
   },
   {
     "id": "bec-du-corbeau",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Bec du Corbeau",
     "description": "Sommet culminant à 1 992 m.",
     "altitude": "1 992 m",
@@ -2233,6 +2791,8 @@
   },
   {
     "id": "pic-boundary",
+    "flag": "🇨🇦",
+    "country": "Canada",
     "name": "pic Boundary",
     "description": "Sommet culminant à 4 007 m.",
     "altitude": "4 007 m",
@@ -2241,6 +2801,8 @@
   },
   {
     "id": "khunyang-chhish",
+    "flag": "🇵🇰",
+    "country": "Pakistan",
     "name": "Khunyang Chhish",
     "description": "Sommet culminant à 7 852 m.",
     "altitude": "7 852 m",
@@ -2249,6 +2811,8 @@
   },
   {
     "id": "birgitzkopfl",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Birgitzköpfl",
     "description": "Le Birgitzköpfl est une montagne culminant à 1 982 m d'altitude dans les Alpes de Stubai.",
     "altitude": "1 982 m",
@@ -2257,6 +2821,8 @@
   },
   {
     "id": "amnye-machen",
+    "flag": "🇨🇳",
+    "country": "Chine",
     "name": "Amnye Machen",
     "description": "Sommet culminant à 6 282 m.",
     "altitude": "6 282 m",
@@ -2265,6 +2831,8 @@
   },
   {
     "id": "mont-ramelau",
+    "flag": "🇹🇱",
+    "country": "Timor oriental",
     "name": "mont Ramelau",
     "description": "Sommet culminant à 2 963 m.",
     "altitude": "2 963 m",
@@ -2273,6 +2841,8 @@
   },
   {
     "id": "pyramidenspitze",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Pyramidenspitze",
     "description": "Sommet culminant à 1 997 m.",
     "altitude": "1 997 m",
@@ -2281,6 +2851,8 @@
   },
   {
     "id": "bosruck",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Bosruck",
     "description": "Sommet culminant à 1 992 m.",
     "altitude": "1 992 m",
@@ -2289,6 +2861,8 @@
   },
   {
     "id": "antillanca",
+    "flag": "🇨🇱",
+    "country": "Chili",
     "name": "Antillanca",
     "description": "Sommet culminant à 1 990 m.",
     "altitude": "1 990 m",
@@ -2297,6 +2871,8 @@
   },
   {
     "id": "schottmalhorn",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Schottmalhorn",
     "description": "Sommet culminant à 1 982 m.",
     "altitude": "1 982 m",
@@ -2305,6 +2881,8 @@
   },
   {
     "id": "monte-furmicula",
+    "flag": "🇮🇹",
+    "country": "Italie",
     "name": "Monte Furmicula",
     "description": "Sommet culminant à 1 981 m.",
     "altitude": "1 981 m",
@@ -2313,6 +2891,8 @@
   },
   {
     "id": "topo-da-coroa",
+    "flag": "🇵🇹",
+    "country": "Portugal",
     "name": "Topo da Coroa",
     "description": "Sommet culminant à 1 979 m.",
     "altitude": "1 979 m",
@@ -2321,6 +2901,8 @@
   },
   {
     "id": "mont-tongariro",
+    "flag": "🇳🇿",
+    "country": "Nouvelle-Zélande",
     "name": "mont Tongariro",
     "description": "Sommet culminant à 1 978 m.",
     "altitude": "1 978 m",
@@ -2329,6 +2911,8 @@
   },
   {
     "id": "mont-tanigawa",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Tanigawa",
     "description": "Sommet culminant à 1 977 m.",
     "altitude": "1 977 m",
@@ -2337,6 +2921,8 @@
   },
   {
     "id": "niederhorn",
+    "flag": "🇨🇭",
+    "country": "Suisse",
     "name": "Niederhorn",
     "description": "Sommet culminant à 1 963 m.",
     "altitude": "1 963 m",
@@ -2345,6 +2931,8 @@
   },
   {
     "id": "black-butte",
+    "flag": "🇺🇸",
+    "country": "États-Unis",
     "name": "Black Butte",
     "description": "Sommet culminant à 1 963 m.",
     "altitude": "1 963 m",
@@ -2353,6 +2941,8 @@
   },
   {
     "id": "sonntagshorn",
+    "flag": "🇩🇪",
+    "country": "Allemagne",
     "name": "Sonntagshorn",
     "description": "Sommet culminant à 1 961 m.",
     "altitude": "1 961 m",
@@ -2361,6 +2951,8 @@
   },
   {
     "id": "kegelkopf",
+    "flag": "🇦🇹",
+    "country": "Autriche",
     "name": "Kegelkopf",
     "description": "Sommet culminant à 1 959 m.",
     "altitude": "1 959 m",
@@ -2369,6 +2961,8 @@
   },
   {
     "id": "mont-tottabetsu",
+    "flag": "🇯🇵",
+    "country": "Japon",
     "name": "mont Tottabetsu",
     "description": "Sommet culminant à 1 959 m.",
     "altitude": "1 959 m",
@@ -2377,6 +2971,8 @@
   },
   {
     "id": "belirang-beriti",
+    "flag": "🇮🇩",
+    "country": "Indonésie",
     "name": "Belirang-Beriti",
     "description": "Sommet culminant à 1 958 m.",
     "altitude": "1 958 m",
@@ -2385,6 +2981,8 @@
   },
   {
     "id": "haute-pointe",
+    "flag": "🇫🇷",
+    "country": "France",
     "name": "Haute-Pointe",
     "description": "Sommet culminant à 1 958 m.",
     "altitude": "1 958 m",
@@ -2393,6 +2991,8 @@
   },
   {
     "id": "karaca-dag",
+    "flag": "🇹🇷",
+    "country": "Turquie",
     "name": "Karaca Dağ",
     "description": "Sommet culminant à 1 957 m.",
     "altitude": "1 957 m",

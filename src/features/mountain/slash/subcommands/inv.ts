@@ -4,7 +4,6 @@ import {
   ContainerBuilder,
   TextDisplayBuilder,
   SeparatorBuilder,
-  SectionBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -104,19 +103,11 @@ function buildInventoryContainer(
     const { emoji } = RARITY_CONFIG[rarity];
     const date = entry.unlockedAt.toLocaleDateString('fr-FR');
 
-    listContainer.addSectionComponents(
-      new SectionBuilder()
-        .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(
-            `${emoji} **${mountain.name}**\n-# 📏 ${mountain.altitude}  ·  🗓️ ${date}`,
-          ),
-        )
-        .setButtonAccessory(
-          new ButtonBuilder()
-            .setCustomId(`${INV_BUTTON_PREFIX}:detail:${userId}:${mountain.id}`)
-            .setLabel('🔍 Détails')
-            .setStyle(ButtonStyle.Secondary),
-        ),
+    const displayName = mountain.name.charAt(0).toUpperCase() + mountain.name.slice(1);
+    listContainer.addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        `${emoji} **${displayName}**\n-# 📏 ${mountain.altitude}  ·  ${mountain.flag} ${mountain.country}  ·  🗓️ ${date}`,
+      ),
     );
   }
 

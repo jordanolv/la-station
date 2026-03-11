@@ -64,6 +64,7 @@ export class MountainSpawnService {
         { name: '⛰️ Montagne', value: mountain.name, inline: true },
         { name: '📏 Altitude', value: mountain.altitude, inline: true },
         { name: '✨ Rareté', value: `${emoji} ${label}`, inline: true },
+        { name: '🌍 Pays', value: `${mountain.flag} ${mountain.country}`, inline: true },
       )
       .setImage(mountain.image)
       .setTimestamp()
@@ -132,6 +133,7 @@ export class MountainSpawnService {
         { name: '⛰️ Montagne', value: mountain.name, inline: true },
         { name: '📏 Altitude', value: mountain.altitude, inline: true },
         { name: '✨ Rareté', value: `${emoji} ${label}`, inline: true },
+        { name: '🌍 Pays', value: `${mountain.flag} ${mountain.country}`, inline: true },
       )
       .setImage(mountain.image)
       .setTimestamp();

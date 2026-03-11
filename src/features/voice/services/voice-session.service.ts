@@ -1,4 +1,4 @@
-import { ChannelType, EmbedBuilder, TextChannel, VoiceChannel, VoiceState } from 'discord.js';
+import { ChannelType, TextChannel, VoiceChannel, VoiceState, ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, SectionBuilder, ThumbnailBuilder, MessageFlags } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { LogService } from '../../../shared/logs/logs.service';
@@ -441,48 +441,74 @@ export class VoiceSessionService {
     const duration = this.formatDuration(session.durationSeconds);
     const activeDuration = this.formatDuration(session.activeSeconds);
 
-    const embed = new EmbedBuilder()
-      .setColor(rewards.mountain?.color ?? 0x5865f2)
-      .setTitle('🔇 Session vocale terminée')
-      .setDescription(`<@${session.userId}> a quitté **${session.channelName}**`)
-      .addFields(
-        { name: '⏰ Arrivée', value: `<t:${startTimestamp}:t>`, inline: true },
-        { name: '⏰ Départ', value: `<t:${endTimestamp}:t>`, inline: true },
-        { name: '⏱️ Durée', value: `${duration} (actif : ${activeDuration})`, inline: true },
-      )
-      .setTimestamp();
+    const accentColor = rewards.mountain?.color ?? 0x5865f2;
 
-    let rewardLines = `+**${rewards.xpGained}** XP ✨\n+**${rewards.moneyGained}** <:ridgecoin:1424543836029325492>`;
-    if (rewards.leveledUp) {
-      rewardLines += `\n🎉 **Level up !** Niveau **${rewards.newLevel}**`;
-    }
+    let rewardLines = `+**${rewards.xpGained}** XP ✨  ·  +**${rewards.moneyGained}** <:ridgecoin:1424543836029325492>`;
+    if (rewards.leveledUp) rewardLines += `\n🎉 **Level up !** Niveau **${rewards.newLevel}**`;
     const vocTickets = rewards.mountain?.ticketsGained ?? 0;
     if (vocTickets > 0 && (rewards.mountain?.isNew || !rewards.mountain?.unlocked)) {
       rewardLines += `\n+**${vocTickets}** 🎟️ ticket${vocTickets > 1 ? 's' : ''} de pack`;
     }
-    embed.addFields({ name: '📊 Récompenses', value: rewardLines, inline: false });
 
-    if (rewards.mountain && rewards.mountain.unlocked) {
+    const container = new ContainerBuilder()
+      .setAccentColor(accentColor)
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+          `### 🔇 <@${session.userId}> a quitté **${session.channelName}**`,
+        ),
+      )
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+          `⏰ <t:${startTimestamp}:t> → <t:${endTimestamp}:t>  ·  ⏱️ ${duration} (actif : ${activeDuration})`,
+        ),
+      )
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(rewardLines),
+      );
+
+    if (rewards.mountain?.unlocked) {
       const m = rewards.mountain;
+      const displayName = m.mountain.name.charAt(0).toUpperCase() + m.mountain.name.slice(1);
+
+      container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+
       if (m.isNew) {
-        embed.addFields(
-          { name: '🏔️ Montagne débloquée !', value: `**${m.mountain.name}** (${m.mountain.altitude})`, inline: true },
-          { name: '✨ Rareté', value: `${m.emoji} ${m.label}`, inline: true },
-          { name: '📊 Collection', value: `${m.totalUnlocked}/${MountainService.count}`, inline: true },
+        let mountainText = [
+          `### ${m.emoji} ${displayName}`,
+          `${m.mountain.flag} ${m.mountain.country}  ·  📏 ${m.mountain.altitude}  ·  ${m.emoji} ${m.label}`,
+          `✅ **Nouvelle montagne débloquée !**  ·  📊 \`${m.totalUnlocked}/${MountainService.count}\``,
+        ].join('\n');
+
+        container.addSectionComponents(
+          new SectionBuilder()
+            .addTextDisplayComponents(new TextDisplayBuilder().setContent(mountainText))
+            .setThumbnailAccessory(new ThumbnailBuilder().setURL(m.mountain.image)),
         );
-        embed.setImage(m.mountain.image);
       } else {
-        let dupeDesc = `**${m.mountain.name}** — déjà possédée\n+**${m.fragmentsGained}** fragment${(m.fragmentsGained ?? 0) > 1 ? 's' : ''} 🧩 (\`${m.totalFragments}/20\`)`;
+        let dupeText = [
+          `### 🔁 ${displayName} — déjà possédée`,
+          `${m.mountain.flag} ${m.mountain.country}  ·  📏 ${m.mountain.altitude}  ·  ${m.emoji} ${m.label}`,
+          `+**${m.fragmentsGained}** fragment${(m.fragmentsGained ?? 0) > 1 ? 's' : ''} 🧩 (\`${m.totalFragments}/20\`)`,
+        ].join('\n');
         if ((m.ticketsGained ?? 0) > 0) {
-          dupeDesc += `\n+**${m.ticketsGained}** 🎟️ ticket${(m.ticketsGained ?? 0) > 1 ? 's' : ''}`;
+          dupeText += `\n+**${m.ticketsGained}** 🎟️ ticket${(m.ticketsGained ?? 0) > 1 ? 's' : ''}`;
         }
-        embed.addFields({ name: '🔁 Montagne en double', value: dupeDesc, inline: false });
-        embed.setThumbnail(m.mountain.image);
+
+        container.addSectionComponents(
+          new SectionBuilder()
+            .addTextDisplayComponents(new TextDisplayBuilder().setContent(dupeText))
+            .setThumbnailAccessory(new ThumbnailBuilder().setURL(m.mountain.image)),
+        );
       }
     }
 
     try {
-      await (channel as TextChannel).send({ embeds: [embed] });
+      await (channel as TextChannel).send({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+      });
     } catch (err) {
       console.error('[VoiceSession] Erreur envoi recap:', err);
     }

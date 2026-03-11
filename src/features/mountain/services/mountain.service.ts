@@ -5,6 +5,8 @@ import { RARITY_CONFIG } from '../constants/mountain.constants';
 
 export interface MountainInfo {
   id: string;
+  flag: string;
+  country: string;
   name: string;
   description: string;
   altitude: string;
