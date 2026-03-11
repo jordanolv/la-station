@@ -5,6 +5,7 @@ const DEFAULTS: IMountainConfig = {
   spawnChannelId: undefined,
   notificationChannelId: undefined,
   spawnSchedule: [],
+  activeChannelMountains: new Map(),
 };
 
 export class MountainConfigRepository {
@@ -41,5 +42,24 @@ export class MountainConfigRepository {
     doc.spawnSchedule = dates;
     doc.markModified('spawnSchedule');
     await doc.save();
+  }
+
+  static async setChannelMountain(channelId: string, mountainId: string): Promise<void> {
+    const doc = await this.getOrCreate();
+    doc.activeChannelMountains.set(channelId, mountainId);
+    doc.markModified('activeChannelMountains');
+    await doc.save();
+  }
+
+  static async deleteChannelMountain(channelId: string): Promise<void> {
+    const doc = await this.getOrCreate();
+    doc.activeChannelMountains.delete(channelId);
+    doc.markModified('activeChannelMountains');
+    await doc.save();
+  }
+
+  static async getActiveChannelMountains(): Promise<Map<string, string>> {
+    const doc = await this.get();
+    return doc?.activeChannelMountains ?? new Map();
   }
 }

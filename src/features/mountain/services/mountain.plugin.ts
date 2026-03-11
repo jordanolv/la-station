@@ -36,6 +36,11 @@ export interface MountainSessionResult {
 export class MountainPlugin implements VoicePlugin {
   private channelMountains = new Map<string, string>();
 
+  async init(): Promise<void> {
+    const stored = await MountainConfigRepository.getActiveChannelMountains();
+    this.channelMountains = new Map(stored);
+  }
+
   onBeforeChannelCreate(_userId: string) {
     const mountain = MountainService.getRandomByPackWeight();
     return {
@@ -54,6 +59,7 @@ export class MountainPlugin implements VoicePlugin {
     if (!mountainId) return;
 
     this.channelMountains.set(channel.id, mountainId);
+    await MountainConfigRepository.setChannelMountain(channel.id, mountainId);
 
     const mountain = MountainService.getById(mountainId);
     if (!mountain) return;
@@ -140,6 +146,9 @@ export class MountainPlugin implements VoicePlugin {
 
   onChannelDeleted(channelId: string): void {
     this.channelMountains.delete(channelId);
+    MountainConfigRepository.deleteChannelMountain(channelId).catch(err =>
+      console.error('[MountainPlugin] Erreur suppression channel montagne:', err),
+    );
   }
 
   // ─── Private helpers ──────────────────────────────────────────────────────

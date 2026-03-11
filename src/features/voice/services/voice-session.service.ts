@@ -27,6 +27,7 @@ export interface VoiceSession {
 }
 
 export interface VoicePlugin {
+  init?(): Promise<void>;
   onSessionStart?(userId: string, channelId: string, client: BotClient): void;
   onSessionEnd?(session: VoiceSession, client: BotClient): Promise<Record<string, unknown> | void>;
   onBeforeChannelCreate?(userId: string): {
@@ -62,6 +63,7 @@ export class VoiceSessionService {
 
   static registerPlugin(plugin: VoicePlugin): void {
     this.plugins.push(plugin);
+    plugin.init?.().catch(err => console.error('[VoiceSessionService] Plugin init error:', err));
   }
 
   // ─── Voice state helpers ──────────────────────────────────────────────────
