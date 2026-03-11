@@ -436,6 +436,9 @@ export class VoiceSessionService {
     const channel = await guild.channels.fetch(vocConfig.notificationChannelId).catch(() => null);
     if (!channel?.isTextBased()) return;
 
+    const member = await guild.members.fetch(session.userId).catch(() => null);
+    const displayName = member?.displayName ?? member?.user.username ?? `<@${session.userId}>`;
+
     const startTimestamp = Math.floor(session.startedAt / 1000);
     const endTimestamp = Math.floor(session.endedAt / 1000);
     const duration = this.formatDuration(session.durationSeconds);
@@ -454,7 +457,7 @@ export class VoiceSessionService {
       .setAccentColor(accentColor)
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-          `### 🔇 <@${session.userId}> a quitté **${session.channelName}**`,
+          `### 🔇 ${displayName} a quitté **${session.channelName}**`,
         ),
       )
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
