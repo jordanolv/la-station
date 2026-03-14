@@ -115,9 +115,7 @@ export default {
           await MountainSpawnService.handleClaim(interaction, client);
         } else if (interaction.customId.startsWith(INV_BUTTON_PREFIX + ':')) {
           await handleInventaireButton(interaction, client);
-        // } else if (interaction.customId.startsWith('impostor_')) {
-        //   await handleImpostorButtonInteraction(interaction, client);
-        // }
+        }
       }
 
       else if (interaction.isStringSelectMenu()) {

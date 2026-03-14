@@ -41,6 +41,18 @@
         ]
       },
       {
+        "type": "fix",
+        "blocks": [
+          {
+            "title": "🔄  Reset des collections",
+            "items": [
+              "Les collections de montagnes ont été remises à zéro pour tout le monde suite à la refonte du système",
+              "En compensation, **15 tickets de pack** seront distribués à tous les membres prochainement"
+            ]
+          }
+        ]
+      },
+      {
         "type": "update",
         "blocks": [
           {
