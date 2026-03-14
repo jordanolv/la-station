@@ -41,8 +41,8 @@ export function buildInventoryContainer(
       const ra = order[a.rarity ?? 'common'];
       const rb = order[b.rarity ?? 'common'];
       if (ra !== rb) return ra - rb;
-      return (MountainService.getById(a.mountainId)?.name ?? '').localeCompare(
-        MountainService.getById(b.mountainId)?.name ?? '',
+      return (MountainService.getById(a.mountainId)?.mountainLabel ?? '').localeCompare(
+        MountainService.getById(b.mountainId)?.mountainLabel ?? '',
       );
     });
 

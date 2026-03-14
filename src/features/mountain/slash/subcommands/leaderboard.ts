@@ -1,5 +1,6 @@
 import {
   ChatInputCommandInteraction,
+  ButtonInteraction,
   ContainerBuilder,
   TextDisplayBuilder,
   SeparatorBuilder,
