@@ -33,7 +33,8 @@ export default {
   async execute(client: BotClient) {
     const statuses = [
       { name: 'Bienvenue sur The Ridge ⛰️', type: ActivityType.Playing },
-      { name: '/profil pour remplir votre profil 📝', type: ActivityType.Watching }
+      { name: '/profil pour remplir votre profil 📝', type: ActivityType.Watching },
+      { name: '/mountain pack — ouvre tes packs 🎟️', type: ActivityType.Playing },
     ];
 
     let currentStatusIndex = 0;

@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
-import { MountainService } from '../../services/mountain.service';
+import { MountainService, MountainInfo } from '../../services/mountain.service';
 import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/mountain.constants';
 
 export const PACK_BUTTON_OPEN = 'mountain:pack:open';
@@ -24,7 +24,7 @@ function buildFragmentBar(fragments: number): string {
   return '🟧'.repeat(filled) + '⬛'.repeat(10 - filled);
 }
 
-function buildPackInfoContainer(tickets: number, fragments: number): ContainerBuilder {
+export function buildPackInfoContainer(tickets: number, fragments: number): ContainerBuilder {
   const fragBar = buildFragmentBar(fragments);
 
   return new ContainerBuilder()
@@ -69,11 +69,7 @@ function buildPackInfoContainer(tickets: number, fragments: number): ContainerBu
 }
 
 function buildRevealEmbed(
-  mountainName: string,
-  altitude: string,
-  flag: string,
-  country: string,
-  mountainImage: string,
+  mountain: MountainInfo,
   rarity: ReturnType<typeof MountainService.getRarity>,
   isDuplicate: boolean,
   fragmentsGained: number,
@@ -82,7 +78,6 @@ function buildRevealEmbed(
   ticketsFromFragments: number,
 ): EmbedBuilder {
   const { emoji, label, color } = RARITY_CONFIG[rarity];
-  const displayName = mountainName.charAt(0).toUpperCase() + mountainName.slice(1);
 
   let resultText: string;
   if (isDuplicate) {
@@ -96,14 +91,14 @@ function buildRevealEmbed(
 
   return new EmbedBuilder()
     .setColor(color)
-    .setTitle(`${emoji} ${displayName}`)
+    .setTitle(`${emoji} ${mountain.mountainLabel}`)
     .addFields(
-      { name: '🏳️ Pays', value: `${flag} ${country}`, inline: true },
-      { name: '📏 Altitude', value: altitude, inline: true },
+      { name: '🌍 Pays', value: MountainService.getCountryDisplay(mountain), inline: true },
+      { name: '📏 Altitude', value: MountainService.getAltitude(mountain), inline: true },
       { name: '✨ Rareté', value: `${emoji} **${label}**`, inline: true },
     )
     .setDescription(resultText)
-    .setImage(mountainImage)
+    .setImage(mountain.image)
     .setFooter({ text: `🎟️ Il te reste ${ticketsLeft} ticket${ticketsLeft > 1 ? 's' : ''}` });
 }
 
@@ -145,11 +140,7 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
   const doc = await UserMountainsRepository.getOrCreate(userId);
 
   const embed = buildRevealEmbed(
-    mountain.name,
-    mountain.altitude,
-    mountain.flag,
-    mountain.country,
-    mountain.image,
+    mountain,
     rarity,
     isDuplicate,
     fragmentsGained,
@@ -181,7 +172,7 @@ export async function handlePackButton(interaction: ButtonInteraction, _client: 
   }
 }
 
-export async function executePack(interaction: ChatInputCommandInteraction, _client: BotClient): Promise<void> {
+export async function executePack(interaction: ChatInputCommandInteraction | ButtonInteraction, _client: BotClient): Promise<void> {
   const userId = interaction.user.id;
   const doc = await UserMountainsRepository.getOrCreate(userId);
 

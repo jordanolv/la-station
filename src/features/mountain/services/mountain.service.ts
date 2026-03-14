@@ -5,13 +5,13 @@ import { RARITY_CONFIG } from '../constants/mountain.constants';
 
 export interface MountainInfo {
   id: string;
-  flag: string;
-  country: string;
-  name: string;
-  description: string;
-  altitude: string;
+  mountainLabel: string;
+  elevation: string;
+  countries: string[];
+  flags: string[];
   image: string;
-  wiki: string;
+  article: string;
+  rarity: MountainRarity;
 }
 
 export class MountainService {
@@ -24,12 +24,24 @@ export class MountainService {
   static loadMountains(): void {
     try {
       const filePath = path.join(__dirname, '../data/mountains.json');
-      this.mountains = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      const raw: Omit<MountainInfo, 'id'>[] = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      this.mountains = raw.map(m => ({
+        ...m,
+        id: m.article.split('/wiki/')[1] ?? m.mountainLabel,
+      }));
       console.log(`[MountainService] ${this.mountains.length} montagnes chargées`);
     } catch (err) {
       console.error('[MountainService] Erreur chargement mountains.json:', err);
       this.mountains = [];
     }
+  }
+
+  static getAltitude(mountain: MountainInfo): string {
+    return Math.round(parseFloat(mountain.elevation)).toLocaleString('fr-FR') + ' m';
+  }
+
+  static getCountryDisplay(mountain: MountainInfo): string {
+    return mountain.flags.map((f, i) => `${f} ${mountain.countries[i]}`).join('  ·  ');
   }
 
   static getAll(): MountainInfo[] {
@@ -45,19 +57,8 @@ export class MountainService {
     return this.mountains[Math.floor(Math.random() * this.mountains.length)];
   }
 
-  /** Parse l'altitude en mètres depuis le string (ex: "4 808 m" → 4808) */
-  static parseAltitudeMeters(altitudeStr: string): number {
-    const cleaned = altitudeStr.replace(/\s/g, '').replace(',', '.').replace('m', '');
-    const num = parseFloat(cleaned);
-    return isNaN(num) ? 0 : num;
-  }
-
   static getRarity(mountain: MountainInfo): MountainRarity {
-    const alt = this.parseAltitudeMeters(mountain.altitude);
-    if (alt >= 8091) return 'legendary';
-    if (alt >= 6500) return 'epic';
-    if (alt >= 4100) return 'rare';
-    return 'common';
+    return mountain.rarity;
   }
 
   /** Tire une montagne au hasard pondérée par les poids de rareté du pack */
@@ -77,7 +78,7 @@ export class MountainService {
       }
     }
 
-    const pool = this.mountains.filter(m => this.getRarity(m) === targetRarity);
+    const pool = this.mountains.filter(m => m.rarity === targetRarity);
     if (pool.length === 0) return this.getRandom();
     return pool[Math.floor(Math.random() * pool.length)];
   }

@@ -76,7 +76,7 @@ export class VoiceSessionService {
   }
 
   private static isActiveState(state: VoiceState): boolean {
-    return !state.selfMute && !state.selfDeaf && !state.serverMute && !state.serverDeaf;
+    return !state.selfMute && !state.selfDeaf && !state.serverMute && !state.serverDeaf && !state.suppress;
   }
 
   // ─── Session lifecycle ────────────────────────────────────────────────────
@@ -475,14 +475,14 @@ export class VoiceSessionService {
 
     if (rewards.mountain?.unlocked) {
       const m = rewards.mountain;
-      const displayName = m.mountain.name.charAt(0).toUpperCase() + m.mountain.name.slice(1);
+      const displayName = m.mountain.mountainLabel;
 
       container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
 
       if (m.isNew) {
         let mountainText = [
           `### ${m.emoji} ${displayName}`,
-          `${m.mountain.flag} ${m.mountain.country}  ·  📏 ${m.mountain.altitude}  ·  ${m.emoji} ${m.label}`,
+          `${MountainService.getCountryDisplay(m.mountain)}  ·  📏 ${MountainService.getAltitude(m.mountain)}  ·  ${m.emoji} ${m.label}`,
           `✅ **Nouvelle montagne débloquée !**  ·  📊 \`${m.totalUnlocked}/${MountainService.count}\``,
         ].join('\n');
 
@@ -494,7 +494,7 @@ export class VoiceSessionService {
       } else {
         let dupeText = [
           `### 🔁 ${displayName} — déjà possédée`,
-          `${m.mountain.flag} ${m.mountain.country}  ·  📏 ${m.mountain.altitude}  ·  ${m.emoji} ${m.label}`,
+          `${MountainService.getCountryDisplay(m.mountain)}  ·  📏 ${MountainService.getAltitude(m.mountain)}  ·  ${m.emoji} ${m.label}`,
           `+**${m.fragmentsGained}** fragment${(m.fragmentsGained ?? 0) > 1 ? 's' : ''} 🧩 (\`${m.totalFragments}/20\`)`,
         ].join('\n');
         if ((m.ticketsGained ?? 0) > 0) {
@@ -508,6 +508,9 @@ export class VoiceSessionService {
         );
       }
     }
+
+    const hasRewards = rewards.xpGained > 0 || rewards.moneyGained > 0 || rewards.mountain != null;
+    if (!hasRewards) return;
 
     try {
       await (channel as TextChannel).send({

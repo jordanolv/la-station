@@ -24,7 +24,7 @@ function buildFragmentBar(fragments: number): string {
   return '🟧'.repeat(filled) + '⬛'.repeat(10 - filled);
 }
 
-function buildInventoryContainer(
+export function buildInventoryContainer(
   userId: string,
   unlocked: Awaited<ReturnType<typeof UserMountainsRepository.getUnlocked>>,
   tickets: number,
@@ -103,10 +103,9 @@ function buildInventoryContainer(
     const { emoji } = RARITY_CONFIG[rarity];
     const date = entry.unlockedAt.toLocaleDateString('fr-FR');
 
-    const displayName = mountain.name.charAt(0).toUpperCase() + mountain.name.slice(1);
     listContainer.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
-        `${emoji} **${displayName}**\n-# 📏 ${mountain.altitude}  ·  ${mountain.flag} ${mountain.country}  ·  🗓️ ${date}`,
+        `${emoji} **${mountain.mountainLabel}**\n-# 📏 ${MountainService.getAltitude(mountain)}  ·  ${MountainService.getCountryDisplay(mountain)}  ·  🗓️ ${date}`,
       ),
     );
   }
@@ -156,7 +155,7 @@ export async function handleInventaireButton(
   }
 }
 
-export async function executeInv(interaction: ChatInputCommandInteraction, _client: BotClient): Promise<void> {
+export async function executeInv(interaction: ChatInputCommandInteraction | ButtonInteraction, _client: BotClient): Promise<void> {
   const userId = interaction.user.id;
   const [doc, unlocked] = await Promise.all([
     UserMountainsRepository.getOrCreate(userId),
@@ -167,6 +166,6 @@ export async function executeInv(interaction: ChatInputCommandInteraction, _clie
 
   await interaction.reply({
     components: containers,
-    flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
+    flags: MessageFlags.IsComponentsV2,
   });
 }

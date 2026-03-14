@@ -1,0 +1,68 @@
+[
+  {
+    "version": "1.2.0",
+    "timestamp": 1773482842,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🏔️  Collection de Montagnes",
+            "items": [
+              "Chaque salon vocal est associé à une montagne aléatoire à son ouverture",
+              "Restez **45 minutes actif** dans un salon pour débloquer la montagne",
+              "**289 montagnes** du monde entier avec image, altitude et pays",
+              "4 raretés : ⬜ Commune · 🟦 Rare · 🟪 Épique · 🟨 Légendaire",
+              "Les montagnes Épiques et Légendaires déclenchent une notif dans le serveur"
+            ]
+          },
+          {
+            "title": "🎟️  Packs de montagnes",
+            "items": [
+              "Gagnez des **tickets de pack** en passant du temps en vocal (1h30 = 1 ticket)",
+              "En cas de doublon : vous recevez des **fragments 🧩** (20 = 1 ticket bonus)"
+            ]
+          },
+          {
+            "title": "🌄  Spawn de montagnes",
+            "items": [
+              "Des montagnes apparaissent spontanément dans un salon dédié",
+              "Soyez le premier à cliquer sur **Revendiquer** pour la débloquer instantanément",
+              "Sans condition de temps minimum"
+            ]
+          },
+          {
+            "title": "⚙️  Commande unifiée `/mountain`",
+            "items": [
+              "`/mountain` affiche votre page d'accueil avec vos stats de collection",
+              "Naviguez vers votre **Collection 🎒**, vos **Packs 🎟️** ou le **Classement 🏆** en un clic"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "🏆  Classement `/leaderboard`",
+            "items": [
+              "Refonte visuelle complète avec le nouveau style du bot",
+              "Votre position est toujours affichée en bas, même si vous n'êtes pas dans le top 10",
+              "5 catégories : 💬 Messages · 🎤 Vocal · 🎮 Arcade · 🔥 Streak · 🎉 Soirées"
+            ]
+          },
+          {
+            "title": "Rôles d'activité",
+            "items": [
+              "Basé sur vos points d'activité cumulés chaque semaine (vocal + messages)",
+              "🏆 **Podium** — Top 3 de la semaine",
+              "🔥 **Actif** — Top 10% (hors podium)",
+              "💬 **Présent** — Top 11–60%",
+              "Les rôles sont recalculés et remis à zéro chaque **lundi à minuit**"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

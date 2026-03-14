@@ -13,9 +13,7 @@ import type { MountainRarity } from '../../types/mountain.types';
 
 const RARITY_ORDER: MountainRarity[] = ['legendary', 'epic', 'rare', 'common'];
 
-export async function executeLeaderboard(interaction: ChatInputCommandInteraction, client: BotClient): Promise<void> {
-  await interaction.deferReply({ ephemeral: false });
-
+export async function buildLeaderboardContainer(requesterId: string, client: BotClient): Promise<ContainerBuilder> {
   const docs = await UserMountainsModel.find({}).lean();
   const totalMountains = MountainService.count;
 
@@ -37,7 +35,7 @@ export async function executeLeaderboard(interaction: ChatInputCommandInteractio
   for (let i = 0; i < top10.length; i++) {
     const entry = top10[i];
     const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `**${i + 1}.**`;
-    const isMe = entry.userId === interaction.user.id;
+    const isMe = entry.userId === requesterId;
 
     let username = `<@${entry.userId}>`;
     try {
@@ -65,7 +63,7 @@ export async function executeLeaderboard(interaction: ChatInputCommandInteractio
       ),
     );
 
-  const userRankIndex = ranked.findIndex(d => d.userId === interaction.user.id);
+  const userRankIndex = ranked.findIndex(d => d.userId === requesterId);
   if (userRankIndex >= 10) {
     const userEntry = ranked[userRankIndex];
     container
@@ -85,6 +83,12 @@ export async function executeLeaderboard(interaction: ChatInputCommandInteractio
       );
   }
 
+  return container;
+}
+
+export async function executeLeaderboard(interaction: ChatInputCommandInteraction | ButtonInteraction, client: BotClient): Promise<void> {
+  await interaction.deferReply({ ephemeral: false });
+  const container = await buildLeaderboardContainer(interaction.user.id, client);
   await interaction.editReply({
     components: [container],
     flags: MessageFlags.IsComponentsV2,

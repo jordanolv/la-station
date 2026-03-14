@@ -61,10 +61,10 @@ export class MountainSpawnService {
       .setTitle(`${emoji} Une montagne est apparue !`)
       .setDescription('Sois le premier à la revendiquer pour la débloquer !')
       .addFields(
-        { name: '⛰️ Montagne', value: mountain.name, inline: true },
-        { name: '📏 Altitude', value: mountain.altitude, inline: true },
+        { name: '⛰️ Montagne', value: mountain.mountainLabel, inline: true },
+        { name: '📏 Altitude', value: MountainService.getAltitude(mountain), inline: true },
         { name: '✨ Rareté', value: `${emoji} ${label}`, inline: true },
-        { name: '🌍 Pays', value: `${mountain.flag} ${mountain.country}`, inline: true },
+        { name: '🌍 Pays', value: MountainService.getCountryDisplay(mountain), inline: true },
       )
       .setImage(mountain.image)
       .setTimestamp()
@@ -80,7 +80,7 @@ export class MountainSpawnService {
     await (channel as TextChannel).send({ embeds: [embed], components: [row] });
 
     await LogService.info(client,
-      `Spawn montagne : **${mountain.name}** ${emoji} ${label} (${mountain.altitude})`,
+      `Spawn montagne : **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})`,
       { feature: LOG_FEATURE, title: '🌄 Nouveau spawn' },
     );
   }
@@ -112,9 +112,9 @@ export class MountainSpawnService {
     let description: string;
     if (isDuplicate) {
       const fragResult = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
-      description = `<@${userId}> a revendiqué **${mountain.name}**, mais la possède déjà !\n→ **+${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''}** 🧩 (\`${fragResult.newFragments}/20\`)`;
+      description = `<@${userId}> a revendiqué **${mountain.mountainLabel}**, mais la possède déjà !\n→ **+${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''}** 🧩 (\`${fragResult.newFragments}/20\`)`;
     } else {
-      description = `<@${userId}> a revendiqué et débloqué **${mountain.name}** ! 🎉\n📊 \`${result!.totalUnlocked}/${MountainService.count}\` montagnes`;
+      description = `<@${userId}> a revendiqué et débloqué **${mountain.mountainLabel}** ! 🎉\n📊 \`${result!.totalUnlocked}/${MountainService.count}\` montagnes`;
     }
 
     const disabledRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -130,10 +130,10 @@ export class MountainSpawnService {
       .setTitle(`${emoji} Montagne revendiquée !`)
       .setDescription(description)
       .addFields(
-        { name: '⛰️ Montagne', value: mountain.name, inline: true },
-        { name: '📏 Altitude', value: mountain.altitude, inline: true },
+        { name: '⛰️ Montagne', value: mountain.mountainLabel, inline: true },
+        { name: '📏 Altitude', value: MountainService.getAltitude(mountain), inline: true },
         { name: '✨ Rareté', value: `${emoji} ${label}`, inline: true },
-        { name: '🌍 Pays', value: `${mountain.flag} ${mountain.country}`, inline: true },
+        { name: '🌍 Pays', value: MountainService.getCountryDisplay(mountain), inline: true },
       )
       .setImage(mountain.image)
       .setTimestamp();
@@ -141,7 +141,7 @@ export class MountainSpawnService {
     await interaction.update({ embeds: [updatedEmbed], components: [disabledRow] });
 
     await LogService.success(client,
-      `<@${userId}> a revendiqué **${mountain.name}** ${emoji} ${label}${isDuplicate ? ' (doublon)' : ''}`,
+      `<@${userId}> a revendiqué **${mountain.mountainLabel}** ${emoji} ${label}${isDuplicate ? ' (doublon)' : ''}`,
       { feature: LOG_FEATURE, title: '🏔️ Spawn revendiqué' },
     );
   }

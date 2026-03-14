@@ -48,7 +48,7 @@ export class MountainPlugin implements VoicePlugin {
   onBeforeChannelCreate(_userId: string) {
     const mountain = MountainService.getRandomByPackWeight();
     return {
-      templateVars: { mountain: mountain ? `${mountain.flag} ${mountain.name}` : 'Vocal' },
+      templateVars: { mountain: mountain ? mountain.mountainLabel : 'Vocal' },
       metadata: { mountainId: mountain?.id ?? null },
     };
   }
@@ -76,7 +76,7 @@ export class MountainPlugin implements VoicePlugin {
       const notifChannel = await this.getNotificationChannel(client);
       if (notifChannel) {
         await notifChannel.send(
-          `${emoji} Une montagne **${label}** est apparue ! **${mountain.name}** (${mountain.altitude}) — connecte-toi vite pour la débloquer ! <#${channel.id}>`,
+          `${emoji} Une montagne **${label}** est apparue ! **${mountain.mountainLabel}** (${MountainService.getAltitude(mountain)}) — connecte-toi vite pour la débloquer ! <#${channel.id}>`,
         );
       }
     }
@@ -118,7 +118,7 @@ export class MountainPlugin implements VoicePlugin {
       const totalTickets = vocTicketsGained + fragTickets;
 
       await LogService.info(client,
-        `<@${session.userId}> a obtenu un doublon : **${mountain.name}** ${emoji} ${label}\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${totalTickets > 0 ? `\n→ +${totalTickets} 🎟️ ticket${totalTickets > 1 ? 's' : ''}` : ''}`,
+        `<@${session.userId}> a obtenu un doublon : **${mountain.mountainLabel}** ${emoji} ${label}\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${totalTickets > 0 ? `\n→ +${totalTickets} 🎟️ ticket${totalTickets > 1 ? 's' : ''}` : ''}`,
         { feature: LOG_FEATURE, title: '🔁 Montagne en double' },
       );
 
@@ -134,7 +134,7 @@ export class MountainPlugin implements VoicePlugin {
     }
 
     await LogService.success(client,
-      `<@${session.userId}> a débloqué **${mountain.name}** ${emoji} ${label} (${mountain.altitude})\nProgression : \`${result.totalUnlocked}/${MountainService.count}\`${vocTicketsGained > 0 ? `\n→ +${vocTicketsGained} 🎟️ ticket${vocTicketsGained > 1 ? 's' : ''}` : ''}`,
+      `<@${session.userId}> a débloqué **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})\nProgression : \`${result.totalUnlocked}/${MountainService.count}\`${vocTicketsGained > 0 ? `\n→ +${vocTicketsGained} 🎟️ ticket${vocTicketsGained > 1 ? 's' : ''}` : ''}`,
       { feature: LOG_FEATURE, title: '🏔️ Montagne débloquée' },
     );
 
@@ -164,12 +164,12 @@ export class MountainPlugin implements VoicePlugin {
 
       const embed = new EmbedBuilder()
         .setColor(color)
-        .setTitle(`⛰️ ${mountain.name}`)
-        .setDescription(mountain.description)
+        .setTitle(`⛰️ ${mountain.mountainLabel}`)
         .addFields(
-          { name: '📏 Altitude', value: mountain.altitude, inline: true },
+          { name: '📏 Altitude', value: MountainService.getAltitude(mountain), inline: true },
           { name: '✨ Rareté', value: `${emoji} ${label}`, inline: true },
-          { name: '🔗 En savoir plus', value: `[Wikipédia](${mountain.wiki})`, inline: true },
+          { name: '🌍 Pays', value: MountainService.getCountryDisplay(mountain), inline: true },
+          { name: '🔗 En savoir plus', value: `[Wikipédia](${mountain.article})`, inline: true },
         )
         .setImage(mountain.image)
         .setTimestamp()

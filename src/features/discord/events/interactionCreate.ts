@@ -29,6 +29,12 @@ import {
   INV_BUTTON_PREFIX,
   handleInventaireButton,
 } from '../../mountain/slash/subcommands/inv';
+import { HOME_BUTTON_PREFIX, handleHomeButton } from '../../mountain/slash/subcommands/home';
+import {
+  handleImpostorButtonInteraction,
+  handleImpostorSelectMenu,
+  handleImpostorModalSubmit,
+} from '../../impostor/events/impostor-interactions';
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
 async function routeToPanelSelectMenu(
@@ -101,18 +107,24 @@ export default {
           }
         } else if (interaction.customId.startsWith(VOC_CONFIG_BUTTON_ID)) {
           await handleVocConfigButton(interaction, client);
+        } else if (interaction.customId.startsWith(HOME_BUTTON_PREFIX + ':')) {
+          await handleHomeButton(interaction, client);
         } else if (interaction.customId.startsWith('mountain:pack:')) {
           await handlePackButton(interaction, client);
         } else if (interaction.customId.startsWith(SPAWN_BUTTON_PREFIX + ':')) {
           await MountainSpawnService.handleClaim(interaction, client);
         } else if (interaction.customId.startsWith(INV_BUTTON_PREFIX + ':')) {
           await handleInventaireButton(interaction, client);
+        } else if (interaction.customId.startsWith('impostor_')) {
+          await handleImpostorButtonInteraction(interaction, client);
         }
       }
 
       else if (interaction.isStringSelectMenu()) {
         if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
           await routeToPanelSelectMenu(interaction, client);
+        } else if (interaction.customId.startsWith('impostor_')) {
+          await handleImpostorSelectMenu(interaction, client);
         } else {
           const lfmCommand = client.slashCommands.get('lfm');
           if (!lfmCommand) return;
@@ -170,6 +182,8 @@ export default {
           if (moneyCommand?.handleModalSubmit) {
             await moneyCommand.handleModalSubmit(interaction, client);
           }
+        } else if (interaction.customId.startsWith('impostor_createmodal_')) {
+          await handleImpostorModalSubmit(interaction, client);
         }
       }
     } catch (error) {

@@ -248,7 +248,7 @@ function formatMountains(unlockedMountains: { mountainId: string; unlockedAt: Da
 
   return allMountains.slice(0, 8).map(mountain => {
     const isUnlocked = unlockedIds.has(mountain.id);
-    return isUnlocked ? `⛰️ **${mountain.name}** ✅` : `🗻 ${mountain.name} 🔒`;
+    return isUnlocked ? `⛰️ **${mountain.mountainLabel}** ✅` : `🗻 ${mountain.mountainLabel} 🔒`;
   }).join('\n');
 }
 
@@ -521,7 +521,7 @@ export default {
       const allMountains = MountainService.getAll();
       const unlockedIds = new Set(unlockedMountains.map(m => m.mountainId));
       const mountainsData = allMountains.map(m => ({
-        name: m.name,
+        name: m.mountainLabel,
         unlocked: unlockedIds.has(m.id)
       }));
 

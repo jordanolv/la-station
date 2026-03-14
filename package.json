@@ -9,8 +9,7 @@
     "start": "pm2 start src/index.ts --name la-station",
     "watch": "nodemon --exec node -r @swc-node/register src/index.ts",
     "dev": "node -r @swc-node/register src/index.ts",
-    "voice:import": "node -r @swc-node/register src/database/scripts/importVoiceStats.ts",
-    "psd:create-template": "node -r @swc-node/register scripts/create-test-template.ts"
+    "grep": "curl -s http://localhost:1234/v1/models > /dev/null 2>&1 || open -a 'LM Studio'; grepai watch --status | grep -q 'running' && echo 'grepai already running' || grepai watch --background"
   },
   "keywords": [
     "discord",
