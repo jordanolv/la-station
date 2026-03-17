@@ -55,21 +55,48 @@ export class LFMService {
   async addInterestedUser(requestId: string, userId: string): Promise<ILFMRequest | null> {
     return LFMRequestModel.findByIdAndUpdate(
       requestId,
-      {
-        $addToSet: { interestedUsers: userId },
-        updatedAt: new Date(),
-      },
+      { $addToSet: { interestedUsers: userId }, updatedAt: new Date() },
       { new: true }
     );
+  }
+
+  async addToWaitlist(requestId: string, userId: string): Promise<ILFMRequest | null> {
+    return LFMRequestModel.findByIdAndUpdate(
+      requestId,
+      { $addToSet: { waitlistUsers: userId }, updatedAt: new Date() },
+      { new: true }
+    );
+  }
+
+  /**
+   * Retire un user (intéressé ou waitlist) et promeut le premier en attente si une place se libère.
+   * Retourne le doc mis à jour et l'id du user promu (si applicable).
+   */
+  async removeUserAndPromote(requestId: string, userId: string): Promise<{ request: ILFMRequest | null; promoted: string | null }> {
+    const request = await LFMRequestModel.findById(requestId);
+    if (!request) return { request: null, promoted: null };
+
+    const wasInLobby = request.interestedUsers.includes(userId);
+    request.interestedUsers = request.interestedUsers.filter((id) => id !== userId);
+    request.waitlistUsers = request.waitlistUsers.filter((id) => id !== userId);
+
+    let promoted: string | null = null;
+
+    if (wasInLobby && request.waitlistUsers.length > 0) {
+      promoted = request.waitlistUsers.shift()!;
+      request.interestedUsers.push(promoted);
+    }
+
+    request.updatedAt = new Date();
+    await request.save();
+
+    return { request, promoted };
   }
 
   async removeInterestedUser(requestId: string, userId: string): Promise<ILFMRequest | null> {
     return LFMRequestModel.findByIdAndUpdate(
       requestId,
-      {
-        $pull: { interestedUsers: userId },
-        updatedAt: new Date(),
-      },
+      { $pull: { interestedUsers: userId }, updatedAt: new Date() },
       { new: true }
     );
   }
@@ -92,11 +119,10 @@ export class LFMService {
     requestId: string,
     messageId: string,
     channelId: string,
-    threadId?: string,
   ): Promise<ILFMRequest | null> {
     return LFMRequestModel.findByIdAndUpdate(
       requestId,
-      { messageId, channelId, threadId, updatedAt: new Date() },
+      { messageId, channelId, updatedAt: new Date() },
       { new: true }
     );
   }
@@ -175,13 +201,17 @@ export class LFMService {
     }
 
     if (request.interestedUsers && request.interestedUsers.length > 0) {
-      const interestedList = request.interestedUsers
-        .map((id, index) => `${index + 1}. <@${id}>`)
-        .join('\n');
-
       embed.addFields({
         name: `👥 Joueurs (${request.interestedUsers.length}/${request.numberOfMates})`,
-        value: interestedList,
+        value: request.interestedUsers.map((id, i) => `${i + 1}. <@${id}>`).join('\n'),
+        inline: false,
+      });
+    }
+
+    if (request.waitlistUsers && request.waitlistUsers.length > 0) {
+      embed.addFields({
+        name: `⏳ Liste d'attente (${request.waitlistUsers.length})`,
+        value: request.waitlistUsers.map((id, i) => `${i + 1}. <@${id}>`).join('\n'),
         inline: false,
       });
     }

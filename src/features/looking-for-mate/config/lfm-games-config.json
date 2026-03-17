@@ -83,7 +83,7 @@
           { "label": "Five Stack", "value": "Five Stack", "slots": 5 }
         ]
       },
-      "privateDefaultSlots": 10,
+      "privateDefaultSlots": 1,
       "typeOptions": [
         { "label": "Casual", "value": "Casual" },
         { "label": "Privé", "value": "Privé" },

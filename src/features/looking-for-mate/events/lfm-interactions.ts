@@ -90,19 +90,39 @@ async function handleJoin(interaction: ButtonInteraction, requestId: string): Pr
     return;
   }
 
-  if (request.interestedUsers.includes(interaction.user.id)) {
+  if (request.interestedUsers.includes(interaction.user.id) || request.waitlistUsers.includes(interaction.user.id)) {
     await interaction.followUp({
-      content: '⚠️ Vous avez déjà manifesté votre intérêt pour cette annonce.',
+      content: '⚠️ Vous êtes déjà dans ce lobby ou en liste d\'attente.',
       flags: MessageFlags.Ephemeral,
     });
     return;
   }
 
   const requestOwner = await interaction.client.users.fetch(request.userId);
-
+  const isFull = request.interestedUsers.length >= request.numberOfMates;
   const isRanked = request.rank && request.rank !== 'Casual' && request.rank !== 'Privé';
 
   if (!isRanked) {
+    if (isFull) {
+      const updatedRequest = await LFMService.addToWaitlist(requestId, interaction.user.id);
+      if (!updatedRequest) {
+        await interaction.followUp({ content: '❌ Impossible de rejoindre la liste d\'attente.', flags: MessageFlags.Ephemeral });
+        return;
+      }
+
+      const gameColor = LFMGamesConfigService.getGameColor(updatedRequest.game);
+      const gameBanner = LFMGamesConfigService.getGameBanner(updatedRequest.game);
+      const embed = LFMService.createLFMEmbed(updatedRequest, requestOwner, gameColor, gameBanner);
+      const buttons = LFMService.createLFMButtons(requestId, true);
+
+      await interaction.message.edit({ embeds: [embed], components: [buttons] });
+      await interaction.followUp({
+        content: `⏳ Le lobby est complet, vous avez été ajouté en liste d'attente (position ${updatedRequest.waitlistUsers.length}) !`,
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
     const updatedRequest = await LFMService.addInterestedUser(requestId, interaction.user.id);
 
     if (!updatedRequest) {
@@ -206,28 +226,22 @@ async function handleLeave(interaction: ButtonInteraction, requestId: string): P
   const request = await LFMService.getRequest(requestId);
 
   if (!request) {
-    await interaction.followUp({
-      content: '❌ Cette annonce n\'existe plus.',
-      flags: MessageFlags.Ephemeral,
-    });
+    await interaction.followUp({ content: '❌ Cette annonce n\'existe plus.', flags: MessageFlags.Ephemeral });
     return;
   }
 
-  if (!request.interestedUsers.includes(interaction.user.id)) {
-    await interaction.followUp({
-      content: '⚠️ Vous n\'êtes pas dans la liste des joueurs intéressés.',
-      flags: MessageFlags.Ephemeral,
-    });
+  const inLobby = request.interestedUsers.includes(interaction.user.id);
+  const inWaitlist = request.waitlistUsers.includes(interaction.user.id);
+
+  if (!inLobby && !inWaitlist) {
+    await interaction.followUp({ content: '⚠️ Vous n\'êtes pas dans ce lobby.', flags: MessageFlags.Ephemeral });
     return;
   }
 
-  const updatedRequest = await LFMService.removeInterestedUser(requestId, interaction.user.id);
+  const { request: updatedRequest, promoted } = await LFMService.removeUserAndPromote(requestId, interaction.user.id);
 
   if (!updatedRequest) {
-    await interaction.followUp({
-      content: '❌ Impossible de quitter cette annonce.',
-      flags: MessageFlags.Ephemeral,
-    });
+    await interaction.followUp({ content: '❌ Impossible de quitter cette annonce.', flags: MessageFlags.Ephemeral });
     return;
   }
 
@@ -240,9 +254,26 @@ async function handleLeave(interaction: ButtonInteraction, requestId: string): P
   await interaction.message.edit({ embeds: [embed], components: [buttons] });
 
   await interaction.followUp({
-    content: '✅ Vous avez quitté l\'annonce.',
+    content: inWaitlist ? '✅ Vous avez quitté la liste d\'attente.' : '✅ Vous avez quitté le lobby.',
     flags: MessageFlags.Ephemeral,
   });
+
+  if (promoted) {
+    try {
+      const promotedUser = await interaction.client.users.fetch(promoted);
+      await promotedUser.send({
+        embeds: [
+          new EmbedBuilder()
+            .setColor('#00ff00')
+            .setTitle('✅ Vous avez été promu !')
+            .setDescription(`Une place s'est libérée dans le lobby **${request.game}** de <@${request.userId}> — vous avez été ajouté automatiquement !`)
+            .setTimestamp(),
+        ],
+      });
+    } catch (error) {
+      console.error('Failed to notify promoted user:', error);
+    }
+  }
 }
 
 async function handleComplete(interaction: ButtonInteraction, requestId: string): Promise<void> {
@@ -399,20 +430,6 @@ async function handlePing(interaction: ButtonInteraction, requestId: string): Pr
   }
 
   const mentions = others.map((id) => `<@${id}>`).join(' ');
-
-  if (request.threadId) {
-    try {
-      const thread = await interaction.client.channels.fetch(request.threadId);
-      if (thread?.isThread()) {
-        await thread.send({ content: `📣 ${mentions}` });
-        await interaction.followUp({ content: '📣 Participants pingés dans le thread !', flags: MessageFlags.Ephemeral });
-        return;
-      }
-    } catch (error) {
-      console.error('Failed to ping in thread:', error);
-    }
-  }
-
   await interaction.followUp({ content: `📣 ${mentions}` });
 }
 

@@ -44,13 +44,13 @@ export class LFMRequest {
   channelId?: string;
 
   @prop()
-  threadId?: string; // ID du thread forum si posté dans un GuildForum
-
-  @prop()
   gameRoleId?: string; // Discord role ID for the game
 
   @prop({ type: () => [String], default: [] })
-  interestedUsers!: string[]; // User IDs who expressed interest
+  interestedUsers!: string[];
+
+  @prop({ type: () => [String], default: [] })
+  waitlistUsers!: string[];
 
   @prop({ default: () => new Date() })
   createdAt!: Date;
