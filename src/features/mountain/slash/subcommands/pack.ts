@@ -11,6 +11,7 @@ import {
   ButtonStyle,
   EmbedBuilder,
   MessageFlags,
+  User,
 } from 'discord.js';
 import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
@@ -85,6 +86,7 @@ function buildRevealEmbed(
   totalFragments: number,
   ticketsLeft: number,
   ticketsFromFragments: number,
+  user: User,
 ): EmbedBuilder {
   const { emoji, label, color } = RARITY_CONFIG[rarity];
 
@@ -100,6 +102,7 @@ function buildRevealEmbed(
 
   return new EmbedBuilder()
     .setColor(color)
+    .setAuthor({ name: user.displayName, iconURL: user.displayAvatarURL() })
     .setTitle(`${emoji} ${mountain.mountainLabel}`)
     .addFields(
       { name: '🌍 Pays', value: MountainService.getCountryDisplay(mountain), inline: true },
@@ -124,11 +127,12 @@ function buildMultiRevealContainer(
   totalTicketsFromFragments: number,
   finalFragments: number,
   ticketsLeft: number,
+  user: User,
 ): ContainerBuilder {
   const container = new ContainerBuilder()
     .setAccentColor(0xe67e22)
     .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`# 🎁 Ouverture x${results.length}`),
+      new TextDisplayBuilder().setContent(`# 🎁 Ouverture x${results.length}\n-# par ${user.displayName}`),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true));
 
@@ -228,6 +232,7 @@ async function openPackMulti(interaction: ButtonInteraction): Promise<void> {
     totalTicketsFromFragments,
     doc.fragments,
     doc.packTickets,
+    interaction.user,
   );
 
   await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
@@ -275,6 +280,7 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
     totalFragments,
     doc.packTickets,
     ticketsFromFragments,
+    interaction.user,
   );
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
