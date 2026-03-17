@@ -44,9 +44,6 @@ export class LFMRequest {
   channelId?: string; // Discord channel ID where the LFM was posted
 
   @prop()
-  threadId?: string; // Discord thread ID for the LFM discussion
-
-  @prop()
   gameRoleId?: string; // Discord role ID for the game
 
   @prop({ type: () => [String], default: [] })

@@ -638,21 +638,10 @@ export default {
           components: [buttons],
         });
 
-        // Create a thread on the message
-        const thread = await message.startThread({
-          name: `${selection.game} - ${interaction.user.username}`,
-          autoArchiveDuration: 1440, // 24 hours
-          reason: 'LFM lobby thread'
-        });
-
-        // Add the creator to the thread
-        await thread.members.add(interaction.user.id);
-
-        // Update request with message info
-        await LFMService.updateMessageInfo(request._id.toString(), message.id, targetChannel.id, thread.id);
+        await LFMService.updateMessageInfo(request._id.toString(), message.id, targetChannel.id);
 
         await interaction.editReply({
-          content: `✅ Votre annonce LFM a été créée avec succès dans <#${targetChannel.id}> !\nUn thread a été créé : ${thread.toString()}`,
+          content: `✅ Votre annonce LFM a été créée avec succès dans <#${targetChannel.id}> !`,
         });
       } else {
         await interaction.editReply({
