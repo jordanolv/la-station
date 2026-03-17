@@ -1,6 +1,7 @@
 import {
   MessageFlags, ChannelSelectMenuInteraction, Events, Interaction, ModalSubmitInteraction, RoleSelectMenuInteraction, StringSelectMenuInteraction, UserSelectMenuInteraction } from 'discord.js';
 import { BotClient } from '../../../bot/client';
+import { AppConfigService } from '../services/app-config.service';
 import { handleLFMButtonInteraction, handleLFMAcceptReject } from '../../looking-for-mate/events/lfm-interactions';
 import {
   GAME_SELECT_ID,
@@ -79,6 +80,12 @@ export default {
         const command = client.slashCommands.get(interaction.commandName.toLowerCase());
         if (!command) return;
         try {
+          const commandChannels = await AppConfigService.getCommandChannels();
+          const allowedChannelId = commandChannels[interaction.commandName.toLowerCase()];
+          if (allowedChannelId && interaction.channelId !== allowedChannelId) {
+            await interaction.reply({ content: `Cette commande est réservée au channel <#${allowedChannelId}>.`, flags: MessageFlags.Ephemeral });
+            return;
+          }
           await command.execute(interaction, client);
         } catch (error) {
           if (interaction.replied || interaction.deferred) {

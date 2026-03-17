@@ -21,6 +21,12 @@ class AppSettings {
     type: () => Object
   })
   channels?: { [key: string]: string };
+
+  @prop({
+    default: () => ({}),
+    type: () => Object
+  })
+  commandChannels?: { [key: string]: string };
 }
 
 class AppFeatures {

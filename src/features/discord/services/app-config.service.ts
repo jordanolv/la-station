@@ -20,4 +20,24 @@ export class AppConfigService {
       { new: true }
     );
   }
+
+  static async setCommandChannel(commandName: string, channelId: string): Promise<void> {
+    await AppConfigModel.updateOne(
+      {},
+      { $set: { [`config.commandChannels.${commandName}`]: channelId } },
+      { upsert: true }
+    );
+  }
+
+  static async removeCommandChannel(commandName: string): Promise<void> {
+    await AppConfigModel.updateOne(
+      {},
+      { $unset: { [`config.commandChannels.${commandName}`]: '' } }
+    );
+  }
+
+  static async getCommandChannels(): Promise<{ [key: string]: string }> {
+    const config = await this.getConfig();
+    return config?.config?.commandChannels ?? {};
+  }
 }
