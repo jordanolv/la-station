@@ -85,6 +85,18 @@ export class UserMountainsRepository {
   }
 
   /**
+   * Consomme N tickets pour ouvrir plusieurs packs.
+   * Retourne false si pas assez de tickets.
+   */
+  static async spendTickets(userId: string, amount: number): Promise<boolean> {
+    const doc = await this.getOrCreate(userId);
+    if (doc.packTickets < amount) return false;
+    doc.packTickets -= amount;
+    await doc.save();
+    return true;
+  }
+
+  /**
    * Ajoute du temps vocal et retourne le nombre de tickets gagnés (1 par MOUNTAIN_TICKET_SECONDS).
    */
   static async addVocSeconds(userId: string, seconds: number): Promise<{ ticketsGained: number }> {

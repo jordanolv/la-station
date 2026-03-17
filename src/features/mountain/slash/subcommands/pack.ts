@@ -5,6 +5,7 @@ import {
   TextDisplayBuilder,
   SeparatorBuilder,
   SectionBuilder,
+  ThumbnailBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -15,9 +16,13 @@ import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
 import { MountainService, MountainInfo } from '../../services/mountain.service';
 import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/mountain.constants';
+import type { MountainRarity } from '../../types/mountain.types';
 
 export const PACK_BUTTON_OPEN = 'mountain:pack:open';
+export const PACK_BUTTON_OPEN_5 = 'mountain:pack:open5';
 export const PACK_BUTTON_CONVERT = 'mountain:pack:convert';
+
+const MULTI_PACK_COUNT = 5;
 
 function buildFragmentBar(fragments: number): string {
   const filled = Math.round((fragments / FRAGMENTS_PER_TICKET) * 10);
@@ -33,20 +38,24 @@ export function buildPackInfoContainer(tickets: number, fragments: number): Cont
       new TextDisplayBuilder().setContent('# 🎟️ Packs de montagnes'),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-    .addSectionComponents(
-      new SectionBuilder()
-        .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(
-            `### Tickets disponibles\n🎟️ **${tickets}** ticket${tickets > 1 ? 's' : ''}`,
-          ),
-        )
-        .setButtonAccessory(
-          new ButtonBuilder()
-            .setCustomId(PACK_BUTTON_OPEN)
-            .setLabel('Ouvrir un pack')
-            .setStyle(ButtonStyle.Success)
-            .setDisabled(tickets === 0),
-        ),
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        `### Tickets disponibles\n🎟️ **${tickets}** ticket${tickets > 1 ? 's' : ''}`,
+      ),
+    )
+    .addActionRowComponents(
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId(PACK_BUTTON_OPEN)
+          .setLabel('Ouvrir 1 pack')
+          .setStyle(ButtonStyle.Success)
+          .setDisabled(tickets === 0),
+        new ButtonBuilder()
+          .setCustomId(PACK_BUTTON_OPEN_5)
+          .setLabel(`Ouvrir ${Math.min(tickets, MULTI_PACK_COUNT)} packs`)
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(tickets <= 1),
+      ),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
     .addTextDisplayComponents(
@@ -100,6 +109,131 @@ function buildRevealEmbed(
     .setDescription(resultText)
     .setImage(mountain.image)
     .setFooter({ text: `🎟️ Il te reste ${ticketsLeft} ticket${ticketsLeft > 1 ? 's' : ''}` });
+}
+
+interface PackDrawResult {
+  mountain: MountainInfo;
+  rarity: MountainRarity;
+  isDuplicate: boolean;
+  fragmentsGained: number;
+}
+
+function buildMultiRevealContainer(
+  results: PackDrawResult[],
+  totalFragmentsGained: number,
+  totalTicketsFromFragments: number,
+  finalFragments: number,
+  ticketsLeft: number,
+): ContainerBuilder {
+  const container = new ContainerBuilder()
+    .setAccentColor(0xe67e22)
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`# 🎁 Ouverture x${results.length}`),
+    )
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+
+  for (const r of results) {
+    const { emoji, label } = RARITY_CONFIG[r.rarity];
+    const statusLine = r.isDuplicate
+      ? `-# 🔁 Double — +${r.fragmentsGained} 🧩`
+      : `-# ✅ Nouvelle !`;
+
+    const flags = r.mountain.flags?.join(' ') ?? '';
+
+    container.addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(
+            `${emoji} **${r.mountain.mountainLabel}** ${flags}\n-# ${label} · ${MountainService.getAltitude(r.mountain)}\n${statusLine}`,
+          ),
+        )
+        .setThumbnailAccessory(
+          new ThumbnailBuilder().setURL(r.mountain.image),
+        ),
+    );
+  }
+
+  const footerLines: string[] = [];
+  if (totalFragmentsGained > 0) {
+    footerLines.push(`🧩 **+${totalFragmentsGained} fragments** — \`${finalFragments}/${FRAGMENTS_PER_TICKET}\``);
+  }
+  if (totalTicketsFromFragments > 0) {
+    footerLines.push(`🎟️ **+${totalTicketsFromFragments} ticket${totalTicketsFromFragments > 1 ? 's' : ''}** bonus depuis les fragments !`);
+  }
+  footerLines.push(`🎟️ Il te reste **${ticketsLeft}** ticket${ticketsLeft !== 1 ? 's' : ''}`);
+
+  container
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(footerLines.join('\n')))
+    .addActionRowComponents(
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId(PACK_BUTTON_OPEN)
+          .setLabel('Ouvrir 1 pack')
+          .setStyle(ButtonStyle.Success)
+          .setDisabled(ticketsLeft === 0),
+        new ButtonBuilder()
+          .setCustomId(PACK_BUTTON_OPEN_5)
+          .setLabel(`Ouvrir ${Math.min(ticketsLeft, MULTI_PACK_COUNT)} packs`)
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(ticketsLeft <= 1),
+      ),
+    );
+
+  return container;
+}
+
+async function openPackMulti(interaction: ButtonInteraction): Promise<void> {
+  const userId = interaction.user.id;
+
+  const docBefore = await UserMountainsRepository.getOrCreate(userId);
+  if (docBefore.packTickets <= 1) {
+    await interaction.reply({
+      content: "❌ Tu n'as pas assez de tickets !",
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const count = Math.min(docBefore.packTickets, MULTI_PACK_COUNT);
+  await UserMountainsRepository.spendTickets(userId, count);
+
+  const results: PackDrawResult[] = [];
+  let totalFragmentsGained = 0;
+  let totalTicketsFromFragments = 0;
+
+  for (let i = 0; i < count; i++) {
+    const mountain = MountainService.getRandomByPackWeight();
+    if (!mountain) continue;
+
+    const rarity = MountainService.getRarity(mountain);
+    const { fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
+
+    const unlockResult = await UserMountainsRepository.unlock(userId, mountain.id, rarity);
+    const isDuplicate = unlockResult === null;
+
+    let fragmentsGained = 0;
+    if (isDuplicate) {
+      const fragResult = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
+      fragmentsGained = fragmentsOnDuplicate;
+      totalFragmentsGained += fragmentsGained;
+      totalTicketsFromFragments += fragResult.ticketsGained;
+    }
+
+    results.push({ mountain, rarity, isDuplicate, fragmentsGained });
+  }
+
+  const doc = await UserMountainsRepository.getOrCreate(userId);
+
+  const container = buildMultiRevealContainer(
+    results,
+    totalFragmentsGained,
+    totalTicketsFromFragments,
+    doc.fragments,
+    doc.packTickets,
+  );
+
+  await interaction.reply({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 async function openPack(interaction: ButtonInteraction): Promise<void> {
@@ -169,6 +303,8 @@ export async function handlePackButton(interaction: ButtonInteraction, _client: 
 
   if (interaction.customId === PACK_BUTTON_OPEN) {
     await openPack(interaction);
+  } else if (interaction.customId === PACK_BUTTON_OPEN_5) {
+    await openPackMulti(interaction);
   }
 }
 
