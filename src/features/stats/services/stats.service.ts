@@ -26,7 +26,7 @@ export class StatsService {
     const { userId, username, totalSeconds, segments } = params;
     if (!segments.length || totalSeconds <= 0) return;
 
-    try {
+    const attempt = async () => {
       const guildUser = await this.userRepo.findUserById(userId);
 
       if (guildUser) {
@@ -41,9 +41,20 @@ export class StatsService {
         newUser.infos.updatedAt = new Date();
         await newUser.save();
       }
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour des statistiques utilisateur:', error);
-      throw error;
+    };
+
+    try {
+      await attempt();
+    } catch (error: any) {
+      if (error.name === 'VersionError') {
+        try {
+          await attempt();
+        } catch (retryError) {
+          console.error('Erreur lors de la mise à jour des statistiques utilisateur:', retryError);
+        }
+      } else {
+        console.error('Erreur lors de la mise à jour des statistiques utilisateur:', error);
+      }
     }
   }
 

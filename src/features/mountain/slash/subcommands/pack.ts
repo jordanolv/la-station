@@ -188,10 +188,7 @@ async function openPackMulti(interaction: ButtonInteraction): Promise<void> {
 
   const docBefore = await UserMountainsRepository.getOrCreate(userId);
   if (docBefore.packTickets <= 1) {
-    await interaction.reply({
-      content: "❌ Tu n'as pas assez de tickets !",
-      flags: MessageFlags.Ephemeral,
-    });
+    await interaction.editReply({ content: "❌ Tu n'as pas assez de tickets !" });
     return;
   }
 
@@ -233,7 +230,7 @@ async function openPackMulti(interaction: ButtonInteraction): Promise<void> {
     doc.packTickets,
   );
 
-  await interaction.reply({ components: [container], flags: MessageFlags.IsComponentsV2 });
+  await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
 
 async function openPack(interaction: ButtonInteraction): Promise<void> {
@@ -241,16 +238,13 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
 
   const spent = await UserMountainsRepository.spendTicket(userId);
   if (!spent) {
-    await interaction.reply({
-      content: "❌ Tu n'as plus de tickets ! Passe du temps en vocal pour en gagner.",
-      flags: MessageFlags.Ephemeral,
-    });
+    await interaction.editReply({ content: "❌ Tu n'as plus de tickets ! Passe du temps en vocal pour en gagner." });
     return;
   }
 
   const mountain = MountainService.getRandomByPackWeight();
   if (!mountain) {
-    await interaction.reply({ content: '❌ Erreur lors du tirage.', flags: MessageFlags.Ephemeral });
+    await interaction.editReply({ content: '❌ Erreur lors du tirage.' });
     return;
   }
 
@@ -291,7 +285,7 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
       .setDisabled(doc.packTickets === 0),
   );
 
-  await interaction.reply({ embeds: [embed], components: [row] });
+  await interaction.editReply({ embeds: [embed], components: [row] });
 }
 
 export async function handlePackButton(interaction: ButtonInteraction, _client: BotClient): Promise<void> {
@@ -300,6 +294,8 @@ export async function handlePackButton(interaction: ButtonInteraction, _client: 
     await interaction.reply({ content: "❌ Ce n'est pas ton pack !", flags: MessageFlags.Ephemeral });
     return;
   }
+
+  await interaction.deferReply();
 
   if (interaction.customId === PACK_BUTTON_OPEN) {
     await openPack(interaction);
