@@ -106,6 +106,12 @@
         "type": "fix",
         "blocks": [
           {
+            "title": "🎟️  Tickets promis distribués",
+            "items": [
+              "Les **15 tickets de pack** promis lors de la v1.2.0 ont été distribués à tous les membres"
+            ]
+          },
+          {
             "title": "🔧  Corrections",
             "items": [
               "Les statistiques vocales ne sont plus perdues en cas de mise à jour simultanée",
