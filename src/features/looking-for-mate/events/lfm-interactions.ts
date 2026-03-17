@@ -54,6 +54,9 @@ export async function handleLFMButtonInteraction(
       case 'cancel':
         await handleCancel(interaction, requestId);
         break;
+      case 'ping':
+        await handlePing(interaction, requestId);
+        break;
       case 'delete':
         await handleDelete(interaction, requestId);
         break;
@@ -81,15 +84,6 @@ async function handleJoin(interaction: ButtonInteraction, requestId: string): Pr
   if (!request) {
     await interaction.followUp({
       content: '❌ Cette annonce n\'existe plus.',
-      flags: MessageFlags.Ephemeral,
-    });
-    return;
-  }
-
-  // Check if user is the request owner
-  if (request.userId === interaction.user.id) {
-    await interaction.followUp({
-      content: '❌ Vous ne pouvez pas rejoindre votre propre annonce.',
       flags: MessageFlags.Ephemeral,
     });
     return;
@@ -465,6 +459,56 @@ async function handleCancel(interaction: ButtonInteraction, requestId: string): 
       console.error(`Failed to send DM to user ${userId}:`, error);
     }
   }
+}
+
+/**
+ * Handle ping button click (owner only) — mentions all participants
+ */
+async function handlePing(interaction: ButtonInteraction, requestId: string): Promise<void> {
+  const request = await LFMService.getRequest(requestId);
+
+  if (!request) {
+    await interaction.followUp({
+      content: '❌ Cette annonce n\'existe plus.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  if (request.userId !== interaction.user.id) {
+    await interaction.followUp({
+      content: '❌ Seul le créateur peut pinger les participants.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const others = request.interestedUsers.filter((id) => id !== request.userId);
+
+  if (others.length === 0) {
+    await interaction.followUp({
+      content: '⚠️ Aucun participant à pinger pour l\'instant.',
+      flags: MessageFlags.Ephemeral,
+    });
+    return;
+  }
+
+  const mentions = others.map((id) => `<@${id}>`).join(' ');
+
+  if (request.threadId) {
+    try {
+      const thread = await interaction.client.channels.fetch(request.threadId);
+      if (thread?.isThread()) {
+        await thread.send({ content: `📣 ${mentions}` });
+        await interaction.followUp({ content: '📣 Participants pingés dans le thread !', flags: MessageFlags.Ephemeral });
+        return;
+      }
+    } catch (error) {
+      console.error('Failed to ping in thread:', error);
+    }
+  }
+
+  await interaction.followUp({ content: `📣 ${mentions}` });
 }
 
 /**

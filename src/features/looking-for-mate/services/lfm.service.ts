@@ -221,6 +221,11 @@ export class LFMService {
     if (isOwner) {
       row.addComponents(
         new ButtonBuilder()
+          .setCustomId(`lfm_ping_${requestId}`)
+          .setLabel('Ping tous')
+          .setStyle(ButtonStyle.Secondary)
+          .setEmoji('📣'),
+        new ButtonBuilder()
           .setCustomId(`lfm_delete_${requestId}`)
           .setStyle(ButtonStyle.Danger)
           .setEmoji('🗑️')
