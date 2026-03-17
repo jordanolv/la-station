@@ -34,3 +34,4 @@ Thumbs.db
 src/bot/uploads/*
 uploads
 .grepai/
+.zed/debug.json
