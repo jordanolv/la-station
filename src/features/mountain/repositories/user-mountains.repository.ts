@@ -72,6 +72,11 @@ export class UserMountainsRepository {
     await doc.save();
   }
 
+  static async addTicketsToAll(amount: number): Promise<number> {
+    const result = await UserMountainsModel.updateMany({}, { $inc: { packTickets: amount } });
+    return result.modifiedCount;
+  }
+
   /**
    * Consomme 1 ticket pour ouvrir un pack.
    * Retourne false si pas assez de tickets.

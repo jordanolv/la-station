@@ -10,6 +10,11 @@ import {
   ChannelType,
   ButtonInteraction,
   ChannelSelectMenuInteraction,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  ModalSubmitInteraction,
+  MessageFlags,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { ConfigPanel, panelCustomId } from '../../config-panel/services/config-panel.registry';
@@ -97,12 +102,46 @@ export const mountainPanel: ConfigPanel = {
             .setPlaceholder('Notifications (unlock, doublons, épiques...)')
             .setChannelTypes(ChannelType.GuildText),
         ),
+      )
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent('### 🎟️ Distribution de tickets'),
+      )
+      .addActionRowComponents(
+        new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId(panelCustomId(PANEL_ID, 'give_tickets'))
+            .setLabel('Donner des tickets à tous')
+            .setStyle(ButtonStyle.Primary),
+        ),
       );
 
     return [container];
   },
 
   async handleButton(interaction: ButtonInteraction, client: BotClient): Promise<void> {
+    const action = interaction.customId.split(':')[2];
+
+    if (action === 'give_tickets') {
+      const modal = new ModalBuilder()
+        .setCustomId(panelCustomId(PANEL_ID, 'modal_give_tickets'))
+        .setTitle('🎟️ Distribuer des tickets')
+        .addComponents(
+          new ActionRowBuilder<TextInputBuilder>().addComponents(
+            new TextInputBuilder()
+              .setCustomId('amount')
+              .setLabel('Nombre de tickets à donner à tous')
+              .setStyle(TextInputStyle.Short)
+              .setPlaceholder('Ex: 5')
+              .setMinLength(1)
+              .setMaxLength(3)
+              .setRequired(true),
+          ),
+        );
+      await interaction.showModal(modal);
+      return;
+    }
+
     const config = await MountainConfigRepository.getOrCreate();
     await MountainConfigRepository.toggle(!config.enabled);
 
@@ -137,5 +176,23 @@ export const mountainPanel: ConfigPanel = {
     }
 
     await ConfigPanelService.refreshPanel(client, PANEL_ID);
+  },
+
+  async handleModal(interaction: ModalSubmitInteraction, _client: BotClient): Promise<void> {
+    const action = interaction.customId.split(':')[2];
+
+    if (action === 'modal_give_tickets') {
+      const raw = interaction.fields.getTextInputValue('amount').trim();
+      const amount = parseInt(raw, 10);
+
+      if (isNaN(amount) || amount <= 0) {
+        await interaction.reply({ content: '❌ Nombre invalide.', flags: MessageFlags.Ephemeral });
+        return;
+      }
+
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+      const count = await UserMountainsRepository.addTicketsToAll(amount);
+      await interaction.editReply({ content: `✅ **+${amount} ticket${amount > 1 ? 's' : ''}** distribués à **${count}** joueurs.` });
+    }
   },
 };
