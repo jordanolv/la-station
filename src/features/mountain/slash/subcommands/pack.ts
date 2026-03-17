@@ -131,8 +131,14 @@ function buildMultiRevealContainer(
 ): ContainerBuilder {
   const container = new ContainerBuilder()
     .setAccentColor(0xe67e22)
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`# 🎁 Ouverture x${results.length}\n-# par ${user.displayName}`),
+    .addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`# 🎁 Ouverture x${results.length}\n-# par **${user.displayName}**`),
+        )
+        .setThumbnailAccessory(
+          new ThumbnailBuilder().setURL(user.displayAvatarURL({ size: 64 })),
+        ),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true));
 
