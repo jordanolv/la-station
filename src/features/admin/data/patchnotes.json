@@ -76,5 +76,44 @@
         ]
       }
     ]
+  },
+  {
+    "version": "1.2.1",
+    "timestamp": 1742166000,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🎮  Looking For Mate — Améliorations",
+            "items": [
+              "**Liste d'attente automatique** : si un lobby est complet, vous êtes placé en file d'attente dans l'ordre d'arrivée",
+              "Quand un joueur quitte, le premier en attente est promu automatiquement et reçoit une notification",
+              "**Bouton 📣 Ping tous** (créateur uniquement) : mentionne tous les participants en un clic",
+              "Le créateur peut désormais rejoindre et quitter son propre lobby librement"
+            ]
+          },
+          {
+            "title": "🎟️  Ouverture de packs x5",
+            "items": [
+              "Nouveau bouton **Ouvrir X packs** pour ouvrir jusqu'à 5 packs d'un coup",
+              "Résumé complet avec toutes les montagnes obtenues, fragments gagnés et tickets bonus"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "fix",
+        "blocks": [
+          {
+            "title": "🔧  Corrections",
+            "items": [
+              "Les statistiques vocales ne sont plus perdues en cas de mise à jour simultanée",
+              "L'ouverture de pack ne timeout plus après quelques secondes d'attente"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
