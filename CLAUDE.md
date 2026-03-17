@@ -176,9 +176,51 @@ Les seuils % sont calculés sur `users.length` (tous les users en BDD).
 
 ## Système de montagnes
 
-- Spawn planifié via `MountainSpawnCron` (seul scheduler, `resumeOrPlanToday()` au démarrage)
+### Format des données (`src/features/mountain/data/mountains.json`)
+
+```ts
+{
+  mountainLabel: string      // nom affiché (première lettre maj)
+  elevation: string          // altitude brute en mètres (ex: "8848.86")
+  countries: string[]        // ex: ["Népal", "République populaire de Chine"]
+  flags: string[]            // ex: ["🇳🇵", "🇨🇳"] — même index que countries
+  image: string              // URL Cloudinary (c_fill,w_800,h_450)
+  article: string            // URL Wikipedia — sert aussi à dériver l'id
+  rarity: MountainRarity     // "common" | "rare" | "epic" | "legendary"
+}
+```
+
+L'`id` est dérivé du slug Wikipedia dans `loadMountains()` (ex: `Everest`). Ne pas ajouter de champ `id` dans le JSON.
+
+### Seuils de rareté (par altitude)
+- `legendary` : ≥ 7000 m
+- `epic` : 4250–6999 m
+- `rare` : 3000–4249 m
+- `common` : < 3000 m
+
+### Helpers MountainService
+- `MountainService.getAltitude(m)` → `"8 849 m"`
+- `MountainService.getCountryDisplay(m)` → `"🇳🇵 Népal  ·  🇨🇳 République populaire de Chine"`
+- Ne jamais accéder à `m.name`, `m.flag`, `m.country`, `m.altitude` — ils n'existent pas.
+
+### Commande `/mountain`
+Point d'entrée unique → `executeHome` affiche les stats + 3 boutons (Collection, Packs, Classement).
+Chaque bouton embarque le `lastMsgId` dans son customId (`mountain:home:ACTION:LAST_MSG_ID`) pour supprimer le message précédent à chaque navigation.
+
+### Spawn
+- Planifié via `MountainSpawnCron` (seul scheduler, `resumeOrPlanToday()` au démarrage)
 - Ne pas appeler `MountainSpawnService.rehydrate()` depuis `ready.ts` → double spawn
 - Le schedule du jour est persisté en BDD
+
+### Images
+- Hébergées sur Cloudinary dans `the-ridge/mountains/{slug}`
+- Script d'upload : `scripts/upload-mountains.mjs`
+
+## Système de patchnotes
+
+- Données dans `src/features/admin/data/patchnotes.json` — tableau d'objets, le dernier est envoyé par `/patchnote`
+- Structure : `{ version, timestamp, sections: [{ type: "new"|"update"|"fix", blocks: [{ title, items[] }] }] }`
+- Commande `/patchnote` (admin) envoie les containers ComponentsV2 dans le channel courant
 
 ## Conventions
 
@@ -186,6 +228,18 @@ Les seuils % sont calculés sur `users.length` (tous les users en BDD).
 - Panels : ne jamais `deferUpdate` dans le router, laisser chaque panel gérer sa propre interaction
 - Ownership des interactions : `interaction.message.interactionMetadata?.user.id`
 - Toujours utiliser `split(':')[2]` pour extraire l'action d'un customId de panel
+- Toutes les vues utilisent ComponentsV2 (`ContainerBuilder`) — ne pas revenir aux `EmbedBuilder` pour les nouvelles features sauf si l'affichage est préférable
+- Pattern navigation avec suppression du message précédent : embarquer le `lastMsgId` dans le customId, `deferUpdate` → delete → `followUp({fetchReply:true})` → `editReply` avec le nouveau msgId
+
+## Style de code
+
+- **Pas de commentaires inutiles** — on ne commente que ce qui n'est pas évident à la lecture. Pas de `// Créer l'embed`, `// Vérifier si...`, etc.
+- **Code découpé par feature** — chaque feature est autonome dans son dossier. Pas de logique métier qui déborde dans un autre module.
+- **Une responsabilité par fichier** — services = logique, repositories = BDD, slash = interaction Discord. Ne pas mélanger.
+- **Pas de duplication** — extraire une fonction dès qu'un bloc est utilisé 2 fois.
+- **Nommage explicite** — un bon nom de fonction/variable vaut mieux qu'un commentaire.
+- **Principes SOLID** — notamment SRP (une seule raison de changer) et DIP (dépendre des abstractions, pas des implémentations concrètes quand ça a du sens).
+- **Features indépendantes** — une feature ne doit pas importer directement depuis une autre feature. Si deux features ont besoin de communiquer, passer par un service partagé dans `shared/`, un event Discord, ou un plugin (ex: `VoicePlugin`). Les couplages directs entre features rendent le code fragile et difficile à maintenir.
 
 
 ## grepai - Semantic Code Search
@@ -255,4 +309,3 @@ grepai trace graph "ValidateToken" --depth 3 --json
 2. Use `grepai trace` to understand function relationships
 3. Use `Read` tool to examine files from results
 4. Only use Grep for exact string searches if needed
-
