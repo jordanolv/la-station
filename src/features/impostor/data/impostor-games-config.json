@@ -1,0 +1,56 @@
+{
+  "games": [
+    {
+      "id": "rocket-league",
+      "name": "Rocket League",
+      "emoji": "🚗",
+      "color": "#088dce",
+      "roles": [
+        {
+          "id": "imposteur",
+          "name": "Imposteur",
+          "emoji": "🔴",
+          "description": "Ton but est de faire perdre ton équipe subtilement. Accomplis tes défis sans éveiller les soupçons !",
+          "goal": "sabotage",
+          "required": 1,
+          "maxPerTeam": 1,
+          "weight": 0
+        },
+        {
+          "id": "crewmate",
+          "name": "Équipier",
+          "emoji": "🟢",
+          "description": "Joue normalement et essaie de démasquer l'imposteur de l'équipe adverse !",
+          "goal": "detect",
+          "required": 0,
+          "maxPerTeam": null,
+          "weight": 60
+        },
+        {
+          "id": "decoy",
+          "name": "Bouc Émissaire",
+          "emoji": "🎭",
+          "description": "Ton but est de te faire voter comme imposteur sans l'être. Joue de façon suspecte !",
+          "goal": "get_voted",
+          "required": 0,
+          "maxPerTeam": 1,
+          "weight": 40
+        }
+      ],
+      "challenges": [
+        { "text": "Ne jamais récupérer le boost à 100% pendant ce match", "difficulty": "easy", "points": 1 },
+        { "text": "Rater volontairement au moins un dégagement clair par mi-temps", "difficulty": "easy", "points": 1 },
+        { "text": "Ne pas sauter pendant un corner adverse", "difficulty": "easy", "points": 1 },
+        { "text": "Ne pas utiliser de boost pendant les 2 premières minutes", "difficulty": "medium", "points": 2 },
+        { "text": "Faire exploser ta voiture volontairement au moins 2 fois", "difficulty": "medium", "points": 2 },
+        { "text": "Ne jamais dépasser la ligne de milieu en attaque", "difficulty": "medium", "points": 2 },
+        { "text": "Toujours arriver 2ème sur les ballons 50/50", "difficulty": "medium", "points": 2 },
+        { "text": "Ne jamais centrer vers le but adverse", "difficulty": "medium", "points": 2 },
+        { "text": "Effectuer toutes tes rotations en sens inverse de l'équipe", "difficulty": "hard", "points": 3 },
+        { "text": "Rater intentionnellement un centre tout seul face au but", "difficulty": "hard", "points": 3 },
+        { "text": "Ne pas jouer aérien pendant tout le match", "difficulty": "hard", "points": 3 },
+        { "text": "Rester dans les cages pendant une minute entière", "difficulty": "hard", "points": 3 }
+      ]
+    }
+  ]
+}

@@ -30,11 +30,11 @@ import {
   handleInventaireButton,
 } from '../../mountain/slash/subcommands/inv';
 import { HOME_BUTTON_PREFIX, handleHomeButton } from '../../mountain/slash/subcommands/home';
-// import {
-//   handleImpostorButtonInteraction,
-//   handleImpostorSelectMenu,
-//   handleImpostorModalSubmit,
-// } from '../../impostor/events/impostor-interactions';
+import {
+  handleImpostorButtonInteraction,
+  handleImpostorSelectMenu,
+  handleImpostorModalSubmit,
+} from '../../impostor/events/impostor-interactions';
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
 async function routeToPanelSelectMenu(
@@ -115,6 +115,8 @@ export default {
           await MountainSpawnService.handleClaim(interaction, client);
         } else if (interaction.customId.startsWith(INV_BUTTON_PREFIX + ':')) {
           await handleInventaireButton(interaction, client);
+        } else if (interaction.customId.startsWith('impostor_')) {
+          await handleImpostorButtonInteraction(interaction, client);
         }
       }
 
@@ -122,7 +124,7 @@ export default {
         if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
           await routeToPanelSelectMenu(interaction, client);
         } else if (interaction.customId.startsWith('impostor_')) {
-          // await handleImpostorSelectMenu(interaction, client);
+          await handleImpostorSelectMenu(interaction, client);
         } else {
           const lfmCommand = client.slashCommands.get('lfm');
           if (!lfmCommand) return;
@@ -181,7 +183,7 @@ export default {
             await moneyCommand.handleModalSubmit(interaction, client);
           }
         } else if (interaction.customId.startsWith('impostor_createmodal_')) {
-          // await handleImpostorModalSubmit(interaction, client);
+          await handleImpostorModalSubmit(interaction, client);
         }
       }
     } catch (error) {
