@@ -612,40 +612,54 @@ export default {
       const embed = LFMService.createLFMEmbed(request, interaction.user, gameColor, gameBanner);
       const buttons = LFMService.createLFMButtons(request._id.toString(), true);
 
-      // Try to find a LFM channel or use current channel
       const guild = interaction.guild;
       let targetChannel = interaction.channel;
 
       if (guild) {
         const lfmChannel = guild.channels.cache.find(
           (ch) =>
-            ch.type === ChannelType.GuildText &&
+            (ch.type === ChannelType.GuildText || ch.type === ChannelType.GuildForum) &&
             (ch.name.includes('lfm') || ch.name.includes('looking-for') || ch.name.includes('mate'))
         );
-        if (lfmChannel && lfmChannel.isTextBased()) {
-          targetChannel = lfmChannel;
+        if (lfmChannel) {
+          targetChannel = lfmChannel as typeof targetChannel;
         }
       }
 
-      // Post the LFM request
-      if (targetChannel && targetChannel.isTextBased()) {
-        // Prepare message content with role mention if available
-        const messageContent = gameRoleId ? `<@&${gameRoleId}>` : undefined;
+      if (!targetChannel) {
+        await interaction.editReply({ content: '❌ Impossible de trouver un channel pour poster l\'annonce.' });
+        return;
+      }
 
+      const messageContent = gameRoleId ? `<@&${gameRoleId}>` : undefined;
+      const requestId = request._id.toString();
+
+      if (targetChannel.type === ChannelType.GuildForum) {
+        const thread = await targetChannel.threads.create({
+          name: `${selection.game} — ${interaction.user.username}`,
+          message: {
+            content: messageContent,
+            embeds: [embed],
+            components: [buttons],
+          },
+        });
+
+        await LFMService.updateMessageInfo(requestId, thread.id, targetChannel.id, thread.id);
+
+        await interaction.editReply({
+          content: `✅ Votre annonce LFM a été créée dans <#${thread.id}> !`,
+        });
+      } else if (targetChannel.isTextBased()) {
         const message = await targetChannel.send({
           content: messageContent,
           embeds: [embed],
           components: [buttons],
         });
 
-        await LFMService.updateMessageInfo(request._id.toString(), message.id, targetChannel.id);
+        await LFMService.updateMessageInfo(requestId, message.id, targetChannel.id);
 
         await interaction.editReply({
-          content: `✅ Votre annonce LFM a été créée avec succès dans <#${targetChannel.id}> !`,
-        });
-      } else {
-        await interaction.editReply({
-          content: '✅ Votre annonce LFM a été créée avec succès !',
+          content: `✅ Votre annonce LFM a été créée dans <#${targetChannel.id}> !`,
         });
       }
     } catch (error) {

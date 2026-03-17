@@ -92,10 +92,11 @@ export class LFMService {
     requestId: string,
     messageId: string,
     channelId: string,
+    threadId?: string,
   ): Promise<ILFMRequest | null> {
     return LFMRequestModel.findByIdAndUpdate(
       requestId,
-      { messageId, channelId, updatedAt: new Date() },
+      { messageId, channelId, threadId, updatedAt: new Date() },
       { new: true }
     );
   }

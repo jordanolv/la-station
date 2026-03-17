@@ -41,7 +41,10 @@ export class LFMRequest {
   messageId?: string; // Discord message ID for the LFM post
 
   @prop()
-  channelId?: string; // Discord channel ID where the LFM was posted
+  channelId?: string;
+
+  @prop()
+  threadId?: string; // ID du thread forum si posté dans un GuildForum
 
   @prop()
   gameRoleId?: string; // Discord role ID for the game

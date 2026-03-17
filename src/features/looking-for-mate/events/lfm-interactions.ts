@@ -399,6 +399,20 @@ async function handlePing(interaction: ButtonInteraction, requestId: string): Pr
   }
 
   const mentions = others.map((id) => `<@${id}>`).join(' ');
+
+  if (request.threadId) {
+    try {
+      const thread = await interaction.client.channels.fetch(request.threadId);
+      if (thread?.isThread()) {
+        await thread.send({ content: `📣 ${mentions}` });
+        await interaction.followUp({ content: '📣 Participants pingés dans le thread !', flags: MessageFlags.Ephemeral });
+        return;
+      }
+    } catch (error) {
+      console.error('Failed to ping in thread:', error);
+    }
+  }
+
   await interaction.followUp({ content: `📣 ${mentions}` });
 }
 
