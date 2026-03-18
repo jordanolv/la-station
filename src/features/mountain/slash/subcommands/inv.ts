@@ -3,11 +3,14 @@ import {
   ButtonInteraction,
   ContainerBuilder,
   TextDisplayBuilder,
+  SectionBuilder,
+  ThumbnailBuilder,
   SeparatorBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   MessageFlags,
+  User,
 } from 'discord.js';
 import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
@@ -25,7 +28,7 @@ function buildFragmentBar(fragments: number): string {
 }
 
 export function buildInventoryContainer(
-  userId: string,
+  user: User,
   unlocked: Awaited<ReturnType<typeof UserMountainsRepository.getUnlocked>>,
   tickets: number,
   fragments: number,
@@ -33,6 +36,8 @@ export function buildInventoryContainer(
 ): ContainerBuilder[] {
   const totalMountains = MountainService.count;
   const rarityOrder: MountainRarity[] = ['legendary', 'epic', 'rare', 'common'];
+
+  const userId = user.id;
 
   const sorted = [...unlocked]
     .filter(e => MountainService.getById(e.mountainId))
@@ -59,8 +64,12 @@ export function buildInventoryContainer(
 
   const summaryContainer = new ContainerBuilder()
     .setAccentColor(0x2ecc71)
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent('# ⛰️ Ma collection'),
+    .addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`# ⛰️ Ma collection\n-# par **${user.displayName}**`),
+        )
+        .setThumbnailAccessory(new ThumbnailBuilder().setURL(user.displayAvatarURL({ size: 64 }))),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(
@@ -148,7 +157,7 @@ export async function handleInventaireButton(
 
     const doc = await UserMountainsRepository.getOrCreate(ownerId);
     const unlocked = await UserMountainsRepository.getUnlocked(ownerId);
-    const containers = buildInventoryContainer(ownerId, unlocked, doc.packTickets, doc.fragments, page);
+    const containers = buildInventoryContainer(interaction.user, unlocked, doc.packTickets, doc.fragments, page);
 
     await interaction.update({ components: containers });
     return;
@@ -156,13 +165,13 @@ export async function handleInventaireButton(
 }
 
 export async function executeInv(interaction: ChatInputCommandInteraction | ButtonInteraction, _client: BotClient): Promise<void> {
-  const userId = interaction.user.id;
+  const { user } = interaction;
   const [doc, unlocked] = await Promise.all([
-    UserMountainsRepository.getOrCreate(userId),
-    UserMountainsRepository.getUnlocked(userId),
+    UserMountainsRepository.getOrCreate(user.id),
+    UserMountainsRepository.getUnlocked(user.id),
   ]);
 
-  const containers = buildInventoryContainer(userId, unlocked, doc.packTickets, doc.fragments, 0);
+  const containers = buildInventoryContainer(user, unlocked, doc.packTickets, doc.fragments, 0);
 
   await interaction.reply({
     components: containers,

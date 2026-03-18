@@ -3,11 +3,14 @@ import {
   ChatInputCommandInteraction,
   ContainerBuilder,
   TextDisplayBuilder,
+  SectionBuilder,
+  ThumbnailBuilder,
   SeparatorBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   MessageFlags,
+  User,
 } from 'discord.js';
 import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
@@ -27,10 +30,10 @@ function buildFragmentBar(fragments: number): string {
   return '🟧'.repeat(filled) + '⬛'.repeat(10 - filled);
 }
 
-async function buildHomeContainer(userId: string, lastMsgId = 'none'): Promise<ContainerBuilder> {
+async function buildHomeContainer(user: User, lastMsgId = 'none'): Promise<ContainerBuilder> {
   const [doc, unlocked] = await Promise.all([
-    UserMountainsRepository.getOrCreate(userId),
-    UserMountainsRepository.getUnlocked(userId),
+    UserMountainsRepository.getOrCreate(user.id),
+    UserMountainsRepository.getUnlocked(user.id),
   ]);
 
   const totalMountains = MountainService.count;
@@ -65,8 +68,12 @@ async function buildHomeContainer(userId: string, lastMsgId = 'none'): Promise<C
 
   return new ContainerBuilder()
     .setAccentColor(0x5865f2)
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent('# ⛰️ Montagnes'),
+    .addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`# ⛰️ Montagnes\n-# par **${user.displayName}**`),
+        )
+        .setThumbnailAccessory(new ThumbnailBuilder().setURL(user.displayAvatarURL({ size: 64 }))),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(
@@ -90,7 +97,7 @@ export async function executeHome(
   interaction: ChatInputCommandInteraction,
   _client: BotClient,
 ): Promise<void> {
-  const container = await buildHomeContainer(interaction.user.id);
+  const container = await buildHomeContainer(interaction.user);
   await interaction.reply({
     components: [container],
     flags: MessageFlags.IsComponentsV2,
@@ -115,20 +122,20 @@ export async function handleHomeButton(
     } catch { /* already deleted or not found */ }
   }
 
-  const userId = interaction.user.id;
+  const { user } = interaction;
   let components: ContainerBuilder[];
 
   if (action === 'inv') {
     const [doc, unlocked] = await Promise.all([
-      UserMountainsRepository.getOrCreate(userId),
-      UserMountainsRepository.getUnlocked(userId),
+      UserMountainsRepository.getOrCreate(user.id),
+      UserMountainsRepository.getUnlocked(user.id),
     ]);
-    components = buildInventoryContainer(userId, unlocked, doc.packTickets, doc.fragments, 0);
+    components = buildInventoryContainer(user, unlocked, doc.packTickets, doc.fragments, 0);
   } else if (action === 'pack') {
-    const doc = await UserMountainsRepository.getOrCreate(userId);
-    components = [buildPackInfoContainer(doc.packTickets, doc.fragments)];
+    const doc = await UserMountainsRepository.getOrCreate(user.id);
+    components = [buildPackInfoContainer(user, doc.packTickets, doc.fragments)];
   } else if (action === 'leaderboard') {
-    components = [await buildLeaderboardContainer(userId, client)];
+    components = [await buildLeaderboardContainer(user, client)];
   } else {
     return;
   }
@@ -139,7 +146,7 @@ export async function handleHomeButton(
     fetchReply: true,
   });
 
-  const updatedHome = await buildHomeContainer(userId, sentMsg.id);
+  const updatedHome = await buildHomeContainer(user, sentMsg.id);
   await interaction.editReply({
     components: [updatedHome],
     flags: MessageFlags.IsComponentsV2,

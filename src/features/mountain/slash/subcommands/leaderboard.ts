@@ -3,8 +3,11 @@ import {
   ButtonInteraction,
   ContainerBuilder,
   TextDisplayBuilder,
+  SectionBuilder,
+  ThumbnailBuilder,
   SeparatorBuilder,
   MessageFlags,
+  User,
 } from 'discord.js';
 import { BotClient } from '../../../../bot/client';
 import UserMountainsModel from '../../models/user-mountains.model';
@@ -14,7 +17,8 @@ import type { MountainRarity } from '../../types/mountain.types';
 
 const RARITY_ORDER: MountainRarity[] = ['legendary', 'epic', 'rare', 'common'];
 
-export async function buildLeaderboardContainer(requesterId: string, client: BotClient): Promise<ContainerBuilder> {
+export async function buildLeaderboardContainer(requester: User, client: BotClient): Promise<ContainerBuilder> {
+  const requesterId = requester.id;
   const docs = await UserMountainsModel.find({}).lean();
   const totalMountains = MountainService.count;
 
@@ -54,8 +58,12 @@ export async function buildLeaderboardContainer(requesterId: string, client: Bot
 
   const container = new ContainerBuilder()
     .setAccentColor(0xf1c40f)
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent('# 🏆 Classement des collectionneurs'),
+    .addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`# 🏆 Classement \n-# demandé par **${requester.displayName}**`),
+        )
+        .setThumbnailAccessory(new ThumbnailBuilder().setURL(requester.displayAvatarURL({ size: 64 }))),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(
@@ -89,7 +97,7 @@ export async function buildLeaderboardContainer(requesterId: string, client: Bot
 
 export async function executeLeaderboard(interaction: ChatInputCommandInteraction | ButtonInteraction, client: BotClient): Promise<void> {
   await interaction.deferReply({ ephemeral: false });
-  const container = await buildLeaderboardContainer(interaction.user.id, client);
+  const container = await buildLeaderboardContainer(interaction.user, client);
   await interaction.editReply({
     components: [container],
     flags: MessageFlags.IsComponentsV2,

@@ -30,13 +30,17 @@ function buildFragmentBar(fragments: number): string {
   return '🟧'.repeat(filled) + '⬛'.repeat(10 - filled);
 }
 
-export function buildPackInfoContainer(tickets: number, fragments: number): ContainerBuilder {
+export function buildPackInfoContainer(user: User, tickets: number, fragments: number): ContainerBuilder {
   const fragBar = buildFragmentBar(fragments);
 
   return new ContainerBuilder()
     .setAccentColor(0xe67e22)
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent('# 🎟️ Packs de montagnes'),
+    .addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`# 🎟️ Packs de montagnes\n-# par **${user.displayName}**`),
+        )
+        .setThumbnailAccessory(new ThumbnailBuilder().setURL(user.displayAvatarURL({ size: 64 }))),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(
@@ -320,7 +324,7 @@ export async function executePack(interaction: ChatInputCommandInteraction | But
   const userId = interaction.user.id;
   const doc = await UserMountainsRepository.getOrCreate(userId);
 
-  const container = buildPackInfoContainer(doc.packTickets, doc.fragments);
+  const container = buildPackInfoContainer(interaction.user, doc.packTickets, doc.fragments);
 
   await interaction.reply({
     components: [container],
