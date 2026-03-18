@@ -36,6 +36,18 @@ import {
   handleImpostorSelectMenu,
   handleImpostorModalSubmit,
 } from '../../impostor/events/impostor-interactions';
+import {
+  handleBetButton,
+  handleBetSelectMenu,
+  handleBetPlaceSelect,
+  handleBetSetupModal,
+  handleBetPlaceModal,
+} from '../../bet/events/bet-interactions';
+import {
+  handleDraftButton,
+  handleDraftUserSelect,
+  handleDraftStringSelect,
+} from '../../draft/events/draft-interactions';
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
 async function routeToPanelSelectMenu(
@@ -88,10 +100,11 @@ export default {
           }
           await command.execute(interaction, client);
         } catch (error) {
+          const payload = { content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: MessageFlags.Ephemeral };
           if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: MessageFlags.Ephemeral });
+            await interaction.followUp(payload).catch(() => {});
           } else {
-            await interaction.reply({ content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: MessageFlags.Ephemeral });
+            await interaction.reply(payload).catch(() => {});
           }
         }
       }
@@ -124,12 +137,22 @@ export default {
           await handleInventaireButton(interaction, client);
         } else if (interaction.customId.startsWith('impostor_')) {
           await handleImpostorButtonInteraction(interaction, client);
+        } else if (interaction.customId.startsWith('bet:')) {
+          await handleBetButton(interaction, client);
+        } else if (interaction.customId.startsWith('draft:')) {
+          await handleDraftButton(interaction, client);
         }
       }
 
       else if (interaction.isStringSelectMenu()) {
         if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
           await routeToPanelSelectMenu(interaction, client);
+        } else if (interaction.customId.startsWith('bet:winner:')) {
+          await handleBetSelectMenu(interaction, client);
+        } else if (interaction.customId.startsWith('bet:place:')) {
+          await handleBetPlaceSelect(interaction, client);
+        } else if (interaction.customId.startsWith('draft:pick:')) {
+          await handleDraftStringSelect(interaction, client);
         } else if (interaction.customId.startsWith('impostor_')) {
           await handleImpostorSelectMenu(interaction, client);
         } else {
@@ -161,6 +184,8 @@ export default {
           await routeToPanelSelectMenu(interaction, client);
         } else if (interaction.customId.startsWith(VOC_INVITE_USER_SELECT_ID)) {
           await handleVocInviteUserSelect(interaction, client);
+        } else if (interaction.customId.startsWith('draft:')) {
+          await handleDraftUserSelect(interaction, client);
         }
       }
 
@@ -191,6 +216,10 @@ export default {
           }
         } else if (interaction.customId.startsWith('impostor_createmodal_')) {
           await handleImpostorModalSubmit(interaction, client);
+        } else if (interaction.customId.startsWith('bet:setup_modal:')) {
+          await handleBetSetupModal(interaction, client);
+        } else if (interaction.customId.startsWith('bet:place_modal:')) {
+          await handleBetPlaceModal(interaction, client);
         }
       }
     } catch (error) {
