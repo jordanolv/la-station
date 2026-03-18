@@ -39,8 +39,6 @@ export class BirthdayCron {
       const monthToday = nowParis.getMonth() + 1;
       const dayToday = nowParis.getDate();
 
-      const guildId = getGuildId();
-
       await LogService.info(this.client as any, `Vérification des anniversaires pour ${dayToday}/${monthToday} (Paris)`, {
         feature: 'birthday'
       });
@@ -54,11 +52,10 @@ export class BirthdayCron {
       }
 
       const users = await UserModel.find({
-        guildId,
         'infos.birthDate': { $exists: true, $ne: null }
       });
 
-      const discordGuild = this.client.guilds.cache.get(guildId);
+      const discordGuild = this.client.guilds.cache.get(getGuildId());
       const birthdayChannelId = birthdayConfig?.channel || discordGuild?.systemChannelId;
       if (!birthdayChannelId) {
         await LogService.warning(this.client as any, `Aucun canal d'anniversaire configuré`, { feature: 'birthday' });
