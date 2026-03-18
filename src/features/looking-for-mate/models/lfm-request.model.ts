@@ -4,7 +4,7 @@ import { prop, getModelForClass, index, DocumentType } from '@typegoose/typegoos
  * Looking For Mate Request Model
  * Stores game party/mate searching requests from users
  */
-@index({ createdAt: 1 }, { expireAfterSeconds: 86400 }) // Auto-delete after 24h
+@index({ createdAt: 1 }, { expireAfterSeconds: 604800 }) // Auto-delete after 7 days
 export class LFMRequest {
   @prop({ required: true })
   userId!: string;
