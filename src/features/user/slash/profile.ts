@@ -84,18 +84,24 @@ export default {
       bioInput.setValue(user.bio);
     }
 
-    const birthValue = buildDateString(user.infos?.birthDate);
+    const existingBirthDate = user.infos?.birthDate;
+    const birthValue = buildDateString(existingBirthDate);
 
     const birthdayInput = new TextInputBuilder()
       .setCustomId(BIRTHDAY_INPUT_ID)
-      .setLabel("Anniversaire (JJ/MM/AAAA)")
       .setStyle(TextInputStyle.Short)
-      .setPlaceholder('Ex: 15/08/1995')
       .setRequired(false)
       .setMaxLength(10);
 
-    if (birthValue) {
-      birthdayInput.setValue(birthValue);
+    if (existingBirthDate) {
+      birthdayInput
+        .setLabel('Anniversaire (défini — non modifiable)')
+        .setPlaceholder('Non modifiable')
+        .setValue(birthValue);
+    } else {
+      birthdayInput
+        .setLabel('Anniversaire (JJ/MM/AAAA)')
+        .setPlaceholder('Ex: 15/08/1995');
     }
 
     modal.addComponents(
@@ -125,9 +131,25 @@ export default {
       await interaction.reply({ content: error, flags: MessageFlags.Ephemeral });
       return;
     }
+
+    if (user.infos?.birthDate && birthDate) {
+      const existing = new Date(user.infos.birthDate);
+      const isSameDate =
+        existing.getFullYear() === birthDate.getFullYear() &&
+        existing.getMonth() === birthDate.getMonth() &&
+        existing.getDate() === birthDate.getDate();
+      if (!isSameDate) {
+        await interaction.reply({
+          content: '❌ Ton anniversaire est déjà enregistré et ne peut plus être modifié.',
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+    }
+
     user.bio = bioRaw.length > 0 ? bioRaw : undefined;
     user.infos = user.infos || { registeredAt: new Date(), updatedAt: new Date() };
-    user.infos.birthDate = birthDate ?? undefined;
+    user.infos.birthDate = user.infos.birthDate ?? birthDate ?? undefined;
     user.infos.updatedAt = new Date();
 
     await user.save();
