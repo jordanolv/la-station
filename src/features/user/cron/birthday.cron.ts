@@ -1,15 +1,15 @@
 import { CronJob } from 'cron';
-import { Client, EmbedBuilder, TextChannel, ChannelType, PermissionsBitField } from 'discord.js';
+import { Client, TextChannel, ChannelType, PermissionsBitField } from 'discord.js';
 import { toZonedTime } from 'date-fns-tz';
 import UserModel from '../models/user.model';
 import AppConfigModel from '../../discord/models/app-config.model';
 import { LogService } from '../../../shared/logs/logs.service';
 import { getGuildId } from '../../../shared/guild';
+import { sendBirthdayAnnouncement, BIRTHDAY_TZ, BIRTHDAY_TICKETS } from '../services/birthday.service';
 
 export class BirthdayCron {
   private job: CronJob;
   private client: Client;
-  private readonly TZ = 'Europe/Paris';
 
   constructor(client: Client) {
     this.client = client;
@@ -19,14 +19,14 @@ export class BirthdayCron {
       this.checkBirthdays.bind(this),
       null,
       false,
-      this.TZ
+      BIRTHDAY_TZ
     );
   }
 
   public start(): void {
     this.job.start();
     const chalk = require('chalk');
-    console.log(chalk.yellow('   ├─ 🎂 Birthday') + chalk.gray(` • tous les jours à 00:00 ${this.TZ}`));
+    console.log(chalk.yellow('   ├─ 🎂 Birthday') + chalk.gray(` • tous les jours à 00:00 ${BIRTHDAY_TZ}`));
   }
 
   public stop(): void {
@@ -35,7 +35,7 @@ export class BirthdayCron {
 
   public async checkBirthdays(): Promise<void> {
     try {
-      const nowParis = toZonedTime(new Date(), this.TZ);
+      const nowParis = toZonedTime(new Date(), BIRTHDAY_TZ);
       const monthToday = nowParis.getMonth() + 1;
       const dayToday = nowParis.getDate();
 
@@ -65,11 +65,8 @@ export class BirthdayCron {
       for (const user of users) {
         if (!user.infos.birthDate) continue;
 
-        const bdParis = toZonedTime(new Date(user.infos.birthDate), this.TZ);
-        const monthBirth = bdParis.getMonth() + 1;
-        const dayBirth = bdParis.getDate();
-
-        if (monthBirth !== monthToday || dayBirth !== dayToday) continue;
+        const bdParis = toZonedTime(new Date(user.infos.birthDate), BIRTHDAY_TZ);
+        if (bdParis.getMonth() + 1 !== monthToday || bdParis.getDate() !== dayToday) continue;
 
         const chan = await this.client.channels.fetch(birthdayChannelId).catch(() => null);
         if (!chan || chan.type !== ChannelType.GuildText) {
@@ -84,25 +81,13 @@ export class BirthdayCron {
           continue;
         }
 
-        const age = nowParis.getFullYear() - bdParis.getFullYear();
-        const discordUser = await this.client.users.fetch(user.discordId).catch(() => null);
-        const avatarUrl = discordUser?.displayAvatarURL({ size: 256 });
+        const { moneyGift } = await sendBirthdayAnnouncement(this.client, textChannel, user.discordId, user.name, user.infos.birthDate);
 
-        const embed = new EmbedBuilder()
-          .setTitle('🎉 Joyeux Anniversaire ! 🎉')
-          .setDescription(
-            `Toute l'équipe souhaite un joyeux anniversaire à <@${user.discordId}> ! 🎂\n\n` +
-            `Aujourd'hui, ${user.name} souffle sa ${age}ème bougie !`
-          )
-          .setColor(0xdac1ff)
-          .setImage('https://c.tenor.com/GscosXEDKhcAAAAd/tenor.gif')
-          .setTimestamp(nowParis)
-          .setFooter({ text: `🎂 ${age} ans aujourd'hui !` });
-
-        if (avatarUrl) embed.setThumbnail(avatarUrl);
-
-        await textChannel.send({ embeds: [embed] });
-        await LogService.success(this.client as any, `Message d'anniversaire envoyé pour ${user.name}`, { feature: 'birthday' });
+        await LogService.success(
+          this.client as any,
+          `🎂 Anniversaire de ${user.name} — +${moneyGift} pièces, +${BIRTHDAY_TICKETS} tickets`,
+          { feature: 'birthday' },
+        );
       }
     } catch (err) {
       console.error('Error in BirthdayCron:', err);
