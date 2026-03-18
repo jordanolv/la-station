@@ -100,11 +100,10 @@ export default {
           }
           await command.execute(interaction, client);
         } catch (error) {
-          const payload = { content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: MessageFlags.Ephemeral };
           if (interaction.replied || interaction.deferred) {
-            await interaction.followUp(payload).catch(() => {});
+            await interaction.followUp({ content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: 64 }).catch(() => {});
           } else {
-            await interaction.reply(payload).catch(() => {});
+            await interaction.reply({ content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: 64 }).catch(() => {});
           }
         }
       }
