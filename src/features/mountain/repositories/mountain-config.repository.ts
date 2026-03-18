@@ -59,6 +59,10 @@ export class MountainConfigRepository {
     );
   }
 
+  static async setLastSpawnWinner(userId: string): Promise<void> {
+    await MountainConfigModel.updateOne({}, { $set: { lastSpawnWinnerId: userId } });
+  }
+
   static async getActiveChannelMountains(): Promise<Map<string, string>> {
     const doc = await this.get();
     const obj = (doc?.activeChannelMountains ?? {}) as Record<string, string>;

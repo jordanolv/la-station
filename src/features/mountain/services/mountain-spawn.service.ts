@@ -20,9 +20,13 @@ export const SPAWN_BUTTON_PREFIX = 'mountain:spawn:claim';
 
 export class MountainSpawnService {
   private static claimedSpawns = new Set<string>();
+  private static lastSpawnWinnerId: string | null = null;
 
   static async rehydrate(client: BotClient): Promise<void> {
     const config = await MountainConfigRepository.get();
+    if (config?.lastSpawnWinnerId) {
+      this.lastSpawnWinnerId = config.lastSpawnWinnerId;
+    }
     const pending = (config?.spawnSchedule ?? []).filter(d => new Date(d) > new Date());
     if (pending.length === 0) return;
 
@@ -87,21 +91,28 @@ export class MountainSpawnService {
 
   static async handleClaim(interaction: ButtonInteraction, client: BotClient): Promise<void> {
     const messageId = interaction.message.id;
+    const userId = interaction.user.id;
 
     if (this.claimedSpawns.has(messageId)) {
-      await interaction.reply({ content: '❌ Cette montagne a déjà été revendiquée !', flags: MessageFlags.Ephemeral });
+      await interaction.reply({ content: '❌ Cette montagne a déjà été revendiquée !', flags: MessageFlags.Ephemeral }).catch(() => {});
       return;
     }
+    if (this.lastSpawnWinnerId === userId) {
+      await interaction.reply({ content: '❌ Tu as gagné le dernier spawn ! Laisse une chance aux autres.', flags: MessageFlags.Ephemeral }).catch(() => {});
+      return;
+    }
+
     this.claimedSpawns.add(messageId);
+    this.lastSpawnWinnerId = userId;
 
     const mountainId = interaction.customId.split(':')[3];
     const mountain = MountainService.getById(mountainId);
     if (!mountain) {
-      await interaction.reply({ content: '❌ Montagne introuvable.', flags: MessageFlags.Ephemeral });
+      this.claimedSpawns.delete(messageId);
+      await interaction.reply({ content: '❌ Montagne introuvable.', flags: MessageFlags.Ephemeral }).catch(() => {});
       return;
     }
 
-    const userId = interaction.user.id;
     const rarity = MountainService.getRarity(mountain);
     const { emoji, label, color } = RARITY_CONFIG[rarity];
     const { fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
@@ -138,7 +149,9 @@ export class MountainSpawnService {
       .setImage(mountain.image)
       .setTimestamp();
 
-    await interaction.update({ embeds: [updatedEmbed], components: [disabledRow] });
+    MountainConfigRepository.setLastSpawnWinner(userId).catch(() => {});
+
+    await interaction.update({ embeds: [updatedEmbed], components: [disabledRow] }).catch(() => {});
 
     await LogService.success(client,
       `<@${userId}> a revendiqué **${mountain.mountainLabel}** ${emoji} ${label}${isDuplicate ? ' (doublon)' : ''}`,

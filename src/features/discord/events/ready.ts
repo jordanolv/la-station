@@ -14,6 +14,7 @@ import { chatGamingPanel } from '../../chat-gaming/panels/chat-gaming.panel';
 import { arcadePanel } from '../../arcade/panels/arcade.panel';
 import { mountainPanel } from '../../mountain/panels/mountain.panel';
 import { activityRolesPanel } from '../../activity-roles/panels/activity-roles.panel';
+import { MountainSpawnService } from '../../mountain/services/mountain-spawn.service';
 
 panelRegistry.register(generalPanel);
 panelRegistry.register(logsPanel);
@@ -48,6 +49,7 @@ export default {
     setStatus();
     setInterval(setStatus, 8000);
     await VoiceService.rehydrate(client);
+    await MountainSpawnService.rehydrate(client);
     await ConfigPanelService.init(client).catch((err) =>
       console.error('[ConfigPanel] Erreur init:', err),
     );

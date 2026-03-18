@@ -15,6 +15,9 @@ export class MountainConfig {
 
   @prop({ type: Object, default: {} })
   activeChannelMountains!: Record<string, string>;
+
+  @prop()
+  lastSpawnWinnerId?: string;
 }
 
 const MountainConfigModel = getModelForClass(MountainConfig, {
