@@ -164,6 +164,23 @@ export class LevelingService {
     }
   }
 
+  static async giveXpDirectly(client: BotClient, userId: string, amount: number): Promise<void> {
+    const user = await UserModel.findOne({ discordId: userId }) as IUser;
+    if (!user) return;
+
+    const config = await this.getOrCreateLevelingConfig();
+    if (!config?.enabled) return;
+
+    user.profil.exp += amount;
+
+    if (user.profil.exp >= this.getXpToLevelUp(user.profil.lvl)) {
+      user.profil.lvl++;
+      console.log(`${user.name} a atteint le niveau ${user.profil.lvl} (récompense soirée)`);
+    }
+
+    await user.save();
+  }
+
   /**
    * Vérifie et gère le level up
    */

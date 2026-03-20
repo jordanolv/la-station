@@ -27,6 +27,9 @@ class AppSettings {
     type: () => Object
   })
   commandChannels?: { [key: string]: string };
+
+  @prop()
+  originalBannerUrl?: string;
 }
 
 class AppFeatures {

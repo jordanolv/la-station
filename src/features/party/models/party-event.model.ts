@@ -14,7 +14,7 @@ export class EventInfo {
   @prop({ required: true })
   dateTime!: Date;
 
-  @prop({ required: true, min: 1, max: 50 })
+  @prop({ required: true, min: 1, max: 100 })
   maxSlots!: number;
 
   @prop()
@@ -38,11 +38,6 @@ export class DiscordInfo {
   @prop()
   roleId?: string;
 
-  @prop()
-  announcementMessageId?: string;
-
-  @prop()
-  announcementChannelId?: string;
 }
 
 export class PartyEvent {

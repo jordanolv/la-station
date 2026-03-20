@@ -10,6 +10,4 @@ export class PartyConfig {
   @prop()
   defaultRoleId?: string;
 
-  @prop()
-  announcementChannelId?: string;
 }

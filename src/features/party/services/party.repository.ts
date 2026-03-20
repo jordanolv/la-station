@@ -52,16 +52,12 @@ export class PartyRepository {
     messageId?: string,
     threadId?: string,
     roleId?: string,
-    announcementMessageId?: string,
-    announcementChannelId?: string,
   ): Promise<PartyEvent> {
     const updateData: any = {};
 
     if (messageId) updateData['discord.messageId'] = messageId;
     if (threadId) updateData['discord.threadId'] = threadId;
     if (roleId) updateData['discord.roleId'] = roleId;
-    if (announcementMessageId) updateData['discord.announcementMessageId'] = announcementMessageId;
-    if (announcementChannelId) updateData['discord.announcementChannelId'] = announcementChannelId;
 
     return this.update(eventId, updateData);
   }

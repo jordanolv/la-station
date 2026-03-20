@@ -1,11 +1,20 @@
-import { ChannelType, EmbedBuilder, ForumChannel, ThreadChannel } from 'discord.js';
+import {
+  ForumChannel,
+  ThreadChannel,
+  MessageFlags,
+  ContainerBuilder,
+  TextDisplayBuilder,
+  SeparatorBuilder,
+  MediaGalleryBuilder,
+  MediaGalleryItemBuilder,
+} from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { PartyEvent } from '../models/party-event.model';
 import { DiscordError } from './party.types';
 
 export class DiscordPartyService {
-  
+
   static async getGuildAndChannel(client: BotClient, channelId: string): Promise<{ guild: any; channel: any }> {
     try {
       const guild = await client.guilds.fetch(getGuildId());
@@ -16,88 +25,126 @@ export class DiscordPartyService {
     }
   }
 
-  static createEventEmbed(event: PartyEvent, roleId?: string, participantNames?: Map<string, string>): EmbedBuilder {
+  static createEventContainer(event: PartyEvent, roleId?: string): ContainerBuilder {
     const ts = Math.floor(new Date(event.eventInfo.dateTime).getTime() / 1000);
-    const participantCount = `${event.participants.length}/${event.eventInfo.maxSlots}`;
+    const filled = event.participants.length;
+    const total = event.eventInfo.maxSlots;
+    const isFull = filled >= total;
+
+    const color = event.eventInfo.color
+      ? parseInt(event.eventInfo.color.replace('#', ''), 16)
+      : 0xFF6B6B;
+
+    const container = new ContainerBuilder().setAccentColor(color);
+
+    // Image en plein format
+    if (event.eventInfo.image) {
+      container.addMediaGalleryComponents(
+        new MediaGalleryBuilder().addItems(
+          new MediaGalleryItemBuilder().setURL(event.eventInfo.image),
+        ),
+      );
+    }
+
+    if (roleId) {
+      container.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(`<@&${roleId}>`),
+      );
+    }
+    container.addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`# 🎉 ${event.eventInfo.name}`),
+    );
+
+    // Description
+    if (event.eventInfo.description) {
+      container
+        .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(event.eventInfo.description),
+        );
+    }
+
+    container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+
+    // Infos principales
+    container.addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        `🎮 **${event.eventInfo.game}**\n📅 <t:${ts}:F> · <t:${ts}:R>`,
+      ),
+    );
+
+    container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+
+    // Participants
+    const slotBar = this.buildSlotBar(filled, total);
     const participantList = event.participants.length > 0
-      ? event.participants.map(id => participantNames?.get(id) ?? `<@${id}>`).join(', ')
+      ? event.participants.map(id => `<@${id}>`).join(' ')
       : '*Aucun participant pour le moment*';
 
-    const embed = new EmbedBuilder()
-      .setTitle(`🎉 ${event.eventInfo.name}`)
-      .addFields([
-        { name: '🎮 Jeu', value: event.eventInfo.game, inline: true },
-        { name: '📅 Date & Heure', value: `<t:${ts}:F>`, inline: true },
-        { name: `👥 Participants (${participantCount})`, value: participantList, inline: false },
-      ])
-      .setColor(event.eventInfo.color ? parseInt(event.eventInfo.color.replace('#', ''), 16) : 0xFF6B6B)
-      .setFooter({ text: 'Réagissez avec 🎉 pour participer à cet événement !' })
-      .setTimestamp();
+    container.addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        `### 👥 ${filled}/${total} participants\n${slotBar}\n${participantList}`,
+      ),
+    );
 
-    // Description avec mention du rôle
-    let description = '';
-    if (roleId) {
-      description += `🎭 <@&${roleId}>\n\n`;
-    }
-    if (event.eventInfo.description) {
-      description += event.eventInfo.description;
-    }
+    container
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+          isFull ? `-# 🔒 Complet — réagis 🎉 pour rejoindre la liste d'attente` : `-# Réagis avec 🎉 pour participer !`,
+        ),
+      );
 
-    if (description) {
-      embed.setDescription(description);
-    }
-
-    // Ajouter l'image si présente
-    if (event.eventInfo.image) {
-      embed.setImage(event.eventInfo.image);
-    }
-
-    return embed;
+    return container;
   }
 
-  static async publishEventMessage(channel: ForumChannel, event: PartyEvent, embed: EmbedBuilder): Promise<{ messageId: string; threadId: string }> {
+  private static buildSlotBar(filled: number, total: number): string {
+    const barLength = 10;
+    const filledCount = Math.round((filled / total) * barLength);
+    const filled_ = '▰'.repeat(filledCount);
+    const empty = '▱'.repeat(barLength - filledCount);
+    return `-# ${filled_}${empty}`;
+  }
+
+  static async publishEventMessage(channel: ForumChannel, event: PartyEvent, container: ContainerBuilder): Promise<{ messageId: string; threadId: string }> {
     try {
       const eventDate = new Date(event.eventInfo.dateTime);
       const formattedDate = eventDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-      
+
       const thread = await channel.threads.create({
         name: `[${formattedDate}] ${event.eventInfo.name}`,
-        message: { embeds: [embed] }
-      });
-      
+        message: {
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+        } as any,
+        invitable: false,
+      } as any);
+
       const starterMessage = await thread.fetchStarterMessage();
       const messageId = starterMessage?.id || thread.lastMessageId!;
 
-      // Ajouter la réaction par défaut
       if (starterMessage) {
         await starterMessage.react('🎉').catch(() => {});
       }
 
-      return {
-        messageId,
-        threadId: thread.id
-      };
+      return { messageId, threadId: thread.id };
     } catch (error) {
       throw new DiscordError(`Impossible de publier l'événement: ${error}`);
     }
   }
 
-  static async updateEventMessage(client: BotClient, event: PartyEvent, embed: EmbedBuilder): Promise<void> {
+  static async updateEventMessage(client: BotClient, event: PartyEvent, container: ContainerBuilder): Promise<void> {
     try {
-      if (!event.discord.threadId) {
-        console.warn('[DISCORD] Pas de threadId pour mettre à jour l\'embed');
-        return;
-      }
+      if (!event.discord.threadId) return;
 
       const thread = await client.channels.fetch(event.discord.threadId) as ThreadChannel;
       if (thread?.isThread()) {
         const starterMessage = await thread.fetchStarterMessage();
         if (starterMessage) {
-          await starterMessage.edit({ 
-            embeds: [embed],
-            files: [],
-            content: null
-          });
+          await starterMessage.edit({
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+          } as any);
         }
       }
     } catch (error) {
@@ -108,7 +155,6 @@ export class DiscordPartyService {
   static async addUserToThread(client: BotClient, event: PartyEvent, userId: string): Promise<void> {
     try {
       if (!event.discord.threadId) return;
-      
       const thread = await client.channels.fetch(event.discord.threadId) as ThreadChannel;
       if (thread?.isThread()) {
         await thread.members.add(userId).catch(() => {});
@@ -121,7 +167,6 @@ export class DiscordPartyService {
   static async removeUserFromThread(client: BotClient, event: PartyEvent, userId: string): Promise<void> {
     try {
       if (!event.discord.threadId) return;
-      
       const thread = await client.channels.fetch(event.discord.threadId) as ThreadChannel;
       if (thread?.isThread()) {
         await thread.members.remove(userId).catch(() => {});
@@ -134,7 +179,6 @@ export class DiscordPartyService {
   static async removeAllReactions(client: BotClient, event: PartyEvent): Promise<void> {
     try {
       if (!event.discord.threadId) return;
-      
       const thread = await client.channels.fetch(event.discord.threadId) as ThreadChannel;
       if (thread?.isThread()) {
         const starterMessage = await thread.fetchStarterMessage();
@@ -150,7 +194,6 @@ export class DiscordPartyService {
   static async archiveThread(client: BotClient, event: PartyEvent): Promise<void> {
     try {
       if (!event.discord.threadId) return;
-
       const thread = await client.channels.fetch(event.discord.threadId) as ThreadChannel;
       if (thread?.isThread() && !thread.name.startsWith('[END]')) {
         await thread.setName(`[END] ${thread.name}`).catch(() => {});
@@ -173,74 +216,29 @@ export class DiscordPartyService {
     }
   }
 
-  static async sendAnnouncementMessage(
-    client: BotClient,
-    event: PartyEvent,
-    announcementChannelId: string,
-    threadUrl: string,
-    roleId?: string,
-    gameImageUrl?: string,
-  ): Promise<string | undefined> {
-    try {
-      const { guild } = await this.getGuildAndChannel(client, event.discord.channelId);
-      const announcementChannel = await guild.channels.fetch(announcementChannelId);
-      
-      if (!announcementChannel?.isTextBased()) {
-        throw new DiscordError('Le channel d\'annonce n\'est pas un channel textuel');
-      }
 
-      const dateStr = new Date(event.eventInfo.dateTime).toLocaleDateString('fr-FR');
-      const timeStr = new Date(event.eventInfo.dateTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-      
-      const embed = new EmbedBuilder()
-        .setTitle(`🎉 Nouvel événement : ${event.eventInfo.name}`)
-        .setDescription(`Un nouvel événement a été créé !\n\n[Rejoindre l'événement](${threadUrl})`)
-        .addFields([
-          { name: '🎮 Jeu', value: event.eventInfo.game, inline: true },
-          { name: '📅 Date', value: `${dateStr} à ${timeStr}`, inline: true },
-          { name: '👥 Places', value: `${event.eventInfo.maxSlots} max`, inline: true }
-        ])
-        .setColor(event.eventInfo.color ? parseInt(event.eventInfo.color.replace('#', ''), 16) : 0xFF6B6B)
-        .setTimestamp();
-
-      // Thumbnail : image du jeu en priorité, sinon image de la soirée
-      const thumbnailUrl = gameImageUrl || event.eventInfo.image;
-      if (thumbnailUrl) {
-        embed.setThumbnail(thumbnailUrl);
-      }
-
-      const messageOptions: any = { embeds: [embed] };
-      if (roleId) {
-        messageOptions.content = `<@&${roleId}>`;
-      }
-
-      const sent = await announcementChannel.send(messageOptions);
-      return sent.id;
-    } catch (error) {
-      console.error('[DISCORD] Erreur envoi annonce:', error);
-      return undefined;
-    }
+  static async getGuildBannerUrl(client: BotClient): Promise<string | null> {
+    const guild = await client.guilds.fetch(getGuildId());
+    return guild.bannerURL({ size: 4096 }) ?? null;
   }
 
-  static async deleteAnnouncementMessage(client: BotClient, event: PartyEvent): Promise<void> {
-    try {
-      if (!event.discord.announcementChannelId || !event.discord.announcementMessageId) return;
-      const { guild } = await this.getGuildAndChannel(client, event.discord.channelId);
-      const channel = await guild.channels.fetch(event.discord.announcementChannelId);
-      if (!channel?.isTextBased()) return;
-      const msg = await (channel as any).messages.fetch(event.discord.announcementMessageId).catch(() => null);
-      if (msg) await msg.delete().catch(() => {});
-    } catch (error) {
-      console.error('[DISCORD] Erreur suppression annonce:', error);
-    }
+  static async setGuildBanner(client: BotClient, imageUrl: string): Promise<void> {
+    const guild = await client.guilds.fetch(getGuildId());
+    const response = await fetch(imageUrl);
+    if (!response.ok) throw new DiscordError(`Impossible de télécharger l'image du banner: ${imageUrl}`);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    await guild.edit({ banner: `data:image/png;base64,${buffer.toString('base64')}` });
   }
 
-  private static formatParticipants(participants: string[], maxSlots: number): { count: string; list: string } {
-    const count = `${participants.length}/${maxSlots}`;
-    const list = participants.length > 0 
-      ? participants.map(userId => `<@${userId}>`).join('\n')
-      : 'Aucun participant pour le moment';
-    
-    return { count, list };
+  static async restoreGuildBanner(client: BotClient, originalBannerUrl: string | null): Promise<void> {
+    const guild = await client.guilds.fetch(getGuildId());
+    if (!originalBannerUrl) {
+      await guild.edit({ banner: null });
+      return;
+    }
+    const response = await fetch(originalBannerUrl);
+    if (!response.ok) return;
+    const buffer = Buffer.from(await response.arrayBuffer());
+    await guild.edit({ banner: `data:image/png;base64,${buffer.toString('base64')}` });
   }
 }

@@ -26,6 +26,7 @@ const ACCENT = 0xdac1ff;
 
 const CHANNEL_KEYS = [
   { key: 'welcome', label: 'Bienvenue', emoji: '👋' },
+  { key: 'commandes', label: 'Commandes', emoji: '⌨️' },
 ] as const;
 
 export const generalPanel: ConfigPanel = {

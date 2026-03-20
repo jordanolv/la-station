@@ -3,7 +3,7 @@ import { PartyRepository } from './party.repository';
 import { DiscordPartyService } from './discord.party.service';
 import { ChatGamingService } from '../../chat-gaming/services/chat-gaming.service';
 import { UserService } from '../../user/services/user.service';
-import { EmbedBuilder } from 'discord.js';
+import { ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags } from 'discord.js';
 import { LogService } from '../../../shared/logs/logs.service';
 import { NotFoundError } from './party.types';
 import { PartyEvent } from '../models/party-event.model';
@@ -24,7 +24,6 @@ export interface CreateEventInput {
   channelId: string;
   createdBy: string;
   chatGamingGameId?: string;
-  announcementChannelId?: string;
 }
 
 export interface EndEventInput {
@@ -52,7 +51,7 @@ export class PartyService {
     try {
       await DiscordPartyService.addUserToThread(client, event, userId);
       const updated = await this.repo.addParticipant(event._id.toString(), userId);
-      const embed = DiscordPartyService.createEventEmbed(updated, updated.discord.roleId);
+      const embed = DiscordPartyService.createEventContainer(updated, updated.discord.roleId);
       await DiscordPartyService.updateEventMessage(client, updated, embed);
 
       const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
@@ -71,7 +70,7 @@ export class PartyService {
     try {
       await DiscordPartyService.removeUserFromThread(client, event, userId);
       const updated = await this.repo.removeParticipant(event._id.toString(), userId);
-      const embed = DiscordPartyService.createEventEmbed(updated, updated.discord.roleId);
+      const embed = DiscordPartyService.createEventContainer(updated, updated.discord.roleId);
       await DiscordPartyService.updateEventMessage(client, updated, embed);
 
       const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
@@ -120,26 +119,53 @@ export class PartyService {
     }
 
     const { channel } = await DiscordPartyService.getGuildAndChannel(client, event.discord.channelId);
-    const embed = DiscordPartyService.createEventEmbed(event, roleId);
+    const embed = DiscordPartyService.createEventContainer(event, roleId);
     const { messageId, threadId } = await DiscordPartyService.publishEventMessage(channel as any, event, embed);
     const updated = await this.repo.updateDiscordInfo(event._id.toString(), messageId, threadId, roleId);
-
-    if (data.announcementChannelId) {
-      const threadUrl = `https://discord.com/channels/${getGuildId()}/${threadId}`;
-      let gameImageUrl: string | undefined;
-      if (event.chatGamingGameId) {
-        const chatGame = await ChatGamingService.getGameById(event.chatGamingGameId);
-        gameImageUrl = chatGame?.image;
-      }
-      const announcementMessageId = await DiscordPartyService.sendAnnouncementMessage(client, updated, data.announcementChannelId, threadUrl, roleId, gameImageUrl);
-      if (announcementMessageId) {
-        await this.repo.updateDiscordInfo(updated._id.toString(), undefined, undefined, undefined, announcementMessageId, data.announcementChannelId);
-      }
-    }
 
     const logMessage = `**${updated.eventInfo.name}** — ${updated.eventInfo.game}\n` +
       `👤 <@${data.createdBy}> · 📅 <t:${Math.floor(data.dateTime.getTime() / 1000)}:F> · 👥 ${data.maxSlots} places`;
     await LogService.success(client, logMessage, { feature: 'party', title: 'Soirée créée' });
+
+    return updated;
+  }
+
+  static async updateEventImage(client: BotClient, eventId: string, imageUrl: string): Promise<PartyEvent> {
+    const event = await this.repo.findById(eventId);
+    if (!event) throw new NotFoundError('Événement non trouvé');
+
+    const updated = await this.repo.update(eventId, { 'eventInfo.image': imageUrl } as any);
+    const embed = DiscordPartyService.createEventContainer(updated, updated.discord.roleId);
+    await DiscordPartyService.updateEventMessage(client, updated, embed);
+
+    return updated;
+  }
+
+  static async startEvent(client: BotClient, eventId: string): Promise<PartyEvent> {
+    const event = await this.repo.findById(eventId);
+    if (!event) throw new NotFoundError('Événement non trouvé');
+
+    if (event.eventInfo.image) {
+      try {
+        const appConfig = await AppConfigModel.findOne({});
+        if (appConfig) {
+          appConfig.config.originalBannerUrl = await DiscordPartyService.getGuildBannerUrl(client) ?? undefined;
+          await appConfig.save();
+        }
+        await DiscordPartyService.setGuildBanner(client, event.eventInfo.image);
+      } catch (err) {
+        console.error('[Party] Erreur changement banner:', err);
+      }
+    }
+
+    const updated = await this.repo.update(eventId, {
+      status: 'started',
+      startedAt: new Date(),
+    });
+
+    const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
+      `🟢 Soirée démarrée · ${event.participants.length} inscrits`;
+    await LogService.success(client, logMessage, { feature: 'party', title: 'Soirée démarrée' });
 
     return updated;
   }
@@ -157,7 +183,13 @@ export class PartyService {
     if (!event) throw new NotFoundError('Événement non trouvé');
     await Promise.all([
       DiscordPartyService.deleteThread(client, event),
-      DiscordPartyService.deleteAnnouncementMessage(client, event),
+      AppConfigModel.findOne({}).then(async appConfig => {
+        if (appConfig?.config.originalBannerUrl !== undefined) {
+          await DiscordPartyService.restoreGuildBanner(client, appConfig.config.originalBannerUrl ?? null);
+          appConfig.config.originalBannerUrl = undefined;
+          await appConfig.save();
+        }
+      }).catch(err => console.error('[Party] Erreur restauration banner:', err)),
     ]);
     await this.repo.delete(eventId);
 
@@ -180,6 +212,17 @@ export class PartyService {
 
     if (data.attendedParticipants.length > 0) {
       await this.distributeRewards(client, updated, data.attendedParticipants, data.rewardAmount ?? 0, data.xpAmount ?? 0);
+    }
+
+    try {
+      const appConfig = await AppConfigModel.findOne({});
+      if (appConfig?.config.originalBannerUrl !== undefined) {
+        await DiscordPartyService.restoreGuildBanner(client, appConfig.config.originalBannerUrl ?? null);
+        appConfig.config.originalBannerUrl = undefined;
+        await appConfig.save();
+      }
+    } catch (err) {
+      console.error('[Party] Erreur restauration banner:', err);
     }
 
     await DiscordPartyService.removeAllReactions(client, updated);
@@ -208,7 +251,7 @@ export class PartyService {
     rewardAmount: number,
     xpAmount: number,
   ): Promise<void> {
-    for (const participantId of attendedParticipants) {
+    await Promise.all(attendedParticipants.map(async participantId => {
       try {
         let user = await UserModel.findOne({ discordId: participantId });
         if (!user) {
@@ -217,21 +260,21 @@ export class PartyService {
           user = await UserService.createUser(discordUser, guild);
         }
 
-        if (rewardAmount > 0) {
-          user.profil.money += rewardAmount;
-          await user.save();
-        }
+        await UserModel.findOneAndUpdate(
+          { discordId: participantId },
+          {
+            ...(rewardAmount > 0 && { $inc: { 'profil.money': rewardAmount } }),
+            $inc: { 'stats.partyParticipated': 1 },
+          },
+        );
 
         if (xpAmount > 0) {
-          const mockMessage = { guild: { id: getGuildId() }, author: { id: participantId }, react: () => Promise.resolve() };
-          await LevelingService.giveXpToUser(client, mockMessage as any, xpAmount);
+          await LevelingService.giveXpDirectly(client, participantId, xpAmount);
         }
-
-        await UserModel.findOneAndUpdate({ discordId: participantId }, { $inc: { 'stats.partyParticipated': 1 } });
       } catch (err) {
         console.error(`[Party] Erreur distribution ${participantId}:`, err);
       }
-    }
+    }));
 
     await this.sendRewardsEmbed(client, event, attendedParticipants, rewardAmount, xpAmount);
   }
@@ -248,21 +291,40 @@ export class PartyService {
       const thread = await client.channels.fetch(event.discord.threadId);
       if (!thread?.isThread()) return;
 
-      const embed = new EmbedBuilder()
-        .setTitle('🎉 Merci d\'avoir participé !')
-        .setDescription(`La soirée **${event.eventInfo.name}** est terminée !`)
-        .setColor((event.eventInfo.color as any) || '#FF6B6B')
-        .addFields({ name: '👥 Participants présents', value: attendedParticipants.map(id => `<@${id}>`).join(', ') || 'Aucun' })
-        .setTimestamp();
+      const color = event.eventInfo.color
+        ? parseInt(event.eventInfo.color.replace('#', ''), 16)
+        : 0xFF6B6B;
 
-      if (moneyPerParticipant > 0) {
-        embed.addFields({ name: '💰 Argent', value: `**${moneyPerParticipant}** 💰 / personne`, inline: true });
-      }
-      if (xpPerParticipant > 0) {
-        embed.addFields({ name: '⭐ XP', value: `**${xpPerParticipant}** XP / personne`, inline: true });
+      const participantList = attendedParticipants.length > 0
+        ? attendedParticipants.map(id => `<@${id}>`).join(', ')
+        : '*Aucun*';
+
+      const rewardParts: string[] = [];
+      if (moneyPerParticipant > 0) rewardParts.push(`💰 **${moneyPerParticipant}** / personne`);
+      if (xpPerParticipant > 0) rewardParts.push(`⭐ **${xpPerParticipant} XP** / personne`);
+
+      const container = new ContainerBuilder()
+        .setAccentColor(color)
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`# 🎉 Merci d'avoir participé !\nLa soirée **${event.eventInfo.name}** est terminée !`),
+        )
+        .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`### 👥 Présents\n${participantList}`),
+        );
+
+      if (rewardParts.length > 0) {
+        container
+          .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
+          .addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(rewardParts.join('　·　')),
+          );
       }
 
-      await thread.send({ embeds: [embed] });
+      await thread.send({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+      } as any);
     } catch (err) {
       console.error('[Party] Erreur embed rewards:', err);
     }
