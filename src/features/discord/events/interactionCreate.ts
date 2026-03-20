@@ -24,6 +24,7 @@ import {
   panelRegistry,
 } from '../../config-panel/services/config-panel.registry';
 import { MONEY_MODAL_PREFIX } from '../../admin/slash/money';
+import { EMBED_EDIT_MODAL_PREFIX } from '../../admin/slash/embed';
 import { handlePackButton } from '../../mountain/slash/subcommands/pack';
 import { MountainSpawnService, SPAWN_BUTTON_PREFIX } from '../../mountain/services/mountain-spawn.service';
 import {
@@ -219,6 +220,9 @@ export default {
           await handleBetSetupModal(interaction, client);
         } else if (interaction.customId.startsWith('bet:place_modal:')) {
           await handleBetPlaceModal(interaction, client);
+        } else if (interaction.customId.startsWith(EMBED_EDIT_MODAL_PREFIX)) {
+          const embedCommand = client.slashCommands.get('embed');
+          if (embedCommand?.handleEditModal) await embedCommand.handleEditModal(interaction, client);
         }
       }
     } catch (error) {
