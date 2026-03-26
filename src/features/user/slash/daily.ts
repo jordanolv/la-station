@@ -1,16 +1,30 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import UserModel from '../models/user.model';
+import { UserMountainsRepository } from '../../mountain/repositories/user-mountains.repository';
 
-// Configuration des récompenses maximales
 const MAX_MONEY = 100;
 const MAX_XP = 100;
 
-/**
- * Génère un nombre aléatoire entre 0 et max (inclus)
- */
+const PACK_CHANCES = [
+  { packs: 0, weight: 40 },
+  { packs: 1, weight: 40 },
+  { packs: 2, weight: 15 },
+  { packs: 3, weight: 5  },
+];
+
 function randomUpTo(max: number): number {
   return Math.floor(Math.random() * (max + 1));
+}
+
+function rollPacks(): number {
+  const roll = Math.random() * 100;
+  let cumulative = 0;
+  for (const { packs, weight } of PACK_CHANCES) {
+    cumulative += weight;
+    if (roll < cumulative) return packs;
+  }
+  return 0;
 }
 
 export default {
@@ -56,9 +70,9 @@ export default {
         }
       }
 
-      // Générer des récompenses aléatoires entre 0 et max
       const moneyReward = randomUpTo(MAX_MONEY);
       const xpReward = randomUpTo(MAX_XP);
+      const packsReward = rollPacks();
 
       user = await UserModel.findOneAndUpdate(
         { discordId: interaction.user.id },
@@ -81,23 +95,36 @@ export default {
         return;
       }
 
-      // Créer l'embed de réponse
+      if (packsReward > 0) {
+        await UserMountainsRepository.addTickets(interaction.user.id, packsReward);
+      }
+
+      const fields = [
+        {
+          name: '💰 Argent',
+          value: `+${moneyReward} 💵\nTotal: **${user.profil.money}** 💵`,
+          inline: true
+        },
+        {
+          name: '⭐ Expérience',
+          value: `+${xpReward} XP\nTotal: **${user.profil.exp}** XP`,
+          inline: true
+        },
+      ];
+
+      if (packsReward > 0) {
+        fields.push({
+          name: '🎟️ Packs',
+          value: `+${packsReward} ticket${packsReward > 1 ? 's' : ''} de pack`,
+          inline: true
+        });
+      }
+
       const embed = new EmbedBuilder()
         .setColor('#4CAF50')
         .setTitle('🎁 Récompense Quotidienne')
         .setDescription(`Vous avez réclamé votre récompense quotidienne !`)
-        .addFields(
-          {
-            name: '💰 Argent',
-            value: `+${moneyReward} 💵\nTotal: **${user.profil.money}** 💵`,
-            inline: true
-          },
-          {
-            name: '⭐ Expérience',
-            value: `+${xpReward} XP\nTotal: **${user.profil.exp}** XP`,
-            inline: true
-          }
-        )
+        .addFields(...fields)
         .setFooter({
           text: `Revenez demain pour plus de récompenses !`,
           iconURL: interaction.user.displayAvatarURL()
