@@ -18,6 +18,9 @@ export class MountainConfig {
 
   @prop()
   lastSpawnWinnerId?: string;
+
+  @prop()
+  activeSpawnMessageId?: string;
 }
 
 const MountainConfigModel = getModelForClass(MountainConfig, {

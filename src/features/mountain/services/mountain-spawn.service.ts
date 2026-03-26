@@ -19,7 +19,6 @@ const LOG_FEATURE = '⛰️ Mountain Spawn';
 export const SPAWN_BUTTON_PREFIX = 'mountain:spawn:claim';
 
 export class MountainSpawnService {
-  private static claimedSpawns = new Set<string>();
   private static lastSpawnWinnerId: string | null = null;
 
   static async rehydrate(client: BotClient): Promise<void> {
@@ -27,21 +26,23 @@ export class MountainSpawnService {
     if (config?.lastSpawnWinnerId) {
       this.lastSpawnWinnerId = config.lastSpawnWinnerId;
     }
-    const pending = (config?.spawnSchedule ?? []).filter(d => new Date(d) > new Date());
-    if (pending.length === 0) return;
+
+    const pending = (config?.spawnSchedule ?? [])
+      .map(d => new Date(d))
+      .filter(d => d.getTime() > Date.now());
 
     const now = Date.now();
     for (const date of pending) {
-      const delay = new Date(date).getTime() - now;
-      if (delay > 0) {
-        setTimeout(() => MountainSpawnService.doSpawn(client), delay);
-      }
+      const delay = date.getTime() - now;
+      if (delay > 0) setTimeout(() => MountainSpawnService.doSpawn(client), delay);
     }
 
-    LogService.info(client,
-      `**${pending.length}** spawn(s) en attente réhydraté(s)`,
-      { feature: LOG_FEATURE, title: '🔄 Réhydratation' },
-    ).catch(() => {});
+    if (pending.length > 0) {
+      LogService.info(client,
+        `**${pending.length}** spawn(s) en attente réhydraté(s)`,
+        { feature: LOG_FEATURE, title: '🔄 Réhydratation' },
+      ).catch(() => {});
+    }
   }
 
   static async doSpawn(client: BotClient): Promise<void> {
@@ -81,7 +82,8 @@ export class MountainSpawnService {
         .setStyle(ButtonStyle.Success),
     );
 
-    await (channel as TextChannel).send({ embeds: [embed], components: [row] });
+    const message = await (channel as TextChannel).send({ embeds: [embed], components: [row] });
+    await MountainConfigRepository.setActiveSpawnMessage(message.id);
 
     await LogService.info(client,
       `Spawn montagne : **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})`,
@@ -93,22 +95,23 @@ export class MountainSpawnService {
     const messageId = interaction.message.id;
     const userId = interaction.user.id;
 
-    if (this.claimedSpawns.has(messageId)) {
-      await interaction.reply({ content: '❌ Cette montagne a déjà été revendiquée !', flags: MessageFlags.Ephemeral }).catch(() => {});
-      return;
-    }
     if (this.lastSpawnWinnerId === userId) {
       await interaction.reply({ content: '❌ Tu as gagné le dernier spawn ! Laisse une chance aux autres.', flags: MessageFlags.Ephemeral }).catch(() => {});
       return;
     }
 
-    this.claimedSpawns.add(messageId);
+    // Claim atomique en BDD — seul le premier à trouver activeSpawnMessageId réussit
+    const claimed = await MountainConfigRepository.claimSpawn(messageId);
+    if (!claimed) {
+      await interaction.reply({ content: '❌ Cette montagne a déjà été revendiquée !', flags: MessageFlags.Ephemeral }).catch(() => {});
+      return;
+    }
+
     this.lastSpawnWinnerId = userId;
 
     const mountainId = interaction.customId.split(':')[3];
     const mountain = MountainService.getById(mountainId);
     if (!mountain) {
-      this.claimedSpawns.delete(messageId);
       await interaction.reply({ content: '❌ Montagne introuvable.', flags: MessageFlags.Ephemeral }).catch(() => {});
       return;
     }

@@ -1,5 +1,5 @@
 import { CronJob } from 'cron';
-import { toZonedTime } from 'date-fns-tz';
+
 import { BotClient } from '../../../bot/client';
 import { MountainSpawnService } from '../services/mountain-spawn.service';
 import { SPAWN_MAX_PER_DAY, SPAWN_HOUR_START, SPAWN_HOUR_END } from '../constants/mountain.constants';
@@ -33,23 +33,7 @@ export class MountainSpawnCron {
       chalk.yellow('   ├─ 🌄 Mountain Spawn') +
         chalk.gray(` • minuit ${TZ}, max ${SPAWN_MAX_PER_DAY} spawn(s)/jour, fenêtre ${SPAWN_HOUR_START}h-${SPAWN_HOUR_END}h`),
     );
-    this.resumeOrPlanToday().catch(() => {});
-  }
-
-  private async resumeOrPlanToday(): Promise<void> {
-    const config = await MountainConfigRepository.get();
-    const schedule = config?.spawnSchedule ?? [];
-    const nowParis = toZonedTime(new Date(), TZ);
-    const todayStart = new Date(nowParis.getFullYear(), nowParis.getMonth(), nowParis.getDate(), 0, 0, 0);
-
-    const todayDates = schedule.map((d) => new Date(d)).filter((d) => d >= todayStart);
-
-    if (todayDates.length === 0) {
-      await this.planDay();
-    } else {
-      const remaining = todayDates.filter((d) => d.getTime() > Date.now());
-      this.scheduleFromDates(remaining);
-    }
+    // La réhydratation est gérée par MountainSpawnService.rehydrate() dans ready.ts
   }
 
   public stop(): void {
@@ -57,6 +41,20 @@ export class MountainSpawnCron {
   }
 
   private async planDay(): Promise<void> {
+    // Vérifie qu'un schedule n'a pas déjà été posé (ex: reboot à minuit pile)
+    const config = await MountainConfigRepository.get();
+    const now = Date.now();
+    const todayStart = (() => {
+      const { toZonedTime } = require('date-fns-tz');
+      const p = toZonedTime(new Date(), TZ);
+      return new Date(p.getFullYear(), p.getMonth(), p.getDate(), 0, 0, 0).getTime();
+    })();
+    const alreadyScheduled = (config?.spawnSchedule ?? [])
+      .map((d: Date) => new Date(d).getTime())
+      .some((t: number) => t >= todayStart && t > now);
+
+    if (alreadyScheduled) return;
+
     const count = Math.floor(Math.random() * (SPAWN_MAX_PER_DAY + 1));
     const dates = generateSpawnDates(count);
 
