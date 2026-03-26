@@ -49,6 +49,7 @@ import {
   handleDraftUserSelect,
   handleDraftStringSelect,
 } from '../../draft/events/draft-interactions';
+import { QuizService, QUIZ_BUTTON_PREFIX } from '../../quiz/services/quiz.service';
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
 async function routeToPanelSelectMenu(
@@ -141,6 +142,8 @@ export default {
           await handleBetButton(interaction, client);
         } else if (interaction.customId.startsWith('draft:')) {
           await handleDraftButton(interaction, client);
+        } else if (interaction.customId.startsWith(QUIZ_BUTTON_PREFIX + ':')) {
+          await QuizService.handleAnswer(client, interaction);
         }
       }
 

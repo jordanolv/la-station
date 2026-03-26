@@ -1,0 +1,314 @@
+[
+  {
+    "id": "q001",
+    "question": "Quelle est la plus haute montagne du monde ?",
+    "choices": [
+      "Mont Blanc",
+      "K2",
+      "Everest",
+      "Kangchenjunga"
+    ],
+    "answer": 2,
+    "explanation": "L'Everest culmine à 8 848 m, c'est le plus haut sommet du monde."
+  },
+  {
+    "id": "q001",
+    "question": "Quelle est la plus longue chaîne de montagnes du monde ?",
+    "choices": [
+      "Les montagnes Rocheuses",
+      "L'Himalaya",
+      "La cordillère des Andes",
+      "Les Alpes"
+    ],
+    "answer": 2,
+    "explanation": "La cordillère des Andes, en Amérique du Sud, s'étend sur environ 7 000 km, ce qui en fait la plus longue chaîne de montagnes continentale au monde."
+  },
+  {
+    "id": "q002",
+    "question": "Quel est le plus haut sommet des Alpes ?",
+    "choices": [
+      "Le mont Cervin",
+      "Le mont Blanc",
+      "Le mont Elbrouz",
+      "Le Grossglockner"
+    ],
+    "answer": 1,
+    "explanation": "Le mont Blanc culmine à 4 805 mètres, c'est le point culminant de la chaîne des Alpes."
+  },
+  {
+    "id": "q003",
+    "question": "Quel fleuve a creusé le Grand Canyon aux États-Unis ?",
+    "choices": [
+      "Le Mississippi",
+      "Le Colorado",
+      "Le Rio Grande",
+      "Le Missouri"
+    ],
+    "answer": 1,
+    "explanation": "Le Grand Canyon a été sculpté au fil de millions d'années par le fleuve Colorado, dans l'État de l'Arizona."
+  },
+  {
+    "id": "q004",
+    "question": "Quel pays possède le plus grand nombre de volcans actifs au monde ?",
+    "choices": [
+      "Le Japon",
+      "L'Islande",
+      "L'Indonésie",
+      "L'Italie"
+    ],
+    "answer": 2,
+    "explanation": "Située sur la ceinture de feu du Pacifique, l'Indonésie compte près de 130 volcans actifs."
+  },
+  {
+    "id": "q005",
+    "question": "Qu'est-ce qu'un fjord d'un point de vue géographique ?",
+    "choices": [
+      "Un lac d'origine volcanique",
+      "Une ancienne vallée glaciaire envahie par la mer",
+      "Un canyon situé en plein désert",
+      "Une rivière souterraine"
+    ],
+    "answer": 1,
+    "explanation": "Un fjord se forme lorsqu'un glacier se retire et que la mer s'engouffre dans la vallée en forme de U qu'il a creusée."
+  },
+  {
+    "id": "q006",
+    "question": "Quel est le point le plus profond des océans ?",
+    "choices": [
+      "La fosse des Kouriles",
+      "La fosse de Tonga",
+      "La fosse des Mariannes",
+      "La fosse de Porto Rico"
+    ],
+    "answer": 2,
+    "explanation": "La fosse des Mariannes, dans l'océan Pacifique, descend à près de 11 000 mètres de profondeur."
+  },
+  {
+    "id": "q007",
+    "question": "Quelle est la plus haute montagne d'Afrique ?",
+    "choices": [
+      "Le mont Kenya",
+      "Le Kilimandjaro",
+      "Le massif de l'Atlas",
+      "Le mont Rwenzori"
+    ],
+    "answer": 1,
+    "explanation": "Le Kilimandjaro, situé en Tanzanie, est un volcan inactif qui culmine à 5 895 mètres d'altitude."
+  },
+  {
+    "id": "q008",
+    "question": "Quel est le plus petit pays du monde en termes de superficie ?",
+    "choices": [
+      "Monaco",
+      "Nauru",
+      "Tuvalu",
+      "Le Vatican"
+    ],
+    "answer": 3,
+    "explanation": "Le Vatican est un État indépendant situé au cœur de Rome, avec une superficie d'environ 0,44 kilomètre carré."
+  },
+  {
+    "id": "q009",
+    "question": "Quel est le plus long fleuve du continent africain ?",
+    "choices": [
+      "Le Congo",
+      "Le Niger",
+      "Le Nil",
+      "Le Zambèze"
+    ],
+    "answer": 2,
+    "explanation": "Le Nil parcourt environ 6 650 km avant de se jeter dans la mer Méditerranée, ce qui en fait l'un des plus longs fleuves du monde."
+  },
+  {
+    "id": "q010",
+    "question": "Sur quel continent se trouve le désert d'Atacama, considéré comme le plus aride du monde ?",
+    "choices": [
+      "L'Afrique",
+      "L'Asie",
+      "L'Amérique du Sud",
+      "L'Océanie"
+    ],
+    "answer": 2,
+    "explanation": "Le désert d'Atacama se trouve au Chili, en Amérique du Sud. Certaines de ses régions n'ont pas connu de pluie depuis des décennies."
+  },
+  {
+    "id": "q011",
+    "question": "Quel est le plus haut sommet d'Amérique du Nord ?",
+    "choices": [
+      "Le mont Logan",
+      "Le Denali (mont McKinley)",
+      "Le mont Whitney",
+      "Le mont Elbert"
+    ],
+    "answer": 1,
+    "explanation": "Le Denali, situé en Alaska, culmine à 6 190 mètres, ce qui en fait le point culminant de l'Amérique du Nord."
+  },
+  {
+    "id": "q012",
+    "question": "Quelle chaîne de montagnes marque traditionnellement la frontière entre l'Europe et l'Asie ?",
+    "choices": [
+      "Les Carpates",
+      "Le Caucase",
+      "L'Oural",
+      "L'Altaï"
+    ],
+    "answer": 2,
+    "explanation": "Les monts Oural, situés en Russie, sont considérés comme la frontière géographique naturelle entre l'Europe et l'Asie."
+  },
+  {
+    "id": "q013",
+    "question": "Quelle est la montagne la plus célèbre et la plus haute du Japon ?",
+    "choices": [
+      "Le mont Kita",
+      "Le mont Tate",
+      "Le mont Yari",
+      "Le mont Fuji"
+    ],
+    "answer": 3,
+    "explanation": "Le mont Fuji est un stratovolcan emblématique du Japon, culminant à 3 776 mètres."
+  },
+  {
+    "id": "q014",
+    "question": "Quelles montagnes forment une frontière naturelle entre la France et l'Espagne ?",
+    "choices": [
+      "Les Alpes",
+      "Les Pyrénées",
+      "Le Massif central",
+      "Le Jura"
+    ],
+    "answer": 1,
+    "explanation": "Les Pyrénées s'étendent sur environ 430 km entre la mer Méditerranée et l'océan Atlantique, séparant la France de la péninsule Ibérique."
+  },
+  {
+    "id": "q015",
+    "question": "Quel est le plus haut sommet de l'Antarctique ?",
+    "choices": [
+      "Le mont Erebus",
+      "Le massif Vinson",
+      "Le mont Tyree",
+      "Le mont Sidley"
+    ],
+    "answer": 1,
+    "explanation": "Le massif Vinson (ou mont Vinson) est le point culminant de l'Antarctique, avec une altitude de 4 892 mètres."
+  },
+  {
+    "id": "q016",
+    "question": "Quelle est la deuxième plus haute montagne du monde ?",
+    "choices": [
+      "Le K2",
+      "Le Kangchenjunga",
+      "Le Lhotse",
+      "Le Makalu"
+    ],
+    "answer": 0,
+    "explanation": "Le K2, situé à la frontière entre la Chine et le Pakistan, culmine à 8 611 mètres, juste derrière l'Everest."
+  },
+  {
+    "id": "q017",
+    "question": "Dans quelle chaîne de montagnes se trouve le mont Elbrouz ?",
+    "choices": [
+      "Les Alpes",
+      "Le Caucase",
+      "L'Oural",
+      "Le Pamir"
+    ],
+    "answer": 1,
+    "explanation": "Le mont Elbrouz se trouve dans le Caucase, en Russie, et culmine à 5 642 m, ce qui en fait le plus haut sommet d'Europe."
+  },
+  {
+    "id": "q018",
+    "question": "Quelle chaîne de montagnes ancienne longe la côte est des États-Unis ?",
+    "choices": [
+      "Les montagnes Rocheuses",
+      "La chaîne des Cascades",
+      "Les Appalaches",
+      "La Sierra Nevada"
+    ],
+    "answer": 2,
+    "explanation": "Les Appalaches sont une très ancienne chaîne de montagnes qui s'étend de Terre-Neuve (Canada) jusqu'au centre de l'Alabama (États-Unis)."
+  },
+  {
+    "id": "q019",
+    "question": "Quel sommet d'Amérique du Sud est le point culminant en dehors de l'Asie ?",
+    "choices": [
+      "L'Aconcagua",
+      "L'Ojos del Salado",
+      "Le Huascarán",
+      "Le Chimborazo"
+    ],
+    "answer": 0,
+    "explanation": "L'Aconcagua, situé en Argentine, culmine à 6 960 mètres, c'est le plus haut sommet des Amériques et du monde hors Asie."
+  },
+  {
+    "id": "q020",
+    "question": "Quelle montagne, si l'on mesure de sa base sous-marine à son sommet, est la plus haute du monde ?",
+    "choices": [
+      "L'Everest",
+      "Le Mauna Loa",
+      "Le Mauna Kea",
+      "Le Teide"
+    ],
+    "answer": 2,
+    "explanation": "Le Mauna Kea à Hawaï dépasse les 10 000 mètres de hauteur totale si l'on compte sa partie immergée sous l'océan Pacifique."
+  },
+  {
+    "id": "q021",
+    "question": "Dans quel pays se trouve le massif du Drakensberg ?",
+    "choices": [
+      "En Éthiopie",
+      "Au Kenya",
+      "Au Maroc",
+      "En Afrique du Sud"
+    ],
+    "answer": 3,
+    "explanation": "Le Drakensberg (la « montagne du Dragon ») est la plus haute chaîne de montagnes d'Afrique du Sud."
+  },
+  {
+    "id": "q022",
+    "question": "Quelle est la capitale la plus haute du monde ?",
+    "choices": [
+      "Katmandou (Népal)",
+      "Lhassa (Tibet, Chine)",
+      "Quito (Équateur)",
+      "La Paz (Bolivie)"
+    ],
+    "answer": 3,
+    "explanation": "La Paz en Bolivie se trouve à une altitude moyenne de 3 650 mètres, ce qui en fait la capitale administrative la plus haute du monde."
+  },
+  {
+    "id": "q023",
+    "question": "Où se trouve la cordillère de l'Atlas ?",
+    "choices": [
+      "Au Moyen-Orient",
+      "En Afrique du Nord",
+      "En Europe de l'Est",
+      "En Asie centrale"
+    ],
+    "answer": 1,
+    "explanation": "Le massif de l'Atlas s'étend sur le Maroc, l'Algérie et la Tunisie en Afrique du Nord."
+  },
+  {
+    "id": "q024",
+    "question": "Quelle montagne grecque était considérée comme le domaine des dieux dans la mythologie ?",
+    "choices": [
+      "Le mont Parnasse",
+      "Le mont Olympe",
+      "Le mont Athos",
+      "Le mont Pélion"
+    ],
+    "answer": 1,
+    "explanation": "Le mont Olympe, point culminant de la Grèce (2 917 m), était le lieu de résidence des douze dieux olympiens."
+  },
+  {
+    "id": "q025",
+    "question": "Comment s'appelle le plus grand lac de montagne du monde, situé dans les Andes ?",
+    "choices": [
+      "Le lac Titicaca",
+      "Le lac Poopó",
+      "Le lac Maracaibo",
+      "Le lac de cratère Quilotoa"
+    ],
+    "answer": 0,
+    "explanation": "À environ 3 812 mètres d'altitude, le lac Titicaca (entre le Pérou et la Bolivie) est souvent considéré comme le plus haut lac navigable au monde."
+  }
+]
