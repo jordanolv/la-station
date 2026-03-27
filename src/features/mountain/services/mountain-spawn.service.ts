@@ -38,8 +38,9 @@ export class MountainSpawnService {
     }
 
     if (pending.length > 0) {
+      const lines = pending.map(d => `• <t:${Math.floor(d.getTime() / 1000)}:T> (<t:${Math.floor(d.getTime() / 1000)}:R>)`);
       LogService.info(client,
-        `**${pending.length}** spawn(s) en attente réhydraté(s)`,
+        `**${pending.length}** spawn(s) réhydraté(s) :\n${lines.join('\n')}`,
         { feature: LOG_FEATURE, title: '🔄 Réhydratation' },
       ).catch(() => {});
     }
