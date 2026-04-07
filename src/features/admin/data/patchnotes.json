@@ -121,5 +121,59 @@
         ]
       }
     ]
+  },
+  {
+    "version": "1.3.0",
+    "timestamp": 1775642400,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🎮  Groupes — `/group`",
+            "items": [
+              "Nouveau système pour trouver des coéquipiers, remplace l'ancien LFM",
+              "Sélectionnez le jeu, le type de partie (Casual / Ranked / Privé), le mode et le rank minimum",
+              "Ajoutez une description ou une heure de session depuis le menu de création",
+              "Le groupe est posté dans le channel courant avec le tag du rôle de notif correspondant",
+              "Boutons **Rejoindre**, **Quitter** et **Fermer** (créateur uniquement) directement sur le post",
+              "**`/group-notifs`** : activez ou désactivez les pings par jeu en un clic"
+            ]
+          },
+          {
+            "title": "🧠  Quiz quotidien",
+            "items": [
+              "Un quiz de géographie ou sur les montagnes est posté chaque jour",
+              "Soyez le premier à répondre correctement pour gagner des **tickets de pack**"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "🎂  Anniversaires",
+            "items": [
+              "Refonte visuelle complète avec votre avatar et un message personnalisé",
+              "Des cadeaux sont offerts le jour J : argent et tickets de pack",
+              "La date d'anniversaire est désormais **verrouillée** une fois définie"
+            ]
+          },
+          {
+            "title": "🎁  Récompense quotidienne `/daily`",
+            "items": [
+              "Le `/daily` inclut désormais une chance de recevoir des **tickets de pack**"
+            ]
+          },
+          {
+            "title": "🎉  Soirées",
+            "items": [
+              "Refonte complète du système de soirées avec un nouveau panel de gestion"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
