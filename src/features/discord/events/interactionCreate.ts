@@ -2,6 +2,15 @@ import {
   MessageFlags, ChannelSelectMenuInteraction, Events, Interaction, ModalSubmitInteraction, RoleSelectMenuInteraction, StringSelectMenuInteraction, UserSelectMenuInteraction } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { AppConfigService } from '../services/app-config.service';
+import {
+  handleGroupButton,
+  handleGroupSelectMenu,
+  handleGroupDescModal,
+  handleGroupTimeModal,
+  GROUP_BUTTON_PREFIX,
+} from '../../group/events/group-interactions';
+import { GROUP_DESC_MODAL_PREFIX, GROUP_TIME_MODAL_PREFIX } from '../../group/services/group-ui.service';
+import { GROUP_NOTIFS_SELECT_ID } from '../../group/slash/group-notifs';
 import { handleLFMButtonInteraction, handleLFMAcceptReject } from '../../looking-for-mate/events/lfm-interactions';
 import {
   GAME_SELECT_ID,
@@ -111,7 +120,9 @@ export default {
       }
 
       else if (interaction.isButton()) {
-        if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
+        if (interaction.customId.startsWith(GROUP_BUTTON_PREFIX + ':')) {
+          await handleGroupButton(interaction, client);
+        } else if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
           const parsed = parsePanelCustomId(interaction.customId);
           if (parsed) {
             const panel = panelRegistry.get(parsed.panelId);
@@ -148,7 +159,12 @@ export default {
       }
 
       else if (interaction.isStringSelectMenu()) {
-        if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
+        if (interaction.customId === GROUP_NOTIFS_SELECT_ID) {
+          const groupNotifsCommand = client.slashCommands.get('group-notifs');
+          if (groupNotifsCommand?.handleSelect) await groupNotifsCommand.handleSelect(interaction, client);
+        } else if (interaction.customId.startsWith(GROUP_BUTTON_PREFIX + ':')) {
+          await handleGroupSelectMenu(interaction, client);
+        } else if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
           await routeToPanelSelectMenu(interaction, client);
         } else if (interaction.customId.startsWith('bet:winner:')) {
           await handleBetSelectMenu(interaction, client);
@@ -193,7 +209,11 @@ export default {
       }
 
       else if (interaction.isModalSubmit()) {
-        if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
+        if (interaction.customId.startsWith(GROUP_DESC_MODAL_PREFIX + ':')) {
+          await handleGroupDescModal(interaction);
+        } else if (interaction.customId.startsWith(GROUP_TIME_MODAL_PREFIX + ':')) {
+          await handleGroupTimeModal(interaction);
+        } else if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
           await routeToPanelModal(interaction, client);
         } else if (interaction.customId === PROFILE_MODAL_ID) {
           const profileCommand = client.slashCommands.get('profil');
