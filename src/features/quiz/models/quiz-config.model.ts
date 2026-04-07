@@ -1,14 +1,12 @@
 import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
+import { QuizQuestion } from '../services/quiz.service';
 
 export class QuizConfig {
-  @prop({ type: () => [String], default: [] })
-  usedQuestionIds!: string[];
-
   @prop()
   activeMessageId?: string;
 
-  @prop()
-  activeQuestionId?: string;
+  @prop({ type: Object })
+  activeQuestion?: QuizQuestion;
 
   @prop()
   activeUntil?: Date;

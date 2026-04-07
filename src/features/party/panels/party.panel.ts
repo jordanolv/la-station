@@ -31,6 +31,7 @@ import { AppConfigService } from '../../discord/services/app-config.service';
 import { PartyService } from '../services/party.service';
 import { ChatGamingService } from '../../chat-gaming/services/chat-gaming.service';
 import { PartyDraftService } from '../services/party-draft.service';
+import { uploadFromUrl } from '../../../shared/cloudinary';
 
 const PANEL_ID = 'party';
 
@@ -640,10 +641,15 @@ export const partyPanel: ConfigPanel = {
 
     // ─── Draft : image ────────────────────────────────────────────────────────
     if (modalType === 'modal_draft_image') {
-      const imageUrl = interaction.fields.getUploadedFiles('image')?.first()?.url;
+      const discordUrl = interaction.fields.getUploadedFiles('image')?.first()?.url;
+      await interaction.deferUpdate();
+      let imageUrl: string | undefined;
+      if (discordUrl) {
+        imageUrl = await uploadFromUrl(discordUrl, 'the-ridge/party', `party_${Date.now()}`);
+      }
       const draft = PartyDraftService.update(userId, { image: imageUrl });
-      if (!draft) { await interaction.reply({ content: '❌ Draft expiré, recommence.', flags: MessageFlags.Ephemeral }); return; }
-      await (interaction as any).update(PartyDraftService.buildPreviewMessage(draft));
+      if (!draft) { await interaction.followUp({ content: '❌ Draft expiré, recommence.', flags: MessageFlags.Ephemeral }); return; }
+      await interaction.editReply(PartyDraftService.buildPreviewMessage(draft) as any);
       return;
     }
 
@@ -679,13 +685,14 @@ export const partyPanel: ConfigPanel = {
     // ─── Image soirée existante ───────────────────────────────────────────────
     if (modalType === 'modal_set_image') {
       const eventId = parts[3];
-      const imageUrl = interaction.fields.getUploadedFiles('image')?.first()?.url;
-      if (!imageUrl) {
+      const discordUrl = interaction.fields.getUploadedFiles('image')?.first()?.url;
+      if (!discordUrl) {
         await interaction.reply({ content: '❌ Aucune image reçue.', flags: MessageFlags.Ephemeral });
         return;
       }
       try {
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        const imageUrl = await uploadFromUrl(discordUrl, 'the-ridge/party', `party_${Date.now()}`);
         await PartyService.updateEventImage(client, eventId, imageUrl);
         await interaction.editReply({ content: '✅ Image mise à jour !' });
         await ConfigPanelService.refreshPanel(client, PANEL_ID);

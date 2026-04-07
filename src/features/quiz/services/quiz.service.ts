@@ -8,11 +8,12 @@ import {
   MessageFlags,
   ButtonInteraction,
 } from 'discord.js';
+import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 import { BotClient } from '../../../bot/client';
 import { QuizConfigRepository } from '../repositories/quiz-config.repository';
 import { MountainConfigRepository } from '../../mountain/repositories/mountain-config.repository';
 import { UserMountainsRepository } from '../../mountain/repositories/user-mountains.repository';
-import questions from '../data/questions.json';
+import { QuizGeneratorService } from './quiz-generator.service';
 
 export interface QuizQuestion {
   id: string;
@@ -23,16 +24,17 @@ export interface QuizQuestion {
 }
 
 export const QUIZ_BUTTON_PREFIX = 'quiz:answer';
-const ANSWER_DURATION_MS = 30 * 60 * 1000;
+const REVEAL_HOUR = 19;
+const TZ = 'Europe/Paris';
 const CHOICE_EMOJIS = ['🅰️', '🅱️', '🅲', '🅳'];
 
-export class QuizService {
-  static pickQuestion(usedIds: string[]): QuizQuestion | null {
-    const pool = (questions as QuizQuestion[]).filter(q => !usedIds.includes(q.id));
-    if (pool.length === 0) return null;
-    return pool[Math.floor(Math.random() * pool.length)];
-  }
+function getTodayRevealDate(): Date {
+  const nowParis = toZonedTime(new Date(), TZ);
+  const naive = new Date(nowParis.getFullYear(), nowParis.getMonth(), nowParis.getDate(), REVEAL_HOUR, 0, 0);
+  return fromZonedTime(naive, TZ);
+}
 
+export class QuizService {
   private static async getChannel(client: BotClient): Promise<TextChannel | null> {
     const mountainConfig = await MountainConfigRepository.get();
     const channelId = mountainConfig?.spawnChannelId;
@@ -47,18 +49,18 @@ export class QuizService {
     answers: Record<string, number>,
     disabled = false,
   ) {
-    const correct: string[] = [];
-    const wrong: string[] = [];
-    for (const [userId, choiceIndex] of Object.entries(answers)) {
-      (choiceIndex === question.answer ? correct : wrong).push(`<@${userId}>`);
+    let correct = 0;
+    let wrong = 0;
+    for (const choiceIndex of Object.values(answers)) {
+      choiceIndex === question.answer ? correct++ : wrong++;
     }
 
     const lines = ['## 🏔️ Question du jour', '', `**${question.question}**`];
 
     if (Object.keys(answers).length > 0) {
       lines.push('');
-      if (correct.length > 0) lines.push(`✅ **Bonne réponse**\n${correct.join('  ')}`);
-      if (wrong.length > 0) lines.push(`❌ **Mauvaise réponse**\n${wrong.join('  ')}`);
+      if (correct > 0) lines.push(`✅ **${correct}** bonne${correct > 1 ? 's' : ''} réponse${correct > 1 ? 's' : ''}`);
+      if (wrong > 0) lines.push(`❌ **${wrong}** mauvaise${wrong > 1 ? 's' : ''} réponse${wrong > 1 ? 's' : ''}`);
     }
 
     if (disabled && question.explanation) {
@@ -85,14 +87,10 @@ export class QuizService {
     const channel = await this.getChannel(client);
     if (!channel) return;
 
-    const quizConfig = await QuizConfigRepository.getOrCreate();
-    let question = this.pickQuestion(quizConfig.usedQuestionIds);
-    if (!question) {
-      await QuizConfigRepository.resetUsedQuestions();
-      question = this.pickQuestion([]);
-    }
-    if (!question) return;
+    const existing = await QuizConfigRepository.getOrCreate();
+    if (existing.activeMessageId) return;
 
+    const question = await QuizGeneratorService.generate();
     const { container, row } = this.buildComponents(question, {});
 
     const message = await channel.send({
@@ -100,33 +98,23 @@ export class QuizService {
       flags: MessageFlags.IsComponentsV2,
     });
 
-    const activeUntil = new Date(Date.now() + ANSWER_DURATION_MS);
-    await QuizConfigRepository.setActiveQuestion(message.id, question.id, activeUntil);
-    await QuizConfigRepository.markQuestionUsed(question.id);
-
-    // La révélation est gérée par le cron à 19h
+    await QuizConfigRepository.setActiveQuestion(message.id, question, getTodayRevealDate());
   }
 
   static async rehydrate(client: BotClient): Promise<void> {
     const config = await QuizConfigRepository.getOrCreate();
-    if (!config.activeMessageId || !config.activeQuestionId || !config.activeUntil) return;
-
-    const question = (questions as QuizQuestion[]).find(q => q.id === config.activeQuestionId);
-    if (!question) return;
+    if (!config.activeMessageId || !config.activeQuestion || !config.activeUntil) return;
 
     const remaining = new Date(config.activeUntil).getTime() - Date.now();
     if (remaining <= 0) {
-      await this.reveal(client, config.activeMessageId, question);
+      await this.reveal(client, config.activeMessageId, config.activeQuestion);
     }
-    // Si encore du temps → la révélation sera faite par le cron à 19h
   }
 
   static async revealActive(client: BotClient): Promise<void> {
     const config = await QuizConfigRepository.getOrCreate();
-    if (!config.activeMessageId || !config.activeQuestionId) return;
-    const question = (questions as QuizQuestion[]).find(q => q.id === config.activeQuestionId);
-    if (!question) return;
-    await this.reveal(client, config.activeMessageId, question);
+    if (!config.activeMessageId || !config.activeQuestion) return;
+    await this.reveal(client, config.activeMessageId, config.activeQuestion);
   }
 
   static async reveal(client: BotClient, messageId: string, question: QuizQuestion): Promise<void> {
@@ -152,14 +140,10 @@ export class QuizService {
     const questionId = parts[2];
     const choiceIndex = parseInt(parts[3], 10);
 
-    const question = (questions as QuizQuestion[]).find(q => q.id === questionId);
-    if (!question) {
-      await interaction.reply({ content: '❌ Question introuvable.', flags: 64 });
-      return;
-    }
-
     const config = await QuizConfigRepository.getOrCreate();
-    if (config.activeQuestionId !== questionId) {
+    const question = config.activeQuestion;
+
+    if (!question || question.id !== questionId) {
       await interaction.reply({ content: 'Cette question est déjà terminée.', flags: 64 });
       return;
     }

@@ -101,6 +101,26 @@ export class MountainSpawnService {
       return;
     }
 
+    const mountainId = interaction.customId.split(':')[3];
+    const mountain = MountainService.getById(mountainId);
+    if (!mountain) {
+      await interaction.reply({ content: '❌ Montagne introuvable.', flags: MessageFlags.Ephemeral }).catch(() => {});
+      return;
+    }
+
+    const alreadyOwned = await UserMountainsRepository.isUnlocked(userId, mountainId);
+    if (alreadyOwned) {
+      const rarity = MountainService.getRarity(mountain);
+      const { emoji, label, fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
+      const { newFragments, ticketsGained } = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
+      const ticketLine = ticketsGained > 0 ? `\n→ +${ticketsGained} 🎟️ ticket${ticketsGained > 1 ? 's' : ''}` : '';
+      await interaction.reply({
+        content: `Tu possèdes déjà **${mountain.mountainLabel}** ${emoji} ${label} !\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${ticketLine}`,
+        flags: MessageFlags.Ephemeral,
+      }).catch(() => {});
+      return;
+    }
+
     // Claim atomique en BDD — seul le premier à trouver activeSpawnMessageId réussit
     const claimed = await MountainConfigRepository.claimSpawn(messageId);
     if (!claimed) {
@@ -110,27 +130,11 @@ export class MountainSpawnService {
 
     this.lastSpawnWinnerId = userId;
 
-    const mountainId = interaction.customId.split(':')[3];
-    const mountain = MountainService.getById(mountainId);
-    if (!mountain) {
-      await interaction.reply({ content: '❌ Montagne introuvable.', flags: MessageFlags.Ephemeral }).catch(() => {});
-      return;
-    }
-
     const rarity = MountainService.getRarity(mountain);
     const { emoji, label, color } = RARITY_CONFIG[rarity];
-    const { fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
 
     const result = await UserMountainsRepository.unlock(userId, mountainId, rarity);
-    const isDuplicate = result === null;
-
-    let description: string;
-    if (isDuplicate) {
-      const fragResult = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
-      description = `<@${userId}> a revendiqué **${mountain.mountainLabel}**, mais la possède déjà !\n→ **+${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''}** 🧩 (\`${fragResult.newFragments}/20\`)`;
-    } else {
-      description = `<@${userId}> a revendiqué et débloqué **${mountain.mountainLabel}** ! 🎉\n📊 \`${result!.totalUnlocked}/${MountainService.count}\` montagnes`;
-    }
+    const description = `<@${userId}> a revendiqué et débloqué **${mountain.mountainLabel}** ! 🎉\n📊 \`${result!.totalUnlocked}/${MountainService.count}\` montagnes`;
 
     const disabledRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
@@ -158,7 +162,7 @@ export class MountainSpawnService {
     await interaction.update({ embeds: [updatedEmbed], components: [disabledRow] }).catch(() => {});
 
     await LogService.success(client,
-      `<@${userId}> a revendiqué **${mountain.mountainLabel}** ${emoji} ${label}${isDuplicate ? ' (doublon)' : ''}`,
+      `<@${userId}> a revendiqué **${mountain.mountainLabel}** ${emoji} ${label}`,
       { feature: LOG_FEATURE, title: '🏔️ Spawn revendiqué' },
     );
   }

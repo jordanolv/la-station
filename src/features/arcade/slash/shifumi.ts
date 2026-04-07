@@ -14,9 +14,7 @@ import { ChallengeService } from '../services/challenge.service';
 import { ArcadeStatsService } from '../services/arcade-stats.service';
 import { UserService } from '../../user/services/user.service';
 import { ArcadeValidationService } from '../services/arcade-validation.service';
-import { getGuildId } from '../../../shared/guild';
 
-// Stockage temporaire des parties en cours
 const pendingGames = new Map<string, {
   challenger: User;
   opponent: User;
@@ -27,6 +25,7 @@ const pendingGames = new Map<string, {
   targetScore: number;
   bet: number;
   currentRound: number;
+  resolving: boolean;
   timeout?: NodeJS.Timeout;
 }>();
 
@@ -56,19 +55,17 @@ export default {
         .setMaxValue(10)
     ),
 
-  async execute(interaction: ChatInputCommandInteraction, client: BotClient) {
+  async execute(interaction: ChatInputCommandInteraction, _client: BotClient) {
     try {
       const opponent = interaction.options.getUser('adversaire', true);
       const challenger = interaction.user;
       const bet = interaction.options.getInteger('mise') || 0;
       const targetScore = interaction.options.getInteger('points') || 3;
 
-      // Validations mutualisées
       if (!await ArcadeValidationService.validatePvPGame(interaction, challenger, opponent, bet, 'shifumi')) {
         return;
       }
 
-      // Demander confirmation à l'adversaire
       const accepted = await ChallengeService.requestChallenge(interaction, {
         challenger,
         opponent,
@@ -78,44 +75,17 @@ export default {
         targetScore
       });
 
-      if (!accepted) {
-        return;
-      }
+      if (!accepted) return;
 
       const gameId = `${challenger.id}-${opponent.id}-${Date.now()}`;
 
-      // Créer les boutons de choix
-      const row = new ActionRowBuilder<ButtonBuilder>()
-        .addComponents(
-          new ButtonBuilder()
-            .setCustomId(`shifumi_pierre_${gameId}`)
-            .setLabel('Pierre')
-            .setEmoji('🪨')
-            .setStyle(ButtonStyle.Primary),
-          new ButtonBuilder()
-            .setCustomId(`shifumi_feuille_${gameId}`)
-            .setLabel('Feuille')
-            .setEmoji('📄')
-            .setStyle(ButtonStyle.Success),
-          new ButtonBuilder()
-            .setCustomId(`shifumi_ciseaux_${gameId}`)
-            .setLabel('Ciseaux')
-            .setEmoji('✂️')
-            .setStyle(ButtonStyle.Danger)
-        );
+      const row = this.buildChoiceRow(gameId, 1);
 
       const gameEmbed = new EmbedBuilder()
         .setTitle(`✂️ Manche 1`)
-        .setDescription(
-          `${challenger} **0** - **0** ${opponent}\n\n` +
-          `Faites vos choix !`
-        )
+        .setDescription(`${challenger} **0** - **0** ${opponent}\n\nFaites vos choix !`)
         .setColor(0x00aaff)
-        .setFooter({
-          text: `Premier à ${targetScore} points` +
-                (bet > 0 ? ` • Mise: ${bet} RidgeCoins` : '') +
-                ` • /shifumi`
-        });
+        .setFooter({ text: this.footerText(targetScore, bet) });
 
       const message = await interaction.editReply({
         content: '',
@@ -123,7 +93,6 @@ export default {
         components: [row]
       });
 
-      // Stocker la partie
       pendingGames.set(gameId, {
         challenger,
         opponent,
@@ -132,100 +101,92 @@ export default {
         targetScore,
         bet,
         currentRound: 1,
-        timeout: setTimeout(() => {
-          this.cancelGame(gameId, interaction);
-        }, 60000) // 60 secondes
+        resolving: false,
+        timeout: setTimeout(() => this.cancelGame(gameId, interaction), 60000)
       });
 
-      // Créer le collecteur de boutons
-      const collector = message.createMessageComponentCollector({
-        componentType: ComponentType.Button,
-        time: 60000
-      });
+      this.attachCollector(message, gameId, interaction);
 
-      collector.on('collect', async (buttonInteraction) => {
+    } catch (error) {
+      console.error('Erreur dans la commande shifumi:', error);
+      const errorMessage = { content: '❌ Une erreur est survenue lors du jeu.', flags: 64 };
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp(errorMessage).catch(() => {});
+      } else {
+        await interaction.reply(errorMessage).catch(() => {});
+      }
+    }
+  },
+
+  attachCollector(message: any, gameId: string, interaction: ChatInputCommandInteraction) {
+    const collector = message.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+      time: 60000
+    });
+
+    collector.on('collect', async (buttonInteraction: any) => {
+      try {
         const game = pendingGames.get(gameId);
-        if (!game) return;
+        if (!game || game.resolving) {
+          await buttonInteraction.deferUpdate().catch(() => {});
+          return;
+        }
 
         const userId = buttonInteraction.user.id;
-        const isChallenger = userId === challenger.id;
-        const isOpponent = userId === opponent.id;
+        const isChallenger = userId === game.challenger.id;
+        const isOpponent = userId === game.opponent.id;
 
         if (!isChallenger && !isOpponent) {
-          await buttonInteraction.reply({
-            content: '❌ Vous ne participez pas à cette partie !',
-            flags: ['Ephemeral']
-          });
+          await buttonInteraction.reply({ content: '❌ Vous ne participez pas à cette partie !', flags: 64 });
           return;
         }
 
         const choice = buttonInteraction.customId.split('_')[1] as ShifumiChoice;
 
-        if (isChallenger) {
+        if (isChallenger && !game.challengerChoice) {
           game.challengerChoice = choice;
-          await buttonInteraction.reply({
-            content: `✅ Vous avez choisi ${ShifumiService.getEmoji(choice)} **${this.capitalize(choice)}** !`,
-            flags: ['Ephemeral']
-          });
-        } else {
+        } else if (isOpponent && !game.opponentChoice) {
           game.opponentChoice = choice;
-          await buttonInteraction.reply({
-            content: `✅ Vous avez choisi ${ShifumiService.getEmoji(choice)} **${this.capitalize(choice)}** !`,
-            flags: ['Ephemeral']
-          });
         }
 
-        // Vérifier si les deux ont joué
-        if (game.challengerChoice && game.opponentChoice) {
+        await buttonInteraction.reply({
+          content: `✅ Vous avez choisi ${ShifumiService.getEmoji(choice)} **${this.capitalize(choice)}** !`,
+          flags: 64
+        });
+
+        if (game.challengerChoice && game.opponentChoice && !game.resolving) {
+          game.resolving = true;
           collector.stop('completed');
           await this.revealResults(game, interaction, gameId);
         }
-      });
-
-      collector.on('end', (collected, reason) => {
-        if (reason === 'time') {
-          this.cancelGame(gameId, interaction);
-        }
-      });
-
-    } catch (error) {
-      console.error('Erreur dans la commande shifumi:', error);
-
-      const errorMessage = {
-        content: '❌ Une erreur est survenue lors du jeu.',
-        flags: [4096] // MessageFlags.Ephemeral
-      };
-
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp(errorMessage);
-      } else {
-        await interaction.reply(errorMessage);
+      } catch (error) {
+        console.error('Erreur collecteur shifumi:', error);
       }
-    }
+    });
+
+    collector.on('end', (_: any, reason: string) => {
+      if (reason === 'time') {
+        this.cancelGame(gameId, interaction);
+      }
+    });
   },
 
   async revealResults(game: any, interaction: ChatInputCommandInteraction, gameId: string) {
-    if (!game.challengerChoice || !game.opponentChoice) return;
+    try {
+      if (!game.challengerChoice || !game.opponentChoice) return;
 
-    const result = this.determineWinner(game.challengerChoice, game.opponentChoice);
+      const result = this.determineWinner(game.challengerChoice, game.opponentChoice);
 
-    // Mettre à jour le score
-    if (result === 'player1') {
-      game.challengerScore++;
-    } else if (result === 'player2') {
-      game.opponentScore++;
-    }
+      if (result === 'player1') game.challengerScore++;
+      else if (result === 'player2') game.opponentScore++;
 
-    // Vérifier si quelqu'un a gagné
-    if (game.challengerScore >= game.targetScore || game.opponentScore >= game.targetScore) {
-      // Fin de partie - afficher directement l'embed de victoire
-      await this.endGame(game, interaction, gameId);
-    } else {
-      // Afficher le résultat de la manche
+      if (game.challengerScore >= game.targetScore || game.opponentScore >= game.targetScore) {
+        await this.endGame(game, interaction, gameId);
+        return;
+      }
+
       const winnerName = result === 'player1' ? game.challenger.username : game.opponent.username;
-      const resultMsg = result === 'draw'
-        ? '🤝 Égalité'
-        : `✅ **${winnerName}** gagne la manche !`;
+      const resultMsg = result === 'draw' ? '🤝 Égalité' : `✅ **${winnerName}** gagne la manche !`;
 
       const roundEmbed = new EmbedBuilder()
         .setTitle(`✂️ Manche ${game.currentRound}`)
@@ -235,222 +196,137 @@ export default {
           `${resultMsg}`
         )
         .setColor(0x00aaff)
-        .setFooter({
-          text: `Premier à ${game.targetScore} points` +
-                (game.bet > 0 ? ` • Mise: ${game.bet} RidgeCoins` : '') +
-                ` • /shifumi`
-        });
+        .setFooter({ text: this.footerText(game.targetScore, game.bet) });
 
-      await interaction.editReply({
-        embeds: [roundEmbed],
-        components: []
-      });
+      await interaction.editReply({ embeds: [roundEmbed], components: [] });
 
-      // Préparer la prochaine manche après 3 secondes
-      setTimeout(async () => {
-        await this.startNextRound(game, interaction, gameId);
-      }, 3000);
+      setTimeout(() => this.startNextRound(game, interaction, gameId), 3000);
+    } catch (error) {
+      console.error('Erreur revealResults shifumi:', error);
+      pendingGames.delete(gameId);
     }
   },
 
   async startNextRound(game: any, interaction: ChatInputCommandInteraction, gameId: string) {
-    game.currentRound++;
-    game.challengerChoice = undefined;
-    game.opponentChoice = undefined;
+    try {
+      game.currentRound++;
+      game.challengerChoice = undefined;
+      game.opponentChoice = undefined;
+      game.resolving = false;
 
-    // Réinitialiser le timeout
-    if (game.timeout) clearTimeout(game.timeout);
-    game.timeout = setTimeout(() => {
-      this.cancelGame(gameId, interaction);
-    }, 60000);
+      if (game.timeout) clearTimeout(game.timeout);
+      game.timeout = setTimeout(() => this.cancelGame(gameId, interaction), 60000);
 
-    // Créer les nouveaux boutons
-    const row = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(
-        new ButtonBuilder()
-          .setCustomId(`shifumi_pierre_${gameId}_${game.currentRound}`)
-          .setLabel('Pierre')
-          .setEmoji('🪨')
-          .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-          .setCustomId(`shifumi_feuille_${gameId}_${game.currentRound}`)
-          .setLabel('Feuille')
-          .setEmoji('📄')
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId(`shifumi_ciseaux_${gameId}_${game.currentRound}`)
-          .setLabel('Ciseaux')
-          .setEmoji('✂️')
-          .setStyle(ButtonStyle.Danger)
-      );
+      const row = this.buildChoiceRow(gameId, game.currentRound);
 
-    const nextRoundEmbed = new EmbedBuilder()
-      .setTitle(`✂️ Manche ${game.currentRound}`)
-      .setDescription(
-        `${game.challenger} **${game.challengerScore}** - **${game.opponentScore}** ${game.opponent}\n\n` +
-        `Faites vos choix !`
-      )
-      .setColor(0x00aaff)
-      .setFooter({
-        text: `Premier à ${game.targetScore} points` +
-              (game.bet > 0 ? ` • Mise: ${game.bet} RidgeCoins` : '') +
-              ` • /shifumi`
-      });
+      const nextRoundEmbed = new EmbedBuilder()
+        .setTitle(`✂️ Manche ${game.currentRound}`)
+        .setDescription(
+          `${game.challenger} **${game.challengerScore}** - **${game.opponentScore}** ${game.opponent}\n\nFaites vos choix !`
+        )
+        .setColor(0x00aaff)
+        .setFooter({ text: this.footerText(game.targetScore, game.bet) });
 
-    const message = await interaction.editReply({
-      embeds: [nextRoundEmbed],
-      components: [row]
-    });
+      const message = await interaction.editReply({ embeds: [nextRoundEmbed], components: [row] });
 
-    // Recréer le collecteur pour cette manche
-    const collector = message.createMessageComponentCollector({
-      componentType: ComponentType.Button,
-      time: 60000
-    });
-
-    collector.on('collect', async (buttonInteraction) => {
-      const currentGame = pendingGames.get(gameId);
-      if (!currentGame) return;
-
-      const userId = buttonInteraction.user.id;
-      const isChallenger = userId === game.challenger.id;
-      const isOpponent = userId === game.opponent.id;
-
-      if (!isChallenger && !isOpponent) {
-        await buttonInteraction.reply({
-          content: '❌ Vous ne participez pas à cette partie !',
-          flags: ['Ephemeral']
-        });
-        return;
-      }
-
-      const choice = buttonInteraction.customId.split('_')[1] as ShifumiChoice;
-
-      if (isChallenger) {
-        currentGame.challengerChoice = choice;
-        await buttonInteraction.reply({
-          content: `✅ Vous avez choisi ${ShifumiService.getEmoji(choice)} **${this.capitalize(choice)}** !`,
-          flags: ['Ephemeral']
-        });
-      } else {
-        currentGame.opponentChoice = choice;
-        await buttonInteraction.reply({
-          content: `✅ Vous avez choisi ${ShifumiService.getEmoji(choice)} **${this.capitalize(choice)}** !`,
-          flags: ['Ephemeral']
-        });
-      }
-
-      if (currentGame.challengerChoice && currentGame.opponentChoice) {
-        collector.stop('completed');
-        await this.revealResults(currentGame, interaction, gameId);
-      }
-    });
-
-    collector.on('end', (collected, reason) => {
-      if (reason === 'time') {
-        this.cancelGame(gameId, interaction);
-      }
-    });
+      this.attachCollector(message, gameId, interaction);
+    } catch (error) {
+      console.error('Erreur startNextRound shifumi:', error);
+      pendingGames.delete(gameId);
+    }
   },
 
   async endGame(game: any, interaction: ChatInputCommandInteraction, gameId: string) {
-    const winner = game.challengerScore >= game.targetScore ? game.challenger : game.opponent;
-    const loser = winner.id === game.challenger.id ? game.opponent : game.challenger;
-
-    let victoryMsg = `🏆 **${winner.username}** remporte la partie !`;
-
     try {
-      await UserService.recordArcadeWin(winner.id, 'shifumi');
-      await UserService.recordArcadeLoss(loser.id, 'shifumi');
-      await ArcadeStatsService.incrementGameCount('shifumi');
+      const winner = game.challengerScore >= game.targetScore ? game.challenger : game.opponent;
+      const loser = winner.id === game.challenger.id ? game.opponent : game.challenger;
 
-      if (game.bet > 0) {
-        await UserService.updateUserMoney(loser.id, -game.bet);
-        await UserService.updateUserMoney(winner.id, game.bet);
-        victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
+      let victoryMsg = `🏆 **${winner.username}** remporte la partie !`;
+
+      try {
+        await UserService.recordArcadeWin(winner.id, 'shifumi');
+        await UserService.recordArcadeLoss(loser.id, 'shifumi');
+        await ArcadeStatsService.incrementGameCount('shifumi');
+
+        if (game.bet > 0) {
+          await UserService.updateUserMoney(loser.id, -game.bet);
+          await UserService.updateUserMoney(winner.id, game.bet);
+          victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la fin de partie shifumi:', error);
       }
+
+      const finalEmbed = new EmbedBuilder()
+        .setTitle(`✂️ Partie terminée`)
+        .setDescription(
+          `${game.challenger} **${game.challengerScore}** - **${game.opponentScore}** ${game.opponent}\n\n` +
+          victoryMsg
+        )
+        .setColor(0xffd700)
+        .setFooter({ text: this.footerText(game.targetScore, game.bet) });
+
+      await interaction.editReply({ embeds: [finalEmbed], components: [] });
     } catch (error) {
-      console.error('Erreur lors de la fin de partie:', error);
+      console.error('Erreur endGame shifumi:', error);
+    } finally {
+      if (game.timeout) clearTimeout(game.timeout);
+      pendingGames.delete(gameId);
     }
-
-    const finalEmbed = new EmbedBuilder()
-      .setTitle(`✂️ Partie terminée`)
-      .setDescription(
-        `${game.challenger} **${game.challengerScore}** - **${game.opponentScore}** ${game.opponent}\n\n` +
-        victoryMsg
-      )
-      .setColor(0xffd700)
-      .setFooter({
-        text: `Premier à ${game.targetScore} points` +
-              (game.bet > 0 ? ` • Mise: ${game.bet} RidgeCoins` : '') +
-              ` • /shifumi`
-      });
-
-    await interaction.editReply({
-      embeds: [finalEmbed],
-      components: []
-    });
-
-    if (game.timeout) clearTimeout(game.timeout);
-    pendingGames.delete(gameId);
-  },
-
-  getRoundResultMessage(result: 'player1' | 'player2' | 'draw', player1: User, player2: User): string {
-    if (result === 'draw') {
-      return '🤝 **Égalité !** Aucun point marqué.';
-    }
-
-    const winner = result === 'player1' ? player1 : player2;
-    return `🎉 **${winner.username}** remporte la manche ! (+1 point)`;
   },
 
   async cancelGame(gameId: string, interaction: ChatInputCommandInteraction) {
     const game = pendingGames.get(gameId);
     if (!game) return;
 
-    const cancelEmbed = new EmbedBuilder()
-      .setDescription('⏱️ Temps écoulé - Partie annulée')
-      .setColor(0xff0000);
+    try {
+      const cancelEmbed = new EmbedBuilder()
+        .setDescription('⏱️ Temps écoulé - Partie annulée')
+        .setColor(0xff0000);
 
-    await interaction.editReply({
-      embeds: [cancelEmbed],
-      components: []
-    });
+      await interaction.editReply({ embeds: [cancelEmbed], components: [] });
+    } catch (error) {
+      console.error('Erreur cancelGame shifumi:', error);
+    } finally {
+      if (game.timeout) clearTimeout(game.timeout);
+      pendingGames.delete(gameId);
+    }
+  },
 
-    if (game.timeout) clearTimeout(game.timeout);
-    pendingGames.delete(gameId);
+  buildChoiceRow(gameId: string, round: number) {
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`shifumi_pierre_${gameId}_${round}`)
+        .setLabel('Pierre')
+        .setEmoji('🪨')
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId(`shifumi_feuille_${gameId}_${round}`)
+        .setLabel('Feuille')
+        .setEmoji('📄')
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId(`shifumi_ciseaux_${gameId}_${round}`)
+        .setLabel('Ciseaux')
+        .setEmoji('✂️')
+        .setStyle(ButtonStyle.Danger)
+    );
+  },
+
+  footerText(targetScore: number, bet: number): string {
+    return `Premier à ${targetScore} points` + (bet > 0 ? ` • Mise: ${bet} RidgeCoins` : '') + ` • /shifumi`;
   },
 
   determineWinner(choice1: ShifumiChoice, choice2: ShifumiChoice): 'player1' | 'player2' | 'draw' {
     if (choice1 === choice2) return 'draw';
-
     const winConditions: Record<ShifumiChoice, ShifumiChoice> = {
       pierre: 'ciseaux',
       feuille: 'pierre',
       ciseaux: 'feuille'
     };
-
     return winConditions[choice1] === choice2 ? 'player1' : 'player2';
   },
 
-  getWinnerMessage(result: 'player1' | 'player2' | 'draw', player1: User, player2: User): string {
-    if (result === 'draw') {
-      return '🤝 **Égalité !** Vous avez tous les deux choisi la même chose !';
-    }
-
-    const winner = result === 'player1' ? player1 : player2;
-    return `🎉 **${winner} a gagné !** Félicitations !`;
-  },
-
-  getColorForWinner(result: 'player1' | 'player2' | 'draw', challengerId: string): number {
-    if (result === 'draw') return 0xffaa00;
-    return 0x00ff00;
-  },
-
-
-  /**
-   * Met la première lettre en majuscule
-   */
   capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }

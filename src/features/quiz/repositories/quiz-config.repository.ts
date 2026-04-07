@@ -1,35 +1,21 @@
 import QuizConfigModel, { IQuizConfigDoc } from '../models/quiz-config.model';
+import { QuizQuestion } from '../services/quiz.service';
 
 export class QuizConfigRepository {
   static async getOrCreate(): Promise<IQuizConfigDoc> {
     const existing = await QuizConfigModel.findOne();
     if (existing) return existing;
-    return QuizConfigModel.create({ usedQuestionIds: [], activeAnswers: {} });
+    return QuizConfigModel.create({ activeAnswers: {} });
   }
 
-  static async markQuestionUsed(questionId: string): Promise<void> {
-    const doc = await this.getOrCreate();
-    if (!doc.usedQuestionIds.includes(questionId)) {
-      doc.usedQuestionIds.push(questionId);
-      doc.markModified('usedQuestionIds');
-      await doc.save();
-    }
-  }
-
-  static async resetUsedQuestions(): Promise<void> {
-    const doc = await this.getOrCreate();
-    doc.usedQuestionIds = [];
-    doc.markModified('usedQuestionIds');
-    await doc.save();
-  }
-
-  static async setActiveQuestion(messageId: string, questionId: string, activeUntil: Date): Promise<void> {
+  static async setActiveQuestion(messageId: string, question: QuizQuestion, activeUntil: Date): Promise<void> {
     const doc = await this.getOrCreate();
     doc.activeMessageId = messageId;
-    doc.activeQuestionId = questionId;
+    doc.activeQuestion = question;
     doc.activeUntil = activeUntil;
     doc.activeAnswers = {};
     doc.firstCorrectUserId = undefined;
+    doc.markModified('activeQuestion');
     doc.markModified('activeAnswers');
     await doc.save();
   }
@@ -49,7 +35,7 @@ export class QuizConfigRepository {
   static async clearActiveQuestion(): Promise<void> {
     const doc = await this.getOrCreate();
     doc.activeMessageId = undefined;
-    doc.activeQuestionId = undefined;
+    doc.activeQuestion = undefined;
     doc.activeUntil = undefined;
     doc.activeAnswers = {};
     doc.firstCorrectUserId = undefined;
