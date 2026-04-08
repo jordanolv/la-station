@@ -23,7 +23,7 @@ export class ActivityRolesService {
     if (!users.length) return;
 
     const scores = users
-      .map(user => ({ userId: user.discordId, points: user.stats.activityPoints ?? 0 }))
+      .map(user => ({ userId: user.discordId, name: user.name, points: user.stats.activityPoints ?? 0 }))
       .filter(u => u.points > 0)
       .sort((a, b) => b.points - a.points);
 
@@ -49,21 +49,26 @@ export class ActivityRolesService {
 
       let targetRoleId: string | undefined;
 
+      const podiumCut = Math.min(3, total);
+      const nonPodiumTotal = total - podiumCut;
+      const nonPodiumRank = rank - podiumCut;
+      const nonPodiumPct = nonPodiumTotal > 0 ? (nonPodiumRank / nonPodiumTotal) * 100 : 100;
+
       if (rank === -1) {
         targetRoleId = inactiveRoleId;
         console.log(`[ActivityRoles] ${userId} → inactif (0 points)`);
       } else if (rank < 3) {
         targetRoleId = podiumRoleId;
         console.log(`[ActivityRoles] ${userId} → podium (rank ${rank + 1}, ${scores[rank].points}pts)`);
-      } else if (total > 0 && (rank / total) * 100 <= activeThresholdPercent) {
+      } else if (nonPodiumTotal > 0 && nonPodiumPct <= activeThresholdPercent) {
         targetRoleId = activeRoleId;
-        console.log(`[ActivityRoles] ${userId} → actif (rank ${rank + 1}/${total}, ${((rank / total) * 100).toFixed(1)}%, ${scores[rank].points}pts)`);
-      } else if (total > 0 && (rank / total) * 100 <= regularThresholdPercent) {
+        console.log(`[ActivityRoles] ${userId} → actif (rank ${rank + 1}/${total}, hors-podium ${nonPodiumPct.toFixed(1)}%, ${scores[rank].points}pts)`);
+      } else if (nonPodiumTotal > 0 && nonPodiumPct <= regularThresholdPercent) {
         targetRoleId = regularRoleId;
-        console.log(`[ActivityRoles] ${userId} → présent (rank ${rank + 1}/${total}, ${((rank / total) * 100).toFixed(1)}%, ${scores[rank].points}pts)`);
+        console.log(`[ActivityRoles] ${userId} → présent (rank ${rank + 1}/${total}, hors-podium ${nonPodiumPct.toFixed(1)}%, ${scores[rank].points}pts)`);
       } else {
         targetRoleId = inactiveRoleId;
-        console.log(`[ActivityRoles] ${userId} → inactif (rank ${rank + 1}/${total}, ${((rank / total) * 100).toFixed(1)}%, ${scores[rank].points}pts)`);
+        console.log(`[ActivityRoles] ${userId} → inactif (rank ${rank + 1}/${total}, hors-podium ${nonPodiumPct.toFixed(1)}%, ${scores[rank].points}pts)`);
       }
 
       if (!targetRoleId) {
@@ -98,7 +103,7 @@ export class ActivityRolesService {
 
   private static async sendWeeklyLeaderboard(
     client: BotClient,
-    scores: { userId: string; points: number }[],
+    scores: { userId: string; name: string; points: number }[],
   ): Promise<void> {
     try {
       const appConfig = await AppConfigModel.findOne({});
@@ -109,11 +114,10 @@ export class ActivityRolesService {
       if (!channel?.isTextBased()) return;
 
       const medals = ['🥇', '🥈', '🥉'];
-      const top10 = scores.slice(0, 10);
-      if (!top10.length) return;
+      if (!scores.length) return;
 
-      const rows = top10.map((s, i) =>
-        `${medals[i] ?? `**${i + 1}.**`} <@${s.userId}> — **${s.points.toLocaleString('fr-FR')}** pts`,
+      const rows = scores.map((s, i) =>
+        `${medals[i] ?? `**${i + 1}.**`} ${s.name} — **${s.points.toLocaleString('fr-FR')}** pts`,
       ).join('\n');
 
       const container = new ContainerBuilder()
