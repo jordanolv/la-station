@@ -1,4 +1,4 @@
-import { EmbedBuilder, TextChannel, VoiceChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, EmbedBuilder, MessageFlags, TextChannel, VoiceChannel } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { VoicePlugin, VoiceSession } from '../../voice/services/voice-session.service';
@@ -10,6 +10,7 @@ import type { MountainRarity } from '../types/mountain.types';
 import { LogService } from '../../../shared/logs/logs.service';
 
 const LOG_FEATURE = '⛰️ Mountain';
+export const VOICE_CHECK_BUTTON_PREFIX = 'mountain:voice:check';
 
 export interface MountainSessionResult {
   mountain: MountainInfo;
@@ -175,9 +176,42 @@ export class MountainPlugin implements VoicePlugin {
         .setTimestamp()
         .setFooter({ text: `🏔️ Restez ${Math.floor(MOUNTAIN_REQUIRED_SECONDS / 60)} minutes pour débloquer cette montagne !` });
 
-      await channel.send({ embeds: [embed] });
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`${VOICE_CHECK_BUTTON_PREFIX}:${mountain.id}`)
+          .setLabel('Vérifier')
+          .setEmoji('🔍')
+          .setStyle(ButtonStyle.Secondary),
+      );
+
+      await channel.send({ embeds: [embed], components: [row] });
     } catch (err) {
       console.error('[MountainPlugin] Erreur envoi embed montagne:', err);
+    }
+  }
+
+  static async handleVoiceCheck(interaction: ButtonInteraction): Promise<void> {
+    const mountainId = interaction.customId.split(':')[3];
+    const mountain = MountainService.getById(mountainId);
+    if (!mountain) {
+      await interaction.reply({ content: '❌ Montagne introuvable.', flags: MessageFlags.Ephemeral });
+      return;
+    }
+
+    const owned = await UserMountainsRepository.isUnlocked(interaction.user.id, mountainId);
+    const rarity = MountainService.getRarity(mountain);
+    const { emoji, label } = RARITY_CONFIG[rarity];
+
+    if (owned) {
+      await interaction.reply({
+        content: `✅ Tu possèdes déjà **${mountain.mountainLabel}** ${emoji} ${label} !`,
+        flags: MessageFlags.Ephemeral,
+      });
+    } else {
+      await interaction.reply({
+        content: `❌ Tu ne possèdes pas encore **${mountain.mountainLabel}** ${emoji} ${label}.\n🏔️ Reste **${Math.floor(MOUNTAIN_REQUIRED_SECONDS / 60)} minutes** en vocal pour la débloquer !`,
+        flags: MessageFlags.Ephemeral,
+      });
     }
   }
 

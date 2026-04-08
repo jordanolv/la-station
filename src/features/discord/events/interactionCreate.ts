@@ -36,6 +36,7 @@ import { MONEY_MODAL_PREFIX } from '../../admin/slash/money';
 import { EMBED_EDIT_MODAL_PREFIX } from '../../admin/slash/embed';
 import { handlePackButton } from '../../mountain/slash/subcommands/pack';
 import { MountainSpawnService, SPAWN_BUTTON_PREFIX } from '../../mountain/services/mountain-spawn.service';
+import { MountainPlugin, VOICE_CHECK_BUTTON_PREFIX } from '../../mountain/services/mountain.plugin';
 import {
   INV_BUTTON_PREFIX,
   handleInventaireButton,
@@ -145,6 +146,8 @@ export default {
           await handlePackButton(interaction, client);
         } else if (interaction.customId.startsWith(SPAWN_BUTTON_PREFIX + ':')) {
           await MountainSpawnService.handleClaim(interaction, client);
+        } else if (interaction.customId.startsWith(VOICE_CHECK_BUTTON_PREFIX + ':')) {
+          await MountainPlugin.handleVoiceCheck(interaction);
         } else if (interaction.customId.startsWith(INV_BUTTON_PREFIX + ':')) {
           await handleInventaireButton(interaction, client);
         } else if (interaction.customId.startsWith('impostor_')) {
