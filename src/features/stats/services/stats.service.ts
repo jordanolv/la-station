@@ -160,11 +160,18 @@ export class StatsService {
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
+  private static toParisDay(d: Date): string {
+    return d.toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
+  }
+
   private static normalizeDate(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+    const parisDay = this.toParisDay(date);
+    const parisNow = new Date(date.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    const offsetMs = date.getTime() - parisNow.getTime();
+    return new Date(new Date(`${parisDay}T00:00:00Z`).getTime() + offsetMs);
   }
 
   private static isSameDay(a: Date, b: Date): boolean {
-    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    return this.toParisDay(a) === this.toParisDay(b);
   }
 }

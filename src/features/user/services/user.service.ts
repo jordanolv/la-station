@@ -153,14 +153,15 @@ export class UserService {
     if (!user) return null;
 
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const toParisDay = (d: Date) => d.toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
+    const today = toParisDay(now);
 
     if (!user.stats.lastActivityDate) {
       return UserModel.findOneAndUpdate(
         { discordId },
         {
           $set: {
-            'stats.lastActivityDate': today,
+            'stats.lastActivityDate': now,
             'stats.dailyStreak': 1
           }
         },
@@ -169,10 +170,9 @@ export class UserService {
     }
 
     const lastActivity = new Date(user.stats.lastActivityDate);
-    const lastActivityDay = new Date(lastActivity.getFullYear(), lastActivity.getMonth(), lastActivity.getDate());
+    const lastActivityDay = toParisDay(lastActivity);
 
-    const diffTime = today.getTime() - lastActivityDay.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.floor((Date.parse(today) - Date.parse(lastActivityDay)) / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
       return user;
@@ -180,7 +180,7 @@ export class UserService {
       return UserModel.findOneAndUpdate(
         { discordId },
         {
-          $set: { 'stats.lastActivityDate': today },
+          $set: { 'stats.lastActivityDate': now },
           $inc: { 'stats.dailyStreak': 1 }
         },
         { new: true }
@@ -190,7 +190,7 @@ export class UserService {
         { discordId },
         {
           $set: {
-            'stats.lastActivityDate': today,
+            'stats.lastActivityDate': now,
             'stats.dailyStreak': 1
           }
         },

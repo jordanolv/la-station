@@ -47,27 +47,22 @@ export default {
         return;
       }
 
-      // Vérifier si l'utilisateur a déjà claim aujourd'hui
       const now = new Date();
       const lastClaim = user.stats.lastDailyClaimDate;
+      const toParisDay = (d: Date) => d.toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
 
-      if (lastClaim) {
-        const lastClaimDate = new Date(lastClaim);
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const lastClaimDay = new Date(lastClaimDate.getFullYear(), lastClaimDate.getMonth(), lastClaimDate.getDate());
+      if (lastClaim && toParisDay(new Date(lastClaim)) === toParisDay(now)) {
+        const parisNow = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+        const nextParisMidnight = new Date(parisNow);
+        nextParisMidnight.setDate(nextParisMidnight.getDate() + 1);
+        nextParisMidnight.setHours(0, 0, 0, 0);
+        const tomorrowTimestamp = Math.floor((nextParisMidnight.getTime() + (now.getTime() - parisNow.getTime())) / 1000);
 
-        // Si déjà claim aujourd'hui
-        if (today.getTime() === lastClaimDay.getTime()) {
-          const tomorrow = new Date(today);
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          const tomorrowTimestamp = Math.floor(tomorrow.getTime() / 1000);
-
-          await interaction.editReply({
-            content: `⏰ Vous avez déjà réclamé votre récompense quotidienne aujourd'hui !\n` +
-                     `Revenez <t:${tomorrowTimestamp}:R>.`
-          });
-          return;
-        }
+        await interaction.editReply({
+          content: `⏰ Vous avez déjà réclamé votre récompense quotidienne aujourd'hui !\n` +
+                   `Revenez <t:${tomorrowTimestamp}:R>.`
+        });
+        return;
       }
 
       const moneyReward = randomUpTo(MAX_MONEY);
