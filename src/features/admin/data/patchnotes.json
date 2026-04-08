@@ -123,6 +123,42 @@
     ]
   },
   {
+    "version": "1.3.1",
+    "timestamp": 1775677324,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🔍  Vérifier une montagne en vocal",
+            "items": [
+              "Un bouton **Vérifier** est désormais affiché sur l'embed de montagne dans le salon vocal",
+              "Cliquez dessus pour savoir instantanément si vous possédez déjà cette montagne"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "fix",
+        "blocks": [
+          {
+            "title": "🎁  Récompense quotidienne `/daily`",
+            "items": [
+              "Le reset du `/daily` se base désormais sur **minuit heure de Paris** — plus de décalage selon votre fuseau ou l'heure du serveur"
+            ]
+          },
+          {
+            "title": "🔥  Rôles d'activité",
+            "items": [
+              "Le calcul des rôles **Actif** et **Présent** exclut désormais correctement le podium du classement",
+              "Le classement hebdomadaire affiche tous les membres actifs, sans limite au top 10"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.3.0",
     "timestamp": 1775642400,
     "sections": [
