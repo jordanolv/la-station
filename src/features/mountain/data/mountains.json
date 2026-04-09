@@ -12,7 +12,9 @@
     "flags": [
       "🇳🇵",
       "🇨🇳"
-    ]
+    ],
+    "lat": 27.988055555,
+    "lng": 86.925
   },
   {
     "mountainLabel": "Mont Fuji",
@@ -25,7 +27,9 @@
     "rarity": "rare",
     "flags": [
       "🇯🇵"
-    ]
+    ],
+    "lat": 35.360555555,
+    "lng": 138.7275
   },
   {
     "mountainLabel": "Vésuve",
@@ -38,7 +42,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇹"
-    ]
+    ],
+    "lat": 40.82261,
+    "lng": 14.42919
   },
   {
     "mountainLabel": "Mont Blanc",
@@ -53,7 +59,9 @@
     "flags": [
       "🇫🇷",
       "🇮🇹"
-    ]
+    ],
+    "lat": 45.832777777,
+    "lng": 6.865
   },
   {
     "mountainLabel": "Aconcagua",
@@ -66,7 +74,9 @@
     "rarity": "epic",
     "flags": [
       "🇦🇷"
-    ]
+    ],
+    "lat": -32.653055555,
+    "lng": -70.011666666
   },
   {
     "mountainLabel": "Elbrouz",
@@ -79,7 +89,9 @@
     "rarity": "epic",
     "flags": [
       "🇷🇺"
-    ]
+    ],
+    "lat": 43.35254,
+    "lng": 42.437875
   },
   {
     "mountainLabel": "K2",
@@ -92,7 +104,9 @@
     "rarity": "legendary",
     "flags": [
       "🇵🇰"
-    ]
+    ],
+    "lat": 35.881111111,
+    "lng": 76.513333333
   },
   {
     "mountainLabel": "Mont Ararat",
@@ -105,7 +119,9 @@
     "rarity": "epic",
     "flags": [
       "🇹🇷"
-    ]
+    ],
+    "lat": 39.701944444,
+    "lng": 44.298333333
   },
   {
     "mountainLabel": "Mont Olympe",
@@ -118,7 +134,9 @@
     "rarity": "common",
     "flags": [
       "🇬🇷"
-    ]
+    ],
+    "lat": 40.083333333,
+    "lng": 22.35
   },
   {
     "mountainLabel": "Kangchenjunga",
@@ -133,7 +151,9 @@
     "flags": [
       "🇳🇵",
       "🇮🇳"
-    ]
+    ],
+    "lat": 27.7,
+    "lng": 88.133333
   },
   {
     "mountainLabel": "Denali",
@@ -146,7 +166,9 @@
     "rarity": "epic",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 63.069102777,
+    "lng": -151.006261111
   },
   {
     "mountainLabel": "Mont Rushmore",
@@ -159,7 +181,9 @@
     "rarity": "common",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 43.878888888,
+    "lng": -103.459166666
   },
   {
     "mountainLabel": "Cervin",
@@ -174,7 +198,9 @@
     "flags": [
       "🇨🇭",
       "🇮🇹"
-    ]
+    ],
+    "lat": 45.976388888,
+    "lng": 7.658611111
   },
   {
     "mountainLabel": "Mont Kailash",
@@ -187,7 +213,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇳"
-    ]
+    ],
+    "lat": 31.066944444,
+    "lng": 81.312777777
   },
   {
     "mountainLabel": "Nanga Parbat",
@@ -200,7 +228,9 @@
     "rarity": "legendary",
     "flags": [
       "🇵🇰"
-    ]
+    ],
+    "lat": 35.239166666,
+    "lng": 74.59
   },
   {
     "mountainLabel": "Makalu",
@@ -215,7 +245,9 @@
     "flags": [
       "🇳🇵",
       "🇨🇳"
-    ]
+    ],
+    "lat": 27.889166666,
+    "lng": 87.088611111
   },
   {
     "mountainLabel": "Mont Kenya",
@@ -228,7 +260,9 @@
     "rarity": "epic",
     "flags": [
       "🇰🇪"
-    ]
+    ],
+    "lat": -0.1,
+    "lng": 37.2
   },
   {
     "mountainLabel": "Dhaulagiri",
@@ -241,7 +275,9 @@
     "rarity": "legendary",
     "flags": [
       "🇳🇵"
-    ]
+    ],
+    "lat": 28.696666666,
+    "lng": 83.49
   },
   {
     "mountainLabel": "Mauna Kea",
@@ -254,7 +290,9 @@
     "rarity": "rare",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 19.820555555,
+    "lng": -155.468055555
   },
   {
     "mountainLabel": "Mont Athos",
@@ -267,7 +305,9 @@
     "rarity": "common",
     "flags": [
       "🇬🇷"
-    ]
+    ],
+    "lat": 40.158333333,
+    "lng": 24.327222222
   },
   {
     "mountainLabel": "Lhotse",
@@ -282,7 +322,9 @@
     "flags": [
       "🇳🇵",
       "🇨🇳"
-    ]
+    ],
+    "lat": 27.961666666,
+    "lng": 86.933333333
   },
   {
     "mountainLabel": "Mont Kosciuszko",
@@ -295,7 +337,9 @@
     "rarity": "common",
     "flags": [
       "🇦🇺"
-    ]
+    ],
+    "lat": -36.4558303,
+    "lng": 148.2635105
   },
   {
     "mountainLabel": "Mont Sinaï",
@@ -308,7 +352,9 @@
     "rarity": "common",
     "flags": [
       "🇪🇬"
-    ]
+    ],
+    "lat": 28.5384,
+    "lng": 33.9752
   },
   {
     "mountainLabel": "Chimborazo",
@@ -321,7 +367,9 @@
     "rarity": "epic",
     "flags": [
       "🇪🇨"
-    ]
+    ],
+    "lat": -1.469166666,
+    "lng": -78.8175
   },
   {
     "mountainLabel": "Mont Saint Helens",
@@ -334,7 +382,9 @@
     "rarity": "common",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 46.200277777,
+    "lng": -122.189444444
   },
   {
     "mountainLabel": "Cho Oyu",
@@ -349,7 +399,9 @@
     "flags": [
       "🇳🇵",
       "🇨🇳"
-    ]
+    ],
+    "lat": 28.094166666,
+    "lng": 86.660833333
   },
   {
     "mountainLabel": "Bazardüzü",
@@ -364,7 +416,9 @@
     "flags": [
       "🇦🇿",
       "🇷🇺"
-    ]
+    ],
+    "lat": 41.2204928,
+    "lng": 47.8583417
   },
   {
     "mountainLabel": "Manaslu",
@@ -377,7 +431,9 @@
     "rarity": "legendary",
     "flags": [
       "🇳🇵"
-    ]
+    ],
+    "lat": 28.55,
+    "lng": 84.559722222
   },
   {
     "mountainLabel": "Mont Damavand",
@@ -390,7 +446,9 @@
     "rarity": "epic",
     "flags": [
       "🇮🇷"
-    ]
+    ],
+    "lat": 35.955277777,
+    "lng": 52.109166666
   },
   {
     "mountainLabel": "Ben Nevis",
@@ -403,7 +461,9 @@
     "rarity": "common",
     "flags": [
       "🇬🇧"
-    ]
+    ],
+    "lat": 56.796891,
+    "lng": -5.003675
   },
   {
     "mountainLabel": "Puncak Jaya",
@@ -416,7 +476,9 @@
     "rarity": "epic",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": -4.083333333,
+    "lng": 137.183333333
   },
   {
     "mountainLabel": "Broad Peak",
@@ -431,7 +493,9 @@
     "flags": [
       "🇵🇰",
       "🇨🇳"
-    ]
+    ],
+    "lat": 35.810555555,
+    "lng": 76.568055555
   },
   {
     "mountainLabel": "Shishapangma",
@@ -444,7 +508,9 @@
     "rarity": "legendary",
     "flags": [
       "🇨🇳"
-    ]
+    ],
+    "lat": 28.352222222,
+    "lng": 85.779722222
   },
   {
     "mountainLabel": "Mont Paektu",
@@ -459,7 +525,9 @@
     "flags": [
       "🇰🇵",
       "🇨🇳"
-    ]
+    ],
+    "lat": 41.992777777,
+    "lng": 128.077222222
   },
   {
     "mountainLabel": "Mont Logan",
@@ -472,7 +540,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇦"
-    ]
+    ],
+    "lat": 60.567222222,
+    "lng": -140.405277777
   },
   {
     "mountainLabel": "Zugspitze",
@@ -487,7 +557,9 @@
     "flags": [
       "🇩🇪",
       "🇦🇹"
-    ]
+    ],
+    "lat": 47.421217,
+    "lng": 10.986314
   },
   {
     "mountainLabel": "Tambora",
@@ -500,7 +572,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": -8.245277777,
+    "lng": 117.992777777
   },
   {
     "mountainLabel": "Nevado Ojos del Salado",
@@ -515,7 +589,9 @@
     "flags": [
       "🇦🇷",
       "🇨🇱"
-    ]
+    ],
+    "lat": -27.109444444,
+    "lng": -68.542222222
   },
   {
     "mountainLabel": "Montagne de la Table",
@@ -528,7 +604,9 @@
     "rarity": "common",
     "flags": [
       "🇿🇦"
-    ]
+    ],
+    "lat": -33.96216,
+    "lng": 18.41352
   },
   {
     "mountainLabel": "Mont Tai",
@@ -541,7 +619,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇳"
-    ]
+    ],
+    "lat": 36.266666666,
+    "lng": 117.1
   },
   {
     "mountainLabel": "Gasherbrum II",
@@ -556,7 +636,9 @@
     "flags": [
       "🇵🇰",
       "🇨🇳"
-    ]
+    ],
+    "lat": 35.7575,
+    "lng": 76.652777777
   },
   {
     "mountainLabel": "Gasherbrum I",
@@ -571,7 +653,9 @@
     "flags": [
       "🇵🇰",
       "🇨🇳"
-    ]
+    ],
+    "lat": 35.724444444,
+    "lng": 76.696388888
   },
   {
     "mountainLabel": "Mont Rainier",
@@ -584,7 +668,9 @@
     "rarity": "epic",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 46.851666666,
+    "lng": -121.760277777
   },
   {
     "mountainLabel": "Aoraki/Mont Cook",
@@ -597,7 +683,9 @@
     "rarity": "rare",
     "flags": [
       "🇳🇿"
-    ]
+    ],
+    "lat": -43.595,
+    "lng": 170.141944444
   },
   {
     "mountainLabel": "Mont des Oliviers",
@@ -610,7 +698,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇱"
-    ]
+    ],
+    "lat": 31.777946,
+    "lng": 35.245686
   },
   {
     "mountainLabel": "Pinatubo",
@@ -623,7 +713,9 @@
     "rarity": "common",
     "flags": [
       "🇵🇭"
-    ]
+    ],
+    "lat": 15.13,
+    "lng": 120.35
   },
   {
     "mountainLabel": "Mont Kinabalu",
@@ -636,7 +728,9 @@
     "rarity": "rare",
     "flags": [
       "🇲🇾"
-    ]
+    ],
+    "lat": 6.075,
+    "lng": 116.558611111
   },
   {
     "mountainLabel": "Aragats",
@@ -649,7 +743,9 @@
     "rarity": "rare",
     "flags": [
       "🇦🇲"
-    ]
+    ],
+    "lat": 40.523055555,
+    "lng": 44.195277777
   },
   {
     "mountainLabel": "Mayon",
@@ -662,7 +758,9 @@
     "rarity": "common",
     "flags": [
       "🇵🇭"
-    ]
+    ],
+    "lat": 13.256666666,
+    "lng": 123.685
   },
   {
     "mountainLabel": "Mont Parnasse",
@@ -675,7 +773,9 @@
     "rarity": "common",
     "flags": [
       "🇬🇷"
-    ]
+    ],
+    "lat": 38.533,
+    "lng": 22.6167
   },
   {
     "mountainLabel": "Cotopaxi",
@@ -688,7 +788,9 @@
     "rarity": "epic",
     "flags": [
       "🇪🇨"
-    ]
+    ],
+    "lat": -0.680555555,
+    "lng": -78.437777777
   },
   {
     "mountainLabel": "Triglav",
@@ -701,7 +803,9 @@
     "rarity": "common",
     "flags": [
       "🇸🇮"
-    ]
+    ],
+    "lat": 46.378333,
+    "lng": 13.836667
   },
   {
     "mountainLabel": "Pic d'Orizaba",
@@ -714,7 +818,9 @@
     "rarity": "epic",
     "flags": [
       "🇲🇽"
-    ]
+    ],
+    "lat": 19.03,
+    "lng": -97.27
   },
   {
     "mountainLabel": "Gangkhar Puensum",
@@ -727,7 +833,9 @@
     "rarity": "legendary",
     "flags": [
       "🇧🇹"
-    ]
+    ],
+    "lat": 28.046944444,
+    "lng": 90.455
   },
   {
     "mountainLabel": "Khan Tengri",
@@ -744,7 +852,9 @@
       "🇰🇬",
       "🇰🇿",
       "🇨🇳"
-    ]
+    ],
+    "lat": 42.210833333,
+    "lng": 80.175
   },
   {
     "mountainLabel": "Mont Kazbek",
@@ -757,7 +867,9 @@
     "rarity": "epic",
     "flags": [
       "🇷🇺"
-    ]
+    ],
+    "lat": 42.696944444,
+    "lng": 44.518888888
   },
   {
     "mountainLabel": "Mont Hermon",
@@ -770,7 +882,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇱"
-    ]
+    ],
+    "lat": 33.4,
+    "lng": 35.85
   },
   {
     "mountainLabel": "Grossglockner",
@@ -783,7 +897,9 @@
     "rarity": "rare",
     "flags": [
       "🇦🇹"
-    ]
+    ],
+    "lat": 47.074528,
+    "lng": 12.69385
   },
   {
     "mountainLabel": "Montagne Pelée",
@@ -796,7 +912,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 14.813055555,
+    "lng": -61.165555555
   },
   {
     "mountainLabel": "Mont Whitney",
@@ -809,7 +927,9 @@
     "rarity": "epic",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 36.578611111,
+    "lng": -118.291944444
   },
   {
     "mountainLabel": "Klioutchevskoï",
@@ -822,7 +942,9 @@
     "rarity": "epic",
     "flags": [
       "🇷🇺"
-    ]
+    ],
+    "lat": 56.066666666,
+    "lng": 160.633333333
   },
   {
     "mountainLabel": "Nemrut Dağı",
@@ -835,7 +957,9 @@
     "rarity": "common",
     "flags": [
       "🇹🇷"
-    ]
+    ],
+    "lat": 37.980738888,
+    "lng": 38.740830555
   },
   {
     "mountainLabel": "Mont Cameroun",
@@ -848,7 +972,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇲"
-    ]
+    ],
+    "lat": 4.216666666,
+    "lng": 9.1725
   },
   {
     "mountainLabel": "Vulcano",
@@ -861,7 +987,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇹"
-    ]
+    ],
+    "lat": 38.4042,
+    "lng": 14.9658
   },
   {
     "mountainLabel": "Nanda Devi",
@@ -874,7 +1002,9 @@
     "rarity": "legendary",
     "flags": [
       "🇮🇳"
-    ]
+    ],
+    "lat": 30.373888888,
+    "lng": 79.970833333
   },
   {
     "mountainLabel": "Mont Thabor",
@@ -887,7 +1017,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇱"
-    ]
+    ],
+    "lat": 32.68625,
+    "lng": 35.392916666
   },
   {
     "mountainLabel": "Agung",
@@ -900,7 +1032,9 @@
     "rarity": "rare",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": -8.341944444,
+    "lng": 115.507777777
   },
   {
     "mountainLabel": "Tirich Mir",
@@ -913,7 +1047,9 @@
     "rarity": "legendary",
     "flags": [
       "🇵🇰"
-    ]
+    ],
+    "lat": 36.245833333,
+    "lng": 71.843888888
   },
   {
     "mountainLabel": "Mont Arafat",
@@ -926,7 +1062,9 @@
     "rarity": "common",
     "flags": [
       "🇸🇦"
-    ]
+    ],
+    "lat": 21.354831,
+    "lng": 39.983886
   },
   {
     "mountainLabel": "Hoverla",
@@ -939,7 +1077,9 @@
     "rarity": "common",
     "flags": [
       "🇺🇦"
-    ]
+    ],
+    "lat": 48.160277777,
+    "lng": 24.5
   },
   {
     "mountainLabel": "Eiger",
@@ -952,7 +1092,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.577607529,
+    "lng": 8.005286822
   },
   {
     "mountainLabel": "Mont Roraima",
@@ -967,7 +1109,9 @@
     "flags": [
       "🇻🇪",
       "🇧🇷"
-    ]
+    ],
+    "lat": 5.141944444,
+    "lng": -60.764166666
   },
   {
     "mountainLabel": "Paricutín",
@@ -980,7 +1124,9 @@
     "rarity": "common",
     "flags": [
       "🇲🇽"
-    ]
+    ],
+    "lat": 19.493,
+    "lng": -102.251
   },
   {
     "mountainLabel": "Mont du Pain de Sucre",
@@ -993,7 +1139,9 @@
     "rarity": "common",
     "flags": [
       "🇧🇷"
-    ]
+    ],
+    "lat": -22.949444444,
+    "lng": -43.156666666
   },
   {
     "mountainLabel": "Nowshak",
@@ -1006,7 +1154,9 @@
     "rarity": "legendary",
     "flags": [
       "🇦🇫"
-    ]
+    ],
+    "lat": 36.431666666,
+    "lng": 71.828333333
   },
   {
     "mountainLabel": "Mont Ventoux",
@@ -1019,7 +1169,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.166666666,
+    "lng": 5.283333333
   },
   {
     "mountainLabel": "Aiguille du Midi",
@@ -1032,7 +1184,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.878888888,
+    "lng": 6.8875
   },
   {
     "mountainLabel": "Mehetia",
@@ -1045,7 +1199,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": -17.866666666,
+    "lng": -148.066666666
   },
   {
     "mountainLabel": "Grandes Jorasses",
@@ -1058,7 +1214,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.868081,
+    "lng": 6.988918
   },
   {
     "mountainLabel": "Mont Orohena",
@@ -1071,7 +1229,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": -17.623055555,
+    "lng": -149.476944444
   },
   {
     "mountainLabel": "Piton des Neiges",
@@ -1084,7 +1244,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": -21.098888888,
+    "lng": 55.478888888
   },
   {
     "mountainLabel": "Soufrière",
@@ -1097,7 +1259,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 16.0438,
+    "lng": -61.6634
   },
   {
     "mountainLabel": "Barre des Écrins",
@@ -1110,7 +1274,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.916666666,
+    "lng": 6.333333333
   },
   {
     "mountainLabel": "Mont Dolent",
@@ -1123,7 +1289,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.9225,
+    "lng": 7.046111111
   },
   {
     "mountainLabel": "Vignemale",
@@ -1136,7 +1304,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.773888888,
+    "lng": -0.1475
   },
   {
     "mountainLabel": "Pic du Canigou",
@@ -1149,7 +1319,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.518901928,
+    "lng": 2.456559641
   },
   {
     "mountainLabel": "Monte Cinto",
@@ -1162,7 +1334,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.379722222,
+    "lng": 8.945833333
   },
   {
     "mountainLabel": "Aiguille Verte",
@@ -1175,7 +1349,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.934722222,
+    "lng": 6.97
   },
   {
     "mountainLabel": "Les Drus",
@@ -1188,7 +1364,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.932777777,
+    "lng": 6.956388888
   },
   {
     "mountainLabel": "Crêt de la Neige",
@@ -1201,7 +1379,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 46.2725,
+    "lng": 5.943611111
   },
   {
     "mountainLabel": "Grand Ballon",
@@ -1214,7 +1394,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 47.900833333,
+    "lng": 7.098055555
   },
   {
     "mountainLabel": "Pic du Midi de Bigorre",
@@ -1227,7 +1409,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.937222222,
+    "lng": 0.141111111
   },
   {
     "mountainLabel": "Aiguille d'Argentière",
@@ -1240,7 +1424,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.959761111,
+    "lng": 7.020319444
   },
   {
     "mountainLabel": "Mont Maudit",
@@ -1253,7 +1439,9 @@
     "rarity": "epic",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.847777777,
+    "lng": 6.875833333
   },
   {
     "mountainLabel": "Pique d'Estats",
@@ -1266,7 +1454,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.666937177,
+    "lng": 1.397900658
   },
   {
     "mountainLabel": "Planche des Belles Filles",
@@ -1279,7 +1469,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 47.7672,
+    "lng": 6.77417
   },
   {
     "mountainLabel": "Mont Panié",
@@ -1292,7 +1484,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": -20.588333333,
+    "lng": 164.770555555
   },
   {
     "mountainLabel": "La Rhune",
@@ -1305,7 +1499,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 43.309166666,
+    "lng": -1.635555555
   },
   {
     "mountainLabel": "Pic du Midi d'Ossau",
@@ -1318,7 +1514,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.843055555,
+    "lng": -0.438055555
   },
   {
     "mountainLabel": "Ballon d'Alsace",
@@ -1331,7 +1529,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 47.822222222,
+    "lng": 6.845277777
   },
   {
     "mountainLabel": "Dôme du Goûter",
@@ -1344,7 +1544,9 @@
     "rarity": "epic",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.841666666,
+    "lng": 6.843333333
   },
   {
     "mountainLabel": "Mont Blanc du Tacul",
@@ -1357,7 +1559,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.856388888,
+    "lng": 6.887777777
   },
   {
     "mountainLabel": "Mont Agel",
@@ -1370,7 +1574,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 43.775277777,
+    "lng": 7.426388888
   },
   {
     "mountainLabel": "Mont Ross",
@@ -1383,7 +1589,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": -49.6,
+    "lng": 69.5
   },
   {
     "mountainLabel": "Pointe Marguareis",
@@ -1396,7 +1604,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.173333333,
+    "lng": 7.684444444
   },
   {
     "mountainLabel": "Dent du Géant",
@@ -1409,7 +1619,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.861944444,
+    "lng": 6.951666666
   },
   {
     "mountainLabel": "Cime du Gélas",
@@ -1422,7 +1634,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.122777777,
+    "lng": 7.383888888
   },
   {
     "mountainLabel": "Aiguille du Tour",
@@ -1435,7 +1649,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.994416666,
+    "lng": 7.009833333
   },
   {
     "mountainLabel": "Table des Trois Rois",
@@ -1448,7 +1664,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.919411,
+    "lng": -0.7275039
   },
   {
     "mountainLabel": "Pic du Balaïtous",
@@ -1461,7 +1679,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.838923,
+    "lng": -0.290149
   },
   {
     "mountainLabel": "Puigmal",
@@ -1476,7 +1696,9 @@
     "flags": [
       "🇫🇷",
       "🇪🇸"
-    ]
+    ],
+    "lat": 42.38326609,
+    "lng": 2.116790662
   },
   {
     "mountainLabel": "La Meije",
@@ -1489,7 +1711,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.004722222,
+    "lng": 6.308611111
   },
   {
     "mountainLabel": "Pic de Médécourbe",
@@ -1502,7 +1726,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.603724,
+    "lng": 1.441992
   },
   {
     "mountainLabel": "Mont Pelvoux",
@@ -1515,7 +1741,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.898056,
+    "lng": 6.393333
   },
   {
     "mountainLabel": "Aiguille de Bionnassay",
@@ -1528,7 +1756,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.835833333,
+    "lng": 6.818055555
   },
   {
     "mountainLabel": "Grande Casse",
@@ -1541,7 +1771,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.405278,
+    "lng": 6.8275
   },
   {
     "mountainLabel": "Mont Aiguille",
@@ -1554,7 +1786,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.841944444,
+    "lng": 5.5525
   },
   {
     "mountainLabel": "Aiguille de Triolet",
@@ -1567,7 +1801,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.916358333,
+    "lng": 7.024338888
   },
   {
     "mountainLabel": "Aiguille du Chardonnet",
@@ -1580,7 +1816,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.968986111,
+    "lng": 7.001427777
   },
   {
     "mountainLabel": "Pic de Perdiguère",
@@ -1593,7 +1831,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.6917,
+    "lng": 0.51861
   },
   {
     "mountainLabel": "Mont Aigoual",
@@ -1606,7 +1846,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.11679167,
+    "lng": 3.58343056
   },
   {
     "mountainLabel": "Pic d'Anie",
@@ -1619,7 +1861,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.944166666,
+    "lng": -0.720833333
   },
   {
     "mountainLabel": "Aiguille de Rochefort",
@@ -1632,7 +1876,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.86194444,
+    "lng": 6.95944444
   },
   {
     "mountainLabel": "Chemin des Révoires",
@@ -1645,7 +1891,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 43.732777777,
+    "lng": 7.4125
   },
   {
     "mountainLabel": "Pech de Bugarach",
@@ -1658,7 +1906,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.863611111,
+    "lng": 2.379166666
   },
   {
     "mountainLabel": "Cornettes de Bise",
@@ -1671,7 +1921,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 46.3325,
+    "lng": 6.784444444
   },
   {
     "mountainLabel": "L'Ailefroide",
@@ -1684,7 +1936,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.885,
+    "lng": 6.356111
   },
   {
     "mountainLabel": "Mont Sainte-Odile",
@@ -1697,7 +1951,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 48.437458,
+    "lng": 7.4044908
   },
   {
     "mountainLabel": "Plomb du Cantal",
@@ -1710,7 +1966,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.05888889,
+    "lng": 2.76166667
   },
   {
     "mountainLabel": "Le Semnoz",
@@ -1723,7 +1981,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.797,
+    "lng": 6.105
   },
   {
     "mountainLabel": "Mont Pelat",
@@ -1736,7 +1996,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.263888888,
+    "lng": 6.700555555
   },
   {
     "mountainLabel": "Montagne Bellevue",
@@ -1749,7 +2011,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 3.540555555,
+    "lng": -53.573333333
   },
   {
     "mountainLabel": "Pic du Marboré",
@@ -1762,7 +2026,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.6928,
+    "lng": 0.01167
   },
   {
     "mountainLabel": "Puy Mary",
@@ -1775,7 +2041,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.1093,
+    "lng": 2.676252777
   },
   {
     "mountainLabel": "Pic Sans Nom",
@@ -1788,7 +2056,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.893333,
+    "lng": 6.383333
   },
   {
     "mountainLabel": "Pic d'Orhy",
@@ -1801,7 +2071,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 42.989627777,
+    "lng": -1.004952777
   },
   {
     "mountainLabel": "Dôme de Rochefort",
@@ -1814,7 +2086,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.86433,
+    "lng": 6.967639
   },
   {
     "mountainLabel": "Les Droites",
@@ -1827,7 +2101,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.933055555,
+    "lng": 6.989166666
   },
   {
     "mountainLabel": "Grand Colombier",
@@ -1840,7 +2116,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.89916667,
+    "lng": 5.76111111
   },
   {
     "mountainLabel": "Hohneck",
@@ -1853,7 +2131,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 48.0375,
+    "lng": 7.016388888
   },
   {
     "mountainLabel": "Mont Pourri",
@@ -1866,7 +2146,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.528333333,
+    "lng": 6.86
   },
   {
     "mountainLabel": "Aiguille des Grands Charmoz",
@@ -1879,7 +2161,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.904444444,
+    "lng": 6.918888888
   },
   {
     "mountainLabel": "Pointe de Charbonnel",
@@ -1892,7 +2176,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.28083333,
+    "lng": 7.05555556
   },
   {
     "mountainLabel": "Aiguille des Glaciers",
@@ -1905,7 +2191,9 @@
     "rarity": "rare",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 45.778417,
+    "lng": 6.802524
   },
   {
     "mountainLabel": "Salève",
@@ -1918,7 +2206,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 46.09417,
+    "lng": 6.14028
   },
   {
     "mountainLabel": "Mont Gerbier-de-Jonc",
@@ -1931,7 +2221,9 @@
     "rarity": "common",
     "flags": [
       "🇫🇷"
-    ]
+    ],
+    "lat": 44.84462222,
+    "lng": 4.220275
   },
   {
     "mountainLabel": "Sniejka",
@@ -1946,7 +2238,9 @@
     "flags": [
       "🇵🇱",
       "🇨🇿"
-    ]
+    ],
+    "lat": 50.736111111,
+    "lng": 15.740277777
   },
   {
     "mountainLabel": "Rysy",
@@ -1961,7 +2255,9 @@
     "flags": [
       "🇵🇱",
       "🇸🇰"
-    ]
+    ],
+    "lat": 49.179444444,
+    "lng": 20.088055555
   },
   {
     "mountainLabel": "Jungfrau",
@@ -1974,7 +2270,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.536944444,
+    "lng": 7.9625
   },
   {
     "mountainLabel": "Moussala",
@@ -1987,7 +2285,9 @@
     "rarity": "common",
     "flags": [
       "🇧🇬"
-    ]
+    ],
+    "lat": 42.179167,
+    "lng": 23.585278
   },
   {
     "mountainLabel": "Kebnekaise",
@@ -2000,7 +2300,9 @@
     "rarity": "common",
     "flags": [
       "🇸🇪"
-    ]
+    ],
+    "lat": 67.883333333,
+    "lng": 18.55
   },
   {
     "mountainLabel": "Pic d'Adam",
@@ -2013,7 +2315,9 @@
     "rarity": "common",
     "flags": [
       "🇱🇰"
-    ]
+    ],
+    "lat": 6.809444444,
+    "lng": 80.499722222
   },
   {
     "mountainLabel": "Gerlachovský štít",
@@ -2026,7 +2330,9 @@
     "rarity": "common",
     "flags": [
       "🇸🇰"
-    ]
+    ],
+    "lat": 49.164166666,
+    "lng": 20.133888888
   },
   {
     "mountainLabel": "Mont Âbû",
@@ -2039,7 +2345,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇳"
-    ]
+    ],
+    "lat": 24.5925,
+    "lng": 72.708333333
   },
   {
     "mountainLabel": "Mont Apo",
@@ -2052,7 +2360,9 @@
     "rarity": "common",
     "flags": [
       "🇵🇭"
-    ]
+    ],
+    "lat": 6.9875,
+    "lng": 125.270833333
   },
   {
     "mountainLabel": "Mont Emei",
@@ -2065,7 +2375,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇳"
-    ]
+    ],
+    "lat": 29.519722222,
+    "lng": 103.3325
   },
   {
     "mountainLabel": "Chkhara",
@@ -2084,7 +2396,9 @@
       "🇬🇪",
       "🇷🇺",
       "🇷🇺"
-    ]
+    ],
+    "lat": 42.999444444,
+    "lng": 43.111666666
   },
   {
     "mountainLabel": "Galdhøpiggen",
@@ -2097,7 +2411,9 @@
     "rarity": "common",
     "flags": [
       "🇳🇴"
-    ]
+    ],
+    "lat": 61.633333333,
+    "lng": 8.3
   },
   {
     "mountainLabel": "Aneto",
@@ -2110,7 +2426,9 @@
     "rarity": "rare",
     "flags": [
       "🇪🇸"
-    ]
+    ],
+    "lat": 42.630991666,
+    "lng": 0.656686111
   },
   {
     "mountainLabel": "Mulhacén",
@@ -2123,7 +2441,9 @@
     "rarity": "rare",
     "flags": [
       "🇪🇸"
-    ]
+    ],
+    "lat": 37.053333333,
+    "lng": -3.311388888
   },
   {
     "mountainLabel": "Djebel Toubkal",
@@ -2136,7 +2456,9 @@
     "rarity": "rare",
     "flags": [
       "🇲🇦"
-    ]
+    ],
+    "lat": 31.061944444,
+    "lng": -7.916111111
   },
   {
     "mountainLabel": "Devils Tower",
@@ -2149,7 +2471,9 @@
     "rarity": "epic",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 44.590277777,
+    "lng": -104.715277777
   },
   {
     "mountainLabel": "Yu Shan",
@@ -2162,7 +2486,9 @@
     "rarity": "rare",
     "flags": [
       "🇹🇼"
-    ]
+    ],
+    "lat": 23.47,
+    "lng": 120.957266666
   },
   {
     "mountainLabel": "Grímsvötn",
@@ -2175,7 +2501,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇸"
-    ]
+    ],
+    "lat": 64.42,
+    "lng": -17.33
   },
   {
     "mountainLabel": "Mont Béloukha",
@@ -2188,7 +2516,9 @@
     "rarity": "epic",
     "flags": [
       "🇷🇺"
-    ]
+    ],
+    "lat": 49.806944444,
+    "lng": 86.589722222
   },
   {
     "mountainLabel": "Pointe Dufour",
@@ -2201,7 +2531,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 45.9369238,
+    "lng": 7.866757
   },
   {
     "mountainLabel": "Mont Erciyes",
@@ -2214,7 +2546,9 @@
     "rarity": "rare",
     "flags": [
       "🇹🇷"
-    ]
+    ],
+    "lat": 38.531666666,
+    "lng": 35.45
   },
   {
     "mountainLabel": "Mont Snowdon",
@@ -2227,7 +2561,9 @@
     "rarity": "common",
     "flags": [
       "🇬🇧"
-    ]
+    ],
+    "lat": 53.068863888,
+    "lng": -4.075588888
   },
   {
     "mountainLabel": "Volcán de Fuego",
@@ -2240,7 +2576,9 @@
     "rarity": "rare",
     "flags": [
       "🇬🇹"
-    ]
+    ],
+    "lat": 14.474722222,
+    "lng": -90.880833333
   },
   {
     "mountainLabel": "Mont Korab",
@@ -2255,7 +2593,9 @@
     "flags": [
       "🇲🇰",
       "🇦🇱"
-    ]
+    ],
+    "lat": 41.7903,
+    "lng": 20.5467
   },
   {
     "mountainLabel": "Moldoveanu",
@@ -2268,7 +2608,9 @@
     "rarity": "common",
     "flags": [
       "🇷🇴"
-    ]
+    ],
+    "lat": 45.599438888,
+    "lng": 24.736211111
   },
   {
     "mountainLabel": "Dykh-Tau",
@@ -2281,7 +2623,9 @@
     "rarity": "epic",
     "flags": [
       "🇷🇺"
-    ]
+    ],
+    "lat": 43.0525,
+    "lng": 43.131666666
   },
   {
     "mountainLabel": "Mönch",
@@ -2294,7 +2638,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.558333333,
+    "lng": 7.997222222
   },
   {
     "mountainLabel": "Mont Wutai",
@@ -2307,7 +2653,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇳"
-    ]
+    ],
+    "lat": 39.081388888,
+    "lng": 113.566944444
   },
   {
     "mountainLabel": "Mont Lu",
@@ -2320,7 +2668,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇳"
-    ]
+    ],
+    "lat": 29.5725,
+    "lng": 115.973333333
   },
   {
     "mountainLabel": "Tungurahua",
@@ -2333,7 +2683,9 @@
     "rarity": "epic",
     "flags": [
       "🇪🇨"
-    ]
+    ],
+    "lat": -1.466944444,
+    "lng": -78.441666666
   },
   {
     "mountainLabel": "Mont Iamantaou",
@@ -2346,7 +2698,9 @@
     "rarity": "common",
     "flags": [
       "🇷🇺"
-    ]
+    ],
+    "lat": 54.255,
+    "lng": 58.102
   },
   {
     "mountainLabel": "Ol Doinyo Lengaï",
@@ -2359,7 +2713,9 @@
     "rarity": "common",
     "flags": [
       "🇹🇿"
-    ]
+    ],
+    "lat": -2.761666666,
+    "lng": 35.913333333
   },
   {
     "mountainLabel": "Monte San Giorgio",
@@ -2372,7 +2728,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 45.916666666,
+    "lng": 8.95
   },
   {
     "mountainLabel": "Snæfellsjökull",
@@ -2385,7 +2743,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇸"
-    ]
+    ],
+    "lat": 64.807120486,
+    "lng": -23.77622792
   },
   {
     "mountainLabel": "Pico Bolívar",
@@ -2398,7 +2758,9 @@
     "rarity": "epic",
     "flags": [
       "🇻🇪"
-    ]
+    ],
+    "lat": 8.540861111,
+    "lng": -71.0465
   },
   {
     "mountainLabel": "Bromo",
@@ -2411,7 +2773,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": -7.943055555,
+    "lng": 112.953888888
   },
   {
     "mountainLabel": "Carrauntuohill",
@@ -2424,7 +2788,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇪"
-    ]
+    ],
+    "lat": 51.998888888,
+    "lng": -9.742777777
   },
   {
     "mountainLabel": "Hvannadalshnjúkur",
@@ -2437,7 +2803,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇸"
-    ]
+    ],
+    "lat": 64.015833333,
+    "lng": -16.674722222
   },
   {
     "mountainLabel": "Mont Rinjani",
@@ -2450,7 +2818,9 @@
     "rarity": "rare",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": -8.416666666,
+    "lng": 116.466666666
   },
   {
     "mountainLabel": "Pilate",
@@ -2463,7 +2833,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.973889,
+    "lng": 8.241111
   },
   {
     "mountainLabel": "Galeras",
@@ -2476,7 +2848,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇴"
-    ]
+    ],
+    "lat": 1.216666666,
+    "lng": -77.366666666
   },
   {
     "mountainLabel": "Ras Dashan",
@@ -2489,7 +2863,9 @@
     "rarity": "epic",
     "flags": [
       "🇪🇹"
-    ]
+    ],
+    "lat": 13.236666666,
+    "lng": 38.3725
   },
   {
     "mountainLabel": "Mont Sanqing",
@@ -2502,7 +2878,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇳"
-    ]
+    ],
+    "lat": 28.951944444,
+    "lng": 118.051944444
   },
   {
     "mountainLabel": "Avatchinski",
@@ -2515,7 +2893,9 @@
     "rarity": "common",
     "flags": [
       "🇷🇺"
-    ]
+    ],
+    "lat": 53.255555555,
+    "lng": 158.833333333
   },
   {
     "mountainLabel": "Dom",
@@ -2528,7 +2908,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.094444444,
+    "lng": 7.856666666
   },
   {
     "mountainLabel": "Fansipan",
@@ -2541,7 +2923,9 @@
     "rarity": "rare",
     "flags": [
       "🇻🇳"
-    ]
+    ],
+    "lat": 22.3033319,
+    "lng": 103.7753148
   },
   {
     "mountainLabel": "Hoher Dachstein",
@@ -2554,7 +2938,9 @@
     "rarity": "common",
     "flags": [
       "🇦🇹"
-    ]
+    ],
+    "lat": 47.475168,
+    "lng": 13.605735
   },
   {
     "mountainLabel": "Volcán de Colima",
@@ -2567,7 +2953,9 @@
     "rarity": "rare",
     "flags": [
       "🇲🇽"
-    ]
+    ],
+    "lat": 19.511388888,
+    "lng": -103.618055555
   },
   {
     "mountainLabel": "Mont Méru",
@@ -2580,7 +2968,9 @@
     "rarity": "epic",
     "flags": [
       "🇹🇿"
-    ]
+    ],
+    "lat": -3.246780555,
+    "lng": 36.76025
   },
   {
     "mountainLabel": "Mont Elgon",
@@ -2595,7 +2985,9 @@
     "flags": [
       "🇰🇪",
       "🇺🇬"
-    ]
+    ],
+    "lat": 1.1185,
+    "lng": 34.5265
   },
   {
     "mountainLabel": "Montserrat",
@@ -2608,7 +3000,9 @@
     "rarity": "common",
     "flags": [
       "🇪🇸"
-    ]
+    ],
+    "lat": 41.605376,
+    "lng": 1.811495
   },
   {
     "mountainLabel": "Vitocha",
@@ -2621,7 +3015,9 @@
     "rarity": "common",
     "flags": [
       "🇧🇬"
-    ]
+    ],
+    "lat": 42.566666666,
+    "lng": 23.283333333
   },
   {
     "mountainLabel": "Mont Narodnaïa",
@@ -2634,7 +3030,9 @@
     "rarity": "common",
     "flags": [
       "🇷🇺"
-    ]
+    ],
+    "lat": 65.033333333,
+    "lng": 60.116666666
   },
   {
     "mountainLabel": "Liskamm",
@@ -2647,7 +3045,9 @@
     "rarity": "epic",
     "flags": [
       "🇮🇹"
-    ]
+    ],
+    "lat": 45.9225,
+    "lng": 7.835555555
   },
   {
     "mountainLabel": "Weisshorn",
@@ -2660,7 +3060,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.101666666,
+    "lng": 7.716111111
   },
   {
     "mountainLabel": "Mont Ida",
@@ -2673,7 +3075,9 @@
     "rarity": "common",
     "flags": [
       "🇬🇷"
-    ]
+    ],
+    "lat": 35.226388888,
+    "lng": 24.770713888
   },
   {
     "mountainLabel": "Lagginhorn",
@@ -2686,7 +3090,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.157222222,
+    "lng": 8.003055555
   },
   {
     "mountainLabel": "Montagne de Clariden",
@@ -2699,7 +3105,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.841944444,
+    "lng": 8.871111111
   },
   {
     "mountainLabel": "Cerro de Monserrate",
@@ -2712,7 +3120,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇴"
-    ]
+    ],
+    "lat": 4.605833,
+    "lng": -74.056389
   },
   {
     "mountainLabel": "Inyangani",
@@ -2725,7 +3135,9 @@
     "rarity": "common",
     "flags": [
       "🇿🇼"
-    ]
+    ],
+    "lat": -18.311111111,
+    "lng": 32.850555555
   },
   {
     "mountainLabel": "Chaitén",
@@ -2738,7 +3150,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇱"
-    ]
+    ],
+    "lat": -42.832777777,
+    "lng": -72.645833333
   },
   {
     "mountainLabel": "Kremenec",
@@ -2751,7 +3165,9 @@
     "rarity": "common",
     "flags": [
       "🇵🇱"
-    ]
+    ],
+    "lat": 49.088694444,
+    "lng": 22.565444444
   },
   {
     "mountainLabel": "Zard Kuh",
@@ -2764,7 +3180,9 @@
     "rarity": "rare",
     "flags": [
       "🇮🇷"
-    ]
+    ],
+    "lat": 32.364444444,
+    "lng": 50.0775
   },
   {
     "mountainLabel": "Ještěd",
@@ -2777,7 +3195,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇿"
-    ]
+    ],
+    "lat": 50.732222222,
+    "lng": 14.985277777
   },
   {
     "mountainLabel": "Cerro de Guadalupe",
@@ -2790,7 +3210,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇴"
-    ]
+    ],
+    "lat": 4.59194,
+    "lng": -74.0544
   },
   {
     "mountainLabel": "Le Grammont",
@@ -2803,7 +3225,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.357472222,
+    "lng": 6.821166666
   },
   {
     "mountainLabel": "Mont Constance",
@@ -2816,7 +3240,9 @@
     "rarity": "common",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 47.7726285,
+    "lng": -123.1273118
   },
   {
     "mountainLabel": "Pic Chaussy",
@@ -2829,7 +3255,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.377111111,
+    "lng": 7.112777777
   },
   {
     "mountainLabel": "Männlichen",
@@ -2842,7 +3270,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.618056,
+    "lng": 7.938056
   },
   {
     "mountainLabel": "Geureudong",
@@ -2855,7 +3285,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": 4.813055555,
+    "lng": 96.816666666
   },
   {
     "mountainLabel": "Gspaltenhorn",
@@ -2868,7 +3300,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.511388888,
+    "lng": 7.827777777
   },
   {
     "mountainLabel": "Alvier",
@@ -2881,7 +3315,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 47.1096,
+    "lng": 9.41473
   },
   {
     "mountainLabel": "Bifertenstock",
@@ -2894,7 +3330,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.805555555,
+    "lng": 8.958611111
   },
   {
     "mountainLabel": "Le Rubli",
@@ -2907,7 +3345,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.463138888,
+    "lng": 7.210722222
   },
   {
     "mountainLabel": "Dent Blanche",
@@ -2920,7 +3360,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.034166666,
+    "lng": 7.611944444
   },
   {
     "mountainLabel": "Finsteraarhorn",
@@ -2933,7 +3375,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.5373553,
+    "lng": 8.1260907
   },
   {
     "mountainLabel": "Grand Combin",
@@ -2946,7 +3390,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 45.9375,
+    "lng": 7.299166666
   },
   {
     "mountainLabel": "Cofre de Perote",
@@ -2959,7 +3405,9 @@
     "rarity": "epic",
     "flags": [
       "🇲🇽"
-    ]
+    ],
+    "lat": 19.491944444,
+    "lng": -97.15
   },
   {
     "mountainLabel": "Alphubel",
@@ -2972,7 +3420,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.062938888,
+    "lng": 7.863911111
   },
   {
     "mountainLabel": "Piz Bernina",
@@ -2985,7 +3435,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.382388888,
+    "lng": 9.908111111
   },
   {
     "mountainLabel": "Zinalrothorn",
@@ -2998,7 +3450,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.064722222,
+    "lng": 7.69
   },
   {
     "mountainLabel": "Dreieckhorn",
@@ -3011,7 +3465,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.478,
+    "lng": 8.019972222
   },
   {
     "mountainLabel": "Fronalpstock",
@@ -3024,7 +3480,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 47.0683,
+    "lng": 9.10778
   },
   {
     "mountainLabel": "Morgenberghorn",
@@ -3037,7 +3495,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.622166666,
+    "lng": 7.793555555
   },
   {
     "mountainLabel": "Altmann",
@@ -3050,7 +3510,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 47.2397,
+    "lng": 9.37194
   },
   {
     "mountainLabel": "Salbitschijen",
@@ -3063,7 +3525,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.680472222,
+    "lng": 8.529416666
   },
   {
     "mountainLabel": "Galenstock",
@@ -3076,7 +3540,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.6126211,
+    "lng": 8.4169576
   },
   {
     "mountainLabel": "Wendenhorn",
@@ -3089,7 +3555,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.753861111,
+    "lng": 8.443555555
   },
   {
     "mountainLabel": "Grassen",
@@ -3102,7 +3570,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.763416666,
+    "lng": 8.448333333
   },
   {
     "mountainLabel": "Hochtor",
@@ -3115,7 +3585,9 @@
     "rarity": "common",
     "flags": [
       "🇦🇹"
-    ]
+    ],
+    "lat": 47.561666666,
+    "lng": 14.632777777
   },
   {
     "mountainLabel": "Mont Macdonald",
@@ -3128,7 +3600,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇦"
-    ]
+    ],
+    "lat": 51.3083,
+    "lng": -117.472
   },
   {
     "mountainLabel": "Gantrisch",
@@ -3141,7 +3615,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.705166666,
+    "lng": 7.4505
   },
   {
     "mountainLabel": "Kaiseregg",
@@ -3154,7 +3630,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.652416666,
+    "lng": 7.319055555
   },
   {
     "mountainLabel": "Titlis",
@@ -3167,7 +3645,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.771944444,
+    "lng": 8.437777777
   },
   {
     "mountainLabel": "Piz Zupò",
@@ -3180,7 +3660,9 @@
     "rarity": "rare",
     "flags": [
       "🇮🇹"
-    ]
+    ],
+    "lat": 46.368333333,
+    "lng": 9.931111111
   },
   {
     "mountainLabel": "Silvrettahorn",
@@ -3193,7 +3675,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.858001,
+    "lng": 10.092342
   },
   {
     "mountainLabel": "Dammastock",
@@ -3206,7 +3690,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.6434517,
+    "lng": 8.4210932
   },
   {
     "mountainLabel": "Rheinwaldhorn",
@@ -3219,7 +3705,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.493611111,
+    "lng": 9.04
   },
   {
     "mountainLabel": "Tödi",
@@ -3232,7 +3720,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.811111111,
+    "lng": 8.914722222
   },
   {
     "mountainLabel": "Ringelspitz",
@@ -3245,7 +3735,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.899722222,
+    "lng": 9.344166666
   },
   {
     "mountainLabel": "Gefrorene-Wand-Spitzen",
@@ -3258,7 +3750,9 @@
     "rarity": "rare",
     "flags": [
       "🇦🇹"
-    ]
+    ],
+    "lat": 47.065277777,
+    "lng": 11.679166666
   },
   {
     "mountainLabel": "Rochemelon",
@@ -3271,7 +3765,9 @@
     "rarity": "rare",
     "flags": [
       "🇮🇹"
-    ]
+    ],
+    "lat": 45.2036,
+    "lng": 7.0769
   },
   {
     "mountainLabel": "Pic Talgar",
@@ -3284,7 +3780,9 @@
     "rarity": "epic",
     "flags": [
       "🇰🇿"
-    ]
+    ],
+    "lat": 43.117838888,
+    "lng": 77.341333333
   },
   {
     "mountainLabel": "Antuco",
@@ -3297,7 +3795,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇱"
-    ]
+    ],
+    "lat": -37.41,
+    "lng": -71.351111111
   },
   {
     "mountainLabel": "Mont Tongariro",
@@ -3310,7 +3810,9 @@
     "rarity": "common",
     "flags": [
       "🇳🇿"
-    ]
+    ],
+    "lat": -39.129722222,
+    "lng": 175.635833333
   },
   {
     "mountainLabel": "Telomoyo",
@@ -3323,7 +3825,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": -7.37,
+    "lng": 110.4
   },
   {
     "mountainLabel": "Bös Fulen",
@@ -3336,7 +3840,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.967222222,
+    "lng": 8.945833333
   },
   {
     "mountainLabel": "Les Diablerets",
@@ -3349,7 +3855,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.303888888,
+    "lng": 7.189166666
   },
   {
     "mountainLabel": "Rotstöckli",
@@ -3362,7 +3870,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.7775,
+    "lng": 8.425833333
   },
   {
     "mountainLabel": "Säntis",
@@ -3375,7 +3885,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 47.249167,
+    "lng": 9.343333
   },
   {
     "mountainLabel": "Vanil Noir",
@@ -3388,7 +3900,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.528472222,
+    "lng": 7.148361111
   },
   {
     "mountainLabel": "Alutu",
@@ -3401,7 +3915,9 @@
     "rarity": "common",
     "flags": [
       "🇪🇹"
-    ]
+    ],
+    "lat": 7.765422222,
+    "lng": 38.782325
   },
   {
     "mountainLabel": "Auyán Tepuy",
@@ -3414,7 +3930,9 @@
     "rarity": "common",
     "flags": [
       "🇻🇪"
-    ]
+    ],
+    "lat": 5.9008721,
+    "lng": -62.5499729
   },
   {
     "mountainLabel": "Talagabodas",
@@ -3427,7 +3945,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": -7.208,
+    "lng": 108.07
   },
   {
     "mountainLabel": "Trebević",
@@ -3440,7 +3960,9 @@
     "rarity": "common",
     "flags": [
       "🇧🇦"
-    ]
+    ],
+    "lat": 43.823333333,
+    "lng": 18.448888888
   },
   {
     "mountainLabel": "Mont Hubbard",
@@ -3453,7 +3975,9 @@
     "rarity": "epic",
     "flags": [
       "🇨🇦"
-    ]
+    ],
+    "lat": 60.319166666,
+    "lng": -139.071388888
   },
   {
     "mountainLabel": "Habicht",
@@ -3466,7 +3990,9 @@
     "rarity": "rare",
     "flags": [
       "🇦🇹"
-    ]
+    ],
+    "lat": 47.043611111,
+    "lng": 11.289444444
   },
   {
     "mountainLabel": "Mont Mitchell",
@@ -3479,7 +4005,9 @@
     "rarity": "common",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 35.764761111,
+    "lng": -82.264861111
   },
   {
     "mountainLabel": "Niesen",
@@ -3492,7 +4020,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.646111111,
+    "lng": 7.6525
   },
   {
     "mountainLabel": "Bürgenstock",
@@ -3505,7 +4035,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 47.000305555,
+    "lng": 8.398388888
   },
   {
     "mountainLabel": "Piz Alv",
@@ -3518,7 +4050,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.579111,
+    "lng": 8.678694
   },
   {
     "mountainLabel": "Gross Düssi",
@@ -3531,7 +4065,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.791805555,
+    "lng": 8.827444444
   },
   {
     "mountainLabel": "Witenwasserenstock",
@@ -3544,7 +4080,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.5282156,
+    "lng": 8.4748445
   },
   {
     "mountainLabel": "Batur",
@@ -3557,7 +4095,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": -8.237222222,
+    "lng": 115.376944444
   },
   {
     "mountainLabel": "Hochblauen",
@@ -3570,7 +4110,9 @@
     "rarity": "common",
     "flags": [
       "🇩🇪"
-    ]
+    ],
+    "lat": 47.7775,
+    "lng": 7.70111111
   },
   {
     "mountainLabel": "Doña Juana",
@@ -3583,7 +4125,9 @@
     "rarity": "rare",
     "flags": [
       "🇨🇴"
-    ]
+    ],
+    "lat": 1.47075,
+    "lng": -76.924902777
   },
   {
     "mountainLabel": "Soufrière",
@@ -3596,7 +4140,9 @@
     "rarity": "common",
     "flags": [
       "🇻🇨"
-    ]
+    ],
+    "lat": 13.333333333,
+    "lng": -61.183333333
   },
   {
     "mountainLabel": "Lelija",
@@ -3609,7 +4155,9 @@
     "rarity": "common",
     "flags": [
       "🇧🇦"
-    ]
+    ],
+    "lat": 43.423055555,
+    "lng": 18.488055555
   },
   {
     "mountainLabel": "Doyle's Delight",
@@ -3622,7 +4170,9 @@
     "rarity": "common",
     "flags": [
       "🇧🇿"
-    ]
+    ],
+    "lat": 16.5,
+    "lng": -89.05
   },
   {
     "mountainLabel": "Mont Churchill",
@@ -3635,7 +4185,9 @@
     "rarity": "epic",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 61.419166666,
+    "lng": -141.715277777
   },
   {
     "mountainLabel": "Mount Snow",
@@ -3648,7 +4200,9 @@
     "rarity": "common",
     "flags": [
       "🇺🇸"
-    ]
+    ],
+    "lat": 42.95897,
+    "lng": -72.92371
   },
   {
     "mountainLabel": "Zelengora",
@@ -3661,7 +4215,9 @@
     "rarity": "common",
     "flags": [
       "🇧🇦"
-    ]
+    ],
+    "lat": 43.4225,
+    "lng": 18.487777777
   },
   {
     "mountainLabel": "Chasseral",
@@ -3674,7 +4230,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 47.133055555,
+    "lng": 7.059444444
   },
   {
     "mountainLabel": "Hasenmatt",
@@ -3687,7 +4245,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 47.242067,
+    "lng": 7.450511
   },
   {
     "mountainLabel": "Mont Raimeux",
@@ -3700,7 +4260,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 47.308333333,
+    "lng": 7.429166666
   },
   {
     "mountainLabel": "Schnebelhorn",
@@ -3713,7 +4275,9 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 47.325611111,
+    "lng": 8.979638888
   },
   {
     "mountainLabel": "Sorikmarapi",
@@ -3726,7 +4290,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": 0.686,
+    "lng": 99.539
   },
   {
     "mountainLabel": "Seulawah Agam",
@@ -3739,7 +4305,9 @@
     "rarity": "common",
     "flags": [
       "🇮🇩"
-    ]
+    ],
+    "lat": 5.448,
+    "lng": 95.658
   },
   {
     "mountainLabel": "Pointe Zumstein",
@@ -3752,7 +4320,9 @@
     "rarity": "epic",
     "flags": [
       "🇮🇹"
-    ]
+    ],
+    "lat": 45.931944444,
+    "lng": 7.871388888
   },
   {
     "mountainLabel": "Ankogel",
@@ -3765,7 +4335,9 @@
     "rarity": "rare",
     "flags": [
       "🇦🇹"
-    ]
+    ],
+    "lat": 47.051111111,
+    "lng": 13.248611111
   },
   {
     "mountainLabel": "Grosser Hundstod",
@@ -3778,7 +4350,9 @@
     "rarity": "common",
     "flags": [
       "🇦🇹"
-    ]
+    ],
+    "lat": 47.5125,
+    "lng": 12.8861
   },
   {
     "mountainLabel": "Krottenkopf",
@@ -3791,7 +4365,9 @@
     "rarity": "common",
     "flags": [
       "🇩🇪"
-    ]
+    ],
+    "lat": 47.545280555,
+    "lng": 11.192780555
   },
   {
     "mountainLabel": "Illhorn",
@@ -3804,6 +4380,8 @@
     "rarity": "common",
     "flags": [
       "🇨🇭"
-    ]
+    ],
+    "lat": 46.26275,
+    "lng": 7.616222222
   }
 ]
