@@ -80,10 +80,13 @@ export class VoiceConfigRepository {
     return config.features.voice;
   }
 
-  static async removeCreatedChannel(channelId: string): Promise<IVoiceConfig | null> {
+  static async removeCreatedChannel(channelId: string, decrementCount = false): Promise<IVoiceConfig | null> {
     const config = await AppConfigService.getOrCreateConfig();
     if (!config.features?.voice) return null;
     config.features.voice.createdChannels = config.features.voice.createdChannels.filter(id => id !== channelId);
+    if (decrementCount && config.features.voice.channelCount > 0) {
+      config.features.voice.channelCount -= 1;
+    }
     await config.save();
     return config.features.voice;
   }

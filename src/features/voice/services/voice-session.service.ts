@@ -4,7 +4,7 @@ import { getGuildId } from '../../../shared/guild';
 import { LogService } from '../../../shared/logs/logs.service';
 import { VoiceConfigRepository } from '../repositories/voice-config.repository';
 import { VoiceSessionRepository } from '../repositories/voice-session.repository';
-import { VOICE_XP_PER_MINUTE, VOICE_MONEY_PER_MINUTE, VOICE_MIN_ACTIVE_SECONDS } from '../constants/voice.constants';
+import { VOICE_XP_PER_MINUTE, VOICE_MONEY_PER_MINUTE, VOICE_MIN_ACTIVE_SECONDS, VOICE_MIN_COUNT_SECONDS } from '../constants/voice.constants';
 import UserModel from '../../user/models/user.model';
 import { LevelingService } from '../../leveling/services/leveling.service';
 import type { MountainSessionResult } from '../../mountain/services/mountain.plugin';
@@ -60,6 +60,7 @@ interface InternalSession {
 export class VoiceSessionService {
   private static plugins: VoicePlugin[] = [];
   private static sessions = new Map<string, InternalSession>();
+  private static channelCreatedAt = new Map<string, number>();
 
   static registerPlugin(plugin: VoicePlugin): void {
     this.plugins.push(plugin);
@@ -263,7 +264,10 @@ export class VoiceSessionService {
         for (const plugin of this.plugins) {
           try { plugin.onChannelDeleted?.(channelId); } catch {}
         }
-        await VoiceConfigRepository.removeCreatedChannel(channelId);
+        const createdAt = this.channelCreatedAt.get(channelId);
+        this.channelCreatedAt.delete(channelId);
+        const tooShort = createdAt !== undefined && (Date.now() - createdAt) / 1000 < VOICE_MIN_COUNT_SECONDS;
+        await VoiceConfigRepository.removeCreatedChannel(channelId, tooShort);
         console.log(`[VoiceSession] Canal supprimé: ${channel.name}`);
       } catch (err) {
         console.error('[VoiceSession] Erreur suppression canal:', err);
@@ -579,6 +583,7 @@ export class VoiceSessionService {
       }
 
       await VoiceConfigRepository.addCreatedChannel(newChannel.id);
+      this.channelCreatedAt.set(newChannel.id, Date.now());
 
       for (const plugin of this.plugins) {
         try {
