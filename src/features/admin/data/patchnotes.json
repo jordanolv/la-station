@@ -123,72 +123,6 @@
     ]
   },
   {
-    "version": "1.3.1",
-    "timestamp": 1775677324,
-    "sections": [
-      {
-        "type": "new",
-        "blocks": [
-          {
-            "title": "🔍  Vérifier une montagne en vocal",
-            "items": [
-              "Un bouton **Vérifier** est désormais affiché sur l'embed de montagne dans le salon vocal",
-              "Cliquez dessus pour savoir instantanément si vous possédez déjà cette montagne"
-            ]
-          }
-        ]
-      },
-      {
-        "type": "fix",
-        "blocks": [
-          {
-            "title": "🎁  Récompense quotidienne `/daily`",
-            "items": [
-              "Le reset du `/daily` se base désormais sur **minuit heure de Paris** — plus de décalage selon votre fuseau ou l'heure du serveur"
-            ]
-          },
-          {
-            "title": "🔥  Rôles d'activité",
-            "items": [
-              "Le calcul des rôles **Actif** et **Présent** exclut désormais correctement le podium du classement",
-              "Le classement hebdomadaire affiche tous les membres actifs, sans limite au top 10"
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "version": "1.4.0",
-    "timestamp": 1775822400,
-    "sections": [
-      {
-        "type": "new",
-        "blocks": [
-          {
-            "title": "🗺️  Carte des montagnes",
-            "items": [
-              "Nouveau bouton **Carte** depuis `/mountain` pour afficher ta carte du monde",
-              "Vue par continent : **Europe**, **Afrique**, **Asie**, **Amérique** — navigue entre les régions directement depuis Discord",
-              "Bouton **Ouvrir le globe 3D** pour explorer ta collection en détail avec le globe interactif"
-            ]
-          }
-        ]
-      },
-      {
-        "type": "update",
-        "blocks": [
-          {
-            "title": "⛰️  Montagnes vocales",
-            "items": [
-              "Si tu quittes un salon vocal et en recrées un dans les **30 minutes**, tu retrouves la même montagne à farmer"
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
     "version": "1.3.0",
     "timestamp": 1775642400,
     "sections": [
@@ -236,6 +170,61 @@
             "title": "🎉  Soirées",
             "items": [
               "Refonte complète du système de soirées avec un nouveau panel de gestion"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "1.4.0",
+    "timestamp": 1775822400,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🔍  Vérifier une montagne en vocal",
+            "items": [
+              "Un bouton **Vérifier** est désormais affiché sur l'embed de montagne dans le salon vocal",
+              "Cliquez dessus pour savoir instantanément si vous possédez déjà cette montagne"
+            ]
+          },
+          {
+            "title": "🗺️  Carte des montagnes",
+            "items": [
+              "Nouveau bouton **Carte** depuis `/mountain` pour afficher ta carte du monde",
+              "Vue par continent : **Europe**, **Afrique**, **Asie**, **Amérique** — navigue entre les régions directement depuis Discord",
+              "Bouton **Ouvrir le globe 3D** pour explorer ta collection en détail avec le globe interactif"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "⛰️  Montagnes vocales",
+            "items": [
+              "Si tu quittes un salon vocal et en recrées un dans les **30 minutes**, tu retrouves la même montagne à farmer"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "fix",
+        "blocks": [
+          {
+            "title": "🎁  Récompense quotidienne `/daily`",
+            "items": [
+              "Le reset du `/daily` se base désormais sur **minuit heure de Paris** — plus de décalage selon votre fuseau ou l'heure du serveur"
+            ]
+          },
+          {
+            "title": "🔥  Rôles d'activité",
+            "items": [
+              "Le calcul des rôles **Actif** et **Présent** exclut désormais correctement le podium du classement",
+              "Le classement hebdomadaire affiche tous les membres actifs, sans limite au top 10"
             ]
           }
         ]
