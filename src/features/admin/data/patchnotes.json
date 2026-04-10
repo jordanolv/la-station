@@ -159,6 +159,36 @@
     ]
   },
   {
+    "version": "1.4.0",
+    "timestamp": 1775822400,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🗺️  Carte des montagnes",
+            "items": [
+              "Nouveau bouton **Carte** depuis `/mountain` pour afficher ta carte du monde",
+              "Vue par continent : **Europe**, **Afrique**, **Asie**, **Amérique** — navigue entre les régions directement depuis Discord",
+              "Bouton **Ouvrir le globe 3D** pour explorer ta collection en détail avec le globe interactif"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "⛰️  Montagnes vocales",
+            "items": [
+              "Si tu quittes un salon vocal et en recrées un dans les **30 minutes**, tu retrouves la même montagne à farmer"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.3.0",
     "timestamp": 1775642400,
     "sections": [

@@ -33,7 +33,9 @@ const assetsToCopy = [
   { source: '../canva', dest: '../dist/canva', name: 'canva/' },
   { source: '../src/assets', dest: '../dist/assets', name: 'src/assets/' },
   { source: '../src/features/voc-manager/data', dest: '../dist/features/voc-manager/data', name: 'src/features/voc-manager/data/' },
-  { source: '../src/features/mountain/data', dest: '../dist/features/mountain/data', name: 'src/features/mountain/data/' }
+  { source: '../src/features/mountain/data', dest: '../dist/features/mountain/data', name: 'src/features/mountain/data/' },
+  { source: '../src/web/public', dest: '../dist/web/public', name: 'src/web/public/' },
+  { source: '../src/web/data', dest: '../dist/web/data', name: 'src/web/data/' }
 ];
 
 let copiedCount = 0;
