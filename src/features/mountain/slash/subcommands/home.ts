@@ -6,6 +6,8 @@ import {
   SectionBuilder,
   ThumbnailBuilder,
   SeparatorBuilder,
+  MediaGalleryBuilder,
+  MediaGalleryItemBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -20,8 +22,55 @@ import type { MountainRarity } from '../../types/mountain.types';
 import { buildInventoryContainer } from './inv';
 import { buildPackInfoContainer } from './pack';
 import { buildLeaderboardContainer } from './leaderboard';
+import { MountainWebService } from '../../services/mountain-web.service';
+import { MountainMapService, CountryData, Continent } from '../../services/mountain-map.service';
 
 export const HOME_BUTTON_PREFIX = 'mountain:home';
+export const MAP_BUTTON_PREFIX = 'mountain:map';
+
+const CONTINENTS: { id: Continent; label: string; emoji: string }[] = [
+  { id: 'europe',   label: 'Europe',   emoji: '🌍' },
+  { id: 'afrique',  label: 'Afrique',  emoji: '🌍' },
+  { id: 'asie',     label: 'Asie',     emoji: '🌏' },
+  { id: 'amerique', label: 'Amérique', emoji: '🌎' },
+];
+
+function buildMapContainer(user: User, countries: CountryData[], totalCountries: number, globeUrl: string, continent: Continent): ContainerBuilder {
+  const continentRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    ...CONTINENTS.map(c =>
+      new ButtonBuilder()
+        .setCustomId(`${MAP_BUTTON_PREFIX}:${c.id}:${user.id}`)
+        .setLabel(c.label)
+        .setEmoji(c.emoji)
+        .setStyle(c.id === continent ? ButtonStyle.Primary : ButtonStyle.Secondary),
+    ),
+  );
+
+  return new ContainerBuilder()
+    .setAccentColor(0x5865f2)
+    .addSectionComponents(
+      new SectionBuilder()
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`## 🗺️ Carte des montagnes\n-# **${user.displayName}** · ${countries.length}/${totalCountries} pays débloqués`),
+        )
+        .setThumbnailAccessory(new ThumbnailBuilder().setURL(user.displayAvatarURL({ size: 64 }))),
+    )
+    .addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setURL('attachment://mountain-map.png'),
+      ),
+    )
+    .addActionRowComponents(continentRow)
+    .addActionRowComponents(
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setLabel('Ouvrir le globe 3D')
+          .setURL(globeUrl)
+          .setStyle(ButtonStyle.Link)
+          .setEmoji('🌐'),
+      ),
+    );
+}
 
 const RARITY_ORDER: MountainRarity[] = ['legendary', 'epic', 'rare', 'common'];
 
@@ -63,6 +112,11 @@ async function buildHomeContainer(user: User, lastMsgId = 'none'): Promise<Conta
       .setCustomId(`${HOME_BUTTON_PREFIX}:leaderboard:${lastMsgId}`)
       .setLabel('Classement')
       .setEmoji('🏆')
+      .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setCustomId(`${HOME_BUTTON_PREFIX}:map:${lastMsgId}`)
+      .setLabel('Carte')
+      .setEmoji('🗺️')
       .setStyle(ButtonStyle.Secondary),
   );
 
@@ -136,6 +190,22 @@ export async function handleHomeButton(
     components = [buildPackInfoContainer(user, doc.packTickets, doc.fragments)];
   } else if (action === 'leaderboard') {
     components = [await buildLeaderboardContainer(user, client)];
+  } else if (action === 'map') {
+    const countries = await MountainMapService.getCountriesForUser(user.id);
+    const totalCountries = MountainMapService.getTotalCountryCount();
+    const globeUrl = MountainWebService.generateMapUrl(user.id);
+    const imageBuffer = await MountainMapService.generateStaticImage(countries, 'europe');
+
+    const sentMsg = await interaction.followUp({
+      files: [{ attachment: imageBuffer, name: 'mountain-map.png' }],
+      components: [buildMapContainer(user, countries, totalCountries, globeUrl, 'europe')],
+      flags: MessageFlags.IsComponentsV2,
+      fetchReply: true,
+    });
+
+    const updatedHome = await buildHomeContainer(user, sentMsg.id);
+    await interaction.editReply({ components: [updatedHome], flags: MessageFlags.IsComponentsV2 });
+    return;
   } else {
     return;
   }
@@ -149,6 +219,31 @@ export async function handleHomeButton(
   const updatedHome = await buildHomeContainer(user, sentMsg.id);
   await interaction.editReply({
     components: [updatedHome],
+    flags: MessageFlags.IsComponentsV2,
+  });
+}
+
+export async function handleMapButton(interaction: ButtonInteraction): Promise<void> {
+  const parts = interaction.customId.split(':');
+  const continent = parts[2] as Continent;
+  const userId = parts[3];
+
+  if (interaction.user.id !== userId) {
+    await interaction.reply({ content: 'Cette carte ne t\'appartient pas.', flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  await interaction.deferUpdate();
+
+  const countries = await MountainMapService.getCountriesForUser(userId);
+  const totalCountries = MountainMapService.getTotalCountryCount();
+  const globeUrl = MountainWebService.generateMapUrl(userId);
+  const imageBuffer = await MountainMapService.generateStaticImage(countries, continent);
+
+  await interaction.editReply({
+    files: [{ attachment: imageBuffer, name: 'mountain-map.png' }],
+    attachments: [],
+    components: [buildMapContainer(interaction.user, countries, totalCountries, globeUrl, continent)],
     flags: MessageFlags.IsComponentsV2,
   });
 }

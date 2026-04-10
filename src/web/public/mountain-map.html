@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ma carte des montagnes</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+      gap: 16px;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 12px; }
+
+    h1 { font-size: 1rem; font-weight: 600; }
+    .subtitle { font-size: 0.8rem; color: #8b949e; }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #e6edf3;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      transition: opacity 0.15s, background 0.15s;
+      user-select: none;
+    }
+
+    .legend-item:hover { background: rgba(255,255,255,0.1); }
+
+    .legend-item.off {
+      opacity: 0.35;
+      background: transparent;
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    #globe-wrapper {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+    }
+
+    #globe-container {
+      position: absolute;
+      inset: 0;
+    }
+
+    #globe-container canvas { display: block; }
+
+    #overlays {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    #overlays > * { pointer-events: auto; }
+
+    .popup {
+      position: absolute;
+      background: #0d1117;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 16px;
+      width: 260px;
+      z-index: 20;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+      display: none;
+      animation: popup-in 0.15s ease;
+    }
+
+    .popup.visible { display: block; }
+
+    @keyframes popup-in {
+      from { opacity: 0; transform: scale(0.95) translateY(4px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 10px; right: 12px;
+      background: none; border: none;
+      color: #8b949e; font-size: 1rem;
+      cursor: pointer; line-height: 1;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    .popup-close:hover { color: #e6edf3; background: rgba(255,255,255,0.08); }
+
+    /* ── Mode montagne seule ── */
+    .popup-rarity {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .popup-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.3;
+      padding-right: 20px;
+    }
+
+    .popup-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: #8b949e;
+      margin-bottom: 5px;
+    }
+
+    .popup-row span:first-child { font-size: 0.9rem; }
+
+    .popup-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 10px 0;
+    }
+
+    .popup-wiki {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      color: #5865f2;
+      text-decoration: none;
+      margin-top: 2px;
+    }
+    .popup-wiki:hover { color: #7d8fef; text-decoration: underline; }
+
+    /* ── Mode cluster ── */
+    .cluster-header {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #8b949e;
+      margin-bottom: 10px;
+      padding-right: 20px;
+    }
+
+    .cluster-list {
+      max-height: 320px;
+      overflow-y: auto;
+      margin: 0 -4px;
+    }
+
+    .cluster-list::-webkit-scrollbar { width: 4px; }
+    .cluster-list::-webkit-scrollbar-track { background: transparent; }
+    .cluster-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+    .cluster-item {
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 2px;
+    }
+
+    .cluster-item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: background 0.1s;
+      user-select: none;
+    }
+
+    .cluster-item-header:hover { background: rgba(255,255,255,0.06); }
+    .cluster-item.open .cluster-item-header { background: rgba(255,255,255,0.06); border-radius: 8px 8px 0 0; }
+
+    .cluster-item-chevron {
+      margin-left: auto;
+      font-size: 0.65rem;
+      color: #8b949e;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .cluster-item.open .cluster-item-chevron { transform: rotate(90deg); }
+
+    .cluster-item-body {
+      display: none;
+      padding: 8px 10px 10px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 0 0 8px 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .cluster-item.open .cluster-item-body { display: block; }
+
+    .cluster-item-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      color: #8b949e;
+      margin-bottom: 4px;
+    }
+
+    .cluster-item-wiki {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.74rem;
+      color: #5865f2;
+      text-decoration: none;
+      margin-top: 4px;
+    }
+    .cluster-item-wiki:hover { color: #7d8fef; text-decoration: underline; }
+
+    .loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      color: #8b949e;
+      gap: 10px;
+    }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: #5865f2;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f85149;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .count-badge {
+      background: rgba(88, 101, 242, 0.15);
+      border: 1px solid rgba(88, 101, 242, 0.3);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      color: #7d8fef;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <span style="font-size:1.4rem">⛰️</span>
+      <div>
+        <h1>Ma carte des montagnes</h1>
+        <div class="subtitle" id="subtitle">Chargement…</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item" data-rarity="legendary"><div class="legend-dot" style="background:#f1c40f"></div>Légendaire</div>
+      <div class="legend-item" data-rarity="epic"><div class="legend-dot" style="background:#9b59b6"></div>Épique</div>
+      <div class="legend-item" data-rarity="rare"><div class="legend-dot" style="background:#3498db"></div>Rare</div>
+      <div class="legend-item" data-rarity="common"><div class="legend-dot" style="background:#95a5a6"></div>Commune</div>
+    </div>
+  </header>
+
+  <div id="globe-wrapper">
+    <div id="globe-container"></div>
+    <div id="overlays">
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        Chargement du globe…
+      </div>
+      <div class="error" id="error">Impossible de charger les données.</div>
+      <div class="popup" id="popup">
+        <button class="popup-close" id="popup-close">✕</button>
+        <!-- Mode montagne seule -->
+        <div id="popup-single">
+          <div class="popup-rarity" id="popup-rarity"></div>
+          <div class="popup-name" id="popup-name"></div>
+          <div class="popup-row"><span>📏</span><span id="popup-altitude"></span></div>
+          <div class="popup-row"><span>🌍</span><span id="popup-countries"></span></div>
+          <hr class="popup-divider" />
+          <a class="popup-wiki" id="popup-wiki" href="#" target="_blank" rel="noopener">🔗 Voir sur Wikipédia</a>
+        </div>
+        <!-- Mode cluster -->
+        <div id="popup-cluster" style="display:none">
+          <div class="cluster-header" id="cluster-header"></div>
+          <div class="cluster-list" id="cluster-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/globe.gl@2/dist/globe.gl.min.js"></script>
+  <script src="https://unpkg.com/supercluster@8/dist/supercluster.min.js"></script>
+  <script>
+    const token = new URLSearchParams(location.search).get('token');
+    const globeEl   = document.getElementById('globe-container');
+    const loadingEl = document.getElementById('loading');
+    const errorEl   = document.getElementById('error');
+    const subtitleEl = document.getElementById('subtitle');
+    const popupEl   = document.getElementById('popup');
+    const popupClose = document.getElementById('popup-close');
+
+    // ── Popup ────────────────────────────────────────────────────────────────
+
+    let pointJustClicked = false;
+
+    function positionPopup(event, height = 220) {
+      const margin = 12, pw = 260;
+      let x = event.clientX + 16;
+      let y = event.clientY - 20;
+      if (x + pw + margin > window.innerWidth) x = event.clientX - pw - 16;
+      if (y + height > window.innerHeight) y = window.innerHeight - height - margin;
+      popupEl.style.left = Math.max(margin, x) + 'px';
+      popupEl.style.top  = Math.max(margin, y) + 'px';
+    }
+
+    function showPopup(point, event) {
+      document.getElementById('popup-single').style.display = 'block';
+      document.getElementById('popup-cluster').style.display = 'none';
+      document.getElementById('popup-rarity').textContent = `${point.emoji} ${point.rarityLabel}`;
+      document.getElementById('popup-rarity').style.color = point.color;
+      document.getElementById('popup-name').textContent = point.label;
+      document.getElementById('popup-altitude').textContent = point.altitude;
+      document.getElementById('popup-countries').textContent = point.countries.join(', ');
+      document.getElementById('popup-wiki').href = point.article ?? '#';
+
+      popupEl.classList.remove('visible');
+      void popupEl.offsetWidth;
+      positionPopup(event, 220);
+      popupEl.classList.add('visible');
+      pointJustClicked = true;
+    }
+
+    function showClusterPopup(point, event) {
+      const leaves = sc.getLeaves(point.clusterId, Infinity);
+      const mountains = leaves.map(l => l.properties).sort((a, b) => {
+        const order = ['legendary', 'epic', 'rare', 'common'];
+        return order.indexOf(a.rarity) - order.indexOf(b.rarity);
+      });
+
+      document.getElementById('popup-single').style.display = 'none';
+      document.getElementById('popup-cluster').style.display = 'block';
+      document.getElementById('cluster-header').textContent = `⛰️ ${mountains.length} montagnes`;
+
+      const list = document.getElementById('cluster-list');
+      list.innerHTML = '';
+
+      for (const m of mountains) {
+        const item = document.createElement('div');
+        item.className = 'cluster-item';
+        item.innerHTML = `
+          <div class="cluster-item-header">
+            <span>${m.emoji}</span>
+            <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.label}</span>
+            <span class="cluster-item-chevron">▶</span>
+          </div>
+          <div class="cluster-item-body">
+            <div class="cluster-item-row"><span>📏</span><span>${m.altitude}</span></div>
+            <div class="cluster-item-row"><span>🌍</span><span>${m.countries.join(', ')}</span></div>
+            <a class="cluster-item-wiki" href="${m.article ?? '#'}" target="_blank" rel="noopener">🔗 Voir sur Wikipédia</a>
+          </div>`;
+
+        item.querySelector('.cluster-item-header').addEventListener('click', () => {
+          const isOpen = item.classList.contains('open');
+          list.querySelectorAll('.cluster-item.open').forEach(el => el.classList.remove('open'));
+          if (!isOpen) item.classList.add('open');
+        });
+
+        list.appendChild(item);
+      }
+
+      popupEl.classList.remove('visible');
+      void popupEl.offsetWidth;
+      positionPopup(event, Math.min(mountains.length * 38 + 60, 400));
+      popupEl.classList.add('visible');
+      pointJustClicked = true;
+    }
+
+    function closePopup() { popupEl.classList.remove('visible'); }
+    popupClose.addEventListener('click', e => { e.stopPropagation(); closePopup(); });
+
+    // ── Clustering ───────────────────────────────────────────────────────────
+
+    // Convertit l'altitude Globe.gl (0.1–2.5) en zoom supercluster (0–12)
+    function altToZoom(alt) {
+      return Math.max(0, Math.min(20, Math.round(Math.log2(2.5 / alt) * 3.5)));
+    }
+
+    function makeClusterPoint(c) {
+      return {
+        lat: c.geometry.coordinates[1],
+        lng: c.geometry.coordinates[0],
+        cluster: true,
+        clusterId: c.id,
+        count: c.properties.point_count,
+        color: 'rgba(255,255,255,0.9)',
+        radius: Math.min(2.0, 0.6 + Math.sqrt(c.properties.point_count) * 0.18),
+      };
+    }
+
+    function makeIndividualPoint(c) {
+      return { ...c.properties, lat: c.geometry.coordinates[1], lng: c.geometry.coordinates[0], cluster: false };
+    }
+
+    let globe, sc, countryLabels = [], lastZoom = -1, allMountains = [];
+    const activeRarities = new Set(['legendary', 'epic', 'rare', 'common']);
+
+    function initSupercluster() {
+      const filtered = allMountains.filter(m => activeRarities.has(m.rarity));
+      sc = new Supercluster({ radius: 40, maxZoom: 20 });
+      sc.load(filtered.map(m => ({
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [m.lng, m.lat] },
+        properties: m,
+      })));
+      lastZoom = -1;
+      updateClusters();
+    }
+
+    document.querySelectorAll('.legend-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const rarity = btn.dataset.rarity;
+        if (activeRarities.has(rarity)) {
+          if (activeRarities.size === 1) return; // garder au moins une rareté active
+          activeRarities.delete(rarity);
+          btn.classList.add('off');
+        } else {
+          activeRarities.add(rarity);
+          btn.classList.remove('off');
+        }
+        if (sc) initSupercluster();
+      });
+    });
+
+    function updateClusters() {
+      if (!globe) return;
+      const alt  = globe.pointOfView().altitude;
+      const zoom = altToZoom(alt);
+      if (zoom === lastZoom) return;
+      lastZoom = zoom;
+
+      const clusters = sc.getClusters([-180, -85, 180, 85], zoom);
+      const points = clusters.map(c => c.properties.cluster ? makeClusterPoint(c) : makeIndividualPoint(c));
+      globe.pointsData(points);
+
+      const clusterLabels = clusters
+        .filter(c => c.properties.cluster)
+        .map(c => ({
+          type: 'cluster',
+          lat: c.geometry.coordinates[1],
+          lng: c.geometry.coordinates[0],
+          count: c.properties.point_count,
+        }));
+
+      globe.htmlElementsData([...countryLabels, ...clusterLabels]);
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+
+    async function init() {
+      if (!token) { showError('Token manquant dans l\'URL.'); return; }
+
+      let data;
+      try {
+        const res = await fetch(`/api/map/mountains?token=${encodeURIComponent(token)}`);
+        if (!res.ok) throw new Error(await res.text());
+        data = await res.json();
+      } catch { showError('Lien expiré ou invalide.'); return; }
+
+      const { mountains, countries: rawCountries, unlockedCount, total } = data;
+      countryLabels = rawCountries.map(c => ({ ...c, type: 'country' }));
+      loadingEl.style.display = 'none';
+      subtitleEl.textContent = `${unlockedCount} / ${total} montagnes débloquées`;
+
+      // Supercluster
+      allMountains = mountains;
+      initSupercluster();
+
+      const geojson = await fetch('/countries.geojson').then(r => r.json());
+
+      globe = Globe()(globeEl)
+        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+        .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+        .polygonsData(geojson.features)
+        .polygonAltitude(0.001)
+        .polygonCapColor(() => 'rgba(0,0,0,0)')
+        .polygonSideColor(() => 'rgba(0,0,0,0)')
+        .polygonStrokeColor(() => 'rgba(255,255,255,0.12)')
+        .pointsData([])
+        .pointLat('lat')
+        .pointLng('lng')
+        .pointColor('color')
+        .pointRadius(d => d.cluster ? d.radius : (d.rarity === 'legendary' ? 0.55 : d.rarity === 'epic' ? 0.45 : d.rarity === 'rare' ? 0.35 : 0.28))
+        .pointAltitude(0.01)
+        .pointResolution(12)
+        .htmlElementsData([])
+        .htmlLat('lat')
+        .htmlLng('lng')
+        .htmlAltitude(0.01)
+        .htmlElement(d => {
+          const el = document.createElement('div');
+          if (d.type === 'cluster') {
+            el.style.cssText = `
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+              font-size: 12px; font-weight: 800;
+              color: #0d1117;
+              pointer-events: none;
+              transform: translate(-50%, -50%);
+              line-height: 1;
+            `;
+            el.textContent = String(d.count);
+          } else {
+            const size = Math.min(11 + d.owned * 0.4, 18);
+            el.style.cssText = `
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+              font-size: ${size}px; font-weight: ${d.owned >= 5 ? '600' : '400'};
+              color: rgba(255,255,255,${Math.min(0.45 + d.owned * 0.025, 0.85)});
+              white-space: nowrap; pointer-events: none;
+              text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+              transform: translate(-50%, -50%);
+            `;
+            el.textContent = `${d.name} (${d.owned}/${d.total})`;
+          }
+          return el;
+        })
+        .onPointClick((point, event) => {
+          if (point.cluster) {
+            showClusterPopup(point, event);
+          } else {
+            showPopup(point, event);
+          }
+        })
+        .onPointHover(point => { globeEl.style.cursor = point ? 'pointer' : 'default'; })
+        .onGlobeClick(() => { if (pointJustClicked) { pointJustClicked = false; return; } closePopup(); });
+
+      globe.controls().autoRotate = false;
+      globe.controls().enableDamping = true;
+
+      // Responsive
+      const ro = new ResizeObserver(() => globe.width(globeEl.offsetWidth).height(globeEl.offsetHeight));
+      ro.observe(globeEl);
+      globe.width(globeEl.offsetWidth).height(globeEl.offsetHeight);
+
+      // Loop de mise à jour au zoom
+      (function loop() { updateClusters(); requestAnimationFrame(loop); })();
+
+      // Vue initiale
+      if (mountains.length > 0) {
+        const top = mountains.find(m => m.rarity === 'legendary') ?? mountains[0];
+        setTimeout(() => globe.pointOfView({ lat: top.lat, lng: top.lng, altitude: 2 }, 1500), 500);
+      }
+    }
+
+    function showError(msg) {
+      loadingEl.style.display = 'none';
+      errorEl.textContent = msg;
+      errorEl.style.display = 'flex';
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -41,7 +41,7 @@ import {
   INV_BUTTON_PREFIX,
   handleInventaireButton,
 } from '../../mountain/slash/subcommands/inv';
-import { HOME_BUTTON_PREFIX, handleHomeButton } from '../../mountain/slash/subcommands/home';
+import { HOME_BUTTON_PREFIX, handleHomeButton, MAP_BUTTON_PREFIX, handleMapButton } from '../../mountain/slash/subcommands/home';
 import {
   handleImpostorButtonInteraction,
   handleImpostorSelectMenu,
@@ -140,6 +140,8 @@ export default {
           }
         } else if (interaction.customId.startsWith(VOC_CONFIG_BUTTON_ID)) {
           await handleVocConfigButton(interaction, client);
+        } else if (interaction.customId.startsWith(MAP_BUTTON_PREFIX + ':')) {
+          await handleMapButton(interaction);
         } else if (interaction.customId.startsWith(HOME_BUTTON_PREFIX + ':')) {
           await handleHomeButton(interaction, client);
         } else if (interaction.customId.startsWith('mountain:pack:')) {

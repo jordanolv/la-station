@@ -1,4 +1,5 @@
 import { startBot } from './bot/start';
+import { startWebServer } from './web/server';
 import dotenv from 'dotenv';
 import chalk from 'chalk';
 
@@ -11,6 +12,7 @@ async function main() {
     console.log(chalk.cyan('═'.repeat(60)));
 
     const botClient = await startBot();
+    startWebServer();
 
     console.log(chalk.cyan('═'.repeat(60)));
     console.log(chalk.green.bold('          ✅ LA STATION EST EN LIGNE'));
