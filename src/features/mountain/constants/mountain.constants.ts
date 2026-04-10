@@ -2,6 +2,7 @@ import type { MountainRarity, RarityConfig } from '../types/mountain.types';
 
 export const MOUNTAIN_REQUIRED_SECONDS = 2700; // 45 minutes en voc pour débloquer
 export const MOUNTAIN_TICKET_SECONDS = 5400;   // 1h30 ticket par heure en voc
+export const MOUNTAIN_LOCK_MIN_SECONDS = 180;  // 3 minutes min pour activer le lock de montagne
 export const FRAGMENTS_PER_TICKET = 20;
 
 export const SPAWN_MAX_PER_DAY = 2;

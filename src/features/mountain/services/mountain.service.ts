@@ -12,6 +12,8 @@ export interface MountainInfo {
   image: string;
   article: string;
   rarity: MountainRarity;
+  lat?: number;
+  lng?: number;
 }
 
 export class MountainService {
@@ -49,7 +51,11 @@ export class MountainService {
   }
 
   static getById(id: string): MountainInfo | undefined {
-    return this.mountains.find(m => m.id === id);
+    const normalized = decodeURIComponent(id).replace(/_/g, ' ');
+    return this.mountains.find(m =>
+      m.id === id ||
+      decodeURIComponent(m.id).replace(/_/g, ' ') === normalized,
+    );
   }
 
   static getRandom(): MountainInfo | null {

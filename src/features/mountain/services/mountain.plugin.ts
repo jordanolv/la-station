@@ -12,6 +12,8 @@ import { LogService } from '../../../shared/logs/logs.service';
 const LOG_FEATURE = '⛰️ Mountain';
 export const VOICE_CHECK_BUTTON_PREFIX = 'mountain:voice:check';
 
+const MOUNTAIN_LOCK_DURATION_MS = 30 * 60 * 1000;
+
 export interface MountainSessionResult {
   mountain: MountainInfo;
   rarity: MountainRarity;
@@ -36,6 +38,7 @@ export interface MountainSessionResult {
  */
 export class MountainPlugin implements VoicePlugin {
   private channelMountains = new Map<string, string>();
+  private userMountainLocks = new Map<string, { mountainId: string; expiresAt: number }>();
 
   async init(): Promise<void> {
     const stored = await MountainConfigRepository.getActiveChannelMountains();
@@ -46,8 +49,18 @@ export class MountainPlugin implements VoicePlugin {
     }
   }
 
-  onBeforeChannelCreate(_userId: string) {
-    const mountain = MountainService.getRandomByPackWeight();
+  onBeforeChannelCreate(userId: string) {
+    const now = Date.now();
+    const lock = this.userMountainLocks.get(userId);
+
+    const mountain = lock && lock.expiresAt > now
+      ? MountainService.getById(lock.mountainId) ?? MountainService.getRandomByPackWeight()
+      : MountainService.getRandomByPackWeight();
+
+    if ((!lock || lock.expiresAt <= now) && mountain) {
+      this.userMountainLocks.set(userId, { mountainId: mountain.id, expiresAt: now + MOUNTAIN_LOCK_DURATION_MS });
+    }
+
     return {
       templateVars: { mountain: mountain ? mountain.mountainLabel : 'Vocal' },
       metadata: { mountainId: mountain?.id ?? null },
