@@ -15,8 +15,11 @@ export class QuizConfigRepository {
     doc.activeUntil = activeUntil;
     doc.activeAnswers = {};
     doc.firstCorrectUserId = undefined;
+    const prev = doc.recentQuestionTexts ?? [];
+    doc.recentQuestionTexts = [...prev, question.question].slice(-25);
     doc.markModified('activeQuestion');
     doc.markModified('activeAnswers');
+    doc.markModified('recentQuestionTexts');
     await doc.save();
   }
 

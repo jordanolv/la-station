@@ -90,7 +90,8 @@ export class QuizService {
     const existing = await QuizConfigRepository.getOrCreate();
     if (existing.activeMessageId) return;
 
-    const question = await QuizGeneratorService.generate();
+    const recent = existing.recentQuestionTexts ?? [];
+    const question = await QuizGeneratorService.generate(recent);
     const { container, row } = this.buildComponents(question, {});
 
     const message = await channel.send({

@@ -17,6 +17,10 @@ export class QuizConfig {
 
   @prop()
   firstCorrectUserId?: string;
+
+  /** Dernières questions posées (évite les répétitions côté prompt IA) */
+  @prop({ type: () => [String], default: [] })
+  recentQuestionTexts!: string[];
 }
 
 const QuizConfigModel = getModelForClass(QuizConfig, {
