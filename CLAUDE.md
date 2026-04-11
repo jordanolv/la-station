@@ -221,6 +221,7 @@ Chaque bouton embarque le `lastMsgId` dans son customId (`mountain:home:ACTION:L
 - Données dans `src/features/admin/data/patchnotes.json` — tableau d'objets, le dernier est envoyé par `/patchnote`
 - Structure : `{ version, timestamp, sections: [{ type: "new"|"update"|"fix", blocks: [{ title, items[] }] }] }`
 - Commande `/patchnote` (admin) envoie les containers ComponentsV2 dans le channel courant
+- **Contenu** : n'inclure que les changements visibles par les utilisateurs — pas de refacto, pas de corrections internes, pas de logs admin
 
 ## Conventions
 

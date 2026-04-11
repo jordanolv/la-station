@@ -230,5 +230,36 @@
         ]
       }
     ]
+  },
+  {
+    "version": "1.5.0",
+    "timestamp": 1775858400,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "⚔️ Raids communautaires",
+            "items": [
+              "Des raids apparaissent aléatoirement sur le serveur — une montagne rare, épique ou légendaire à faire tomber ensemble",
+              "Contribuez via le vocal et les messages pour détruire ses HP et tenter de la décrocher",
+              "Récompenses (XP, coins, tickets) proportionnelles à votre contribution — plus vous contribuez, plus vous avez de chances de drop la montagne",
+              "Un thread de coordination est créé automatiquement à chaque raid"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "🎁 Récompense quotidienne `/daily`",
+            "items": [
+              "Une petite histoire générée par IA apparaît maintenant dans ta récompense quotidienne — elle raconte ce qui t'est arrivé aujourd'hui pour justifier ton butin (ou ta misère)"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

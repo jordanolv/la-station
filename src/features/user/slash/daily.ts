@@ -3,6 +3,7 @@ import { BotClient } from '../../../bot/client';
 import UserModel from '../models/user.model';
 import { UserMountainsRepository } from '../../mountain/repositories/user-mountains.repository';
 import { LogService } from '../../../shared/logs/logs.service';
+import { DailyStoryService } from '../services/daily-story.service';
 
 const MAX_MONEY = 100;
 const MAX_XP = 100;
@@ -96,6 +97,8 @@ export default {
         await LogService.info(`<@${interaction.user.id}> a reçu **${packsReward} ticket${packsReward > 1 ? 's' : ''}** 🎟️`, { feature: 'Daily', title: '🎟️ Tickets gagnés' });
       }
 
+      const story = await DailyStoryService.generate(interaction.user.displayName, moneyReward, xpReward, packsReward);
+
       const fields = [
         {
           name: '💰 Argent',
@@ -120,7 +123,7 @@ export default {
       const embed = new EmbedBuilder()
         .setColor('#4CAF50')
         .setTitle('🎁 Récompense Quotidienne')
-        .setDescription(`Vous avez réclamé votre récompense quotidienne !`)
+        .setDescription(story ?? 'Vous avez réclamé votre récompense quotidienne !')
         .addFields(...fields)
         .setFooter({
           text: `Revenez demain pour plus de récompenses !`,
