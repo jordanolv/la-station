@@ -8,7 +8,7 @@ export default {
 
   async execute(client: BotClient, oldRole: Role, newRole: Role) {
     try {
-      await LogService.logRoleUpdate(client, oldRole, newRole);
+      await LogService.logRoleUpdate(oldRole, newRole);
     } catch (error) {
       console.error('[roleUpdate] Erreur:', error);
     }

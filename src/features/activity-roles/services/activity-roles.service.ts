@@ -93,8 +93,7 @@ export class ActivityRolesService {
     const top3 = scores.slice(0, 3).map((s, i) => `${i + 1}. <@${s.userId}> — ${s.points} pts`).join('\n');
 
     await LogService.success(
-      client,
-      `Mise à jour des rôles d'activité terminée.\n**${assigned}** rôle(s) attribué(s), **${removed}** retiré(s)\n\n**🏆 Top 3**\n${top3 || 'Aucun'}`,
+            `Mise à jour des rôles d'activité terminée.\n**${assigned}** rôle(s) attribué(s), **${removed}** retiré(s)\n\n**🏆 Top 3**\n${top3 || 'Aucun'}`,
       { feature: LOG_FEATURE, title: '🗓️ Rotation hebdomadaire' },
     ).catch(() => {});
 

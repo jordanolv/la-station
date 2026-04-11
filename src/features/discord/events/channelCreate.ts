@@ -9,7 +9,7 @@ export default {
   async execute(client: BotClient, channel: GuildChannel) {
     try {
       if (!channel.guild) return;
-      await LogService.logChannelCreate(client, channel);
+      await LogService.logChannelCreate(channel);
     } catch (error) {
       console.error('[channelCreate] Erreur:', error);
     }

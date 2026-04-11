@@ -8,7 +8,7 @@ export default {
 
   async execute(client: BotClient, role: Role) {
     try {
-      await LogService.logRoleDelete(client, role);
+      await LogService.logRoleDelete(role);
     } catch (error) {
       console.error('[roleDelete] Erreur:', error);
     }

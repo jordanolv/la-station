@@ -8,7 +8,7 @@ export default {
 
   async execute(client: BotClient, invite: Invite) {
     try {
-      await LogService.logInviteDelete(client, invite);
+      await LogService.logInviteDelete(invite);
     } catch (error) {
       console.error('[inviteDelete] Erreur:', error);
     }

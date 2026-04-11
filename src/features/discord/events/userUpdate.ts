@@ -8,7 +8,7 @@ export default {
 
   async execute(client: BotClient, oldUser: User | PartialUser, newUser: User) {
     try {
-      await LogService.logUserUpdate(client, oldUser as User, newUser);
+      await LogService.logUserUpdate(oldUser as User, newUser);
     } catch (error) {
       console.error('[userUpdate] Erreur:', error);
     }

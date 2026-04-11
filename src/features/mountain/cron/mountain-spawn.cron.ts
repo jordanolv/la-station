@@ -62,8 +62,7 @@ export class MountainSpawnCron {
     this.scheduleFromDates(dates);
 
     LogService.info(
-      this.client,
-      `**${dates.length}** spawn(s) programmé(s) (fenêtre ${SPAWN_HOUR_START}h-${SPAWN_HOUR_END}h Paris)`,
+            `**${dates.length}** spawn(s) programmé(s) (fenêtre ${SPAWN_HOUR_START}h-${SPAWN_HOUR_END}h Paris)`,
       { feature: '⛰️ Mountain Spawn', title: '🗓️ Planification du jour' },
     ).catch(() => {});
   }

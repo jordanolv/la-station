@@ -8,7 +8,7 @@ export default {
 
   async execute(client: BotClient, ban: GuildBan) {
     try {
-      await LogService.logBanAdd(client, ban.guild, ban.user);
+      await LogService.logBanAdd(ban.guild, ban.user);
     } catch (error) {
       console.error('[guildBanAdd] Erreur:', error);
     }

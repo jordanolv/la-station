@@ -14,6 +14,7 @@ import { QuizConfigRepository } from '../repositories/quiz-config.repository';
 import { MountainConfigRepository } from '../../mountain/repositories/mountain-config.repository';
 import { UserMountainsRepository } from '../../mountain/repositories/user-mountains.repository';
 import { QuizGeneratorService } from './quiz-generator.service';
+import { LogService } from '../../../shared/logs/logs.service';
 
 export interface QuizQuestion {
   id: string;
@@ -162,6 +163,7 @@ export class QuizService {
     if (isCorrect) {
       const packs = isFirst ? 2 : 1;
       await UserMountainsRepository.addTickets(interaction.user.id, packs);
+      await LogService.info(`<@${interaction.user.id}> a remporté **${packs} ticket${packs > 1 ? 's' : ''}** 🎟️${isFirst ? ' (premier à répondre)' : ''}`, { feature: 'Quiz', title: '🎟️ Tickets gagnés' });
       await interaction.reply({
         content: isFirst
           ? `✅ Bonne réponse ! Premier à répondre — tu remportes **2 tickets de pack** 🎟️🎟️`

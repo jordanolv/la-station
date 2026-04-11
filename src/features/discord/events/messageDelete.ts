@@ -9,7 +9,7 @@ export default {
   async execute(client: BotClient, message: Message | PartialMessage) {
     try {
       if (!message.guild) return;
-      await LogService.logMessageDelete(client, message);
+      await LogService.logMessageDelete(message);
     } catch (error) {
       console.error('[messageDelete] Erreur:', error);
     }

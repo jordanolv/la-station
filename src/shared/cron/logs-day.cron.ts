@@ -31,6 +31,6 @@ export class LogsDayCron {
   }
 
   private async sendSeparator(): Promise<void> {
-    await LogService.sendDaySeparator(this.client as BotClient);
+    await LogService.sendDaySeparator();
   }
 }

@@ -8,7 +8,7 @@ export default {
 
   async execute(client: BotClient, member: GuildMember) {
     try {
-      await LogService.logMemberJoin(client, member);
+      await LogService.logMemberJoin(member);
     } catch (error) {
       console.error('[guildMemberAdd] Erreur:', error);
     }

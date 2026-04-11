@@ -8,7 +8,7 @@ export default {
 
   async execute(client: BotClient, oldMember: GuildMember | PartialGuildMember, newMember: GuildMember) {
     try {
-      await LogService.logMemberUpdate(client, oldMember, newMember);
+      await LogService.logMemberUpdate(oldMember, newMember);
     } catch (error) {
       console.error('[guildMemberUpdate] Erreur:', error);
     }

@@ -9,7 +9,7 @@ export default {
   async execute(client: BotClient, oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage) {
     try {
       if (!newMessage.guild) return;
-      await LogService.logMessageEdit(client, oldMessage, newMessage);
+      await LogService.logMessageEdit(oldMessage, newMessage);
     } catch (error) {
       console.error('[messageUpdate] Erreur:', error);
     }

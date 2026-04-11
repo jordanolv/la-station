@@ -28,8 +28,7 @@ export class StatsPlugin implements VoicePlugin {
       });
 
       await LogService.info(
-        client,
-        `${username} a passé ${this.formatDuration(session.activeSeconds)} en vocal`,
+                `${username} a passé ${this.formatDuration(session.activeSeconds)} en vocal`,
         { feature: 'stats', title: 'Session vocale terminée' },
       );
     } catch (err) {

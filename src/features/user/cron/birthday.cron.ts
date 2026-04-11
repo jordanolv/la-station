@@ -39,7 +39,7 @@ export class BirthdayCron {
       const monthToday = nowParis.getMonth() + 1;
       const dayToday = nowParis.getDate();
 
-      await LogService.info(this.client as any, `Vérification des anniversaires pour ${dayToday}/${monthToday} (Paris)`, {
+      await LogService.info(`Vérification des anniversaires pour ${dayToday}/${monthToday} (Paris)`, {
         feature: 'birthday'
       });
 
@@ -47,7 +47,7 @@ export class BirthdayCron {
       const birthdayConfig = guildDoc?.features?.birthday;
 
       if (!birthdayConfig?.enabled) {
-        await LogService.info(this.client as any, `Fonctionnalité d'anniversaire désactivée`, { feature: 'birthday' });
+        await LogService.info(`Fonctionnalité d'anniversaire désactivée`, { feature: 'birthday' });
         return;
       }
 
@@ -58,7 +58,7 @@ export class BirthdayCron {
       const discordGuild = this.client.guilds.cache.get(getGuildId());
       const birthdayChannelId = birthdayConfig?.channel || discordGuild?.systemChannelId;
       if (!birthdayChannelId) {
-        await LogService.warning(this.client as any, `Aucun canal d'anniversaire configuré`, { feature: 'birthday' });
+        await LogService.warning(`Aucun canal d'anniversaire configuré`, { feature: 'birthday' });
         return;
       }
 
@@ -70,28 +70,27 @@ export class BirthdayCron {
 
         const chan = await this.client.channels.fetch(birthdayChannelId).catch(() => null);
         if (!chan || chan.type !== ChannelType.GuildText) {
-          await LogService.error(this.client as any, `Canal ${birthdayChannelId} non trouvé ou n'est pas un canal texte`, { feature: 'birthday' });
+          await LogService.error(`Canal ${birthdayChannelId} non trouvé ou n'est pas un canal texte`, { feature: 'birthday' });
           continue;
         }
         const textChannel = chan as TextChannel;
 
         const me = this.client.user;
         if (!me || !textChannel.permissionsFor(me).has(PermissionsBitField.Flags.SendMessages)) {
-          await LogService.error(this.client as any, `Permission d'envoi manquante dans le canal ${birthdayChannelId}`, { feature: 'birthday' });
+          await LogService.error(`Permission d'envoi manquante dans le canal ${birthdayChannelId}`, { feature: 'birthday' });
           continue;
         }
 
         const { moneyGift } = await sendBirthdayAnnouncement(this.client, textChannel, user.discordId, user.name, user.infos.birthDate);
 
         await LogService.success(
-          this.client as any,
-          `🎂 Anniversaire de ${user.name} — +${moneyGift} pièces, +${BIRTHDAY_TICKETS} tickets`,
+                    `🎂 Anniversaire de ${user.name} — +${moneyGift} pièces, +${BIRTHDAY_TICKETS} tickets`,
           { feature: 'birthday' },
         );
       }
     } catch (err) {
       console.error('Error in BirthdayCron:', err);
-      await LogService.error(this.client as any, `Erreur lors de la vérification des anniversaires: ${err.message}`, { feature: 'birthday' });
+      await LogService.error(`Erreur lors de la vérification des anniversaires: ${err.message}`, { feature: 'birthday' });
     }
   }
 }

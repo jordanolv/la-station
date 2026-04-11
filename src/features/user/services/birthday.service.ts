@@ -11,6 +11,7 @@ import {
 import { toZonedTime } from 'date-fns-tz';
 import UserModel from '../models/user.model';
 import { UserMountainsRepository } from '../../mountain/repositories/user-mountains.repository';
+import { LogService } from '../../../shared/logs/logs.service';
 
 export const BIRTHDAY_TZ = 'Europe/Paris';
 export const BIRTHDAY_TICKETS = 5;
@@ -35,6 +36,7 @@ export async function sendBirthdayAnnouncement(
     UserModel.updateOne({ discordId }, { $inc: { 'profil.money': moneyGift } }),
     UserMountainsRepository.addTickets(discordId, BIRTHDAY_TICKETS),
   ]);
+  await LogService.info(`<@${discordId}> a reçu **${BIRTHDAY_TICKETS} tickets** 🎟️ pour son anniversaire 🎂`, { feature: 'Birthday', title: '🎟️ Tickets gagnés' });
 
   const container = new ContainerBuilder()
     .setAccentColor(0xdac1ff)

@@ -206,7 +206,7 @@ export class VoiceSessionService {
 
     if (!isJoinChannel) {
       const username = newState.member?.user.username ?? userId;
-      LogService.info(client, `<@${userId}> (**${username}**) a rejoint **${channelName}**`, {
+      LogService.info(`<@${userId}> (**${username}**) a rejoint **${channelName}**`, {
         feature: 'voice',
         title: '🎙️ Session vocale démarrée',
       });
@@ -236,7 +236,7 @@ export class VoiceSessionService {
         const username = oldState.member?.user.username ?? userId;
         const duration = this.formatDuration(session.durationSeconds);
         const active = this.formatDuration(session.activeSeconds);
-        LogService.info(client, `<@${userId}> (**${username}**) a quitté **${session.channelName}** — durée : ${duration} (actif : ${active})`, {
+        LogService.info(`<@${userId}> (**${username}**) a quitté **${session.channelName}** — durée : ${duration} (actif : ${active})`, {
           feature: 'voice',
           title: '🔇 Session vocale terminée',
         });

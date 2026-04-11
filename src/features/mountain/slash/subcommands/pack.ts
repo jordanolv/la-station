@@ -18,6 +18,7 @@ import { UserMountainsRepository } from '../../repositories/user-mountains.repos
 import { MountainService, MountainInfo } from '../../services/mountain.service';
 import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/mountain.constants';
 import type { MountainRarity } from '../../types/mountain.types';
+import { LogService } from '../../../../shared/logs/logs.service';
 
 export const PACK_BUTTON_OPEN = 'mountain:pack:open';
 export const PACK_BUTTON_OPEN_5 = 'mountain:pack:open5';
@@ -246,6 +247,10 @@ async function openPackMulti(interaction: ButtonInteraction): Promise<void> {
   );
 
   await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
+
+  const newList = results.filter(r => !r.isDuplicate).map(r => `${RARITY_CONFIG[r.rarity].emoji} ${r.mountain.mountainLabel}`).join(', ') || '—';
+  const dupList = results.filter(r => r.isDuplicate).map(r => `${RARITY_CONFIG[r.rarity].emoji} ${r.mountain.mountainLabel}`).join(', ') || '—';
+  await LogService.info(`<@${interaction.user.id}> a ouvert **${count} packs** 🎟️ · restants: **${doc.packTickets}**\n✅ ${newList}\n🔁 ${dupList}${totalFragmentsGained > 0 ? `\n🧩 +${totalFragmentsGained} fragments → \`${doc.fragments}/${FRAGMENTS_PER_TICKET}\`` : ''}`, { feature: 'Mountain · Packs', title: '🎁 Packs ouverts' });
 }
 
 async function openPack(interaction: ButtonInteraction): Promise<void> {
@@ -302,6 +307,10 @@ async function openPack(interaction: ButtonInteraction): Promise<void> {
   );
 
   await interaction.editReply({ embeds: [embed], components: [row] });
+
+  const { emoji, label } = RARITY_CONFIG[rarity];
+  const packResult = isDuplicate ? `🔁 double +${fragmentsGained}🧩${ticketsFromFragments > 0 ? ` +${ticketsFromFragments}🎟️` : ''}` : '✅ nouveau';
+  await LogService.info(`<@${interaction.user.id}> a ouvert un pack · ${emoji} **${mountain.mountainLabel}** (${label}) — ${packResult} · 🎟️ ${doc.packTickets} restants`, { feature: 'Mountain · Packs', title: '🎟️ Pack ouvert' });
 }
 
 export async function handlePackButton(interaction: ButtonInteraction, _client: BotClient): Promise<void> {

@@ -33,11 +33,11 @@ export default {
           vocConfig?.joinChannels.some(c => c.id === oldState.channelId) &&
           vocConfig?.createdChannels.includes(newState.channelId ?? '');
         if (!isJoinToCreateFlow) {
-          await LogService.logVoiceMove(client, oldState, newState);
+          await LogService.logVoiceMove(oldState, newState);
         }
       } else {
         await VoiceService.handleVoiceStateChange(oldState, newState);
-        await LogService.logVoiceStateChange(client, oldState, newState);
+        await LogService.logVoiceStateChange(oldState, newState);
       }
     } catch (error) {
       console.error('[voiceStateUpdate] Erreur:', error);

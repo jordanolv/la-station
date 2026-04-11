@@ -2,6 +2,7 @@ import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from '
 import { BotClient } from '../../../bot/client';
 import UserModel from '../models/user.model';
 import { UserMountainsRepository } from '../../mountain/repositories/user-mountains.repository';
+import { LogService } from '../../../shared/logs/logs.service';
 
 const MAX_MONEY = 100;
 const MAX_XP = 100;
@@ -32,7 +33,7 @@ export default {
     .setName('daily')
     .setDescription('Réclamez votre récompense quotidienne'),
 
-  async execute(interaction: ChatInputCommandInteraction, _client: BotClient) {
+  async execute(interaction: ChatInputCommandInteraction, client: BotClient) {
     try {
       await interaction.deferReply();
 
@@ -92,6 +93,7 @@ export default {
 
       if (packsReward > 0) {
         await UserMountainsRepository.addTickets(interaction.user.id, packsReward);
+        await LogService.info(`<@${interaction.user.id}> a reçu **${packsReward} ticket${packsReward > 1 ? 's' : ''}** 🎟️`, { feature: 'Daily', title: '🎟️ Tickets gagnés' });
       }
 
       const fields = [

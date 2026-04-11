@@ -131,8 +131,7 @@ export class MountainPlugin implements VoicePlugin {
       const { newFragments, ticketsGained: fragTickets } = await UserMountainsRepository.addFragments(session.userId, fragmentsOnDuplicate);
       const totalTickets = vocTicketsGained + fragTickets;
 
-      await LogService.info(client,
-        `<@${session.userId}> a obtenu un doublon : **${mountain.mountainLabel}** ${emoji} ${label}\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${totalTickets > 0 ? `\n→ +${totalTickets} 🎟️ ticket${totalTickets > 1 ? 's' : ''}` : ''}`,
+      await LogService.info(`<@${session.userId}> a obtenu un doublon : **${mountain.mountainLabel}** ${emoji} ${label}\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${totalTickets > 0 ? `\n→ +${totalTickets} 🎟️ ticket${totalTickets > 1 ? 's' : ''}` : ''}`,
         { feature: LOG_FEATURE, title: '🔁 Montagne en double' },
       );
 
@@ -147,8 +146,7 @@ export class MountainPlugin implements VoicePlugin {
       };
     }
 
-    await LogService.success(client,
-      `<@${session.userId}> a débloqué **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})\nProgression : \`${result.totalUnlocked}/${MountainService.count}\`${vocTicketsGained > 0 ? `\n→ +${vocTicketsGained} 🎟️ ticket${vocTicketsGained > 1 ? 's' : ''}` : ''}`,
+    await LogService.success(`<@${session.userId}> a débloqué **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})\nProgression : \`${result.totalUnlocked}/${MountainService.count}\`${vocTicketsGained > 0 ? `\n→ +${vocTicketsGained} 🎟️ ticket${vocTicketsGained > 1 ? 's' : ''}` : ''}`,
       { feature: LOG_FEATURE, title: '🏔️ Montagne débloquée' },
     );
 

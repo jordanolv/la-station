@@ -56,7 +56,7 @@ export class PartyService {
 
       const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
         `<@${userId}> a rejoint · ${updated.participants.length}/${event.eventInfo.maxSlots} places`;
-      await LogService.info(client, logMessage, { feature: 'party', title: 'Participant ajouté' });
+      await LogService.info(logMessage, { feature: 'party', title: 'Participant ajouté' });
       await ConfigPanelService.refreshPanel(client, 'party');
     } catch (err) {
       console.error('[Party] Erreur réaction add:', err);
@@ -75,7 +75,7 @@ export class PartyService {
 
       const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
         `<@${userId}> a quitté · ${updated.participants.length}/${event.eventInfo.maxSlots} places`;
-      await LogService.info(client, logMessage, { feature: 'party', title: 'Participant retiré' });
+      await LogService.info(logMessage, { feature: 'party', title: 'Participant retiré' });
       await ConfigPanelService.refreshPanel(client, 'party');
     } catch (err) {
       console.error('[Party] Erreur réaction remove:', err);
@@ -125,7 +125,7 @@ export class PartyService {
 
     const logMessage = `**${updated.eventInfo.name}** — ${updated.eventInfo.game}\n` +
       `👤 <@${data.createdBy}> · 📅 <t:${Math.floor(data.dateTime.getTime() / 1000)}:F> · 👥 ${data.maxSlots} places`;
-    await LogService.success(client, logMessage, { feature: 'party', title: 'Soirée créée' });
+    await LogService.success(logMessage, { feature: 'party', title: 'Soirée créée' });
 
     return updated;
   }
@@ -165,7 +165,7 @@ export class PartyService {
 
     const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
       `🟢 Soirée démarrée · ${event.participants.length} inscrits`;
-    await LogService.success(client, logMessage, { feature: 'party', title: 'Soirée démarrée' });
+    await LogService.success(logMessage, { feature: 'party', title: 'Soirée démarrée' });
 
     return updated;
   }
@@ -195,7 +195,7 @@ export class PartyService {
 
     const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
       `👥 ${event.participants.length} participant(s) inscrit(s)`;
-    await LogService.error(client, logMessage, { feature: 'party', title: 'Soirée supprimée' });
+    await LogService.error(logMessage, { feature: 'party', title: 'Soirée supprimée' });
   }
 
   static async endEvent(client: BotClient, eventId: string, data: EndEventInput): Promise<PartyEvent> {
@@ -237,7 +237,7 @@ export class PartyService {
     ].filter(Boolean).join(' · ') || 'Aucune récompense';
     const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
       `👥 Présents : ${attendedList}\n${rewardLine}`;
-    await LogService.info(client, logMessage, { feature: 'party', title: 'Soirée terminée' });
+    await LogService.info(logMessage, { feature: 'party', title: 'Soirée terminée' });
 
     return updated;
   }

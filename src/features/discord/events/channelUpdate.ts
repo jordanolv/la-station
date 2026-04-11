@@ -9,7 +9,7 @@ export default {
   async execute(client: BotClient, oldChannel: GuildChannel | DMChannel, newChannel: GuildChannel | DMChannel) {
     try {
       if (!('guild' in newChannel)) return;
-      await LogService.logChannelUpdate(client, oldChannel as GuildChannel, newChannel as GuildChannel);
+      await LogService.logChannelUpdate(oldChannel as GuildChannel, newChannel as GuildChannel);
     } catch (error) {
       console.error('[channelUpdate] Erreur:', error);
     }

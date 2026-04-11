@@ -39,8 +39,7 @@ export class MountainSpawnService {
 
     if (pending.length > 0) {
       const lines = pending.map(d => `• <t:${Math.floor(d.getTime() / 1000)}:T> (<t:${Math.floor(d.getTime() / 1000)}:R>)`);
-      LogService.info(client,
-        `**${pending.length}** spawn(s) réhydraté(s) :\n${lines.join('\n')}`,
+      LogService.info(`**${pending.length}** spawn(s) réhydraté(s) :\n${lines.join('\n')}`,
         { feature: LOG_FEATURE, title: '🔄 Réhydratation' },
       ).catch(() => {});
     }
@@ -86,8 +85,7 @@ export class MountainSpawnService {
     const message = await (channel as TextChannel).send({ embeds: [embed], components: [row] });
     await MountainConfigRepository.setActiveSpawnMessage(message.id);
 
-    await LogService.info(client,
-      `Spawn montagne : **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})`,
+    await LogService.info(`Spawn montagne : **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})`,
       { feature: LOG_FEATURE, title: '🌄 Nouveau spawn' },
     );
   }
@@ -161,8 +159,7 @@ export class MountainSpawnService {
 
     await interaction.update({ embeds: [updatedEmbed], components: [disabledRow] }).catch(() => {});
 
-    await LogService.success(client,
-      `<@${userId}> a revendiqué **${mountain.mountainLabel}** ${emoji} ${label}`,
+    await LogService.success(`<@${userId}> a revendiqué **${mountain.mountainLabel}** ${emoji} ${label}`,
       { feature: LOG_FEATURE, title: '🏔️ Spawn revendiqué' },
     );
   }

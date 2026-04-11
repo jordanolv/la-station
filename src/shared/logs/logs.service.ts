@@ -18,7 +18,7 @@ import { BotClient } from '../../bot/client';
 import { getGuildId } from '../guild';
 import ConfigPanelModel from '../../features/config-panel/models/config-panel.model';
 
-// ─── Thread ID cache ──────────────────────────────────────────────────────────
+let _client: BotClient | null = null;
 let _cachedThreadId: string | null = null;
 
 export class LogService {
@@ -27,11 +27,8 @@ export class LogService {
   // THREAD MANAGEMENT
   // ═══════════════════════════════════════════════════════════════════════════
 
-  /**
-   * À appeler au ready : scanne le forum admin et verrouille l'ID du thread "📋 Logs".
-   * Remplace toujours ce qui est en DB pour éviter de pointer sur un vieux thread.
-   */
   static async init(client: BotClient): Promise<void> {
+    _client = client;
     _cachedThreadId = null;
 
     const guild = client.guilds.cache.get(getGuildId());
@@ -68,16 +65,12 @@ export class LogService {
     _cachedThreadId = threadId;
   }
 
-  /**
-   * Renvoie le thread de logs.
-   * Cherche d'abord par ID en cache, puis par nom "📋 Logs" dans le forum admin.
-   * Ne crée jamais de thread.
-   */
-  private static async getLogsThread(client: BotClient): Promise<ThreadChannel | null> {
-    const guild = client.guilds.cache.get(getGuildId());
+  private static async getLogsThread(): Promise<ThreadChannel | null> {
+    if (!_client) return null;
+
+    const guild = _client.guilds.cache.get(getGuildId());
     if (!guild) return null;
 
-    // 1. Essayer depuis le cache
     const threadId = await this.getLogsThreadId();
     if (threadId) {
       try {
@@ -89,7 +82,6 @@ export class LogService {
       } catch { /* introuvable, on cherche par nom */ }
     }
 
-    // 2. Chercher dans le forum admin par nom
     const state = await ConfigPanelModel.findOne();
     if (!state?.forumChannelId) return null;
 
@@ -107,13 +99,9 @@ export class LogService {
     return null;
   }
 
-  /**
-   * Envoie un séparateur de jour dans le thread de logs.
-   * Appelé par le cron à minuit.
-   */
-  static async sendDaySeparator(client: BotClient): Promise<void> {
+  static async sendDaySeparator(): Promise<void> {
     try {
-      const thread = await this.getLogsThread(client);
+      const thread = await this.getLogsThread();
       if (!thread) return;
       const label = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' });
       await thread.send({ content: `\n─────────────────────────────\n📅 **${label.charAt(0).toUpperCase() + label.slice(1)}**\n─────────────────────────────` });
@@ -122,9 +110,9 @@ export class LogService {
     }
   }
 
-  static async send(client: BotClient, embed: EmbedBuilder): Promise<void> {
+  static async send(embed: EmbedBuilder): Promise<void> {
     try {
-      const thread = await this.getLogsThread(client);
+      const thread = await this.getLogsThread();
       if (!thread) return;
       await thread.send({ embeds: [embed] });
     } catch (error) {
@@ -132,63 +120,55 @@ export class LogService {
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LEGACY COMPAT
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  static async sendEmbed(client: BotClient, embed: EmbedBuilder): Promise<void> {
-    return this.send(client, embed);
+  static async sendEmbed(embed: EmbedBuilder): Promise<void> {
+    return this.send(embed);
   }
 
-  static async info(client: BotClient, message: string, options?: { feature?: string; title?: string }): Promise<void> {
+  static async info(message: string, options?: { feature?: string; title?: string }): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle(options?.title ?? 'ℹ️ Info')
       .setDescription(message)
       .setColor(0x3498db)
       .setTimestamp();
     if (options?.feature) embed.setFooter({ text: options.feature });
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async success(client: BotClient, message: string, options?: { feature?: string; title?: string }): Promise<void> {
+  static async success(message: string, options?: { feature?: string; title?: string }): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle(options?.title ?? '✅ Succès')
       .setDescription(message)
       .setColor(0x27ae60)
       .setTimestamp();
     if (options?.feature) embed.setFooter({ text: options.feature });
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async warning(client: BotClient, message: string, options?: { feature?: string; title?: string }): Promise<void> {
+  static async warning(message: string, options?: { feature?: string; title?: string }): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle(options?.title ?? '⚠️ Avertissement')
       .setDescription(message)
       .setColor(0xf39c12)
       .setTimestamp();
     if (options?.feature) embed.setFooter({ text: options.feature });
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async error(client: BotClient, message: string, options?: { feature?: string; title?: string }): Promise<void> {
+  static async error(message: string, options?: { feature?: string; title?: string }): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle(options?.title ?? '❌ Erreur')
       .setDescription(message)
       .setColor(0xe74c3c)
       .setTimestamp();
     if (options?.feature) embed.setFooter({ text: options.feature });
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // MESSAGES
   // ═══════════════════════════════════════════════════════════════════════════
 
-  static async logMessageEdit(
-    client: BotClient,
-    oldMessage: Message | PartialMessage,
-    newMessage: Message | PartialMessage,
-  ): Promise<void> {
+  static async logMessageEdit(oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage): Promise<void> {
     if (!oldMessage.author || oldMessage.author.bot) return;
     if (oldMessage.content === newMessage.content) return;
 
@@ -204,13 +184,10 @@ export class LogService {
         { name: 'Après', value: (newMessage.content || '_vide_').slice(0, 1024), inline: false },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logMessageDelete(
-    client: BotClient,
-    message: Message | PartialMessage,
-  ): Promise<void> {
+  static async logMessageDelete(message: Message | PartialMessage): Promise<void> {
     if (!message.author || message.author.bot) return;
 
     const embed = new EmbedBuilder()
@@ -228,14 +205,14 @@ export class LogService {
       embed.addFields({ name: 'Fichiers', value: message.attachments.map(a => a.url).join('\n').slice(0, 1024) });
     }
 
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // MEMBRES
   // ═══════════════════════════════════════════════════════════════════════════
 
-  static async logMemberJoin(client: BotClient, member: GuildMember): Promise<void> {
+  static async logMemberJoin(member: GuildMember): Promise<void> {
     const accountAge = Math.floor((Date.now() - member.user.createdTimestamp) / 86400000);
     const embed = new EmbedBuilder()
       .setTitle('📥 Membre rejoint')
@@ -248,10 +225,10 @@ export class LogService {
       )
       .setThumbnail(member.user.displayAvatarURL())
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logMemberLeave(client: BotClient, member: GuildMember | PartialGuildMember): Promise<void> {
+  static async logMemberLeave(member: GuildMember | PartialGuildMember): Promise<void> {
     const roles = member.roles.cache.filter(r => r.id !== member.guild.id).map(r => `<@&${r.id}>`).join(', ') || '*Aucun*';
     const joinedAt = member.joinedAt ? `<t:${Math.floor(member.joinedTimestamp! / 1000)}:R>` : '*Inconnu*';
 
@@ -267,28 +244,21 @@ export class LogService {
       )
       .setThumbnail(member.user.displayAvatarURL())
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logMemberUpdate(
-    client: BotClient,
-    oldMember: GuildMember | PartialGuildMember,
-    newMember: GuildMember,
-  ): Promise<void> {
+  static async logMemberUpdate(oldMember: GuildMember | PartialGuildMember, newMember: GuildMember): Promise<void> {
     const changes: string[] = [];
 
-    // Pseudo / surnom
     if (oldMember.nickname !== newMember.nickname) {
       changes.push(`**Surnom** : \`${oldMember.nickname ?? 'aucun'}\` → \`${newMember.nickname ?? 'aucun'}\``);
     }
 
-    // Rôles ajoutés/retirés
     const addedRoles = newMember.roles.cache.filter(r => !oldMember.roles.cache.has(r.id) && r.id !== newMember.guild.id);
     const removedRoles = oldMember.roles.cache.filter(r => !newMember.roles.cache.has(r.id) && r.id !== newMember.guild.id);
     if (addedRoles.size > 0) changes.push(`**Rôles ajoutés** : ${addedRoles.map(r => `<@&${r.id}>`).join(', ')}`);
     if (removedRoles.size > 0) changes.push(`**Rôles retirés** : ${removedRoles.map(r => `<@&${r.id}>`).join(', ')}`);
 
-    // Timeout
     const wasTimedOut = (oldMember as GuildMember).communicationDisabledUntil;
     const isTimedOut = newMember.communicationDisabledUntil;
     if (!wasTimedOut && isTimedOut) {
@@ -306,10 +276,10 @@ export class LogService {
       .setDescription(changes.join('\n'))
       .addFields({ name: 'Utilisateur', value: `<@${newMember.id}>`, inline: true })
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logUserUpdate(client: BotClient, oldUser: User | null, newUser: User): Promise<void> {
+  static async logUserUpdate(oldUser: User | null, newUser: User): Promise<void> {
     if (!oldUser) return;
     const changes: string[] = [];
 
@@ -329,14 +299,14 @@ export class LogService {
       .setDescription(changes.join('\n'))
       .setThumbnail(newUser.displayAvatarURL())
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // VOCAL
   // ═══════════════════════════════════════════════════════════════════════════
 
-  static async logVoiceMove(client: BotClient, oldState: VoiceState, newState: VoiceState): Promise<void> {
+  static async logVoiceMove(oldState: VoiceState, newState: VoiceState): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle('🔀 Déplacement vocal')
       .setColor(0xf39c12)
@@ -346,10 +316,10 @@ export class LogService {
         { name: 'Après', value: `<#${newState.channelId}>`, inline: true },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logVoiceStateChange(client: BotClient, oldState: VoiceState, newState: VoiceState): Promise<void> {
+  static async logVoiceStateChange(oldState: VoiceState, newState: VoiceState): Promise<void> {
     const changes: string[] = [];
     const member = newState.member ?? oldState.member;
     if (!member) return;
@@ -378,14 +348,14 @@ export class LogService {
         { name: 'Changements', value: changes.join('\n'), inline: false },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // SALONS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  static async logChannelCreate(client: BotClient, channel: GuildChannel): Promise<void> {
+  static async logChannelCreate(channel: GuildChannel): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle('➕ Salon créé')
       .setColor(0x57f287)
@@ -395,10 +365,10 @@ export class LogService {
         { name: 'Catégorie', value: channel.parent?.name ?? '*Aucune*', inline: true },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logChannelDelete(client: BotClient, channel: GuildChannel): Promise<void> {
+  static async logChannelDelete(channel: GuildChannel): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle('🗑️ Salon supprimé')
       .setColor(0xed4245)
@@ -408,10 +378,10 @@ export class LogService {
         { name: 'Catégorie', value: channel.parent?.name ?? '*Aucune*', inline: true },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logChannelUpdate(client: BotClient, oldChannel: GuildChannel, newChannel: GuildChannel): Promise<void> {
+  static async logChannelUpdate(oldChannel: GuildChannel, newChannel: GuildChannel): Promise<void> {
     const changes: string[] = [];
     if (oldChannel.name !== newChannel.name) changes.push(`**Nom** : \`${oldChannel.name}\` → \`${newChannel.name}\``);
 
@@ -425,14 +395,14 @@ export class LogService {
         { name: 'Changements', value: changes.join('\n'), inline: false },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RÔLES
   // ═══════════════════════════════════════════════════════════════════════════
 
-  static async logRoleCreate(client: BotClient, role: Role): Promise<void> {
+  static async logRoleCreate(role: Role): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle('➕ Rôle créé')
       .setColor(role.color || 0x57f287)
@@ -442,10 +412,10 @@ export class LogService {
         { name: 'Mentionnable', value: role.mentionable ? 'Oui' : 'Non', inline: true },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logRoleDelete(client: BotClient, role: Role): Promise<void> {
+  static async logRoleDelete(role: Role): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle('🗑️ Rôle supprimé')
       .setColor(0xed4245)
@@ -454,10 +424,10 @@ export class LogService {
         { name: 'Couleur', value: role.hexColor, inline: true },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logRoleUpdate(client: BotClient, oldRole: Role, newRole: Role): Promise<void> {
+  static async logRoleUpdate(oldRole: Role, newRole: Role): Promise<void> {
     const changes: string[] = [];
     if (oldRole.name !== newRole.name) changes.push(`**Nom** : \`${oldRole.name}\` → \`${newRole.name}\``);
     if (oldRole.color !== newRole.color) changes.push(`**Couleur** : \`${oldRole.hexColor}\` → \`${newRole.hexColor}\``);
@@ -473,15 +443,14 @@ export class LogService {
         { name: 'Changements', value: changes.join('\n'), inline: false },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // MODÉRATION
   // ═══════════════════════════════════════════════════════════════════════════
 
-  static async logBanAdd(client: BotClient, guild: Guild, user: User): Promise<void> {
-    // Chercher le moderateur dans l'audit log
+  static async logBanAdd(guild: Guild, user: User): Promise<void> {
     let moderator = '*Inconnu*';
     let reason = '*Aucune*';
     try {
@@ -503,10 +472,10 @@ export class LogService {
         { name: 'Raison', value: reason, inline: false },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logBanRemove(client: BotClient, guild: Guild, user: User): Promise<void> {
+  static async logBanRemove(guild: Guild, user: User): Promise<void> {
     let moderator = '*Inconnu*';
     try {
       const auditLogs = await guild.fetchAuditLogs({ type: AuditLogEvent.MemberBanRemove, limit: 1 });
@@ -525,14 +494,14 @@ export class LogService {
         { name: 'Modérateur', value: moderator, inline: true },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // INVITATIONS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  static async logInviteCreate(client: BotClient, invite: Invite): Promise<void> {
+  static async logInviteCreate(invite: Invite): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle('🔗 Invitation créée')
       .setColor(0x57f287)
@@ -544,10 +513,10 @@ export class LogService {
         { name: 'Utilisations max', value: String(invite.maxUses ?? '∞'), inline: true },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
-  static async logInviteDelete(client: BotClient, invite: Invite): Promise<void> {
+  static async logInviteDelete(invite: Invite): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle('🗑️ Invitation supprimée')
       .setColor(0xed4245)
@@ -556,20 +525,20 @@ export class LogService {
         { name: 'Salon', value: invite.channel ? `<#${invite.channel.id}>` : '*Inconnu*', inline: true },
       )
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
   // BOT ACTIONS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  static async logBotAction(client: BotClient, title: string, description: string, color: number = 0x9b59b6): Promise<void> {
+  static async logBotAction(title: string, description: string, color: number = 0x9b59b6): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle(`🤖 ${title}`)
       .setDescription(description)
       .setColor(color)
       .setFooter({ text: 'Action bot' })
       .setTimestamp();
-    await this.send(client, embed);
+    await this.send(embed);
   }
 }

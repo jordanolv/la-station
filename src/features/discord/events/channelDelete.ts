@@ -9,7 +9,7 @@ export default {
   async execute(client: BotClient, channel: GuildChannel | DMChannel) {
     try {
       if (!('guild' in channel)) return;
-      await LogService.logChannelDelete(client, channel as GuildChannel);
+      await LogService.logChannelDelete(channel as GuildChannel);
     } catch (error) {
       console.error('[channelDelete] Erreur:', error);
     }

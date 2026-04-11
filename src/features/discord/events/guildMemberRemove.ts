@@ -8,7 +8,7 @@ export default {
 
   async execute(client: BotClient, member: GuildMember | PartialGuildMember) {
     try {
-      await LogService.logMemberLeave(client, member);
+      await LogService.logMemberLeave(member);
     } catch (error) {
       console.error('[guildMemberRemove] Erreur:', error);
     }
