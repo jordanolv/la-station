@@ -15,11 +15,13 @@ import { VoiceConfigRepository } from '../repositories/voice-config.repository';
 import { VoiceSessionService } from './voice-session.service';
 import { MountainPlugin } from '../../mountain/services/mountain.plugin';
 import { StatsPlugin } from '../../stats/services/stats.plugin';
+import { RaidPlugin } from '../../mountain/services/raid.plugin';
 
 export { VOC_CONFIG_BUTTON_ID, VOC_INVITE_USER_SELECT_ID } from '../constants/voice.constants';
 
 VoiceSessionService.registerPlugin(new MountainPlugin());
 VoiceSessionService.registerPlugin(new StatsPlugin());
+VoiceSessionService.registerPlugin(new RaidPlugin());
 
 export class VoiceService {
   // ─── Config ────────────────────────────────────────────────────────────────

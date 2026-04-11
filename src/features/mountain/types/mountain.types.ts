@@ -9,3 +9,11 @@ export interface RarityConfig {
   /** Poids pour le tirage de pack (total = 100) */
   packWeight: number;
 }
+
+export interface RaidRarityConfig {
+  hpMultiplier: number;
+  durationDaysMin: number;
+  durationDaysMax: number;
+  baseXp: number;
+  baseCoins: number;
+}

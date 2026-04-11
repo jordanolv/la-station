@@ -1,5 +1,6 @@
 import { UserRepository } from '../../user/services/user.repository';
 import { IUser } from '../../user/models/user.model';
+import { ActivityHooks } from '../../../shared/hooks/activity-hooks';
 
 export type VoiceHistorySegment = {
   date: Date;
@@ -117,6 +118,7 @@ export class StatsService {
         }
         if (isValidSlot) {
           guildUser.stats.activityPoints = (guildUser.stats.activityPoints ?? 0) + MSG_POINTS;
+          ActivityHooks.notifyMessageActivity(userId, MSG_POINTS);
         }
         guildUser.infos.updatedAt = new Date();
         await guildUser.save();
@@ -124,7 +126,10 @@ export class StatsService {
         const newUser = await this.userRepo.createUser({ discordId: userId, name: username || 'Unknown User' });
         newUser.stats.totalMsg = 1;
         newUser.stats.messageHistory = [{ date: today, count: 1 }] as any;
-        if (isValidSlot) newUser.stats.activityPoints = MSG_POINTS;
+        if (isValidSlot) {
+          newUser.stats.activityPoints = MSG_POINTS;
+          ActivityHooks.notifyMessageActivity(userId, MSG_POINTS);
+        }
         await newUser.save();
       }
     } catch (error) {

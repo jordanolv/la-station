@@ -80,6 +80,10 @@ class UserStats {
   /** Points d'activité de la semaine en cours (voc + messages), reset chaque lundi */
   @prop({ default: 0 })
   activityPoints!: number;
+
+  /** Points d'activité de la semaine précédente (snapshot au moment du reset) */
+  @prop({ default: 0 })
+  lastWeekActivityPoints!: number;
 }
 
 class UserInfos {

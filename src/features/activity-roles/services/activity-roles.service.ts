@@ -33,8 +33,10 @@ export class ActivityRolesService {
     const { podiumRoleId, activeRoleId, regularRoleId, inactiveRoleId, activeThresholdPercent, regularThresholdPercent } = config;
     console.log(`[ActivityRoles] Config rôles — podium:${podiumRoleId} actif:${activeRoleId} présent:${regularRoleId} inactif:${inactiveRoleId}`);
 
-    // Reset des points avant l'attribution pour éviter l'accumulation si crash
-    await UserModel.updateMany({}, { $set: { 'stats.activityPoints': 0 } });
+    await UserModel.updateMany(
+      {},
+      [{ $set: { 'stats.lastWeekActivityPoints': '$stats.activityPoints', 'stats.activityPoints': 0 } }],
+    );
     console.log(`[ActivityRoles] activityPoints remis à 0 pour tous les users`);
 
     let assigned = 0;
