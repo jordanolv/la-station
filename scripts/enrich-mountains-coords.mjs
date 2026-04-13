@@ -15,7 +15,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_PATH = path.join(__dirname, '../src/features/mountain/data/mountains.json');
+const DATA_PATH = path.join(__dirname, '../src/features/peak-hunters/data/mountains.json');
 
 const DELAY_MS = 150; // délai entre requêtes pour ne pas spam Wikidata
 const BATCH_SIZE = 50; // taille des batches pour l'API Wikidata

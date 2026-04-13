@@ -12,9 +12,9 @@ import { voicePanel } from '../../voice/panels/voice.panel';
 import { partyPanel } from '../../party/panels/party.panel';
 import { chatGamingPanel } from '../../chat-gaming/panels/chat-gaming.panel';
 import { arcadePanel } from '../../arcade/panels/arcade.panel';
-import { mountainPanel } from '../../mountain/panels/mountain.panel';
+import { peakHuntersPanel } from '../../peak-hunters/panels/peak-hunters.panel';
 import { activityRolesPanel } from '../../activity-roles/panels/activity-roles.panel';
-import { MountainSpawnService } from '../../mountain/services/mountain-spawn.service';
+import { SpawnService } from '../../peak-hunters/services/spawn.service';
 import { QuizService } from '../../quiz/services/quiz.service';
 
 panelRegistry.register(generalPanel);
@@ -25,7 +25,7 @@ panelRegistry.register(voicePanel);
 panelRegistry.register(partyPanel);
 panelRegistry.register(chatGamingPanel);
 panelRegistry.register(arcadePanel);
-panelRegistry.register(mountainPanel);
+panelRegistry.register(peakHuntersPanel);
 panelRegistry.register(activityRolesPanel);
 
 export default {
@@ -50,7 +50,7 @@ export default {
     setStatus();
     setInterval(setStatus, 8000);
     await VoiceService.rehydrate(client);
-    await MountainSpawnService.rehydrate(client);
+    await SpawnService.rehydrate(client);
     await QuizService.rehydrate(client);
     await ConfigPanelService.init(client).catch((err) =>
       console.error('[ConfigPanel] Erreur init:', err),

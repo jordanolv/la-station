@@ -11,7 +11,7 @@ cloudinary.config({
   api_secret: '',
 });
 
-const MOUNTAINS_PATH = path.join(__dirname, '../src/features/mountain/data/mountains.json');
+const MOUNTAINS_PATH = path.join(__dirname, '../src/features/peak-hunters/data/mountains.json');
 const mountains = JSON.parse(fs.readFileSync(MOUNTAINS_PATH, 'utf-8'));
 
 function slugify(str) {

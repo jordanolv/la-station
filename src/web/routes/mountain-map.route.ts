@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { UserMountainsRepository } from '../../features/mountain/repositories/user-mountains.repository';
-import { MountainService } from '../../features/mountain/services/mountain.service';
-import { RARITY_CONFIG } from '../../features/mountain/constants/mountain.constants';
+import { UserMountainsRepository } from '../../features/peak-hunters/repositories/user-mountains.repository';
+import { MountainService } from '../../features/peak-hunters/services/mountain.service';
+import { RARITY_CONFIG } from '../../features/peak-hunters/constants/peak-hunters.constants';
 import centroids from '../data/country-centroids.json';
 
 const router = Router();

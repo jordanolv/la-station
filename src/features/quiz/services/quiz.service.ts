@@ -11,10 +11,10 @@ import {
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 import { BotClient } from '../../../bot/client';
 import { QuizConfigRepository } from '../repositories/quiz-config.repository';
-import { MountainConfigRepository } from '../../mountain/repositories/mountain-config.repository';
-import { UserMountainsRepository } from '../../mountain/repositories/user-mountains.repository';
+import { PeakHuntersConfigRepository } from '../../peak-hunters/repositories/peak-hunters-config.repository';
 import { QuizGeneratorService } from './quiz-generator.service';
 import { LogService } from '../../../shared/logs/logs.service';
+import { awardExpeditions } from '../../peak-hunters/services/expedition.service';
 
 export interface QuizQuestion {
   id: string;
@@ -37,7 +37,7 @@ function getTodayRevealDate(): Date {
 
 export class QuizService {
   private static async getChannel(client: BotClient): Promise<TextChannel | null> {
-    const mountainConfig = await MountainConfigRepository.get();
+    const mountainConfig = await PeakHuntersConfigRepository.get();
     const channelId = mountainConfig?.spawnChannelId;
     if (!channelId) return null;
     const guild = client.guilds.cache.get(process.env.GUILD_ID!);
@@ -162,12 +162,12 @@ export class QuizService {
 
     if (isCorrect) {
       const packs = isFirst ? 2 : 1;
-      await UserMountainsRepository.addTickets(interaction.user.id, packs);
-      await LogService.info(`<@${interaction.user.id}> a remporté **${packs} ticket${packs > 1 ? 's' : ''}** 🎟️${isFirst ? ' (premier à répondre)' : ''}`, { feature: 'Quiz', title: '🎟️ Tickets gagnés' });
+      const { summary } = await awardExpeditions(interaction.user.id, packs);
+      await LogService.info(`<@${interaction.user.id}> a remporté **${packs} ticket${packs > 1 ? 's' : ''}** ${summary}${isFirst ? ' (premier à répondre)' : ''}`, { feature: 'Quiz', title: '🎟️ Tickets gagnés' });
       await interaction.reply({
         content: isFirst
-          ? `✅ Bonne réponse ! Premier à répondre — tu remportes **2 tickets de pack** 🎟️🎟️`
-          : `✅ Bonne réponse ! Tu remportes **1 ticket de pack** 🎟️`,
+          ? `✅ Bonne réponse ! Premier à répondre — tu remportes **2 tickets de pack** ${summary}`
+          : `✅ Bonne réponse ! Tu remportes **1 ticket de pack** ${summary}`,
         flags: 64,
       });
     } else {

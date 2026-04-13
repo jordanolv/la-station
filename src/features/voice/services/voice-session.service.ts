@@ -7,7 +7,7 @@ import { VoiceSessionRepository } from '../repositories/voice-session.repository
 import { VOICE_XP_PER_MINUTE, VOICE_MONEY_PER_MINUTE, VOICE_MIN_ACTIVE_SECONDS, VOICE_MIN_COUNT_SECONDS } from '../constants/voice.constants';
 import UserModel from '../../user/models/user.model';
 import { LevelingService } from '../../leveling/services/leveling.service';
-import type { MountainSessionResult } from '../../mountain/services/mountain.plugin';
+import type { PeakHuntersSessionResult } from '../../peak-hunters/services/peak-hunters.plugin';
 
 // ─── Plugin contract ────────────────────────────────────────────────────────
 
@@ -409,7 +409,7 @@ export class VoiceSessionService {
       }
     }
 
-    const mountainResult = pluginResults.find(r => r.mountain)?.mountain as MountainSessionResult | undefined;
+    const mountainResult = pluginResults.find(r => r.mountain)?.mountain as PeakHuntersSessionResult | undefined;
 
     if (!skipRecapEmbed) {
       await this.sendSessionRecap(client, session, {
@@ -430,7 +430,7 @@ export class VoiceSessionService {
       moneyGained: number;
       leveledUp: boolean;
       newLevel: number;
-      mountain?: MountainSessionResult;
+      mountain?: PeakHuntersSessionResult;
     },
   ): Promise<void> {
     const vocConfig = await VoiceConfigRepository.get();
@@ -601,4 +601,4 @@ export class VoiceSessionService {
 }
 
 // Avoid circular import — resolved at runtime
-import { MountainService } from '../../mountain/services/mountain.service';
+import { MountainService } from '../../peak-hunters/services/mountain.service';

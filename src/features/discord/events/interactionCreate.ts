@@ -33,15 +33,16 @@ import {
   panelRegistry,
 } from '../../config-panel/services/config-panel.registry';
 import { MONEY_MODAL_PREFIX } from '../../admin/slash/money';
+import giveExpeditionCommand, { GIVE_EXPEDITION_BUTTON_PREFIX, GIVE_EXPEDITION_MODAL_PREFIX } from '../../peak-hunters/slash/give-expedition';
 import { EMBED_EDIT_MODAL_PREFIX } from '../../admin/slash/embed';
-import { handlePackButton } from '../../mountain/slash/subcommands/pack';
-import { MountainSpawnService, SPAWN_BUTTON_PREFIX } from '../../mountain/services/mountain-spawn.service';
-import { MountainPlugin, VOICE_CHECK_BUTTON_PREFIX } from '../../mountain/services/mountain.plugin';
+import { handleExpeditionButton } from '../../peak-hunters/slash/subcommands/expedition';
+import { SpawnService, SPAWN_BUTTON_PREFIX } from '../../peak-hunters/services/spawn.service';
+import { PeakHuntersPlugin, VOICE_CHECK_BUTTON_PREFIX } from '../../peak-hunters/services/peak-hunters.plugin';
 import {
   INV_BUTTON_PREFIX,
   handleInventaireButton,
-} from '../../mountain/slash/subcommands/inv';
-import { HOME_BUTTON_PREFIX, handleHomeButton, MAP_BUTTON_PREFIX, handleMapButton } from '../../mountain/slash/subcommands/home';
+} from '../../peak-hunters/slash/subcommands/inv';
+import { HOME_BUTTON_PREFIX, handleHomeButton, MAP_BUTTON_PREFIX, handleMapButton } from '../../peak-hunters/slash/subcommands/home';
 import {
   handleImpostorButtonInteraction,
   handleImpostorSelectMenu,
@@ -145,11 +146,11 @@ export default {
         } else if (interaction.customId.startsWith(HOME_BUTTON_PREFIX + ':')) {
           await handleHomeButton(interaction, client);
         } else if (interaction.customId.startsWith('mountain:pack:')) {
-          await handlePackButton(interaction, client);
+          await handleExpeditionButton(interaction, client);
         } else if (interaction.customId.startsWith(SPAWN_BUTTON_PREFIX + ':')) {
-          await MountainSpawnService.handleClaim(interaction, client);
+          await SpawnService.handleClaim(interaction, client);
         } else if (interaction.customId.startsWith(VOICE_CHECK_BUTTON_PREFIX + ':')) {
-          await MountainPlugin.handleVoiceCheck(interaction);
+          await PeakHuntersPlugin.handleVoiceCheck(interaction);
         } else if (interaction.customId.startsWith(INV_BUTTON_PREFIX + ':')) {
           await handleInventaireButton(interaction, client);
         } else if (interaction.customId.startsWith('impostor_')) {
@@ -160,6 +161,8 @@ export default {
           await handleDraftButton(interaction, client);
         } else if (interaction.customId.startsWith(QUIZ_BUTTON_PREFIX + ':')) {
           await QuizService.handleAnswer(client, interaction);
+        } else if (interaction.customId.startsWith(GIVE_EXPEDITION_BUTTON_PREFIX)) {
+          await giveExpeditionCommand.handleButton(interaction, client);
         }
       }
 
@@ -242,6 +245,8 @@ export default {
           if (moneyCommand?.handleModalSubmit) {
             await moneyCommand.handleModalSubmit(interaction, client);
           }
+        } else if (interaction.customId.startsWith(GIVE_EXPEDITION_MODAL_PREFIX)) {
+          await giveExpeditionCommand.handleModalSubmit(interaction, client);
         } else if (interaction.customId.startsWith('impostor_createmodal_')) {
           await handleImpostorModalSubmit(interaction, client);
         } else if (interaction.customId.startsWith('bet:setup_modal:')) {

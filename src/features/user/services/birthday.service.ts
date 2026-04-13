@@ -10,7 +10,7 @@ import {
 } from 'discord.js';
 import { toZonedTime } from 'date-fns-tz';
 import UserModel from '../models/user.model';
-import { UserMountainsRepository } from '../../mountain/repositories/user-mountains.repository';
+import { UserMountainsRepository } from '../../peak-hunters/repositories/user-mountains.repository';
 import { LogService } from '../../../shared/logs/logs.service';
 
 export const BIRTHDAY_TZ = 'Europe/Paris';

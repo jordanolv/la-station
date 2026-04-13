@@ -1,9 +1,9 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import UserModel from '../models/user.model';
-import { UserMountainsRepository } from '../../mountain/repositories/user-mountains.repository';
 import { LogService } from '../../../shared/logs/logs.service';
 import { DailyStoryService } from '../services/daily-story.service';
+import { awardExpeditions } from '../../peak-hunters/services/expedition.service';
 
 const MAX_MONEY = 100;
 const MAX_XP = 100;
@@ -92,9 +92,11 @@ export default {
         return;
       }
 
+      let packSummary = '';
       if (packsReward > 0) {
-        await UserMountainsRepository.addTickets(interaction.user.id, packsReward);
-        await LogService.info(`<@${interaction.user.id}> a reçu **${packsReward} ticket${packsReward > 1 ? 's' : ''}** 🎟️`, { feature: 'Daily', title: '🎟️ Tickets gagnés' });
+        const packResult = await awardExpeditions(interaction.user.id, packsReward);
+        packSummary = packResult.summary;
+        await LogService.info(`<@${interaction.user.id}> a reçu **${packsReward} ticket${packsReward > 1 ? 's' : ''}** ${packSummary}`, { feature: 'Daily', title: '🎟️ Tickets gagnés' });
       }
 
       const story = await DailyStoryService.generate(interaction.user.displayName, moneyReward, xpReward, packsReward);
@@ -114,8 +116,8 @@ export default {
 
       if (packsReward > 0) {
         fields.push({
-          name: '🎟️ Packs',
-          value: `+${packsReward} ticket${packsReward > 1 ? 's' : ''} de pack`,
+          name: '🎁 Packs',
+          value: `+${packsReward} ticket${packsReward > 1 ? 's' : ''} ${packSummary}`,
           inline: true
         });
       }

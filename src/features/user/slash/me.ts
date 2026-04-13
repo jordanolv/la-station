@@ -18,8 +18,8 @@ import {
 import { BotClient } from '../../../bot/client';
 import { UserService } from '../services/user.service';
 import { getGuildId } from '../../../shared/guild';
-import UserMountainsModel from '../../mountain/models/user-mountains.model';
-import { MountainService } from '../../mountain/services/mountain.service';
+import UserMountainsModel from '../../peak-hunters/models/user-mountains.model';
+import { MountainService } from '../../peak-hunters/services/mountain.service';
 import { ProfileCardService } from '../services/profileCard.service';
 
 type UserDoc = NonNullable<Awaited<ReturnType<typeof UserService.getUserByDiscordId>>>;
