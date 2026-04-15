@@ -65,7 +65,7 @@ export async function buildLeaderboardContainer(requester: User, client: BotClie
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(`# 🏆 Leaderboard\n-# demandé par **${requester.displayName}**`),
         )
-        .setThumbnailAccessory(new ThumbnailBuilder().setURL('https://cdn.discordapp.com/attachments/1299384448198119476/1493679823351185652/logo-ph-2.png?ex=69dfd93d&is=69de87bd&hm=bd9f2c9f3b305e47e3098b7329de41605a8b83faca9ef31e0cf630c582a3dd0e&')),
+        .setThumbnailAccessory(new ThumbnailBuilder().setURL('https://res.cloudinary.com/theridge-bot/image/upload/q_auto/f_auto/v1776241636/the-ridge/discord/logo/ph-logo.png')),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(
@@ -96,7 +96,7 @@ export async function buildLeaderboardContainer(requester: User, client: BotClie
 
   container.addMediaGalleryComponents(
     new MediaGalleryBuilder().addItems(
-      new MediaGalleryItemBuilder().setURL('https://cdn.discordapp.com/attachments/1299384448198119476/1493690193855909968/banner-2.png?ex=69dfe2e5&is=69de9165&hm=e28c578b002ccab2b2394824d794f54b05efbedcac3749794fd788a69c303526&'),
+      new MediaGalleryItemBuilder().setURL('https://res.cloudinary.com/theridge-bot/image/upload/q_auto/f_auto/v1776241629/the-ridge/discord/logo/ph-banner.png'),
     ),
   );
 

@@ -29,8 +29,8 @@ import { MapService, CountryData, Continent } from '../../services/map.service';
 export const HOME_BUTTON_PREFIX = 'mountain:home';
 export const MAP_BUTTON_PREFIX = 'mountain:map';
 
-const PEAK_HUNTERS_LOGO = 'https://cdn.discordapp.com/attachments/1299384448198119476/1493679823351185652/logo-ph-2.png?ex=69dfd93d&is=69de87bd&hm=bd9f2c9f3b305e47e3098b7329de41605a8b83faca9ef31e0cf630c582a3dd0e&';
-const BANNER_URL = 'https://cdn.discordapp.com/attachments/1299384448198119476/1493690193855909968/banner-2.png?ex=69dfe2e5&is=69de9165&hm=e28c578b002ccab2b2394824d794f54b05efbedcac3749794fd788a69c303526&';
+const PEAK_HUNTERS_LOGO = 'https://res.cloudinary.com/theridge-bot/image/upload/q_auto/f_auto/v1776241636/the-ridge/discord/logo/ph-logo.png';
+const BANNER_URL = 'https://res.cloudinary.com/theridge-bot/image/upload/q_auto/f_auto/v1776241629/the-ridge/discord/logo/ph-banner.png';
 
 const CONTINENTS: { id: Continent; label: string; emoji: string }[] = [
   { id: 'europe',   label: 'Europe',   emoji: '🌍' },
