@@ -111,7 +111,7 @@ export class SpawnService {
       const rarity = MountainService.getRarity(mountain);
       const { emoji, label, fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
       const { newFragments, ticketsGained } = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
-      const ticketLine = ticketsGained > 0 ? `\n→ +${ticketsGained} 🎟️ ticket${ticketsGained > 1 ? 's' : ''}` : '';
+      const ticketLine = ticketsGained > 0 ? `\n→ +${ticketsGained} 🗺️ expédition${ticketsGained > 1 ? 's' : ''}` : '';
       await interaction.reply({
         content: `Tu possèdes déjà **${mountain.mountainLabel}** ${emoji} ${label} !\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${ticketLine}`,
         flags: MessageFlags.Ephemeral,

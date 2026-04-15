@@ -140,7 +140,7 @@ function buildRevealEmbed(
     )
     .setDescription(resultText)
     .setImage(mountain.image)
-    .setFooter({ text: `Expédition ${tierCfg.label}  ·  ${formatExpeditionsLineText(sentierTickets, falaiseTickets, sommetTickets)}` });
+    .setFooter({ text: `Expédition ${tierCfg.label}  |  ${formatExpeditionsLineText(sentierTickets, falaiseTickets, sommetTickets)}` });
 }
 
 interface PackDrawResult {
