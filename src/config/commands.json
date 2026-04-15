@@ -60,8 +60,8 @@
       "description": "Organisez et rejoignez des sessions de jeu avec d'autres membres",
       "commands": [
         {
-          "name": "lfm",
-          "description": "Créez une annonce pour trouver des coéquipiers pour une session de jeu",
+          "name": "group",
+          "description": "Créez un groupe pour trouver des coéquipiers pour une session de jeu",
           "usage": ""
         }
       ]
