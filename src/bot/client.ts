@@ -5,6 +5,7 @@ export class BotClient extends Client {
   private static _instance: BotClient;
   public commands: Collection<string, any>;
   public slashCommands: Collection<string, any>;
+  public eventsLoaded = false;
 
   private constructor() {
     super({

@@ -34,12 +34,15 @@ export async function startBot() {
     const eventsPath = path.join(__dirname, 'events');
     const featuresPath = path.join(__dirname, '../features');
 
-    const loadStart = Date.now();
-    await Promise.all([
-      loadEvents(client, eventsPath),
-      loadFeatures(client, featuresPath)
-    ]);
-    console.log(chalk.gray(`⏱️  Events + Features: ${Date.now() - loadStart}ms`));
+    if (!client.eventsLoaded) {
+      const loadStart = Date.now();
+      await Promise.all([
+        loadEvents(client, eventsPath),
+        loadFeatures(client, featuresPath)
+      ]);
+      client.eventsLoaded = true;
+      console.log(chalk.gray(`⏱️  Events + Features: ${Date.now() - loadStart}ms`));
+    }
 
     const token = process.env.DISCORD_TOKEN;
     if (!token) throw new Error("DISCORD_TOKEN manquant");
