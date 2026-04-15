@@ -1,4 +1,4 @@
-# CLAUDE.md — La Station Bot
+# CLAUDE.md — The Ridge Bot
 
 Bot Discord communautaire pour le serveur La Station. TypeScript, Discord.js v14, MongoDB/TypeGoose, PM2.
 
@@ -47,6 +47,7 @@ src/
 ```
 
 Chaque feature suit la même structure :
+
 ```
 feature/
 ├── models/        # TypeGoose models (Mongoose)
@@ -108,6 +109,7 @@ export class MyPanel implements ConfigPanel {
 ```
 
 Enregistrement dans `src/features/discord/events/ready.ts` :
+
 ```ts
 panelRegistry.register(new MyPanel());
 ```
@@ -158,15 +160,18 @@ profil: { money, exp, lvl }
 ## Système activityPoints
 
 Chaque lundi minuit (Paris), `ActivityRolesService.run()` :
+
 1. Lit `activityPoints` sur chaque user
 2. Trie et attribue les rôles selon les seuils %
 3. Reset `activityPoints` à 0 via `updateMany`
 
 **Accumulation des points :**
+
 - **Voc** : 1 seconde = 1 point (ajouté dans `StatsService.applyVoiceSegmentsToUser`)
 - **Messages** : cooldown 30min en RAM (`Map<userId, timestamp>`), 1 slot valide = 450 points (= 25% du voc à activité égale)
 
 **Rôles (configurables via panel admin) :**
+
 - Top 3 → Podium
 - Top `activeThresholdPercent`% (défaut 10%) → Campeur
 - Top `regularThresholdPercent`% (défaut 60%) → Explorateur
@@ -193,26 +198,31 @@ Les seuils % sont calculés sur `users.length` (tous les users en BDD).
 L'`id` est dérivé du slug Wikipedia dans `loadMountains()` (ex: `Everest`). Ne pas ajouter de champ `id` dans le JSON.
 
 ### Seuils de rareté (par altitude)
+
 - `legendary` : ≥ 7000 m
 - `epic` : 4250–6999 m
 - `rare` : 3000–4249 m
 - `common` : < 3000 m
 
 ### Helpers MountainService
+
 - `MountainService.getAltitude(m)` → `"8 849 m"`
 - `MountainService.getCountryDisplay(m)` → `"🇳🇵 Népal  ·  🇨🇳 République populaire de Chine"`
 - Ne jamais accéder à `m.name`, `m.flag`, `m.country`, `m.altitude` — ils n'existent pas.
 
 ### Commande `/mountain`
+
 Point d'entrée unique → `executeHome` affiche les stats + 3 boutons (Collection, Packs, Classement).
 Chaque bouton embarque le `lastMsgId` dans son customId (`mountain:home:ACTION:LAST_MSG_ID`) pour supprimer le message précédent à chaque navigation.
 
 ### Spawn
+
 - Planifié via `MountainSpawnCron` (seul scheduler, `resumeOrPlanToday()` au démarrage)
 - Ne pas appeler `MountainSpawnService.rehydrate()` depuis `ready.ts` → double spawn
 - Le schedule du jour est persisté en BDD
 
 ### Images
+
 - Hébergées sur Cloudinary dans `the-ridge/mountains/{slug}`
 - Script d'upload : `scripts/upload-mountains.mjs`
 
@@ -242,7 +252,6 @@ Chaque bouton embarque le `lastMsgId` dans son customId (`mountain:home:ACTION:L
 - **Principes SOLID** — notamment SRP (une seule raison de changer) et DIP (dépendre des abstractions, pas des implémentations concrètes quand ça a du sens).
 - **Features indépendantes** — une feature ne doit pas importer directement depuis une autre feature. Si deux features ont besoin de communiquer, passer par un service partagé dans `shared/`, un event Discord, ou un plugin (ex: `VoicePlugin`). Les couplages directs entre features rendent le code fragile et difficile à maintenir.
 
-
 ## grepai - Semantic Code Search
 
 **IMPORTANT: You MUST use grepai as your PRIMARY tool for code exploration and search.**
@@ -250,6 +259,7 @@ Chaque bouton embarque le `lastMsgId` dans son customId (`mountain:home:ACTION:L
 ### When to Use grepai (REQUIRED)
 
 Use `grepai search` INSTEAD OF Grep/Glob/find for:
+
 - Understanding what code does or where functionality lives
 - Finding implementations by intent (e.g., "authentication logic", "error handling")
 - Exploring unfamiliar parts of the codebase
@@ -258,6 +268,7 @@ Use `grepai search` INSTEAD OF Grep/Glob/find for:
 ### When to Use Standard Tools
 
 Only use Grep/Glob when you need:
+
 - Exact text matching (variable names, imports, specific strings)
 - File path patterns (e.g., `**/*.go`)
 
@@ -285,6 +296,7 @@ grepai search "API request validation" --json --compact
 ### Call Graph Tracing
 
 Use `grepai trace` to understand function relationships:
+
 - Finding all callers of a function before modifying it
 - Understanding what functions are called by a given function
 - Visualizing the complete call graph around a symbol
@@ -310,3 +322,4 @@ grepai trace graph "ValidateToken" --depth 3 --json
 2. Use `grepai trace` to understand function relationships
 3. Use `Read` tool to examine files from results
 4. Only use Grep for exact string searches if needed
+

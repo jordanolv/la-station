@@ -8,14 +8,14 @@ dotenv.config();
 async function main() {
   try {
     console.log(chalk.cyan('═'.repeat(60)));
-    console.log(chalk.cyan.bold('          🚀 DÉMARRAGE DE LA STATION'));
+    console.log(chalk.cyan.bold('          🚀 DÉMARRAGE DE RIDGY'));
     console.log(chalk.cyan('═'.repeat(60)));
 
     const botClient = await startBot();
     startWebServer();
 
     console.log(chalk.cyan('═'.repeat(60)));
-    console.log(chalk.green.bold('          ✅ LA STATION EST EN LIGNE'));
+    console.log(chalk.green.bold('          ✅ THE RIDGE EST EN LIGNE'));
     console.log(chalk.cyan('═'.repeat(60)));
 
     process.on('SIGINT', async () => {

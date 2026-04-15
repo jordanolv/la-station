@@ -33,7 +33,7 @@ export default {
     const mainEmbed = new EmbedBuilder()
       .setTitle('📖 Guide des commandes')
       .setDescription(
-        'Bienvenue sur **La Station** ! Voici toutes les commandes disponibles.\n\n' +
+        'Bienvenue sur **The Ridge** ! Voici toutes les commandes disponibles.\n\n' +
         '**Sélectionnez une catégorie ci-dessous pour en savoir plus.**'
       )
       .setColor(0xdac1ff)
