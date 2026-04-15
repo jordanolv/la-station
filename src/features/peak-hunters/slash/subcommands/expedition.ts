@@ -16,7 +16,6 @@ import {
   User,
 } from 'discord.js';
 import { BotClient } from '../../../../bot/client';
-import { buildUserHeaderContainer } from '../../../../shared/components/user-header';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
 import { MountainService, MountainInfo } from '../../services/mountain.service';
 import { RARITY_CONFIG, FRAGMENTS_PER_TICKET, PACK_TIER_CONFIG, PACK_TIER_RARITY_WEIGHTS } from '../../constants/peak-hunters.constants';
@@ -132,6 +131,7 @@ function buildRevealEmbed(
   return new EmbedBuilder()
     .setColor(color)
     .setAuthor({ name: user.displayName, iconURL: user.displayAvatarURL() })
+    .setThumbnail('https://res.cloudinary.com/theridge-bot/image/upload/q_auto/f_auto/v1776241636/the-ridge/discord/logo/ph-logo.png')
     .setTitle(`${emoji} ${mountain.mountainLabel}`)
     .addFields(
       { name: '🌍 Pays', value: MountainService.getCountryDisplay(mountain), inline: true },

@@ -10,18 +10,18 @@ export const SPAWN_HOUR_START = 7;
 export const SPAWN_HOUR_END = 23;
 
 export const RARITY_CONFIG: Record<MountainRarity, RarityConfig> = {
-  common:    { label: 'Commune',    emoji: '<:iconcommon:1493887332019998780>', color: 0x95a5a6, fragmentsOnDuplicate: 1,  packWeight: 60 },
-  rare:      { label: 'Rare',       emoji: '<:iconrare:1493887337644560554>', color: 0x3498db, fragmentsOnDuplicate: 3,  packWeight: 25 },
-  epic:      { label: 'Épique',     emoji: '<:iconepic:1493887333248794686>', color: 0x9b59b6, fragmentsOnDuplicate: 8,  packWeight: 12 },
-  legendary: { label: 'Légendaire', emoji: '<:iconleg:1493887335765512343>', color: 0xf1c40f, fragmentsOnDuplicate: 20, packWeight: 3  },
+  common:    { label: 'Commune',    emoji: '<:iconcommon:1493913972590510170>', color: 0x95a5a6, fragmentsOnDuplicate: 1,  packWeight: 60 },
+  rare:      { label: 'Rare',       emoji: '<:iconrare:1493913954622378075>', color: 0x3498db, fragmentsOnDuplicate: 3,  packWeight: 25 },
+  epic:      { label: 'Épique',     emoji: '<:iconepic:1493913951346491512>', color: 0x9b59b6, fragmentsOnDuplicate: 8,  packWeight: 12 },
+  legendary: { label: 'Légendaire', emoji: '<:iconleg:1493913953254903909>', color: 0xf1c40f, fragmentsOnDuplicate: 20, packWeight: 3  },
 };
 
 // ─── Tiers d'expédition ───────────────────────────────────────────────────────
 
 export const PACK_TIER_CONFIG: Record<PackTier, PackTierConfig> = {
-  sentier:  { label: 'Sentier',  emoji: '<:sentierTier:1493261306478858391>', color: 0xe67e22, description: 'Probabilités normales' },
-  falaise:  { label: 'Falaise',  emoji: '<:falaiseTier:1493261308093792368>',  color: 0x3498db, description: 'Meilleures chances de rare et épique' },
-  sommet:   { label: 'Sommet',   emoji: '<:sommetTier:1493261304742547556>', color: 0x9b59b6, description: 'Garantit une montagne Épique ou Légendaire' },
+  sentier:  { label: 'Sentier',  emoji: '<:sentierTier:1493914305824034907>', color: 0xe67e22, description: 'Probabilités normales' },
+  falaise:  { label: 'Falaise',  emoji: '<:falaiseTier:1493914310282448916>',  color: 0x3498db, description: 'Meilleures chances de rare et épique' },
+  sommet:   { label: 'Sommet',   emoji: '<:sommetTier:1493914307698884608>', color: 0x9b59b6, description: 'Garantit une montagne Épique ou Légendaire' },
 };
 
 /** Poids de rareté par tier d'expédition */
