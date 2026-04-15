@@ -6,10 +6,11 @@ import UserModel from '../../user/models/user.model';
 import { LevelingService } from '../../leveling/services/leveling.service';
 import { RaidRepository } from '../repositories/raid.repository';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
-import { MountainConfigRepository } from '../repositories/mountain-config.repository';
+import { PeakHuntersConfigRepository } from '../repositories/peak-hunters-config.repository';
 import { MountainService } from './mountain.service';
-import { RARITY_CONFIG, RAID_RARITY_CONFIG, RAID_COOLDOWN_MS, RAID_AVG_POINTS_FLOOR, RAID_MIN_CONTRIBUTION_RATIO, RAID_HP_BAR_LENGTH, RAID_SPAWN_CHANCE_PER_HOUR } from '../constants/mountain.constants';
-import type { MountainRarity } from '../types/mountain.types';
+import { RARITY_CONFIG, RAID_RARITY_CONFIG, RAID_COOLDOWN_MS, RAID_AVG_POINTS_FLOOR, RAID_MIN_CONTRIBUTION_RATIO, RAID_HP_BAR_LENGTH, RAID_SPAWN_CHANCE_PER_HOUR, PACK_TIER_CONFIG } from '../constants/peak-hunters.constants';
+import { awardExpeditions } from './expedition.service';
+import type { MountainRarity, PackTier } from '../types/peak-hunters.types';
 import type { IRaidDoc } from '../models/raid.model';
 
 const LOG_FEATURE = '⚔️ Raid';
@@ -135,7 +136,11 @@ export class RaidService {
   static async checkAndFinalize(client: BotClient): Promise<void> {
     const { default: RaidModel } = await import('../models/raid.model');
 
-    const completedPending = await RaidModel.findOne({ status: 'completed' });
+    const completedPending = await RaidModel.findOneAndUpdate(
+      { status: 'completed' },
+      { $set: { status: 'failed' } },
+      { new: false },
+    );
     if (completedPending) {
       await this.distributeRewards(client, completedPending, false);
       return;
@@ -176,6 +181,7 @@ export class RaidService {
       xpGained: number;
       coinsGained: number;
       ticketsGained: number;
+      ticketTiers: PackTier[];
       mountainDropped: boolean;
       isNew: boolean;
     }
@@ -206,8 +212,10 @@ export class RaidService {
         { $inc: { 'profil.money': coinsGained } },
       );
       await LevelingService.giveXpDirectly(client, p.userId, xpGained);
+      let ticketTiers: PackTier[] = [];
       if (ticketsGained > 0) {
-        await UserMountainsRepository.addTickets(p.userId, ticketsGained);
+        const packResult = await awardExpeditions(p.userId, ticketsGained);
+        ticketTiers = packResult.tiers;
       }
 
       if (mountainDropped) {
@@ -221,7 +229,7 @@ export class RaidService {
       }
 
       await RaidRepository.markRewarded(raidDoc.id, p.userId);
-      lines.push({ userId: p.userId, pct, xpGained, coinsGained, ticketsGained, mountainDropped, isNew });
+      lines.push({ userId: p.userId, pct, xpGained, coinsGained, ticketsGained, ticketTiers, mountainDropped, isNew });
     }
 
     const channel = await this.getNotificationChannel(client);
@@ -297,6 +305,7 @@ export class RaidService {
       xpGained: number;
       coinsGained: number;
       ticketsGained: number;
+      ticketTiers: PackTier[];
       mountainDropped: boolean;
       isNew: boolean;
     }[],
@@ -316,9 +325,10 @@ export class RaidService {
       } catch {}
 
       const pctStr = `${Math.round(l.pct * 100)}%`;
+      const tierEmojis = l.ticketTiers.map(t => PACK_TIER_CONFIG[t].emoji).join('');
       const rewards = isPartial
         ? `+${l.coinsGained} 💵  +${l.xpGained} XP`
-        : `+${l.coinsGained} 💵  +${l.xpGained} XP  +${l.ticketsGained} 🎟️${l.mountainDropped ? (l.isNew ? '  ✅ montagne !' : '  🧩 fragments') : ''}`;
+        : `+${l.coinsGained} 💵  +${l.xpGained} XP  ${tierEmojis}${l.mountainDropped ? (l.isNew ? '  ✅ montagne !' : '  🧩 fragments') : ''}`;
 
       rankLines.push(`${medal} **${username}** — ${pctStr}  |  ${rewards}`);
     }
@@ -372,9 +382,10 @@ export class RaidService {
   private static async getNotificationChannel(client: BotClient): Promise<TextChannel | null> {
     const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
     if (!guild) return null;
-    const config = await MountainConfigRepository.get();
-    if (!config?.notificationChannelId) return null;
-    const channel = await guild.channels.fetch(config.notificationChannelId).catch(() => null);
+    const config = await PeakHuntersConfigRepository.get();
+    const channelId = config?.raidChannelId ?? config?.notificationChannelId;
+    if (!channelId) return null;
+    const channel = await guild.channels.fetch(channelId).catch(() => null);
     if (!channel?.isTextBased()) return null;
     return channel as TextChannel;
   }
