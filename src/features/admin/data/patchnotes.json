@@ -232,6 +232,43 @@
     ]
   },
   {
+    "version": "1.6.0",
+    "timestamp": 1776241716,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🥾 Expéditions par tiers",
+            "items": [
+              "Les expéditions sont maintenant de 3 types : **Sentier**, **Falaise** et **Sommet** — chacun avec ses propres probabilités de rareté",
+              "Le **Sommet** garantit une montagne Épique ou Légendaire",
+              "Les tickets sont attribués aléatoirement selon les poids de chaque tier (Sentier 80%, Falaise 18%, Sommet 2%)"
+            ]
+          },
+          {
+            "title": "🏆 Classement Peak Hunters",
+            "items": [
+              "Un onglet **Peak Hunters** a été ajouté dans `/leaderboard` — classement des collectionneurs par nombre de montagnes débloquées"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "⛰️ Interface Peak Hunters",
+            "items": [
+              "Nouvelle charte graphique unifiée pour toutes les vues Peak Hunters (couleur, bannière, navigation)",
+              "La commande `/peak-hunters` affiche maintenant le détail de chaque type d'expédition disponible"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "1.5.0",
     "timestamp": 1775858400,
     "sections": [
