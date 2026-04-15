@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import type { MountainRarity } from '../types/mountain.types';
-import { RARITY_CONFIG } from '../constants/mountain.constants';
+import type { MountainRarity, PackTier } from '../types/peak-hunters.types';
+import { RARITY_CONFIG, PACK_TIER_RARITY_WEIGHTS } from '../constants/peak-hunters.constants';
 
 export interface MountainInfo {
   id: string;
@@ -67,17 +67,23 @@ export class MountainService {
     return mountain.rarity;
   }
 
-  /** Tire une montagne au hasard pondérée par les poids de rareté du pack */
+  /** Tire une montagne au hasard pondérée par les poids de rareté du pack standard */
   static getRandomByPackWeight(): MountainInfo | null {
+    return this.getRandomByTier('sentier');
+  }
+
+  /** Tire une montagne au hasard selon le tier de pack */
+  static getRandomByTier(tier: PackTier): MountainInfo | null {
     if (this.mountains.length === 0) return null;
 
-    const totalWeight = Object.values(RARITY_CONFIG).reduce((acc, r) => acc + r.packWeight, 0);
+    const weights = PACK_TIER_RARITY_WEIGHTS[tier];
+    const totalWeight = Object.values(weights).reduce((acc, w) => acc + w, 0);
     let roll = Math.random() * totalWeight;
 
     const rarityOrder: MountainRarity[] = ['common', 'rare', 'epic', 'legendary'];
     let targetRarity: MountainRarity = 'common';
     for (const rarity of rarityOrder) {
-      roll -= RARITY_CONFIG[rarity].packWeight;
+      roll -= weights[rarity];
       if (roll <= 0) {
         targetRarity = rarity;
         break;

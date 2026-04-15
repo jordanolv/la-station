@@ -1,5 +1,5 @@
 import RaidModel, { IRaidDoc } from '../models/raid.model';
-import type { MountainRarity } from '../types/mountain.types';
+import type { MountainRarity } from '../types/peak-hunters.types';
 
 export class RaidRepository {
   static async getActive(): Promise<IRaidDoc | null> {

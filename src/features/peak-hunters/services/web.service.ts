@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 const TOKEN_TTL = '24h';
 
-export class MountainWebService {
+export class WebService {
   static generateMapUrl(userId: string): string {
     const secret = process.env.WEB_JWT_SECRET;
     if (!secret) throw new Error('WEB_JWT_SECRET manquant');

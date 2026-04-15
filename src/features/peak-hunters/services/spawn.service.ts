@@ -9,20 +9,20 @@ import {
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
-import { MountainConfigRepository } from '../repositories/mountain-config.repository';
+import { PeakHuntersConfigRepository } from '../repositories/peak-hunters-config.repository';
 import { MountainService } from './mountain.service';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
-import { RARITY_CONFIG } from '../constants/mountain.constants';
+import { RARITY_CONFIG } from '../constants/peak-hunters.constants';
 import { LogService } from '../../../shared/logs/logs.service';
 
 const LOG_FEATURE = '⛰️ Mountain Spawn';
 export const SPAWN_BUTTON_PREFIX = 'mountain:spawn:claim';
 
-export class MountainSpawnService {
+export class SpawnService {
   private static lastSpawnWinnerId: string | null = null;
 
   static async rehydrate(client: BotClient): Promise<void> {
-    const config = await MountainConfigRepository.get();
+    const config = await PeakHuntersConfigRepository.get();
     if (config?.lastSpawnWinnerId) {
       this.lastSpawnWinnerId = config.lastSpawnWinnerId;
     }
@@ -34,7 +34,7 @@ export class MountainSpawnService {
     const now = Date.now();
     for (const date of pending) {
       const delay = date.getTime() - now;
-      if (delay > 0) setTimeout(() => MountainSpawnService.doSpawn(client), delay);
+      if (delay > 0) setTimeout(() => SpawnService.doSpawn(client), delay);
     }
 
     if (pending.length > 0) {
@@ -46,7 +46,7 @@ export class MountainSpawnService {
   }
 
   static async doSpawn(client: BotClient): Promise<void> {
-    const config = await MountainConfigRepository.get();
+    const config = await PeakHuntersConfigRepository.get();
     if (!config?.spawnChannelId) return;
 
     const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
@@ -83,7 +83,7 @@ export class MountainSpawnService {
     );
 
     const message = await (channel as TextChannel).send({ embeds: [embed], components: [row] });
-    await MountainConfigRepository.setActiveSpawnMessage(message.id);
+    await PeakHuntersConfigRepository.setActiveSpawnMessage(message.id);
 
     await LogService.info(`Spawn montagne : **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})`,
       { feature: LOG_FEATURE, title: '🌄 Nouveau spawn' },
@@ -120,7 +120,7 @@ export class MountainSpawnService {
     }
 
     // Claim atomique en BDD — seul le premier à trouver activeSpawnMessageId réussit
-    const claimed = await MountainConfigRepository.claimSpawn(messageId);
+    const claimed = await PeakHuntersConfigRepository.claimSpawn(messageId);
     if (!claimed) {
       await interaction.reply({ content: '❌ Cette montagne a déjà été revendiquée !', flags: MessageFlags.Ephemeral }).catch(() => {});
       return;
@@ -155,7 +155,7 @@ export class MountainSpawnService {
       .setImage(mountain.image)
       .setTimestamp();
 
-    MountainConfigRepository.setLastSpawnWinner(userId).catch(() => {});
+    PeakHuntersConfigRepository.setLastSpawnWinner(userId).catch(() => {});
 
     await interaction.update({ embeds: [updatedEmbed], components: [disabledRow] }).catch(() => {});
 

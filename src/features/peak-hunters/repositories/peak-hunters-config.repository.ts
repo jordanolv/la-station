@@ -1,39 +1,46 @@
-import MountainConfigModel, { IMountainConfig, IMountainConfigDoc } from '../models/mountain-config.model';
+import MountainConfigModel, { IPeakHuntersConfig, IPeakHuntersConfigDoc } from '../models/peak-hunters-config.model';
 
-const DEFAULTS: IMountainConfig = {
+const DEFAULTS: IPeakHuntersConfig = {
   enabled: false,
   spawnChannelId: undefined,
   notificationChannelId: undefined,
+  raidChannelId: undefined,
   spawnSchedule: [],
   activeChannelMountains: {},
 };
 
-export class MountainConfigRepository {
-  static async get(): Promise<IMountainConfigDoc | null> {
+export class PeakHuntersConfigRepository {
+  static async get(): Promise<IPeakHuntersConfigDoc | null> {
     return MountainConfigModel.findOne();
   }
 
-  static async getOrCreate(): Promise<IMountainConfigDoc> {
+  static async getOrCreate(): Promise<IPeakHuntersConfigDoc> {
     const existing = await this.get();
     if (existing) return existing;
     return MountainConfigModel.create({ ...DEFAULTS });
   }
 
-  static async toggle(enabled: boolean): Promise<IMountainConfigDoc> {
+  static async toggle(enabled: boolean): Promise<IPeakHuntersConfigDoc> {
     const doc = await this.getOrCreate();
     doc.enabled = enabled;
     return doc.save();
   }
 
-  static async setSpawnChannel(channelId: string | null): Promise<IMountainConfigDoc> {
+  static async setSpawnChannel(channelId: string | null): Promise<IPeakHuntersConfigDoc> {
     const doc = await this.getOrCreate();
     doc.spawnChannelId = channelId ?? undefined;
     return doc.save();
   }
 
-  static async setNotificationChannel(channelId: string | null): Promise<IMountainConfigDoc> {
+  static async setNotificationChannel(channelId: string | null): Promise<IPeakHuntersConfigDoc> {
     const doc = await this.getOrCreate();
     doc.notificationChannelId = channelId ?? undefined;
+    return doc.save();
+  }
+
+  static async setRaidChannel(channelId: string | null): Promise<IPeakHuntersConfigDoc> {
+    const doc = await this.getOrCreate();
+    doc.raidChannelId = channelId ?? undefined;
     return doc.save();
   }
 

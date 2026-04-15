@@ -1,5 +1,5 @@
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
-import { SPAWN_HOUR_START, SPAWN_HOUR_END } from '../constants/mountain.constants';
+import { SPAWN_HOUR_START, SPAWN_HOUR_END } from '../constants/peak-hunters.constants';
 
 const TZ = 'Europe/Paris';
 

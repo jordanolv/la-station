@@ -1,5 +1,5 @@
 import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
-import type { MountainRarity } from '../types/mountain.types';
+import type { MountainRarity } from '../types/peak-hunters.types';
 
 export class RaidParticipant {
   @prop({ required: true })

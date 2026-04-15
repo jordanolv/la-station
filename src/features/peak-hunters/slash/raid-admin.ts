@@ -3,7 +3,7 @@ import { BotClient } from '../../../bot/client';
 import { RaidService } from '../services/raid.service';
 import { RaidRepository } from '../repositories/raid.repository';
 import { MountainService } from '../services/mountain.service';
-import { RARITY_CONFIG } from '../constants/mountain.constants';
+import { RARITY_CONFIG } from '../constants/peak-hunters.constants';
 
 export default {
   data: new SlashCommandBuilder()

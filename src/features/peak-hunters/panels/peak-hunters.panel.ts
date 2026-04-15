@@ -19,26 +19,28 @@ import {
 import { BotClient } from '../../../bot/client';
 import { ConfigPanel, panelCustomId } from '../../config-panel/services/config-panel.registry';
 import { ConfigPanelService } from '../../config-panel/services/config-panel.service';
-import { MountainConfigRepository } from '../repositories/mountain-config.repository';
+import { PeakHuntersConfigRepository } from '../repositories/peak-hunters-config.repository';
 import { MountainService } from '../services/mountain.service';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
-import { SPAWN_MAX_PER_DAY, SPAWN_HOUR_START, SPAWN_HOUR_END, RARITY_CONFIG } from '../constants/mountain.constants';
+import { SPAWN_MAX_PER_DAY, SPAWN_HOUR_START, SPAWN_HOUR_END, PACK_TIER_CONFIG } from '../constants/peak-hunters.constants';
+import type { PackTier } from '../types/peak-hunters.types';
 
 const PANEL_ID = 'mountain';
 const ACCENT_ON = 0x2ecc71;
 const ACCENT_OFF = 0xed4245;
 
-export const mountainPanel: ConfigPanel = {
+export const peakHuntersPanel: ConfigPanel = {
   id: PANEL_ID,
   title: 'Montagnes',
   emoji: '⛰️',
   description: 'Système de collection de montagnes',
 
   async buildContainers(_client: BotClient): Promise<ContainerBuilder[]> {
-    const config = await MountainConfigRepository.getOrCreate();
+    const config = await PeakHuntersConfigRepository.getOrCreate();
     const enabled = config.enabled;
     const spawnChannel = config.spawnChannelId;
     const notifChannel = config.notificationChannelId;
+    const raidChannel = config.raidChannelId;
     const totalMountains = MountainService.count;
 
     const pendingSpawns = config.spawnSchedule.filter(d => new Date(d) > new Date()).length;
@@ -103,16 +105,38 @@ export const mountainPanel: ConfigPanel = {
             .setChannelTypes(ChannelType.GuildText),
         ),
       )
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+          `### ⚔️ Salon des raids\n${raidChannel ? `<#${raidChannel}>` : '*Non défini*'}`,
+        ),
+      )
+      .addActionRowComponents(
+        new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+          new ChannelSelectMenuBuilder()
+            .setCustomId(panelCustomId(PANEL_ID, 'select_raid'))
+            .setPlaceholder('Annonces de raids (début, progression, résultats)')
+            .setChannelTypes(ChannelType.GuildText),
+        ),
+      )
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
       .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent('### 🎟️ Distribution de tickets'),
+        new TextDisplayBuilder().setContent('### 🗺️ Distribution d\'expéditions'),
       )
       .addActionRowComponents(
         new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId(panelCustomId(PANEL_ID, 'give_tickets'))
-            .setLabel('Donner des tickets à tous')
+            .setCustomId(panelCustomId(PANEL_ID, 'give_tickets_sentier'))
+            .setLabel('Sentier')
+            .setStyle(ButtonStyle.Secondary),
+          new ButtonBuilder()
+            .setCustomId(panelCustomId(PANEL_ID, 'give_tickets_falaise'))
+            .setLabel('Falaise')
             .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId(panelCustomId(PANEL_ID, 'give_tickets_sommet'))
+            .setLabel('Sommet')
+            .setStyle(ButtonStyle.Danger),
         ),
       );
 
@@ -122,15 +146,18 @@ export const mountainPanel: ConfigPanel = {
   async handleButton(interaction: ButtonInteraction, client: BotClient): Promise<void> {
     const action = interaction.customId.split(':')[2];
 
-    if (action === 'give_tickets') {
+    const TIERS: PackTier[] = ['sentier', 'falaise', 'sommet'];
+    const matchedTier = TIERS.find(t => action === `give_tickets_${t}`);
+    if (matchedTier) {
+      const { label } = PACK_TIER_CONFIG[matchedTier];
       const modal = new ModalBuilder()
-        .setCustomId(panelCustomId(PANEL_ID, 'modal_give_tickets'))
-        .setTitle('🎟️ Distribuer des tickets')
+        .setCustomId(panelCustomId(PANEL_ID, `modal_give_tickets_${matchedTier}`))
+        .setTitle(`🗺️ Expéditions ${label}`)
         .addComponents(
           new ActionRowBuilder<TextInputBuilder>().addComponents(
             new TextInputBuilder()
               .setCustomId('amount')
-              .setLabel('Nombre de tickets à donner à tous')
+              .setLabel(`Expéditions ${label} à donner`)
               .setStyle(TextInputStyle.Short)
               .setPlaceholder('Ex: 5')
               .setMinLength(1)
@@ -142,8 +169,8 @@ export const mountainPanel: ConfigPanel = {
       return;
     }
 
-    const config = await MountainConfigRepository.getOrCreate();
-    await MountainConfigRepository.toggle(!config.enabled);
+    const config = await PeakHuntersConfigRepository.getOrCreate();
+    await PeakHuntersConfigRepository.toggle(!config.enabled);
 
     await interaction.reply({
       content: !config.enabled ? '✅ Montagnes activées !' : '❌ Montagnes désactivées.',
@@ -160,7 +187,7 @@ export const mountainPanel: ConfigPanel = {
     const channelId = interaction.values[0];
 
     if (action === 'select_spawn') {
-      await MountainConfigRepository.setSpawnChannel(channelId);
+      await PeakHuntersConfigRepository.setSpawnChannel(channelId);
       await interaction.reply({
         content: `✅ Salon de spawn : <#${channelId}>`,
         ephemeral: true,
@@ -168,9 +195,17 @@ export const mountainPanel: ConfigPanel = {
     }
 
     if (action === 'select_notif') {
-      await MountainConfigRepository.setNotificationChannel(channelId);
+      await PeakHuntersConfigRepository.setNotificationChannel(channelId);
       await interaction.reply({
         content: `✅ Salon de notification montagne : <#${channelId}>`,
+        ephemeral: true,
+      });
+    }
+
+    if (action === 'select_raid') {
+      await PeakHuntersConfigRepository.setRaidChannel(channelId);
+      await interaction.reply({
+        content: `✅ Salon des raids : <#${channelId}>`,
         ephemeral: true,
       });
     }
@@ -181,7 +216,9 @@ export const mountainPanel: ConfigPanel = {
   async handleModal(interaction: ModalSubmitInteraction, _client: BotClient): Promise<void> {
     const action = interaction.customId.split(':')[2];
 
-    if (action === 'modal_give_tickets') {
+    const TIERS: PackTier[] = ['sentier', 'falaise', 'sommet'];
+    const matchedTier = TIERS.find(t => action === `modal_give_tickets_${t}`);
+    if (matchedTier) {
       const raw = interaction.fields.getTextInputValue('amount').trim();
       const amount = parseInt(raw, 10);
 
@@ -190,9 +227,10 @@ export const mountainPanel: ConfigPanel = {
         return;
       }
 
+      const { label, emoji } = PACK_TIER_CONFIG[matchedTier];
       await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-      const count = await UserMountainsRepository.addTicketsToAll(amount);
-      await interaction.editReply({ content: `✅ **+${amount} ticket${amount > 1 ? 's' : ''}** distribués à **${count}** joueurs.` });
+      const count = await UserMountainsRepository.addTicketsToAll(amount, matchedTier);
+      await interaction.editReply({ content: `✅ **+${amount} expédition${amount > 1 ? 's' : ''}** ${emoji} **${label}** distribuées à **${count}** joueurs.` });
     }
   },
 };

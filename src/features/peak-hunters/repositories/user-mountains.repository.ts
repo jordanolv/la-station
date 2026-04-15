@@ -1,6 +1,6 @@
 import UserMountainsModel, { IUserMountainsDoc } from '../models/user-mountains.model';
-import type { MountainRarity } from '../types/mountain.types';
-import { FRAGMENTS_PER_TICKET, MOUNTAIN_TICKET_SECONDS } from '../constants/mountain.constants';
+import type { MountainRarity, PackTier } from '../types/peak-hunters.types';
+import { FRAGMENTS_PER_TICKET, MOUNTAIN_TICKET_SECONDS, TICKET_TIER_CHANCES, rollPackTier } from '../constants/peak-hunters.constants';
 
 export interface UnlockedMountainEntry {
   mountainId: string;
@@ -16,9 +16,12 @@ export class UserMountainsRepository {
   static async getOrCreate(userId: string): Promise<IUserMountainsDoc> {
     let doc = await this.getByUserId(userId);
     if (!doc) {
-      doc = new UserMountainsModel({ userId, unlockedMountains: [], packTickets: 0, fragments: 0, vocSecondsAccumulated: 0 });
+      doc = new UserMountainsModel({ userId, unlockedMountains: [], sentierTickets: 0, falaiseTickets: 0, sommetTickets: 0, fragments: 0, vocSecondsAccumulated: 0 });
       await doc.save();
     }
+    doc.falaiseTickets ??= 0;
+    doc.sommetTickets ??= 0;
+    doc.fragments ??= 0;
     return doc;
   }
 
@@ -56,24 +59,27 @@ export class UserMountainsRepository {
     const ticketsGained = Math.floor(doc.fragments / FRAGMENTS_PER_TICKET);
     if (ticketsGained > 0) {
       doc.fragments = doc.fragments % FRAGMENTS_PER_TICKET;
-      doc.packTickets += ticketsGained;
+      doc.sentierTickets += ticketsGained;
     }
     doc.markModified('fragments');
-    doc.markModified('packTickets');
+    doc.markModified('sentierTickets');
     await doc.save();
 
     return { newFragments: doc.fragments, ticketsGained };
   }
 
-  /** Ajoute des tickets directement. */
-  static async addTickets(userId: string, amount: number): Promise<void> {
+  /** Ajoute des tickets directement (standard par défaut). */
+  static async addTickets(userId: string, amount: number, tier: PackTier = 'sentier'): Promise<void> {
     const doc = await this.getOrCreate(userId);
-    doc.packTickets += amount;
+    if (tier === 'falaise') doc.falaiseTickets += amount;
+    else if (tier === 'sommet') doc.sommetTickets += amount;
+    else doc.sentierTickets += amount;
     await doc.save();
   }
 
-  static async addTicketsToAll(amount: number): Promise<number> {
-    const result = await UserMountainsModel.updateMany({}, { $inc: { packTickets: amount } });
+  static async addTicketsToAll(amount: number, tier: PackTier = 'sentier'): Promise<number> {
+    const field = tier === 'falaise' ? 'falaiseTickets' : tier === 'sommet' ? 'sommetTickets' : 'sentierTickets';
+    const result = await UserMountainsModel.updateMany({}, { $inc: { [field]: amount } });
     return result.modifiedCount;
   }
 
@@ -81,10 +87,18 @@ export class UserMountainsRepository {
    * Consomme 1 ticket pour ouvrir un pack.
    * Retourne false si pas assez de tickets.
    */
-  static async spendTicket(userId: string): Promise<boolean> {
+  static async spendTicket(userId: string, tier: PackTier = 'sentier'): Promise<boolean> {
     const doc = await this.getOrCreate(userId);
-    if (doc.packTickets <= 0) return false;
-    doc.packTickets -= 1;
+    if (tier === 'falaise') {
+      if (doc.falaiseTickets <= 0) return false;
+      doc.falaiseTickets -= 1;
+    } else if (tier === 'sommet') {
+      if (doc.sommetTickets <= 0) return false;
+      doc.sommetTickets -= 1;
+    } else {
+      if (doc.sentierTickets <= 0) return false;
+      doc.sentierTickets -= 1;
+    }
     await doc.save();
     return true;
   }
@@ -93,31 +107,51 @@ export class UserMountainsRepository {
    * Consomme N tickets pour ouvrir plusieurs packs.
    * Retourne false si pas assez de tickets.
    */
-  static async spendTickets(userId: string, amount: number): Promise<boolean> {
+  static async spendTickets(userId: string, amount: number, tier: PackTier = 'sentier'): Promise<boolean> {
     const doc = await this.getOrCreate(userId);
-    if (doc.packTickets < amount) return false;
-    doc.packTickets -= amount;
+    if (tier === 'falaise') {
+      if (doc.falaiseTickets < amount) return false;
+      doc.falaiseTickets -= amount;
+    } else if (tier === 'sommet') {
+      if (doc.sommetTickets < amount) return false;
+      doc.sommetTickets -= amount;
+    } else {
+      if (doc.sentierTickets < amount) return false;
+      doc.sentierTickets -= amount;
+    }
     await doc.save();
     return true;
   }
 
   /**
-   * Ajoute du temps vocal et retourne le nombre de tickets gagnés (1 par MOUNTAIN_TICKET_SECONDS).
+   * Ajoute du temps vocal et retourne le nombre de tickets gagnés, avec leur tier.
+   * Chaque ticket obtenu est rollé selon TICKET_TIER_CHANCES.
    */
-  static async addVocSeconds(userId: string, seconds: number): Promise<{ ticketsGained: number }> {
+  static async addVocSeconds(userId: string, seconds: number): Promise<{ ticketsGained: number; tiers: PackTier[] }> {
     const doc = await this.getOrCreate(userId);
 
     doc.vocSecondsAccumulated += seconds;
     const ticketsGained = Math.floor(doc.vocSecondsAccumulated / MOUNTAIN_TICKET_SECONDS);
+    const tiers: PackTier[] = [];
+
     if (ticketsGained > 0) {
       doc.vocSecondsAccumulated = doc.vocSecondsAccumulated % MOUNTAIN_TICKET_SECONDS;
-      doc.packTickets += ticketsGained;
+      for (let i = 0; i < ticketsGained; i++) {
+        const tier = rollPackTier(TICKET_TIER_CHANCES);
+        tiers.push(tier);
+        if (tier === 'falaise') doc.falaiseTickets += 1;
+        else if (tier === 'sommet') doc.sommetTickets += 1;
+        else doc.sentierTickets += 1;
+      }
     }
+
     doc.markModified('vocSecondsAccumulated');
-    doc.markModified('packTickets');
+    doc.markModified('sentierTickets');
+    doc.markModified('falaiseTickets');
+    doc.markModified('sommetTickets');
     await doc.save();
 
-    return { ticketsGained };
+    return { ticketsGained, tiers };
   }
 
   /** Transfère une montagne d'un user à un autre (pour les échanges). */

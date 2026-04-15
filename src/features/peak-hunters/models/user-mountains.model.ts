@@ -1,5 +1,5 @@
 import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
-import type { MountainRarity } from '../types/mountain.types';
+import type { MountainRarity } from '../types/peak-hunters.types';
 
 export class UnlockedMountain {
   @prop({ required: true })
@@ -19,9 +19,17 @@ export class UserMountains {
   @prop({ type: () => [UnlockedMountain], default: [] })
   unlockedMountains!: UnlockedMountain[];
 
-  /** Tickets de pack disponibles à ouvrir */
+  /** Expéditions Sentier disponibles */
   @prop({ default: 0 })
-  packTickets!: number;
+  sentierTickets!: number;
+
+  /** Expéditions Falaise disponibles */
+  @prop({ default: 0 })
+  falaiseTickets!: number;
+
+  /** Expéditions Sommet disponibles (garantit épique ou légendaire) */
+  @prop({ default: 0 })
+  sommetTickets!: number;
 
   /** Fragments accumulés (pour convertir en tickets) */
   @prop({ default: 0 })

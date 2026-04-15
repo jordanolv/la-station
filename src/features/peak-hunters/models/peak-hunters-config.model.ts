@@ -1,6 +1,6 @@
 import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
 
-export class MountainConfig {
+export class PeakHuntersConfig {
   @prop({ default: false })
   enabled!: boolean;
 
@@ -9,6 +9,9 @@ export class MountainConfig {
 
   @prop()
   notificationChannelId?: string;
+
+  @prop()
+  raidChannelId?: string;
 
   @prop({ type: () => [Date], default: [] })
   spawnSchedule!: Date[];
@@ -23,10 +26,10 @@ export class MountainConfig {
   activeSpawnMessageId?: string;
 }
 
-const MountainConfigModel = getModelForClass(MountainConfig, {
+const MountainConfigModel = getModelForClass(PeakHuntersConfig, {
   schemaOptions: { collection: 'mountain_config', timestamps: true },
 });
 
-export type IMountainConfig = MountainConfig;
-export type IMountainConfigDoc = DocumentType<MountainConfig>;
+export type IPeakHuntersConfig = PeakHuntersConfig;
+export type IPeakHuntersConfigDoc = DocumentType<PeakHuntersConfig>;
 export default MountainConfigModel;

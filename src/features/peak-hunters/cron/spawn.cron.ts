@@ -1,16 +1,16 @@
 import { CronJob } from 'cron';
 
 import { BotClient } from '../../../bot/client';
-import { MountainSpawnService } from '../services/mountain-spawn.service';
-import { SPAWN_MAX_PER_DAY, SPAWN_HOUR_START, SPAWN_HOUR_END } from '../constants/mountain.constants';
-import { MountainConfigRepository } from '../repositories/mountain-config.repository';
+import { SpawnService } from '../services/spawn.service';
+import { SPAWN_MAX_PER_DAY, SPAWN_HOUR_START, SPAWN_HOUR_END } from '../constants/peak-hunters.constants';
+import { PeakHuntersConfigRepository } from '../repositories/peak-hunters-config.repository';
 import { LogService } from '../../../shared/logs/logs.service';
 import { generateSpawnDates } from '../utils/spawn-date.utils';
 
 const TZ = 'Europe/Paris';
 const CRON_EXPRESSION = '0 0 0 * * *'; // minuit Paris
 
-export class MountainSpawnCron {
+export class SpawnCron {
   private job: CronJob;
   private client: BotClient;
 
@@ -33,7 +33,7 @@ export class MountainSpawnCron {
       chalk.yellow('   ├─ 🌄 Mountain Spawn') +
         chalk.gray(` • minuit ${TZ}, max ${SPAWN_MAX_PER_DAY} spawn(s)/jour, fenêtre ${SPAWN_HOUR_START}h-${SPAWN_HOUR_END}h`),
     );
-    // La réhydratation est gérée par MountainSpawnService.rehydrate() dans ready.ts
+    // La réhydratation est gérée par SpawnService.rehydrate() dans ready.ts
   }
 
   public stop(): void {
@@ -42,7 +42,7 @@ export class MountainSpawnCron {
 
   private async planDay(): Promise<void> {
     // Vérifie qu'un schedule n'a pas déjà été posé (ex: reboot à minuit pile)
-    const config = await MountainConfigRepository.get();
+    const config = await PeakHuntersConfigRepository.get();
     const now = Date.now();
     const todayStart = (() => {
       const { toZonedTime } = require('date-fns-tz');
@@ -58,7 +58,7 @@ export class MountainSpawnCron {
     const count = Math.floor(Math.random() * (SPAWN_MAX_PER_DAY + 1));
     const dates = generateSpawnDates(count);
 
-    await MountainConfigRepository.setSpawnSchedule(dates);
+    await PeakHuntersConfigRepository.setSpawnSchedule(dates);
     this.scheduleFromDates(dates);
 
     LogService.info(
@@ -72,7 +72,7 @@ export class MountainSpawnCron {
     for (const date of dates) {
       const delay = date.getTime() - now;
       if (delay > 0) {
-        setTimeout(() => MountainSpawnService.doSpawn(this.client), delay);
+        setTimeout(() => SpawnService.doSpawn(this.client), delay);
       }
     }
   }

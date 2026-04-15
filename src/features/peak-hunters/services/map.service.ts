@@ -40,7 +40,7 @@ function latToY(lat: number, b: Bounds): number {
   return ((b.maxLat - lat) / (b.maxLat - b.minLat)) * MAP_H;
 }
 
-export class MountainMapService {
+export class MapService {
   private static geojson: any = null;
 
   private static getGeoJSON(): any {

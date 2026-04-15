@@ -1,22 +1,22 @@
 import { BaseCronManager } from '../../../shared/cron/base-cron-manager';
 import { BotClient } from '../../../bot/client';
-import { MountainSpawnCron } from './mountain-spawn.cron';
+import { SpawnCron } from './spawn.cron';
 import { RaidCron } from './raid.cron';
 
-export class MountainCronManager extends BaseCronManager {
-  private mountainSpawnCron: MountainSpawnCron;
+export class PeakHuntersCronManager extends BaseCronManager {
+  private spawnCron: SpawnCron;
   private raidCron: RaidCron;
 
   constructor(client: BotClient) {
-    super(client, 'mountain');
+    super(client, 'peak-hunters');
 
-    this.mountainSpawnCron = new MountainSpawnCron(client);
+    this.spawnCron = new SpawnCron(client);
     this.raidCron = new RaidCron(client);
-    this.addCron(this.mountainSpawnCron);
+    this.addCron(this.spawnCron);
     this.addCron(this.raidCron);
   }
 
-  public getMountainSpawnCron(): MountainSpawnCron {
-    return this.mountainSpawnCron;
+  public getSpawnCron(): SpawnCron {
+    return this.spawnCron;
   }
 }

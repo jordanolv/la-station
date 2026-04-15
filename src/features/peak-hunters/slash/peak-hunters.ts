@@ -4,7 +4,7 @@ import { executeHome } from './subcommands/home';
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('mountain')
+    .setName('peak-hunters')
     .setDescription('Ta collection de montagnes'),
 
   async execute(interaction: ChatInputCommandInteraction, client: BotClient): Promise<void> {
