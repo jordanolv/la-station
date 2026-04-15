@@ -15,8 +15,9 @@ import {
 import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
 import { MountainService } from '../../services/mountain.service';
-import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/mountain.constants';
-import type { MountainRarity } from '../../types/mountain.types';
+import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/peak-hunters.constants';
+import { formatExpeditionsLine } from '../../services/expedition.service';
+import type { MountainRarity } from '../../types/peak-hunters.types';
 
 export const INV_BUTTON_PREFIX = 'mountain:inv';
 
@@ -30,9 +31,11 @@ function buildFragmentBar(fragments: number): string {
 export function buildInventoryContainer(
   user: User,
   unlocked: Awaited<ReturnType<typeof UserMountainsRepository.getUnlocked>>,
-  tickets: number,
+  sentierTickets: number,
   fragments: number,
   page: number,
+  falaiseTickets = 0,
+  sommetTickets = 0,
 ): ContainerBuilder[] {
   const totalMountains = MountainService.count;
   const rarityOrder: MountainRarity[] = ['legendary', 'epic', 'rare', 'common'];
@@ -63,7 +66,7 @@ export function buildInventoryContainer(
   const fragBar = buildFragmentBar(fragments);
 
   const summaryContainer = new ContainerBuilder()
-    .setAccentColor(0x2ecc71)
+    .setAccentColor(0x1e8d73)
     .addSectionComponents(
       new SectionBuilder()
         .addTextDisplayComponents(
@@ -83,7 +86,7 @@ export function buildInventoryContainer(
             return `${emoji} ${label} : **${countByRarity[r]}/${totalForRarity}**`;
           }).join('  ·  '),
           '',
-          `🎟️ **${tickets}** ticket${tickets > 1 ? 's' : ''} de pack  ·  🧩 Fragments : ${fragBar} \`${fragments}/${FRAGMENTS_PER_TICKET}\``,
+          `${formatExpeditionsLine(sentierTickets, falaiseTickets, sommetTickets)}  ·  🧩 ${fragBar} \`${fragments}/${FRAGMENTS_PER_TICKET}\``,
         ].join('\n'),
       ),
     );
@@ -97,7 +100,7 @@ export function buildInventoryContainer(
   }
 
   const listContainer = new ContainerBuilder()
-    .setAccentColor(0x27ae60)
+    .setAccentColor(0x1e8d73)
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
         `### Montagnes (page ${safePage + 1}/${totalPages})`,
@@ -157,7 +160,7 @@ export async function handleInventaireButton(
 
     const doc = await UserMountainsRepository.getOrCreate(ownerId);
     const unlocked = await UserMountainsRepository.getUnlocked(ownerId);
-    const containers = buildInventoryContainer(interaction.user, unlocked, doc.packTickets, doc.fragments, page);
+    const containers = buildInventoryContainer(interaction.user, unlocked, doc.sentierTickets, doc.fragments, page, doc.falaiseTickets, doc.sommetTickets);
 
     await interaction.update({ components: containers });
     return;
@@ -171,7 +174,7 @@ export async function executeInv(interaction: ChatInputCommandInteraction | Butt
     UserMountainsRepository.getUnlocked(user.id),
   ]);
 
-  const containers = buildInventoryContainer(user, unlocked, doc.packTickets, doc.fragments, 0);
+  const containers = buildInventoryContainer(user, unlocked, doc.sentierTickets, doc.fragments, 0, doc.falaiseTickets, doc.sommetTickets);
 
   await interaction.reply({
     components: containers,

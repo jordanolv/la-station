@@ -17,16 +17,20 @@ import {
 import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
 import { MountainService } from '../../services/mountain.service';
-import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/mountain.constants';
-import type { MountainRarity } from '../../types/mountain.types';
+import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/peak-hunters.constants';
+import type { MountainRarity } from '../../types/peak-hunters.types';
 import { buildInventoryContainer } from './inv';
-import { buildPackInfoContainer } from './pack';
-import { buildLeaderboardContainer } from './leaderboard';
-import { MountainWebService } from '../../services/mountain-web.service';
-import { MountainMapService, CountryData, Continent } from '../../services/mountain-map.service';
+import { buildExpeditionContainer } from './expedition';
+import { formatExpeditionsLine } from '../../services/expedition.service';
+import { buildUserHeaderContainer } from '../../../../shared/components/user-header';
+import { WebService } from '../../services/web.service';
+import { MapService, CountryData, Continent } from '../../services/map.service';
 
 export const HOME_BUTTON_PREFIX = 'mountain:home';
 export const MAP_BUTTON_PREFIX = 'mountain:map';
+
+const PEAK_HUNTERS_LOGO = 'https://cdn.discordapp.com/attachments/1299384448198119476/1493679823351185652/logo-ph-2.png?ex=69dfd93d&is=69de87bd&hm=bd9f2c9f3b305e47e3098b7329de41605a8b83faca9ef31e0cf630c582a3dd0e&';
+const BANNER_URL = 'https://cdn.discordapp.com/attachments/1299384448198119476/1493690193855909968/banner-2.png?ex=69dfe2e5&is=69de9165&hm=e28c578b002ccab2b2394824d794f54b05efbedcac3749794fd788a69c303526&';
 
 const CONTINENTS: { id: Continent; label: string; emoji: string }[] = [
   { id: 'europe',   label: 'Europe',   emoji: '🌍' },
@@ -47,7 +51,7 @@ function buildMapContainer(user: User, countries: CountryData[], totalCountries:
   );
 
   return new ContainerBuilder()
-    .setAccentColor(0x5865f2)
+    .setAccentColor(0x1e8d73)
     .addSectionComponents(
       new SectionBuilder()
         .addTextDisplayComponents(
@@ -97,21 +101,19 @@ async function buildHomeContainer(user: User, lastMsgId = 'none'): Promise<Conta
 
   const fragBar = buildFragmentBar(doc.fragments);
 
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+  const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(`${HOME_BUTTON_PREFIX}:inv:${lastMsgId}`)
       .setLabel('Collection')
       .setEmoji('🎒')
       .setStyle(ButtonStyle.Secondary),
+  );
+
+  const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(`${HOME_BUTTON_PREFIX}:pack:${lastMsgId}`)
-      .setLabel('Packs')
-      .setEmoji('🎟️')
-      .setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder()
-      .setCustomId(`${HOME_BUTTON_PREFIX}:leaderboard:${lastMsgId}`)
-      .setLabel('Classement')
-      .setEmoji('🏆')
+      .setLabel('Expéditions')
+      .setEmoji('🥾')
       .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId(`${HOME_BUTTON_PREFIX}:map:${lastMsgId}`)
@@ -121,30 +123,34 @@ async function buildHomeContainer(user: User, lastMsgId = 'none'): Promise<Conta
   );
 
   return new ContainerBuilder()
-    .setAccentColor(0x5865f2)
+    .setAccentColor(0x1e8d73)
     .addSectionComponents(
       new SectionBuilder()
         .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(`# ⛰️ Montagnes\n-# par **${user.displayName}**`),
+          new TextDisplayBuilder().setContent(`## 🏔️ Peak Hunters\n-# par <@${user.id}>`),
+        )
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(`🧩 ${fragBar}  \`${doc.fragments}/${FRAGMENTS_PER_TICKET}\``),
         )
         .setThumbnailAccessory(new ThumbnailBuilder().setURL(user.displayAvatarURL({ size: 64 }))),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
-        [
-          `**${unlocked.length}/${totalMountains}** montagnes débloquées`,
-          rarityLine,
-        ].join('\n'),
+        `**${unlocked.length}/${totalMountains}** montagnes débloquées\n${rarityLine}`,
       ),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
+    .addActionRowComponents(row1)
     .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(
-        `🎟️ **${doc.packTickets}** ticket${doc.packTickets > 1 ? 's' : ''} de pack  ·  🧩 ${fragBar} \`${doc.fragments}/${FRAGMENTS_PER_TICKET}\``,
-      ),
+      new TextDisplayBuilder().setContent(formatExpeditionsLine(doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets)),
     )
-    .addActionRowComponents(row);
+    .addActionRowComponents(row2)
+    .addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setURL(BANNER_URL),
+      ),
+    );
 }
 
 export async function executeHome(
@@ -160,7 +166,7 @@ export async function executeHome(
 
 export async function handleHomeButton(
   interaction: ButtonInteraction,
-  client: BotClient,
+  _client: BotClient,
 ): Promise<void> {
   const parts = interaction.customId.split(':');
   const action = parts[2];
@@ -184,17 +190,16 @@ export async function handleHomeButton(
       UserMountainsRepository.getOrCreate(user.id),
       UserMountainsRepository.getUnlocked(user.id),
     ]);
-    components = buildInventoryContainer(user, unlocked, doc.packTickets, doc.fragments, 0);
+    components = buildInventoryContainer(user, unlocked, doc.sentierTickets, doc.fragments, 0, doc.falaiseTickets, doc.sommetTickets);
   } else if (action === 'pack') {
     const doc = await UserMountainsRepository.getOrCreate(user.id);
-    components = [buildPackInfoContainer(user, doc.packTickets, doc.fragments)];
-  } else if (action === 'leaderboard') {
-    components = [await buildLeaderboardContainer(user, client)];
+    const total = doc.sentierTickets + doc.falaiseTickets + doc.sommetTickets;
+    components = [buildExpeditionContainer(user, doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets, doc.fragments)];
   } else if (action === 'map') {
-    const countries = await MountainMapService.getCountriesForUser(user.id);
-    const totalCountries = MountainMapService.getTotalCountryCount();
-    const globeUrl = MountainWebService.generateMapUrl(user.id);
-    const imageBuffer = await MountainMapService.generateStaticImage(countries, 'europe');
+    const countries = await MapService.getCountriesForUser(user.id);
+    const totalCountries = MapService.getTotalCountryCount();
+    const globeUrl = WebService.generateMapUrl(user.id);
+    const imageBuffer = await MapService.generateStaticImage(countries, 'europe');
 
     const sentMsg = await interaction.followUp({
       files: [{ attachment: imageBuffer, name: 'mountain-map.png' }],
@@ -235,10 +240,10 @@ export async function handleMapButton(interaction: ButtonInteraction): Promise<v
 
   await interaction.deferUpdate();
 
-  const countries = await MountainMapService.getCountriesForUser(userId);
-  const totalCountries = MountainMapService.getTotalCountryCount();
-  const globeUrl = MountainWebService.generateMapUrl(userId);
-  const imageBuffer = await MountainMapService.generateStaticImage(countries, continent);
+  const countries = await MapService.getCountriesForUser(userId);
+  const totalCountries = MapService.getTotalCountryCount();
+  const globeUrl = WebService.generateMapUrl(userId);
+  const imageBuffer = await MapService.generateStaticImage(countries, continent);
 
   await interaction.editReply({
     files: [{ attachment: imageBuffer, name: 'mountain-map.png' }],
