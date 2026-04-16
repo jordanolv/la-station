@@ -92,11 +92,11 @@ export default {
         return;
       }
 
-      let packSummary = '';
+      let expeditionSummary = '';
       if (packsReward > 0) {
-        const packResult = await awardExpeditions(interaction.user.id, packsReward);
-        packSummary = packResult.summary;
-        await LogService.info(`<@${interaction.user.id}> a reçu **${packsReward} ticket${packsReward > 1 ? 's' : ''}** ${packSummary}`, { feature: 'Daily', title: '🎟️ Tickets gagnés' });
+        const result = await awardExpeditions(interaction.user.id, packsReward);
+        expeditionSummary = result.summary;
+        await LogService.info(`<@${interaction.user.id}> a reçu **${packsReward} expédition${packsReward > 1 ? 's' : ''}** ${expeditionSummary}`, { feature: 'Daily', title: '🗺️ Expéditions gagnées' });
       }
 
       const story = await DailyStoryService.generate(interaction.user.displayName, moneyReward, xpReward, packsReward);
@@ -116,8 +116,8 @@ export default {
 
       if (packsReward > 0) {
         fields.push({
-          name: '🎁 Packs',
-          value: `+${packsReward} ticket${packsReward > 1 ? 's' : ''} ${packSummary}`,
+          name: '🗺️ Expéditions',
+          value: `+${packsReward} expédition${packsReward > 1 ? 's' : ''} ${expeditionSummary}`,
           inline: true
         });
       }

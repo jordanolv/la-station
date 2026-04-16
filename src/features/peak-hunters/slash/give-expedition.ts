@@ -15,11 +15,11 @@ import {
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
-import { PACK_TIER_CONFIG } from '../constants/peak-hunters.constants';
-import type { PackTier } from '../types/peak-hunters.types';
+import { EXPEDITION_TIER_CONFIG } from '../constants/peak-hunters.constants';
+import type { ExpeditionTier } from '../types/peak-hunters.types';
 
-export const GIVE_EXPEDITION_BUTTON_PREFIX = 'give_pack:';
-export const GIVE_EXPEDITION_MODAL_PREFIX = 'give_pack_modal:';
+export const GIVE_EXPEDITION_BUTTON_PREFIX = 'give_expe:';
+export const GIVE_EXPEDITION_MODAL_PREFIX = 'give_expe_modal:';
 
 export default {
   data: new ContextMenuCommandBuilder()
@@ -56,9 +56,9 @@ export default {
     const withoutPrefix = interaction.customId.slice(GIVE_EXPEDITION_BUTTON_PREFIX.length);
     const colonIdx = withoutPrefix.lastIndexOf(':');
     const targetId = withoutPrefix.slice(0, colonIdx);
-    const tier = withoutPrefix.slice(colonIdx + 1) as PackTier;
+    const tier = withoutPrefix.slice(colonIdx + 1) as ExpeditionTier;
 
-    const { label } = PACK_TIER_CONFIG[tier];
+    const { label } = EXPEDITION_TIER_CONFIG[tier];
     const modal = new ModalBuilder()
       .setCustomId(`${GIVE_EXPEDITION_MODAL_PREFIX}${targetId}:${tier}`)
       .setTitle(`Expéditions ${label}`)
@@ -82,7 +82,7 @@ export default {
     const withoutPrefix = interaction.customId.slice(GIVE_EXPEDITION_MODAL_PREFIX.length);
     const colonIdx = withoutPrefix.lastIndexOf(':');
     const targetId = withoutPrefix.slice(0, colonIdx);
-    const tier = withoutPrefix.slice(colonIdx + 1) as PackTier;
+    const tier = withoutPrefix.slice(colonIdx + 1) as ExpeditionTier;
 
     const raw = interaction.fields.getTextInputValue('amount').trim();
     const amount = parseInt(raw, 10);
@@ -93,9 +93,9 @@ export default {
     }
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-    await UserMountainsRepository.addTickets(targetId, amount, tier);
+    await UserMountainsRepository.addExpeditions(targetId, amount, tier);
 
-    const { label, emoji } = PACK_TIER_CONFIG[tier];
+    const { label, emoji } = EXPEDITION_TIER_CONFIG[tier];
     await interaction.editReply({
       content: `✅ **+${amount} expédition${amount > 1 ? 's' : ''}** ${emoji} **${label}** données à <@${targetId}>.`,
     });

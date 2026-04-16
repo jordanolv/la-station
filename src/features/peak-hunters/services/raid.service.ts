@@ -8,9 +8,9 @@ import { RaidRepository } from '../repositories/raid.repository';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
 import { PeakHuntersConfigRepository } from '../repositories/peak-hunters-config.repository';
 import { MountainService } from './mountain.service';
-import { RARITY_CONFIG, RAID_RARITY_CONFIG, RAID_COOLDOWN_MS, RAID_AVG_POINTS_FLOOR, RAID_MIN_CONTRIBUTION_RATIO, RAID_HP_BAR_LENGTH, RAID_SPAWN_CHANCE_PER_HOUR, PACK_TIER_CONFIG } from '../constants/peak-hunters.constants';
+import { RARITY_CONFIG, RAID_RARITY_CONFIG, RAID_COOLDOWN_MS, RAID_AVG_POINTS_FLOOR, RAID_MIN_CONTRIBUTION_RATIO, RAID_HP_BAR_LENGTH, RAID_SPAWN_CHANCE_PER_HOUR, EXPEDITION_TIER_CONFIG } from '../constants/peak-hunters.constants';
 import { awardExpeditions } from './expedition.service';
-import type { MountainRarity, PackTier } from '../types/peak-hunters.types';
+import type { MountainRarity, ExpeditionTier } from '../types/peak-hunters.types';
 import type { IRaidDoc } from '../models/raid.model';
 
 const LOG_FEATURE = '⚔️ Raid';
@@ -180,8 +180,8 @@ export class RaidService {
       pct: number;
       xpGained: number;
       coinsGained: number;
-      ticketsGained: number;
-      ticketTiers: PackTier[];
+      expeditionsGained: number;
+      expeditionTiers: ExpeditionTier[];
       mountainDropped: boolean;
       isNew: boolean;
     }
@@ -200,7 +200,7 @@ export class RaidService {
 
       const xpGained = Math.round(baseXp * (1 + pct) * xpMultiplier);
       const coinsGained = Math.round(baseCoins * (1 + pct));
-      const ticketsGained = isPartial
+      let expeditionsGained = isPartial
         ? 0
         : 1 + (pct > 0.1 ? 1 : 0) + (i === 0 ? 1 : 0);
 
@@ -212,24 +212,29 @@ export class RaidService {
         { $inc: { 'profil.money': coinsGained } },
       );
       await LevelingService.giveXpDirectly(client, p.userId, xpGained);
-      let ticketTiers: PackTier[] = [];
-      if (ticketsGained > 0) {
-        const packResult = await awardExpeditions(p.userId, ticketsGained);
-        ticketTiers = packResult.tiers;
+      let expeditionTiers: ExpeditionTier[] = [];
+      if (expeditionsGained > 0) {
+        const result = await awardExpeditions(p.userId, expeditionsGained);
+        expeditionTiers = result.tiers;
       }
 
       if (mountainDropped) {
         const unlocked = await UserMountainsRepository.unlock(p.userId, raidDoc.mountainId, raidDoc.rarity as MountainRarity);
         if (!unlocked) {
           const { fragmentsOnDuplicate } = RARITY_CONFIG[raidDoc.rarity as MountainRarity];
-          await UserMountainsRepository.addFragments(p.userId, fragmentsOnDuplicate);
+          const { expeditionsToAward } = await UserMountainsRepository.addFragments(p.userId, fragmentsOnDuplicate);
+          if (expeditionsToAward > 0) {
+            const { tiers: fragTiers } = await awardExpeditions(p.userId, expeditionsToAward);
+            expeditionTiers = [...expeditionTiers, ...fragTiers];
+            expeditionsGained += expeditionsToAward;
+          }
         } else {
           isNew = true;
         }
       }
 
       await RaidRepository.markRewarded(raidDoc.id, p.userId);
-      lines.push({ userId: p.userId, pct, xpGained, coinsGained, ticketsGained, ticketTiers, mountainDropped, isNew });
+      lines.push({ userId: p.userId, pct, xpGained, coinsGained, expeditionsGained, expeditionTiers, mountainDropped, isNew });
     }
 
     const channel = await this.getNotificationChannel(client);
@@ -304,8 +309,8 @@ export class RaidService {
       pct: number;
       xpGained: number;
       coinsGained: number;
-      ticketsGained: number;
-      ticketTiers: PackTier[];
+      expeditionsGained: number;
+      expeditionTiers: ExpeditionTier[];
       mountainDropped: boolean;
       isNew: boolean;
     }[],
@@ -325,7 +330,7 @@ export class RaidService {
       } catch {}
 
       const pctStr = `${Math.round(l.pct * 100)}%`;
-      const tierEmojis = l.ticketTiers.map(t => PACK_TIER_CONFIG[t].emoji).join('');
+      const tierEmojis = l.expeditionTiers.map(t => EXPEDITION_TIER_CONFIG[t].emoji).join('');
       const rewards = isPartial
         ? `+${l.coinsGained} 💵  +${l.xpGained} XP`
         : `+${l.coinsGained} 💵  +${l.xpGained} XP  ${tierEmojis}${l.mountainDropped ? (l.isNew ? '  ✅ montagne !' : '  🧩 fragments') : ''}`;

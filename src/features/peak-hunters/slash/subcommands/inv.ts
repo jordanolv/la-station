@@ -15,7 +15,7 @@ import {
 import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
 import { MountainService } from '../../services/mountain.service';
-import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/peak-hunters.constants';
+import { RARITY_CONFIG, FRAGMENTS_PER_EXPEDITION } from '../../constants/peak-hunters.constants';
 import { formatExpeditionsLine } from '../../services/expedition.service';
 import type { MountainRarity } from '../../types/peak-hunters.types';
 
@@ -24,7 +24,7 @@ export const INV_BUTTON_PREFIX = 'mountain:inv';
 const MOUNTAINS_PER_PAGE = 8;
 
 function buildFragmentBar(fragments: number): string {
-  const filled = Math.round((fragments / FRAGMENTS_PER_TICKET) * 10);
+  const filled = Math.round((fragments / FRAGMENTS_PER_EXPEDITION) * 10);
   return '🟧'.repeat(filled) + '⬛'.repeat(10 - filled);
 }
 
@@ -86,7 +86,7 @@ export function buildInventoryContainer(
             return `${emoji} ${label} : **${countByRarity[r]}/${totalForRarity}**`;
           }).join('  ·  '),
           '',
-          `${formatExpeditionsLine(sentierTickets, falaiseTickets, sommetTickets)}  ·  🧩 ${fragBar} \`${fragments}/${FRAGMENTS_PER_TICKET}\``,
+          `${formatExpeditionsLine(sentierTickets, falaiseTickets, sommetTickets)}  ·  🧩 ${fragBar} \`${fragments}/${FRAGMENTS_PER_EXPEDITION}\``,
         ].join('\n'),
       ),
     );

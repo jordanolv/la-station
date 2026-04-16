@@ -36,7 +36,7 @@ export default {
     const statuses = [
       { name: 'Bienvenue sur The Ridge ⛰️', type: ActivityType.Playing },
       { name: '/profil pour remplir votre profil 📝', type: ActivityType.Watching },
-      { name: '/pack — ouvre tes packs 🎟️', type: ActivityType.Playing },
+      { name: '/peak-hunters — lance tes expéditions 🗺️', type: ActivityType.Playing },
     ];
 
     let currentStatusIndex = 0;

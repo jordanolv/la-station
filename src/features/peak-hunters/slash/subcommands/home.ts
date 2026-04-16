@@ -17,7 +17,7 @@ import {
 import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
 import { MountainService } from '../../services/mountain.service';
-import { RARITY_CONFIG, FRAGMENTS_PER_TICKET } from '../../constants/peak-hunters.constants';
+import { RARITY_CONFIG, FRAGMENTS_PER_EXPEDITION } from '../../constants/peak-hunters.constants';
 import type { MountainRarity } from '../../types/peak-hunters.types';
 import { buildInventoryContainer } from './inv';
 import { buildExpeditionContainer } from './expedition';
@@ -79,7 +79,7 @@ function buildMapContainer(user: User, countries: CountryData[], totalCountries:
 const RARITY_ORDER: MountainRarity[] = ['legendary', 'epic', 'rare', 'common'];
 
 function buildFragmentBar(fragments: number): string {
-  const filled = Math.round((fragments / FRAGMENTS_PER_TICKET) * 10);
+  const filled = Math.round((fragments / FRAGMENTS_PER_EXPEDITION) * 10);
   return '🟧'.repeat(filled) + '⬛'.repeat(10 - filled);
 }
 
@@ -111,7 +111,7 @@ async function buildHomeContainer(user: User, lastMsgId = 'none'): Promise<Conta
 
   const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId(`${HOME_BUTTON_PREFIX}:pack:${lastMsgId}`)
+      .setCustomId(`${HOME_BUTTON_PREFIX}:expe:${lastMsgId}`)
       .setLabel('Expéditions')
       .setEmoji('🥾')
       .setStyle(ButtonStyle.Secondary),
@@ -130,7 +130,7 @@ async function buildHomeContainer(user: User, lastMsgId = 'none'): Promise<Conta
           new TextDisplayBuilder().setContent(`## 🏔️ Peak Hunters\n-# par <@${user.id}>`),
         )
         .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(`🧩 ${fragBar}  \`${doc.fragments}/${FRAGMENTS_PER_TICKET}\``),
+          new TextDisplayBuilder().setContent(`🧩 ${fragBar}  \`${doc.fragments}/${FRAGMENTS_PER_EXPEDITION}\``),
         )
         .setThumbnailAccessory(new ThumbnailBuilder().setURL(user.displayAvatarURL({ size: 64 }))),
     )
@@ -191,7 +191,7 @@ export async function handleHomeButton(
       UserMountainsRepository.getUnlocked(user.id),
     ]);
     components = buildInventoryContainer(user, unlocked, doc.sentierTickets, doc.fragments, 0, doc.falaiseTickets, doc.sommetTickets);
-  } else if (action === 'pack') {
+  } else if (action === 'expe') {
     const doc = await UserMountainsRepository.getOrCreate(user.id);
     const total = doc.sentierTickets + doc.falaiseTickets + doc.sommetTickets;
     components = [buildExpeditionContainer(user, doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets, doc.fragments)];

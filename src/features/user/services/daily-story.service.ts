@@ -7,7 +7,7 @@ Tu génères une micro-histoire absurde et drôle de 1 à 2 lignes maximum pour 
 Le personnage s'appelle "${name}". L'histoire doit expliquer de façon humoristique pourquoi il reçoit aujourd'hui :
 - ${money} pièces d'argent (min 0, max 100)
 - ${xp} XP (min 0, max 100)
-- ${packs} ticket${packs > 1 ? 's' : ''} de pack (min 0, max 3)
+- ${packs} expédition${packs > 1 ? 's' : ''} (min 0, max 3)
 
 Règles :
 - 1 à 2 lignes max, pas plus

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import type { MountainRarity, PackTier } from '../types/peak-hunters.types';
-import { RARITY_CONFIG, PACK_TIER_RARITY_WEIGHTS } from '../constants/peak-hunters.constants';
+import type { MountainRarity, ExpeditionTier } from '../types/peak-hunters.types';
+import { RARITY_CONFIG, EXPEDITION_TIER_RARITY_WEIGHTS } from '../constants/peak-hunters.constants';
 
 export interface MountainInfo {
   id: string;
@@ -67,16 +67,16 @@ export class MountainService {
     return mountain.rarity;
   }
 
-  /** Tire une montagne au hasard pondérée par les poids de rareté du pack standard */
-  static getRandomByPackWeight(): MountainInfo | null {
+  /** Tire une montagne au hasard pondérée par les poids de rareté standard (tier Sentier) */
+  static getRandomWeighted(): MountainInfo | null {
     return this.getRandomByTier('sentier');
   }
 
-  /** Tire une montagne au hasard selon le tier de pack */
-  static getRandomByTier(tier: PackTier): MountainInfo | null {
+  /** Tire une montagne au hasard selon le tier d'expédition */
+  static getRandomByTier(tier: ExpeditionTier): MountainInfo | null {
     if (this.mountains.length === 0) return null;
 
-    const weights = PACK_TIER_RARITY_WEIGHTS[tier];
+    const weights = EXPEDITION_TIER_RARITY_WEIGHTS[tier];
     const totalWeight = Object.values(weights).reduce((acc, w) => acc + w, 0);
     let roll = Math.random() * totalWeight;
 

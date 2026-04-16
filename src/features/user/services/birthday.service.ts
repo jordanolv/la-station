@@ -14,7 +14,7 @@ import { UserMountainsRepository } from '../../peak-hunters/repositories/user-mo
 import { LogService } from '../../../shared/logs/logs.service';
 
 export const BIRTHDAY_TZ = 'Europe/Paris';
-export const BIRTHDAY_TICKETS = 5;
+export const BIRTHDAY_EXPEDITIONS = 5;
 
 export async function sendBirthdayAnnouncement(
   client: Client,
@@ -34,9 +34,9 @@ export async function sendBirthdayAnnouncement(
 
   await Promise.all([
     UserModel.updateOne({ discordId }, { $inc: { 'profil.money': moneyGift } }),
-    UserMountainsRepository.addTickets(discordId, BIRTHDAY_TICKETS),
+    UserMountainsRepository.addExpeditions(discordId, BIRTHDAY_EXPEDITIONS),
   ]);
-  await LogService.info(`<@${discordId}> a reçu **${BIRTHDAY_TICKETS} tickets** 🎟️ pour son anniversaire 🎂`, { feature: 'Birthday', title: '🎟️ Tickets gagnés' });
+  await LogService.info(`<@${discordId}> a reçu **${BIRTHDAY_EXPEDITIONS} expéditions** 🗺️ pour son anniversaire 🎂`, { feature: 'Birthday', title: '🗺️ Expéditions gagnées' });
 
   const container = new ContainerBuilder()
     .setAccentColor(0xdac1ff)
@@ -63,7 +63,7 @@ export async function sendBirthdayAnnouncement(
         [
           '### 🎁 Cadeaux du jour',
           `-# 💰 **+${moneyGift} pièces** ajoutées à ton solde`,
-          `-# 🎟️ **+${BIRTHDAY_TICKETS} tickets de pack** pour ouvrir des montagnes`,
+          `-# 🗺️ **+${BIRTHDAY_EXPEDITIONS} expéditions** pour découvrir des montagnes`,
         ].join('\n')
       ),
     );

@@ -22,8 +22,8 @@ import { ConfigPanelService } from '../../config-panel/services/config-panel.ser
 import { PeakHuntersConfigRepository } from '../repositories/peak-hunters-config.repository';
 import { MountainService } from '../services/mountain.service';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
-import { SPAWN_MAX_PER_DAY, SPAWN_HOUR_START, SPAWN_HOUR_END, PACK_TIER_CONFIG } from '../constants/peak-hunters.constants';
-import type { PackTier } from '../types/peak-hunters.types';
+import { SPAWN_MAX_PER_DAY, SPAWN_HOUR_START, SPAWN_HOUR_END, EXPEDITION_TIER_CONFIG } from '../constants/peak-hunters.constants';
+import type { ExpeditionTier } from '../types/peak-hunters.types';
 
 const PANEL_ID = 'mountain';
 const ACCENT_ON = 0x2ecc71;
@@ -126,15 +126,15 @@ export const peakHuntersPanel: ConfigPanel = {
       .addActionRowComponents(
         new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
-            .setCustomId(panelCustomId(PANEL_ID, 'give_tickets_sentier'))
+            .setCustomId(panelCustomId(PANEL_ID, 'give_expe_sentier'))
             .setLabel('Sentier')
             .setStyle(ButtonStyle.Secondary),
           new ButtonBuilder()
-            .setCustomId(panelCustomId(PANEL_ID, 'give_tickets_falaise'))
+            .setCustomId(panelCustomId(PANEL_ID, 'give_expe_falaise'))
             .setLabel('Falaise')
             .setStyle(ButtonStyle.Primary),
           new ButtonBuilder()
-            .setCustomId(panelCustomId(PANEL_ID, 'give_tickets_sommet'))
+            .setCustomId(panelCustomId(PANEL_ID, 'give_expe_sommet'))
             .setLabel('Sommet')
             .setStyle(ButtonStyle.Danger),
         ),
@@ -146,12 +146,12 @@ export const peakHuntersPanel: ConfigPanel = {
   async handleButton(interaction: ButtonInteraction, client: BotClient): Promise<void> {
     const action = interaction.customId.split(':')[2];
 
-    const TIERS: PackTier[] = ['sentier', 'falaise', 'sommet'];
-    const matchedTier = TIERS.find(t => action === `give_tickets_${t}`);
+    const TIERS: ExpeditionTier[] = ['sentier', 'falaise', 'sommet'];
+    const matchedTier = TIERS.find(t => action === `give_expe_${t}`);
     if (matchedTier) {
-      const { label } = PACK_TIER_CONFIG[matchedTier];
+      const { label } = EXPEDITION_TIER_CONFIG[matchedTier];
       const modal = new ModalBuilder()
-        .setCustomId(panelCustomId(PANEL_ID, `modal_give_tickets_${matchedTier}`))
+        .setCustomId(panelCustomId(PANEL_ID, `modal_give_expe_${matchedTier}`))
         .setTitle(`🗺️ Expéditions ${label}`)
         .addComponents(
           new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -216,8 +216,8 @@ export const peakHuntersPanel: ConfigPanel = {
   async handleModal(interaction: ModalSubmitInteraction, _client: BotClient): Promise<void> {
     const action = interaction.customId.split(':')[2];
 
-    const TIERS: PackTier[] = ['sentier', 'falaise', 'sommet'];
-    const matchedTier = TIERS.find(t => action === `modal_give_tickets_${t}`);
+    const TIERS: ExpeditionTier[] = ['sentier', 'falaise', 'sommet'];
+    const matchedTier = TIERS.find(t => action === `modal_give_expe_${t}`);
     if (matchedTier) {
       const raw = interaction.fields.getTextInputValue('amount').trim();
       const amount = parseInt(raw, 10);
@@ -227,9 +227,9 @@ export const peakHuntersPanel: ConfigPanel = {
         return;
       }
 
-      const { label, emoji } = PACK_TIER_CONFIG[matchedTier];
+      const { label, emoji } = EXPEDITION_TIER_CONFIG[matchedTier];
       await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-      const count = await UserMountainsRepository.addTicketsToAll(amount, matchedTier);
+      const count = await UserMountainsRepository.addExpeditionsToAll(amount, matchedTier);
       await interaction.editReply({ content: `✅ **+${amount} expédition${amount > 1 ? 's' : ''}** ${emoji} **${label}** distribuées à **${count}** joueurs.` });
     }
   },

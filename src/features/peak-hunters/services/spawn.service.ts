@@ -14,6 +14,7 @@ import { MountainService } from './mountain.service';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
 import { RARITY_CONFIG } from '../constants/peak-hunters.constants';
 import { LogService } from '../../../shared/logs/logs.service';
+import { awardExpeditions } from './expedition.service';
 
 const LOG_FEATURE = '⛰️ Mountain Spawn';
 export const SPAWN_BUTTON_PREFIX = 'mountain:spawn:claim';
@@ -55,7 +56,7 @@ export class SpawnService {
     const channel = await guild.channels.fetch(config.spawnChannelId).catch(() => null);
     if (!channel?.isTextBased()) return;
 
-    const mountain = MountainService.getRandomByPackWeight();
+    const mountain = MountainService.getRandomWeighted();
     if (!mountain) return;
 
     const rarity = MountainService.getRarity(mountain);
@@ -110,10 +111,14 @@ export class SpawnService {
     if (alreadyOwned) {
       const rarity = MountainService.getRarity(mountain);
       const { emoji, label, fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
-      const { newFragments, ticketsGained } = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
-      const ticketLine = ticketsGained > 0 ? `\n→ +${ticketsGained} 🗺️ expédition${ticketsGained > 1 ? 's' : ''}` : '';
+      const { newFragments, expeditionsToAward } = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
+      let expeditionLine = '';
+      if (expeditionsToAward > 0) {
+        const { summary } = await awardExpeditions(userId, expeditionsToAward);
+        expeditionLine = `\n→ +${expeditionsToAward} 🗺️ expédition${expeditionsToAward > 1 ? 's' : ''} ${summary}`;
+      }
       await interaction.reply({
-        content: `Tu possèdes déjà **${mountain.mountainLabel}** ${emoji} ${label} !\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${ticketLine}`,
+        content: `Tu possèdes déjà **${mountain.mountainLabel}** ${emoji} ${label} !\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${expeditionLine}`,
         flags: MessageFlags.Ephemeral,
       }).catch(() => {});
       return;

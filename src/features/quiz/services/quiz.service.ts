@@ -163,11 +163,11 @@ export class QuizService {
     if (isCorrect) {
       const packs = isFirst ? 2 : 1;
       const { summary } = await awardExpeditions(interaction.user.id, packs);
-      await LogService.info(`<@${interaction.user.id}> a remporté **${packs} ticket${packs > 1 ? 's' : ''}** ${summary}${isFirst ? ' (premier à répondre)' : ''}`, { feature: 'Quiz', title: '🎟️ Tickets gagnés' });
+      await LogService.info(`<@${interaction.user.id}> a remporté **${packs} expédition${packs > 1 ? 's' : ''}** ${summary}${isFirst ? ' (premier à répondre)' : ''}`, { feature: 'Quiz', title: '🗺️ Expéditions gagnées' });
       await interaction.reply({
         content: isFirst
-          ? `✅ Bonne réponse ! Premier à répondre — tu remportes **2 tickets de pack** ${summary}`
-          : `✅ Bonne réponse ! Tu remportes **1 ticket de pack** ${summary}`,
+          ? `✅ Bonne réponse ! Premier à répondre — tu remportes **2 expéditions** ${summary}`
+          : `✅ Bonne réponse ! Tu remportes **1 expédition** ${summary}`,
         flags: 64,
       });
     } else {

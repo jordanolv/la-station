@@ -31,11 +31,11 @@ export class UserMountains {
   @prop({ default: 0 })
   sommetTickets!: number;
 
-  /** Fragments accumulés (pour convertir en tickets) */
+  /** Fragments accumulés (convertis en expéditions tous les 20) */
   @prop({ default: 0 })
   fragments!: number;
 
-  /** Secondes de vocal trackées pour le prochain ticket (remet à 0 à chaque ticket obtenu) */
+  /** Secondes de vocal accumulées pour la prochaine expédition (reset à chaque gain) */
   @prop({ default: 0 })
   vocSecondsAccumulated!: number;
 }

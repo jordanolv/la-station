@@ -1,6 +1,6 @@
 import UserMountainsModel, { IUserMountainsDoc } from '../models/user-mountains.model';
-import type { MountainRarity, PackTier } from '../types/peak-hunters.types';
-import { FRAGMENTS_PER_TICKET, MOUNTAIN_TICKET_SECONDS, TICKET_TIER_CHANCES, rollPackTier } from '../constants/peak-hunters.constants';
+import type { MountainRarity, ExpeditionTier } from '../types/peak-hunters.types';
+import { FRAGMENTS_PER_EXPEDITION, EXPEDITION_INTERVAL_SECONDS } from '../constants/peak-hunters.constants';
 
 export interface UnlockedMountainEntry {
   mountainId: string;
@@ -51,25 +51,26 @@ export class UserMountainsRepository {
     return { totalUnlocked: doc.unlockedMountains.length };
   }
 
-  /** Ajoute des fragments. Convertit automatiquement les paliers de 20 en tickets. */
-  static async addFragments(userId: string, amount: number): Promise<{ newFragments: number; ticketsGained: number }> {
+  /**
+   * Ajoute des fragments. Quand un palier de {@link FRAGMENTS_PER_EXPEDITION} est atteint,
+   * retourne le nombre d'expéditions à créditer via `awardExpeditions` (roll de tier côté appelant).
+   */
+  static async addFragments(userId: string, amount: number): Promise<{ newFragments: number; expeditionsToAward: number }> {
     const doc = await this.getOrCreate(userId);
 
     doc.fragments += amount;
-    const ticketsGained = Math.floor(doc.fragments / FRAGMENTS_PER_TICKET);
-    if (ticketsGained > 0) {
-      doc.fragments = doc.fragments % FRAGMENTS_PER_TICKET;
-      doc.sentierTickets += ticketsGained;
+    const expeditionsToAward = Math.floor(doc.fragments / FRAGMENTS_PER_EXPEDITION);
+    if (expeditionsToAward > 0) {
+      doc.fragments = doc.fragments % FRAGMENTS_PER_EXPEDITION;
     }
     doc.markModified('fragments');
-    doc.markModified('sentierTickets');
     await doc.save();
 
-    return { newFragments: doc.fragments, ticketsGained };
+    return { newFragments: doc.fragments, expeditionsToAward };
   }
 
-  /** Ajoute des tickets directement (standard par défaut). */
-  static async addTickets(userId: string, amount: number, tier: PackTier = 'sentier'): Promise<void> {
+  /** Ajoute des expéditions directement (Sentier par défaut). */
+  static async addExpeditions(userId: string, amount: number, tier: ExpeditionTier = 'sentier'): Promise<void> {
     const doc = await this.getOrCreate(userId);
     if (tier === 'falaise') doc.falaiseTickets += amount;
     else if (tier === 'sommet') doc.sommetTickets += amount;
@@ -77,17 +78,17 @@ export class UserMountainsRepository {
     await doc.save();
   }
 
-  static async addTicketsToAll(amount: number, tier: PackTier = 'sentier'): Promise<number> {
+  static async addExpeditionsToAll(amount: number, tier: ExpeditionTier = 'sentier'): Promise<number> {
     const field = tier === 'falaise' ? 'falaiseTickets' : tier === 'sommet' ? 'sommetTickets' : 'sentierTickets';
     const result = await UserMountainsModel.updateMany({}, { $inc: { [field]: amount } });
     return result.modifiedCount;
   }
 
   /**
-   * Consomme 1 ticket pour ouvrir un pack.
-   * Retourne false si pas assez de tickets.
+   * Consomme 1 expédition.
+   * Retourne false si pas assez d'expéditions.
    */
-  static async spendTicket(userId: string, tier: PackTier = 'sentier'): Promise<boolean> {
+  static async spendExpedition(userId: string, tier: ExpeditionTier = 'sentier'): Promise<boolean> {
     const doc = await this.getOrCreate(userId);
     if (tier === 'falaise') {
       if (doc.falaiseTickets <= 0) return false;
@@ -104,10 +105,10 @@ export class UserMountainsRepository {
   }
 
   /**
-   * Consomme N tickets pour ouvrir plusieurs packs.
-   * Retourne false si pas assez de tickets.
+   * Consomme N expéditions.
+   * Retourne false si pas assez d'expéditions.
    */
-  static async spendTickets(userId: string, amount: number, tier: PackTier = 'sentier'): Promise<boolean> {
+  static async spendExpeditions(userId: string, amount: number, tier: ExpeditionTier = 'sentier'): Promise<boolean> {
     const doc = await this.getOrCreate(userId);
     if (tier === 'falaise') {
       if (doc.falaiseTickets < amount) return false;
@@ -124,34 +125,23 @@ export class UserMountainsRepository {
   }
 
   /**
-   * Ajoute du temps vocal et retourne le nombre de tickets gagnés, avec leur tier.
-   * Chaque ticket obtenu est rollé selon TICKET_TIER_CHANCES.
+   * Ajoute du temps vocal et retourne le nombre d'expéditions à créditer via `awardExpeditions`
+   * (roll de tier côté appelant). Ne modifie pas les tickets.
    */
-  static async addVocSeconds(userId: string, seconds: number): Promise<{ ticketsGained: number; tiers: PackTier[] }> {
+  static async addVocSeconds(userId: string, seconds: number): Promise<{ expeditionsToAward: number }> {
     const doc = await this.getOrCreate(userId);
 
     doc.vocSecondsAccumulated += seconds;
-    const ticketsGained = Math.floor(doc.vocSecondsAccumulated / MOUNTAIN_TICKET_SECONDS);
-    const tiers: PackTier[] = [];
+    const expeditionsToAward = Math.floor(doc.vocSecondsAccumulated / EXPEDITION_INTERVAL_SECONDS);
 
-    if (ticketsGained > 0) {
-      doc.vocSecondsAccumulated = doc.vocSecondsAccumulated % MOUNTAIN_TICKET_SECONDS;
-      for (let i = 0; i < ticketsGained; i++) {
-        const tier = rollPackTier(TICKET_TIER_CHANCES);
-        tiers.push(tier);
-        if (tier === 'falaise') doc.falaiseTickets += 1;
-        else if (tier === 'sommet') doc.sommetTickets += 1;
-        else doc.sentierTickets += 1;
-      }
+    if (expeditionsToAward > 0) {
+      doc.vocSecondsAccumulated = doc.vocSecondsAccumulated % EXPEDITION_INTERVAL_SECONDS;
     }
 
     doc.markModified('vocSecondsAccumulated');
-    doc.markModified('sentierTickets');
-    doc.markModified('falaiseTickets');
-    doc.markModified('sommetTickets');
     await doc.save();
 
-    return { ticketsGained, tiers };
+    return { expeditionsToAward };
   }
 
   /** Transfère une montagne d'un user à un autre (pour les échanges). */

@@ -3,16 +3,18 @@ import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { VoicePlugin, VoiceSession } from '../../voice/services/voice-session.service';
 import { PeakHuntersConfigRepository } from '../repositories/peak-hunters-config.repository';
-import { MOUNTAIN_REQUIRED_SECONDS, PACK_TIER_CONFIG, RARITY_CONFIG } from '../constants/peak-hunters.constants';
+import { MOUNTAIN_REQUIRED_SECONDS, RARITY_CONFIG } from '../constants/peak-hunters.constants';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
 import { MountainService, MountainInfo } from './mountain.service';
-import type { MountainRarity, PackTier } from '../types/peak-hunters.types';
+import type { MountainRarity } from '../types/peak-hunters.types';
 import { LogService } from '../../../shared/logs/logs.service';
+import { awardExpeditions } from './expedition.service';
 
 const LOG_FEATURE = '⛰️ Mountain';
 export const VOICE_CHECK_BUTTON_PREFIX = 'mountain:voice:check';
 
-const MOUNTAIN_LOCK_DURATION_MS = 30 * 60 * 1000;
+// const MOUNTAIN_LOCK_DURATION_MS = 30 * 60 * 1000;
+const MOUNTAIN_LOCK_DURATION_MS = 1;
 
 export interface PeakHuntersSessionResult {
   mountain: MountainInfo;
@@ -25,8 +27,8 @@ export interface PeakHuntersSessionResult {
   totalUnlocked?: number;
   fragmentsGained?: number;
   totalFragments?: number;
-  ticketsGained?: number;
-  ticketTiers?: PackTier[];
+  expeditionsGained?: number;
+  tierSummary?: string;
 }
 
 /**
@@ -34,7 +36,7 @@ export interface PeakHuntersSessionResult {
  *
  * - Assigne une montagne aléatoire à chaque channel créé
  * - À la déconnexion : débloque si l'user est resté ≥ MOUNTAIN_REQUIRED_SECONDS
- * - À la déconnexion : attribue des tickets en fonction du temps vocal cumulé
+ * - À la déconnexion : attribue des expéditions en fonction du temps vocal cumulé
  * - Tout est calculé au session end, aucun timer en cours de session
  */
 export class PeakHuntersPlugin implements VoicePlugin {
@@ -55,8 +57,8 @@ export class PeakHuntersPlugin implements VoicePlugin {
     const lock = this.userMountainLocks.get(userId);
 
     const mountain = lock && lock.expiresAt > now
-      ? MountainService.getById(lock.mountainId) ?? MountainService.getRandomByPackWeight()
-      : MountainService.getRandomByPackWeight();
+      ? MountainService.getById(lock.mountainId) ?? MountainService.getRandomWeighted()
+      : MountainService.getRandomWeighted();
 
     if ((!lock || lock.expiresAt <= now) && mountain) {
       this.userMountainLocks.set(userId, { mountainId: mountain.id, expiresAt: now + MOUNTAIN_LOCK_DURATION_MS });
@@ -107,27 +109,24 @@ export class PeakHuntersPlugin implements VoicePlugin {
     const rarity = MountainService.getRarity(mountain);
     const { emoji, label, color } = RARITY_CONFIG[rarity];
 
-    // Tickets : accumulation cross-sessions via vocSecondsAccumulated en BDD
-    let vocTicketsGained = 0;
-    let vocTicketTiers: PackTier[] = [];
+    let vocExpeditions = 0;
+    let vocSummary = '';
     if (session.activeSeconds > 0) {
-      const vocResult = await UserMountainsRepository.addVocSeconds(session.userId, session.activeSeconds);
-      vocTicketsGained = vocResult.ticketsGained;
-      vocTicketTiers = vocResult.tiers;
+      const { expeditionsToAward } = await UserMountainsRepository.addVocSeconds(session.userId, session.activeSeconds);
+      if (expeditionsToAward > 0) {
+        const { summary } = await awardExpeditions(session.userId, expeditionsToAward);
+        vocExpeditions = expeditionsToAward;
+        vocSummary = summary;
+      }
     }
 
-    const tierSummary = vocTicketTiers.length > 0
-      ? vocTicketTiers.map(t => PACK_TIER_CONFIG[t].emoji).join('')
-      : '';
-
-    // Pas assez de temps actif → on retourne quand même la montagne du channel sans unlock
     if (session.activeSeconds < MOUNTAIN_REQUIRED_SECONDS) {
       return {
         mountain: {
           mountain, rarity, emoji, label, color,
           unlocked: false, isNew: false,
-          ticketsGained: vocTicketsGained,
-          ticketTiers: vocTicketTiers,
+          expeditionsGained: vocExpeditions,
+          tierSummary: vocSummary,
         } satisfies PeakHuntersSessionResult,
       };
     }
@@ -136,10 +135,18 @@ export class PeakHuntersPlugin implements VoicePlugin {
 
     if (!result) {
       const { fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
-      const { newFragments, ticketsGained: fragTickets } = await UserMountainsRepository.addFragments(session.userId, fragmentsOnDuplicate);
-      const totalTickets = vocTicketsGained + fragTickets;
+      const { newFragments, expeditionsToAward } = await UserMountainsRepository.addFragments(session.userId, fragmentsOnDuplicate);
 
-      await LogService.info(`<@${session.userId}> a obtenu un doublon : **${mountain.mountainLabel}** ${emoji} ${label}\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${totalTickets > 0 ? `\n→ +${totalTickets} expéditions ${tierSummary}` : ''}`,
+      let fragSummary = '';
+      if (expeditionsToAward > 0) {
+        const { summary } = await awardExpeditions(session.userId, expeditionsToAward);
+        fragSummary = summary;
+      }
+
+      const totalExpeditions = vocExpeditions + expeditionsToAward;
+      const totalSummary = vocSummary + fragSummary;
+
+      await LogService.info(`<@${session.userId}> a obtenu un doublon : **${mountain.mountainLabel}** ${emoji} ${label}\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${totalExpeditions > 0 ? `\n→ +${totalExpeditions} expéditions ${totalSummary}` : ''}`,
         { feature: LOG_FEATURE, title: '🔁 Montagne en double' },
       );
 
@@ -149,13 +156,13 @@ export class PeakHuntersPlugin implements VoicePlugin {
           unlocked: true, isNew: false,
           fragmentsGained: fragmentsOnDuplicate,
           totalFragments: newFragments,
-          ticketsGained: totalTickets,
-          ticketTiers: vocTicketTiers,
+          expeditionsGained: totalExpeditions,
+          tierSummary: totalSummary,
         } satisfies PeakHuntersSessionResult,
       };
     }
 
-    await LogService.success(`<@${session.userId}> a débloqué **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})\nProgression : \`${result.totalUnlocked}/${MountainService.count}\`${vocTicketsGained > 0 ? `\n→ +${vocTicketsGained} expéditions ${tierSummary}` : ''}`,
+    await LogService.success(`<@${session.userId}> a débloqué **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})\nProgression : \`${result.totalUnlocked}/${MountainService.count}\`${vocExpeditions > 0 ? `\n→ +${vocExpeditions} expéditions ${vocSummary}` : ''}`,
       { feature: LOG_FEATURE, title: '🏔️ Montagne débloquée' },
     );
 
@@ -164,8 +171,8 @@ export class PeakHuntersPlugin implements VoicePlugin {
         mountain, rarity, emoji, label, color,
         unlocked: true, isNew: true,
         totalUnlocked: result.totalUnlocked,
-        ticketsGained: vocTicketsGained,
-        ticketTiers: vocTicketTiers,
+        expeditionsGained: vocExpeditions,
+        tierSummary: vocSummary,
       } satisfies PeakHuntersSessionResult,
     };
   }

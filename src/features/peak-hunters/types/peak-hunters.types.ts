@@ -1,6 +1,6 @@
 export type MountainRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
-export type PackTier = 'sentier' | 'falaise' | 'sommet';
+export type ExpeditionTier = 'sentier' | 'falaise' | 'sommet';
 
 export interface RarityConfig {
   label: string;
@@ -8,11 +8,11 @@ export interface RarityConfig {
   color: number;
   /** Fragments donnés si la montagne est déjà débloquée (doublon) */
   fragmentsOnDuplicate: number;
-  /** Poids pour le tirage de pack standard (total = 100) */
-  packWeight: number;
+  /** Poids pour le tirage d'expédition standard (total = 100) */
+  expeditionWeight: number;
 }
 
-export interface PackTierConfig {
+export interface ExpeditionTierConfig {
   label: string;
   emoji: string;
   color: number;

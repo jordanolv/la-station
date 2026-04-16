@@ -5,7 +5,7 @@ import UserModel from '../models/user.model';
 import AppConfigModel from '../../discord/models/app-config.model';
 import { LogService } from '../../../shared/logs/logs.service';
 import { getGuildId } from '../../../shared/guild';
-import { sendBirthdayAnnouncement, BIRTHDAY_TZ, BIRTHDAY_TICKETS } from '../services/birthday.service';
+import { sendBirthdayAnnouncement, BIRTHDAY_TZ, BIRTHDAY_EXPEDITIONS } from '../services/birthday.service';
 
 export class BirthdayCron {
   private job: CronJob;
@@ -84,7 +84,7 @@ export class BirthdayCron {
         const { moneyGift } = await sendBirthdayAnnouncement(this.client, textChannel, user.discordId, user.name, user.infos.birthDate);
 
         await LogService.success(
-                    `🎂 Anniversaire de ${user.name} — +${moneyGift} pièces, +${BIRTHDAY_TICKETS} tickets`,
+                    `🎂 Anniversaire de ${user.name} — +${moneyGift} pièces, +${BIRTHDAY_EXPEDITIONS} expéditions`,
           { feature: 'birthday' },
         );
       }

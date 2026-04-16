@@ -454,9 +454,9 @@ export class VoiceSessionService {
 
     let rewardLines = `+**${rewards.xpGained}** XP ✨  ·  +**${rewards.moneyGained}** <:ridgecoin:1424543836029325492>`;
     if (rewards.leveledUp) rewardLines += `\n🎉 **Level up !** Niveau **${rewards.newLevel}**`;
-    const vocTickets = rewards.mountain?.ticketsGained ?? 0;
-    if (vocTickets > 0 && (rewards.mountain?.isNew || !rewards.mountain?.unlocked)) {
-      rewardLines += `\n+**${vocTickets}** 🎟️ ticket${vocTickets > 1 ? 's' : ''} de pack`;
+    const vocExpeditions = rewards.mountain?.expeditionsGained ?? 0;
+    if (vocExpeditions > 0 && (rewards.mountain?.isNew || !rewards.mountain?.unlocked)) {
+      rewardLines += `\n+**${vocExpeditions}** 🗺️ expédition${vocExpeditions > 1 ? 's' : ''}${rewards.mountain?.tierSummary ? ` ${rewards.mountain.tierSummary}` : ''}`;
     }
 
     const container = new ContainerBuilder()
@@ -501,8 +501,8 @@ export class VoiceSessionService {
           `${MountainService.getCountryDisplay(m.mountain)}  ·  📏 ${MountainService.getAltitude(m.mountain)}  ·  ${m.emoji} ${m.label}`,
           `+**${m.fragmentsGained}** fragment${(m.fragmentsGained ?? 0) > 1 ? 's' : ''} 🧩 (\`${m.totalFragments}/20\`)`,
         ].join('\n');
-        if ((m.ticketsGained ?? 0) > 0) {
-          dupeText += `\n+**${m.ticketsGained}** 🎟️ ticket${(m.ticketsGained ?? 0) > 1 ? 's' : ''}`;
+        if ((m.expeditionsGained ?? 0) > 0) {
+          dupeText += `\n+**${m.expeditionsGained}** 🗺️ expédition${(m.expeditionsGained ?? 0) > 1 ? 's' : ''}${m.tierSummary ? ` ${m.tierSummary}` : ''}`;
         }
 
         container.addSectionComponents(

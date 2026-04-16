@@ -132,7 +132,7 @@ export default {
           await handleMapButton(interaction);
         } else if (interaction.customId.startsWith(HOME_BUTTON_PREFIX + ':')) {
           await handleHomeButton(interaction, client);
-        } else if (interaction.customId.startsWith('mountain:pack:')) {
+        } else if (interaction.customId.startsWith('mountain:expe:')) {
           await handleExpeditionButton(interaction, client);
         } else if (interaction.customId.startsWith(SPAWN_BUTTON_PREFIX + ':')) {
           await SpawnService.handleClaim(interaction, client);

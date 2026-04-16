@@ -18,29 +18,36 @@ import {
 import { BotClient } from '../../../../bot/client';
 import { UserMountainsRepository } from '../../repositories/user-mountains.repository';
 import { MountainService, MountainInfo } from '../../services/mountain.service';
-import { RARITY_CONFIG, FRAGMENTS_PER_TICKET, PACK_TIER_CONFIG, PACK_TIER_RARITY_WEIGHTS } from '../../constants/peak-hunters.constants';
+import { RARITY_CONFIG, FRAGMENTS_PER_EXPEDITION, EXPEDITION_TIER_CONFIG, EXPEDITION_TIER_RARITY_WEIGHTS } from '../../constants/peak-hunters.constants';
 
-import type { MountainRarity, PackTier } from '../../types/peak-hunters.types';
+import type { MountainRarity, ExpeditionTier } from '../../types/peak-hunters.types';
 import { LogService } from '../../../../shared/logs/logs.service';
-import { formatExpeditionsLine, formatExpeditionsLineText } from '../../services/expedition.service';
+import { awardExpeditions, formatExpeditionsLine, formatExpeditionsLineText } from '../../services/expedition.service';
 
-// customId format : mountain:pack:open:<tier>:<userId>
-//                   mountain:pack:open5:<tier>:<userId>
-export const EXPEDITION_BUTTON_PREFIX = 'mountain:pack';
-const packOpenId  = (tier: PackTier, userId: string) => `mountain:pack:open:${tier}:${userId}`;
-const packOpen5Id = (tier: PackTier, userId: string) => `mountain:pack:open5:${tier}:${userId}`;
+// customId format : mountain:expe:open:<tier>:<userId>
+//                   mountain:expe:open5:<tier>:<userId>
+export const EXPEDITION_BUTTON_PREFIX = 'mountain:expe';
+const expeditionOpenId  = (tier: ExpeditionTier, userId: string) => `mountain:expe:open:${tier}:${userId}`;
+const expeditionOpen5Id = (tier: ExpeditionTier, userId: string) => `mountain:expe:open5:${tier}:${userId}`;
 
-const MULTI_PACK_COUNT = 5;
+const MULTI_EXPEDITION_COUNT = 5;
 const BAR_IMAGE_URL =
   'https://cdn.discordapp.com/attachments/685655650923053122/1493313723744518237/Nouveau_projet_7.png?ex=69de8448&is=69dd32c8&hm=e784bdf98db6660531cbf89dbd522b7d3da94558972c1b3dde033b1ac0718726&';
 
+function buildRarityImageUrl(imageUrl: string, rarity: MountainRarity): string {
+  const { color } = RARITY_CONFIG[rarity];
+  const colorHex = color.toString(16).padStart(6, '0');
+  const overlay = `l_text:Arial_1:.,co_rgb:${colorHex},b_rgb:${colorHex},g_south,y_0,fl_relative,w_1.0,h_0.09`;
+  return imageUrl.replace('/upload/', `/upload/${overlay}/`);
+}
+
 function buildFragmentBar(fragments: number): string {
-  const filled = Math.round((fragments / FRAGMENTS_PER_TICKET) * 10);
+  const filled = Math.round((fragments / FRAGMENTS_PER_EXPEDITION) * 10);
   return '🟧'.repeat(filled) + '⬛'.repeat(10 - filled);
 }
 
-function buildRarityOddsLine(tier: PackTier): string {
-  const weights = PACK_TIER_RARITY_WEIGHTS[tier];
+function buildRarityOddsLine(tier: ExpeditionTier): string {
+  const weights = EXPEDITION_TIER_RARITY_WEIGHTS[tier];
   const rarities: MountainRarity[] = ['common', 'rare', 'epic', 'legendary'];
   const total = rarities.reduce((sum, r) => sum + weights[r], 0);
   return rarities
@@ -49,47 +56,47 @@ function buildRarityOddsLine(tier: PackTier): string {
     .join('  ');
 }
 
-export function buildExpeditionContainer(user: User, sentierTickets: number, falaiseTickets: number, sommetTickets: number, fragments: number): ContainerBuilder {
-  const { emoji: sEmoji, label: sLabel } = PACK_TIER_CONFIG.sentier;
-  const { emoji: fEmoji, label: fLabel } = PACK_TIER_CONFIG.falaise;
-  const { emoji: eEmoji, label: eLabel } = PACK_TIER_CONFIG.sommet;
+export function buildExpeditionContainer(user: User, sentier: number, falaise: number, sommet: number, fragments: number): ContainerBuilder {
+  const { emoji: sEmoji, label: sLabel } = EXPEDITION_TIER_CONFIG.sentier;
+  const { emoji: fEmoji, label: fLabel } = EXPEDITION_TIER_CONFIG.falaise;
+  const { emoji: eEmoji, label: eLabel } = EXPEDITION_TIER_CONFIG.sommet;
 
   const container = new ContainerBuilder()
     .setAccentColor(0x1e8d73)
     .addSectionComponents(
       new SectionBuilder()
         .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## 🗺️ Expéditions\n-# par <@${user.id}>`))
-        .addTextDisplayComponents(new TextDisplayBuilder().setContent(`🧩 ${buildFragmentBar(fragments)}  \`${fragments}/${FRAGMENTS_PER_TICKET}\``))
+        .addTextDisplayComponents(new TextDisplayBuilder().setContent(`🧩 ${buildFragmentBar(fragments)}  \`${fragments}/${FRAGMENTS_PER_EXPEDITION}\``))
         .setThumbnailAccessory(new ThumbnailBuilder().setURL(user.displayAvatarURL({ size: 64 }))),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${sEmoji} ${sLabel} — **${sentierTickets}** disponible${sentierTickets !== 1 ? 's' : ''}\n-# ${buildRarityOddsLine('sentier')}`))
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${sEmoji} ${sLabel} — **${sentier}** disponible${sentier !== 1 ? 's' : ''}\n-# ${buildRarityOddsLine('sentier')}`))
 
-  if (sentierTickets > 0) container.addActionRowComponents(
+  if (sentier > 0) container.addActionRowComponents(
     new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder().setCustomId(packOpenId('sentier', user.id)).setLabel('🥾 Lancer 1').setStyle(ButtonStyle.Secondary),
-      ...(sentierTickets > 1 ? [new ButtonBuilder().setCustomId(packOpen5Id('sentier', user.id)).setLabel(`🥾 Lancer ${Math.min(sentierTickets, MULTI_PACK_COUNT)}`).setStyle(ButtonStyle.Secondary)] : []),
+      new ButtonBuilder().setCustomId(expeditionOpenId('sentier', user.id)).setLabel('🥾 Lancer 1').setStyle(ButtonStyle.Secondary),
+      ...(sentier > 1 ? [new ButtonBuilder().setCustomId(expeditionOpen5Id('sentier', user.id)).setLabel(`🥾 Lancer ${Math.min(sentier, MULTI_EXPEDITION_COUNT)}`).setStyle(ButtonStyle.Secondary)] : []),
     ),
   );
 
   container
     .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
-    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${fEmoji} ${fLabel} — **${falaiseTickets}** disponible${falaiseTickets !== 1 ? 's' : ''}\n-# ${buildRarityOddsLine('falaise')}`));
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${fEmoji} ${fLabel} — **${falaise}** disponible${falaise !== 1 ? 's' : ''}\n-# ${buildRarityOddsLine('falaise')}`));
 
-  if (falaiseTickets > 0) container.addActionRowComponents(
+  if (falaise > 0) container.addActionRowComponents(
     new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder().setCustomId(packOpenId('falaise', user.id)).setLabel('🥾 Lancer 1').setStyle(ButtonStyle.Secondary),
-      ...(falaiseTickets > 1 ? [new ButtonBuilder().setCustomId(packOpen5Id('falaise', user.id)).setLabel(`🥾 Lancer ${Math.min(falaiseTickets, MULTI_PACK_COUNT)}`).setStyle(ButtonStyle.Secondary)] : []),
+      new ButtonBuilder().setCustomId(expeditionOpenId('falaise', user.id)).setLabel('🥾 Lancer 1').setStyle(ButtonStyle.Secondary),
+      ...(falaise > 1 ? [new ButtonBuilder().setCustomId(expeditionOpen5Id('falaise', user.id)).setLabel(`🥾 Lancer ${Math.min(falaise, MULTI_EXPEDITION_COUNT)}`).setStyle(ButtonStyle.Secondary)] : []),
     ),
   );
 
   container
     .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
-    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${eEmoji} ${eLabel} — **${sommetTickets}** disponible${sommetTickets !== 1 ? 's' : ''}\n-# ${buildRarityOddsLine('sommet')}`));
+    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${eEmoji} ${eLabel} — **${sommet}** disponible${sommet !== 1 ? 's' : ''}\n-# ${buildRarityOddsLine('sommet')}`));
 
-  if (sommetTickets > 0) container.addActionRowComponents(
+  if (sommet > 0) container.addActionRowComponents(
     new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder().setCustomId(packOpenId('sommet', user.id)).setLabel('🥾 Lancer 1').setStyle(ButtonStyle.Danger),
+      new ButtonBuilder().setCustomId(expeditionOpenId('sommet', user.id)).setLabel('🥾 Lancer 1').setStyle(ButtonStyle.Danger),
     ),
   );
 
@@ -105,24 +112,25 @@ export function buildExpeditionContainer(user: User, sentierTickets: number, fal
 function buildRevealEmbed(
   mountain: MountainInfo,
   rarity: MountainRarity,
-  tier: PackTier,
+  tier: ExpeditionTier,
   isDuplicate: boolean,
   fragmentsGained: number,
   totalFragments: number,
-  sentierTickets: number,
-  falaiseTickets: number,
-  sommetTickets: number,
-  ticketsFromFragments: number,
+  sentier: number,
+  falaise: number,
+  sommet: number,
+  expeditionsFromFragments: number,
+  expeditionsFromFragmentsSummary: string,
   user: User,
 ): EmbedBuilder {
   const { emoji, label, color } = RARITY_CONFIG[rarity];
-  const tierCfg = PACK_TIER_CONFIG[tier];
+  const tierCfg = EXPEDITION_TIER_CONFIG[tier];
 
   let resultText: string;
   if (isDuplicate) {
-    resultText = `**Double !** Tu possèdes déjà cette montagne.\n→ **+${fragmentsGained} fragment${fragmentsGained > 1 ? 's' : ''}** 🧩 (\`${totalFragments}/${FRAGMENTS_PER_TICKET}\`)`;
-    if (ticketsFromFragments > 0) {
-      resultText += `\n🗺️ **+${ticketsFromFragments} expédition${ticketsFromFragments > 1 ? 's' : ''}** bonus !`;
+    resultText = `**Double !** Tu possèdes déjà cette montagne.\n→ **+${fragmentsGained} fragment${fragmentsGained > 1 ? 's' : ''}** 🧩 (\`${totalFragments}/${FRAGMENTS_PER_EXPEDITION}\`)`;
+    if (expeditionsFromFragments > 0) {
+      resultText += `\n🗺️ **+${expeditionsFromFragments} expédition${expeditionsFromFragments > 1 ? 's' : ''}** bonus ! ${expeditionsFromFragmentsSummary}`;
     }
   } else {
     resultText = '**Nouvelle montagne débloquée !** ✅';
@@ -140,10 +148,10 @@ function buildRevealEmbed(
     )
     .setDescription(resultText)
     .setImage(mountain.image)
-    .setFooter({ text: `Expédition ${tierCfg.label}  |  ${formatExpeditionsLineText(sentierTickets, falaiseTickets, sommetTickets)}` });
+    .setFooter({ text: `Expédition ${tierCfg.label}  |  ${formatExpeditionsLineText(sentier, falaise, sommet)}` });
 }
 
-interface PackDrawResult {
+interface ExpeditionDrawResult {
   mountain: MountainInfo;
   rarity: MountainRarity;
   isDuplicate: boolean;
@@ -151,34 +159,41 @@ interface PackDrawResult {
 }
 
 function buildMultiRevealContainer(
-  results: PackDrawResult[],
-  tier: PackTier,
+  results: ExpeditionDrawResult[],
+  tier: ExpeditionTier,
   totalFragmentsGained: number,
-  totalTicketsFromFragments: number,
+  totalExpeditionsFromFragments: number,
+  totalExpeditionsFromFragmentsSummary: string,
   finalFragments: number,
-  sentierTickets: number,
-  falaiseTickets: number,
-  sommetTickets: number,
+  sentier: number,
+  falaise: number,
+  sommet: number,
   user: User,
 ): ContainerBuilder {
-  const tierCfg = PACK_TIER_CONFIG[tier];
-  const remaining = tier === 'falaise' ? falaiseTickets : tier === 'sommet' ? sommetTickets : sentierTickets;
+  const tierCfg = EXPEDITION_TIER_CONFIG[tier];
+  const remaining = tier === 'falaise' ? falaise : tier === 'sommet' ? sommet : sentier;
 
   const headerLines: string[] = [
     `# ${tierCfg.emoji} Expédition x${results.length}\n-# par <@${user.id}>\n`,
   ];
   if (totalFragmentsGained > 0) {
-    headerLines.push(`🧩 +${totalFragmentsGained} fragments — ${finalFragments}/${FRAGMENTS_PER_TICKET}`);
+    headerLines.push(`🧩 +${totalFragmentsGained} fragments — ${finalFragments}/${FRAGMENTS_PER_EXPEDITION}`);
   }
-  if (totalTicketsFromFragments > 0) {
+  if (totalExpeditionsFromFragments > 0) {
     headerLines.push(
-      `🗺️ **+${totalTicketsFromFragments} expédition${totalTicketsFromFragments > 1 ? 's' : ''}** bonus depuis les fragments !`,
+      `🗺️ **+${totalExpeditionsFromFragments} expédition${totalExpeditionsFromFragments > 1 ? 's' : ''}** bonus depuis les fragments ! ${totalExpeditionsFromFragmentsSummary}`,
     );
   }
-  headerLines.push(formatExpeditionsLine(sentierTickets, falaiseTickets, sommetTickets));
+  headerLines.push(formatExpeditionsLine(sentier, falaise, sommet));
+
+  const rarityOrder: MountainRarity[] = ['common', 'rare', 'epic', 'legendary'];
+  const highestRarity = results.reduce<MountainRarity>((best, r) =>
+    rarityOrder.indexOf(r.rarity) > rarityOrder.indexOf(best) ? r.rarity : best,
+    'common',
+  );
 
   const container = new ContainerBuilder()
-    .setAccentColor(0x1e8d73)
+    .setAccentColor(RARITY_CONFIG[highestRarity].color)
     .addSectionComponents(
       new SectionBuilder()
         .addTextDisplayComponents(new TextDisplayBuilder().setContent(headerLines.join('\n')))
@@ -198,7 +213,7 @@ function buildMultiRevealContainer(
     container.addSectionComponents(
       new SectionBuilder()
         .addTextDisplayComponents(new TextDisplayBuilder().setContent(`${emoji} **${r.mountain.mountainLabel}** ${flags}\n-# ${label} · ${MountainService.getAltitude(r.mountain)}\n${statusLine}`))
-        .setThumbnailAccessory(new ThumbnailBuilder().setURL(r.mountain.image)),
+        .setThumbnailAccessory(new ThumbnailBuilder().setURL(buildRarityImageUrl(r.mountain.image, r.rarity))),
     );
   }
 
@@ -207,14 +222,14 @@ function buildMultiRevealContainer(
     if (tier === 'sommet') {
       container.addActionRowComponents(
         new ActionRowBuilder<ButtonBuilder>().addComponents(
-          new ButtonBuilder().setCustomId(packOpenId(tier, user.id)).setLabel('🥾 Lancer 1 autre').setStyle(ButtonStyle.Danger),
+          new ButtonBuilder().setCustomId(expeditionOpenId(tier, user.id)).setLabel('🥾 Lancer 1 autre').setStyle(ButtonStyle.Danger),
         ),
       );
     } else {
       container.addActionRowComponents(
         new ActionRowBuilder<ButtonBuilder>().addComponents(
-          new ButtonBuilder().setCustomId(packOpenId(tier, user.id)).setLabel('🥾 Lancer 1').setStyle(ButtonStyle.Secondary),
-          ...(remaining > 1 ? [new ButtonBuilder().setCustomId(packOpen5Id(tier, user.id)).setLabel(`🥾 Lancer ${Math.min(remaining, MULTI_PACK_COUNT)}`).setStyle(ButtonStyle.Secondary)] : []),
+          new ButtonBuilder().setCustomId(expeditionOpenId(tier, user.id)).setLabel('🥾 Lancer 1').setStyle(ButtonStyle.Secondary),
+          ...(remaining > 1 ? [new ButtonBuilder().setCustomId(expeditionOpen5Id(tier, user.id)).setLabel(`🥾 Lancer ${Math.min(remaining, MULTI_EXPEDITION_COUNT)}`).setStyle(ButtonStyle.Secondary)] : []),
         ),
       );
     }
@@ -223,7 +238,7 @@ function buildMultiRevealContainer(
   return container;
 }
 
-async function openPackMulti(interaction: ButtonInteraction, tier: PackTier): Promise<void> {
+async function openExpeditionMulti(interaction: ButtonInteraction, tier: ExpeditionTier): Promise<void> {
   const userId = interaction.user.id;
   const docBefore = await UserMountainsRepository.getOrCreate(userId);
   const available = tier === 'falaise' ? docBefore.falaiseTickets : tier === 'sommet' ? docBefore.sommetTickets : docBefore.sentierTickets;
@@ -233,12 +248,13 @@ async function openPackMulti(interaction: ButtonInteraction, tier: PackTier): Pr
     return;
   }
 
-  const count = Math.min(available, MULTI_PACK_COUNT);
-  await UserMountainsRepository.spendTickets(userId, count, tier);
+  const count = Math.min(available, MULTI_EXPEDITION_COUNT);
+  await UserMountainsRepository.spendExpeditions(userId, count, tier);
 
-  const results: PackDrawResult[] = [];
+  const results: ExpeditionDrawResult[] = [];
   let totalFragmentsGained = 0;
-  let totalTicketsFromFragments = 0;
+  let totalExpeditionsFromFragments = 0;
+  let totalExpeditionsFromFragmentsSummary = '';
 
   for (let i = 0; i < count; i++) {
     const mountain = MountainService.getRandomByTier(tier);
@@ -251,20 +267,24 @@ async function openPackMulti(interaction: ButtonInteraction, tier: PackTier): Pr
 
     let fragmentsGained = 0;
     if (isDuplicate) {
-      const fragResult = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
+      const { expeditionsToAward } = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
       fragmentsGained = fragmentsOnDuplicate;
       totalFragmentsGained += fragmentsGained;
-      totalTicketsFromFragments += fragResult.ticketsGained;
+      if (expeditionsToAward > 0) {
+        const { summary } = await awardExpeditions(userId, expeditionsToAward);
+        totalExpeditionsFromFragments += expeditionsToAward;
+        totalExpeditionsFromFragmentsSummary += summary;
+      }
     }
 
     results.push({ mountain, rarity, isDuplicate, fragmentsGained });
   }
 
   const doc = await UserMountainsRepository.getOrCreate(userId);
-  const tierCfg = PACK_TIER_CONFIG[tier];
+  const tierCfg = EXPEDITION_TIER_CONFIG[tier];
 
   const container = buildMultiRevealContainer(
-    results, tier, totalFragmentsGained, totalTicketsFromFragments,
+    results, tier, totalFragmentsGained, totalExpeditionsFromFragments, totalExpeditionsFromFragmentsSummary,
     doc.fragments, doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets, interaction.user,
   );
 
@@ -273,15 +293,15 @@ async function openPackMulti(interaction: ButtonInteraction, tier: PackTier): Pr
   const newList = results.filter(r => !r.isDuplicate).map(r => `${RARITY_CONFIG[r.rarity].emoji} ${r.mountain.mountainLabel}`).join(', ') || '—';
   const dupList = results.filter(r => r.isDuplicate).map(r => `${RARITY_CONFIG[r.rarity].emoji} ${r.mountain.mountainLabel}`).join(', ') || '—';
   await LogService.info(
-    `<@${userId}> a lancé **${count} expéditions ${tierCfg.label}** ${tierCfg.emoji} · ${formatExpeditionsLineText(doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets)}\n✅ ${newList}\n🔁 ${dupList}${totalFragmentsGained > 0 ? `\n🧩 +${totalFragmentsGained} fragments → \`${doc.fragments}/${FRAGMENTS_PER_TICKET}\`` : ''}`,
+    `<@${userId}> a lancé **${count} expéditions ${tierCfg.label}** ${tierCfg.emoji} · ${formatExpeditionsLineText(doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets)}\n✅ ${newList}\n🔁 ${dupList}${totalFragmentsGained > 0 ? `\n🧩 +${totalFragmentsGained} fragments → \`${doc.fragments}/${FRAGMENTS_PER_EXPEDITION}\`` : ''}`,
     { feature: 'Mountain · Expéditions', title: `🗺️ Expéditions ${tierCfg.label} lancées` },
   );
 }
 
-async function openPack(interaction: ButtonInteraction, tier: PackTier): Promise<void> {
+async function openExpedition(interaction: ButtonInteraction, tier: ExpeditionTier): Promise<void> {
   const userId = interaction.user.id;
 
-  const spent = await UserMountainsRepository.spendTicket(userId, tier);
+  const spent = await UserMountainsRepository.spendExpedition(userId, tier);
   if (!spent) {
     await interaction.editReply({ content: "❌ Tu n'as plus d'expéditions ! Passe du temps en vocal pour en gagner." });
     return;
@@ -301,28 +321,33 @@ async function openPack(interaction: ButtonInteraction, tier: PackTier): Promise
 
   let fragmentsGained = 0;
   let totalFragments = 0;
-  let ticketsFromFragments = 0;
+  let expeditionsFromFragments = 0;
+  let expeditionsFromFragmentsSummary = '';
 
   if (isDuplicate) {
     const fragResult = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
     fragmentsGained = fragmentsOnDuplicate;
     totalFragments = fragResult.newFragments;
-    ticketsFromFragments = fragResult.ticketsGained;
+    if (fragResult.expeditionsToAward > 0) {
+      const { summary } = await awardExpeditions(userId, fragResult.expeditionsToAward);
+      expeditionsFromFragments = fragResult.expeditionsToAward;
+      expeditionsFromFragmentsSummary = summary;
+    }
   }
 
   const doc = await UserMountainsRepository.getOrCreate(userId);
-  const tierCfg = PACK_TIER_CONFIG[tier];
+  const tierCfg = EXPEDITION_TIER_CONFIG[tier];
   const remaining = tier === 'falaise' ? doc.falaiseTickets : tier === 'sommet' ? doc.sommetTickets : doc.sentierTickets;
 
   const embed = buildRevealEmbed(
     mountain, rarity, tier, isDuplicate, fragmentsGained, totalFragments,
-    doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets, ticketsFromFragments, interaction.user,
+    doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets, expeditionsFromFragments, expeditionsFromFragmentsSummary, interaction.user,
   );
 
   const components = remaining > 0
     ? [new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId(packOpenId(tier, userId))
+          .setCustomId(expeditionOpenId(tier, userId))
           .setLabel('🥾 Lancer une autre expédition')
           .setStyle(tier === 'sommet' ? ButtonStyle.Danger : ButtonStyle.Success),
       )]
@@ -331,18 +356,18 @@ async function openPack(interaction: ButtonInteraction, tier: PackTier): Promise
   await interaction.editReply({ embeds: [embed], components });
 
   const { emoji, label } = RARITY_CONFIG[rarity];
-  const packResult = isDuplicate ? `🔁 double +${fragmentsGained}🧩${ticketsFromFragments > 0 ? ` +${ticketsFromFragments}🗺️` : ''}` : '✅ nouveau';
+  const resultText = isDuplicate ? `🔁 double +${fragmentsGained}🧩${expeditionsFromFragments > 0 ? ` +${expeditionsFromFragments}🗺️ ${expeditionsFromFragmentsSummary}` : ''}` : '✅ nouveau';
   await LogService.info(
-    `<@${userId}> a lancé une expédition **${tierCfg.label}** ${tierCfg.emoji} · ${emoji} **${mountain.mountainLabel}** (${label}) — ${packResult} · ${formatExpeditionsLineText(doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets)}`,
+    `<@${userId}> a lancé une expédition **${tierCfg.label}** ${tierCfg.emoji} · ${emoji} **${mountain.mountainLabel}** (${label}) — ${resultText} · ${formatExpeditionsLineText(doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets)}`,
     { feature: 'Mountain · Expéditions', title: `${tierCfg.emoji} Expédition ${tierCfg.label} lancée` },
   );
 }
 
 export async function handleExpeditionButton(interaction: ButtonInteraction, _client: BotClient): Promise<void> {
-  // customId: mountain:pack:open:<tier>:<userId> ou mountain:pack:open5:<tier>:<userId>
+  // customId: mountain:expe:open:<tier>:<userId> ou mountain:expe:open5:<tier>:<userId>
   const parts = interaction.customId.split(':');
   const action = parts[2]; // 'open' ou 'open5'
-  const tier = parts[3] as PackTier;
+  const tier = parts[3] as ExpeditionTier;
   const ownerId = parts[4];
 
   if (interaction.user.id !== ownerId) {
@@ -353,9 +378,9 @@ export async function handleExpeditionButton(interaction: ButtonInteraction, _cl
   await interaction.deferReply();
 
   if (action === 'open') {
-    await openPack(interaction, tier);
+    await openExpedition(interaction, tier);
   } else if (action === 'open5') {
-    await openPackMulti(interaction, tier);
+    await openExpeditionMulti(interaction, tier);
   }
 }
 
