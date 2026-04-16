@@ -15,6 +15,7 @@ export const VOICE_CHECK_BUTTON_PREFIX = 'mountain:voice:check';
 
 const MOUNTAIN_LOCK_DURATION_MS = 15 * 60 * 1000;
 // const MOUNTAIN_LOCK_DURATION_MS = 1;
+const MOUNTAIN_PROGRESS_TTL_MS = 24 * 60 * 60 * 1000;
 
 export interface PeakHuntersSessionResult {
   mountain: MountainInfo;
@@ -42,6 +43,7 @@ export interface PeakHuntersSessionResult {
 export class PeakHuntersPlugin implements VoicePlugin {
   private channelMountains = new Map<string, string>();
   private userMountainLocks = new Map<string, { mountainId: string; expiresAt: number }>();
+  private channelProgress = new Map<string, { accumulatedActiveSeconds: number; expiresAt: number }>();
 
   async init(): Promise<void> {
     const stored = await PeakHuntersConfigRepository.getActiveChannelMountains();
@@ -120,7 +122,17 @@ export class PeakHuntersPlugin implements VoicePlugin {
       }
     }
 
-    if (session.activeSeconds < MOUNTAIN_REQUIRED_SECONDS) {
+    const progressKey = `${session.userId}:${session.channelId}`;
+    const now = Date.now();
+    const previous = this.channelProgress.get(progressKey);
+    const previousSeconds = previous && previous.expiresAt > now ? previous.accumulatedActiveSeconds : 0;
+    const totalActive = previousSeconds + session.activeSeconds;
+
+    if (totalActive < MOUNTAIN_REQUIRED_SECONDS) {
+      this.channelProgress.set(progressKey, {
+        accumulatedActiveSeconds: totalActive,
+        expiresAt: now + MOUNTAIN_PROGRESS_TTL_MS,
+      });
       return {
         mountain: {
           mountain, rarity, emoji, label, color,
@@ -130,6 +142,8 @@ export class PeakHuntersPlugin implements VoicePlugin {
         } satisfies PeakHuntersSessionResult,
       };
     }
+
+    this.channelProgress.delete(progressKey);
 
     const result = await UserMountainsRepository.unlock(session.userId, mountainId, rarity);
 
@@ -179,6 +193,10 @@ export class PeakHuntersPlugin implements VoicePlugin {
 
   onChannelDeleted(channelId: string): void {
     this.channelMountains.delete(channelId);
+    const suffix = `:${channelId}`;
+    for (const key of this.channelProgress.keys()) {
+      if (key.endsWith(suffix)) this.channelProgress.delete(key);
+    }
     PeakHuntersConfigRepository.deleteChannelMountain(channelId).catch(err =>
       console.error('[PeakHuntersPlugin] Erreur suppression channel montagne:', err),
     );
