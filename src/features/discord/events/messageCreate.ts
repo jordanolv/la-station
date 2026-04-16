@@ -4,6 +4,7 @@ import { StatsService } from '../../stats/services/stats.service';
 import { AppConfigService } from '../services/app-config.service';
 import { LevelingService } from '@/features/leveling/services/leveling.service';
 import { ChatGamingService } from '../../chat-gaming/services/chat-gaming.service';
+import { SuggestionService } from '../../suggestion/services/suggestion.service';
 import { UserService } from '../../user/services/user.service';
 import { getGuildId } from '../../../shared/guild';
 
@@ -41,6 +42,7 @@ export default {
       await UserService.updateDailyStreak(message.author.id);
       await LevelingService.giveXpToUser(client, message);
       await ChatGamingService.checkAndRemindGamingRole(message);
+      await SuggestionService.handleMessage(message);
 
     } catch (error) {
       console.error('Erreur dans l\'événement messageCreate:', error);

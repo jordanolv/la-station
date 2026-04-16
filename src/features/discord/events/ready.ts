@@ -14,6 +14,7 @@ import { chatGamingPanel } from '../../chat-gaming/panels/chat-gaming.panel';
 import { arcadePanel } from '../../arcade/panels/arcade.panel';
 import { peakHuntersPanel } from '../../peak-hunters/panels/peak-hunters.panel';
 import { activityRolesPanel } from '../../activity-roles/panels/activity-roles.panel';
+import { suggestionPanel } from '../../suggestion/panels/suggestion.panel';
 import { SpawnService } from '../../peak-hunters/services/spawn.service';
 import { QuizService } from '../../quiz/services/quiz.service';
 
@@ -27,6 +28,7 @@ panelRegistry.register(chatGamingPanel);
 panelRegistry.register(arcadePanel);
 panelRegistry.register(peakHuntersPanel);
 panelRegistry.register(activityRolesPanel);
+panelRegistry.register(suggestionPanel);
 
 export default {
   name: Events.ClientReady,

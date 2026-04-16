@@ -5,6 +5,7 @@ import { VoiceConfig } from '../../voice/models/voice-config.model';
 import { PartyConfig } from '../../party/models/party-config.model';
 import { BirthdayConfig } from '../../user/models/birthday-config.model';
 import { ArcadeConfig } from '../../arcade/models/arcade-config.model';
+import { SuggestionConfig } from '../../suggestion/models/suggestion-config.model';
 
 @modelOptions({ options: { allowMixed: 0 } })
 class AppSettings {
@@ -50,6 +51,9 @@ class AppFeatures {
 
   @prop({ type: () => ArcadeConfig })
   arcade?: ArcadeConfig;
+
+  @prop({ type: () => SuggestionConfig })
+  suggestion?: SuggestionConfig;
 }
 
 export class AppConfig {
