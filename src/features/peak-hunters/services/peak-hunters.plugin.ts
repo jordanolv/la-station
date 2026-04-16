@@ -13,8 +13,8 @@ import { awardExpeditions } from './expedition.service';
 const LOG_FEATURE = '⛰️ Mountain';
 export const VOICE_CHECK_BUTTON_PREFIX = 'mountain:voice:check';
 
-// const MOUNTAIN_LOCK_DURATION_MS = 30 * 60 * 1000;
-const MOUNTAIN_LOCK_DURATION_MS = 1;
+const MOUNTAIN_LOCK_DURATION_MS = 15 * 60 * 1000;
+// const MOUNTAIN_LOCK_DURATION_MS = 1;
 
 export interface PeakHuntersSessionResult {
   mountain: MountainInfo;

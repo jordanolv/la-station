@@ -1,8 +1,8 @@
 import type { MountainRarity, RarityConfig, RaidRarityConfig, ExpeditionTier, ExpeditionTierConfig } from '../types/peak-hunters.types';
 
-export const MOUNTAIN_REQUIRED_SECONDS = 1; // 45 minutes en voc pour débloquer
-export const EXPEDITION_INTERVAL_SECONDS = 1;  // 3h de voc pour gagner une expédition
-export const MOUNTAIN_LOCK_MIN_SECONDS = 1;  // 3 minutes min pour activer le lock de montagne
+export const MOUNTAIN_REQUIRED_SECONDS = 2700; // 45 minutes en voc pour débloquer
+export const EXPEDITION_INTERVAL_SECONDS = 5400;  // 3h de voc pour gagner une expédition
+export const MOUNTAIN_LOCK_MIN_SECONDS = 180;  // 3 minutes min pour activer le lock de montagne
 export const FRAGMENTS_PER_EXPEDITION = 20;
 
 export const SPAWN_MAX_PER_DAY = 2;
@@ -19,7 +19,7 @@ export const RARITY_CONFIG: Record<MountainRarity, RarityConfig> = {
 // ─── Tiers d'expédition ───────────────────────────────────────────────────────
 
 export const EXPEDITION_TIER_CONFIG: Record<ExpeditionTier, ExpeditionTierConfig> = {
-  sentier:  { label: 'Sentier',  emoji: '<:iconcommon:1493886938401214565>', color: 0xe67e22, description: 'Probabilités normales' },
+  sentier:  { label: 'Sentier',  emoji: '<:sentierTier:1493914305824034907>', color: 0xe67e22, description: 'Probabilités normales' },
   falaise:  { label: 'Falaise',  emoji: '<:falaiseTier:1493914310282448916>',  color: 0x3498db, description: 'Meilleures chances de rare et épique' },
   sommet:   { label: 'Sommet',   emoji: '<:sommetTier:1493914307698884608>', color: 0x9b59b6, description: 'Garantit une montagne Épique ou Légendaire' },
 };
