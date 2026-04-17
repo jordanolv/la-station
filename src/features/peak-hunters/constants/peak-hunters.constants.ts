@@ -10,10 +10,10 @@ export const SPAWN_HOUR_START = 7;
 export const SPAWN_HOUR_END = 23;
 
 export const RARITY_CONFIG: Record<MountainRarity, RarityConfig> = {
-  common:    { label: 'Commune',    emoji: '<:iconcommon:1493913972590510170>', color: 0x95a5a6, fragmentsOnDuplicate: 1,  expeditionWeight: 60 },
-  rare:      { label: 'Rare',       emoji: '<:iconrare:1493913954622378075>', color: 0x3498db, fragmentsOnDuplicate: 3,  expeditionWeight: 25 },
-  epic:      { label: 'Épique',     emoji: '<:iconepic:1493913951346491512>', color: 0x9b59b6, fragmentsOnDuplicate: 8,  expeditionWeight: 12 },
-  legendary: { label: 'Légendaire', emoji: '<:iconleg:1493913953254903909>', color: 0xf1c40f, fragmentsOnDuplicate: 20, expeditionWeight: 3  },
+  common:    { label: 'Commune',    emoji: '<:iconcommon:1493913972590510170>', nameEmoji: '⬜', color: 0x95a5a6, fragmentsOnDuplicate: 1,  expeditionWeight: 60 },
+  rare:      { label: 'Rare',       emoji: '<:iconrare:1493913954622378075>', nameEmoji: '🟦', color: 0x3498db, fragmentsOnDuplicate: 3,  expeditionWeight: 25 },
+  epic:      { label: 'Épique',     emoji: '<:iconepic:1493913951346491512>', nameEmoji: '🟪', color: 0x9b59b6, fragmentsOnDuplicate: 8,  expeditionWeight: 12 },
+  legendary: { label: 'Légendaire', emoji: '<:iconleg:1493913953254903909>', nameEmoji: '⭐', color: 0xf1c40f, fragmentsOnDuplicate: 20, expeditionWeight: 3  },
 };
 
 // ─── Tiers d'expédition ───────────────────────────────────────────────────────

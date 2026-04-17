@@ -5,6 +5,7 @@ export type ExpeditionTier = 'sentier' | 'falaise' | 'sommet';
 export interface RarityConfig {
   label: string;
   emoji: string;
+  nameEmoji: string;
   color: number;
   /** Fragments donnés si la montagne est déjà débloquée (doublon) */
   fragmentsOnDuplicate: number;

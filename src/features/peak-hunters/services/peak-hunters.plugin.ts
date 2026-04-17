@@ -67,6 +67,7 @@ export class PeakHuntersPlugin implements VoicePlugin {
     }
 
     return {
+      channelNamePrefix: mountain ? RARITY_CONFIG[mountain.rarity].nameEmoji : undefined,
       templateVars: { mountain: mountain ? mountain.mountainLabel : 'Vocal' },
       metadata: { mountainId: mountain?.id ?? null },
     };

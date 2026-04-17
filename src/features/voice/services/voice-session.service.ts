@@ -33,6 +33,7 @@ export interface VoicePlugin {
   onBeforeChannelCreate?(userId: string): {
     templateVars?: Record<string, string>;
     metadata?: Record<string, unknown>;
+    channelNamePrefix?: string;
   };
   onChannelCreated?(
     channel: VoiceChannel,
@@ -548,11 +549,13 @@ export class VoiceSessionService {
 
     const metadata: Record<string, unknown> = {};
     const extraVars: Record<string, string> = {};
+    const channelNamePrefixes: string[] = [];
 
     for (const plugin of this.plugins) {
       try {
         const result = plugin.onBeforeChannelCreate?.(userId);
         if (result) {
+          if (result.channelNamePrefix) channelNamePrefixes.push(result.channelNamePrefix);
           Object.assign(extraVars, result.templateVars ?? {});
           Object.assign(metadata, result.metadata ?? {});
         }
@@ -567,6 +570,14 @@ export class VoiceSessionService {
 
     for (const [key, value] of Object.entries(extraVars)) {
       channelName = channelName.replace(`{${key}}`, value);
+    }
+
+    if (channelNamePrefixes.length > 0) {
+      channelName = `${channelNamePrefixes.join(' ')} ${channelName}`.trim();
+    }
+
+    if (channelName.length > 100) {
+      channelName = channelName.slice(0, 100);
     }
 
     try {
