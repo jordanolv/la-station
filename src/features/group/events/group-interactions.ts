@@ -9,7 +9,7 @@ import {
   MessageFlags,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
-import { getGame, NONE } from '../data/games';
+import { getGame } from '../data/games';
 import GroupUIService, { GROUP_PREFIX, GROUP_DESC_MODAL_PREFIX, GROUP_TIME_MODAL_PREFIX } from '../services/group-ui.service';
 import groupService from '../services/group.service';
 import groupRepository from '../repositories/group.repository';
@@ -18,6 +18,10 @@ export const GROUP_BUTTON_PREFIX = GROUP_PREFIX;
 export const GROUP_SELECT_PREFIX = GROUP_PREFIX;
 
 interface GroupDraft {
+  gameId?: string;
+  selectedTypes: string[];
+  selectedModes: string[];
+  selectedRank?: string;
   description?: string;
   sessionTime?: string;
 }
@@ -25,7 +29,92 @@ interface GroupDraft {
 export const groupDraftMap = new Map<string, GroupDraft>();
 
 function getDraft(userId: string): GroupDraft {
-  return groupDraftMap.get(userId) ?? {};
+  return groupDraftMap.get(userId) ?? {
+    selectedTypes: [],
+    selectedModes: [],
+  };
+}
+
+function setDraft(userId: string, draft: GroupDraft): GroupDraft {
+  groupDraftMap.set(userId, draft);
+  return draft;
+}
+
+function needsMode(gameId: string, selectedTypes: string[]): boolean {
+  const game = getGame(gameId);
+  if (!game) return false;
+
+  return selectedTypes.some((type) => game.typeOptions.find((option) => option.value === type)?.requiresMode);
+}
+
+function needsRank(gameId: string, selectedTypes: string[]): boolean {
+  const game = getGame(gameId);
+  if (!game || game.rankOptions === null) return false;
+
+  return selectedTypes.some((type) => game.typeOptions.find((option) => option.value === type)?.requiresRank);
+}
+
+function getTotalSlots(gameId: string, selectedTypes: string[], selectedModes: string[]): number {
+  const game = getGame(gameId);
+  if (!game) return 0;
+
+  const typeSlots = selectedTypes.map((type) => game.typeOptions.find((option) => option.value === type)?.slots ?? 0);
+  const modeSlots = selectedModes.map((modeId) => game.modes?.find((mode) => mode.id === modeId)?.slots ?? 0);
+
+  return Math.max(0, ...typeSlots, ...modeSlots, selectedTypes.length > 0 ? 4 : 0);
+}
+
+function sanitizeDraft(draft: GroupDraft): GroupDraft {
+  if (!draft.gameId) {
+    return {
+      selectedTypes: [],
+      selectedModes: [],
+      description: draft.description,
+      sessionTime: draft.sessionTime,
+    };
+  }
+
+  const game = getGame(draft.gameId);
+  if (!game) {
+    return {
+      selectedTypes: [],
+      selectedModes: [],
+      description: draft.description,
+      sessionTime: draft.sessionTime,
+    };
+  }
+
+  const selectedTypes = draft.selectedTypes.filter((type) =>
+    game.typeOptions.some((option) => option.value === type),
+  );
+
+  const selectedModes = needsMode(game.id, selectedTypes)
+    ? draft.selectedModes.filter((modeId) => game.modes?.some((mode) => mode.id === modeId))
+    : [];
+
+  const selectedRank = needsRank(game.id, selectedTypes)
+    && game.rankOptions?.some((rank) => rank.value === draft.selectedRank)
+      ? draft.selectedRank
+      : undefined;
+
+  return {
+    ...draft,
+    gameId: game.id,
+    selectedTypes,
+    selectedModes,
+    selectedRank,
+  };
+}
+
+function renderDraft(draft: GroupDraft) {
+  return GroupUIService.buildConfigurator(
+    draft.gameId!,
+    draft.selectedTypes,
+    draft.selectedModes,
+    draft.selectedRank,
+    draft.description,
+    draft.sessionTime,
+  );
 }
 
 export async function handleGroupSelectMenu(
@@ -37,51 +126,55 @@ export async function handleGroupSelectMenu(
 
   if (step === 'game') {
     const gameId = interaction.values[0];
-    const ui = GroupUIService.buildStep2(gameId);
+    const previousDraft = getDraft(interaction.user.id);
+    const draft = setDraft(interaction.user.id, {
+      gameId,
+      selectedTypes: [],
+      selectedModes: [],
+      description: previousDraft.description,
+      sessionTime: previousDraft.sessionTime,
+    });
+    const ui = renderDraft(draft);
     await interaction.update({ components: ui.components });
     return;
   }
 
   if (step === 'type') {
     const gameId = parts[2];
-    const type = interaction.values[0];
-
-    const game = getGame(gameId);
-    if (!game) return;
-
-    const needsMode = game.modes !== null && type !== 'Privé' && type !== 'Aram';
-    const needsRank = type === 'Ranked' && game.rankOptions !== null;
-
-    if (!needsMode && !needsRank) {
-      await createGroup(interaction, gameId, type, NONE, NONE);
-      return;
-    }
-
     const draft = getDraft(interaction.user.id);
-    const ui = GroupUIService.buildStep3(gameId, type, NONE, NONE, draft.description, draft.sessionTime);
+    const updatedDraft = setDraft(interaction.user.id, sanitizeDraft({
+      ...draft,
+      gameId,
+      selectedTypes: interaction.values,
+    }));
+    const ui = renderDraft(updatedDraft);
     await interaction.update({ components: ui.components });
     return;
   }
 
   if (step === 'mode') {
     const gameId = parts[2];
-    const type = parts[3];
-    const modeId = interaction.values[0];
-
     const draft = getDraft(interaction.user.id);
-    const ui = GroupUIService.buildStep3(gameId, type, modeId, NONE, draft.description, draft.sessionTime);
+    const updatedDraft = setDraft(interaction.user.id, sanitizeDraft({
+      ...draft,
+      gameId,
+      selectedModes: interaction.values,
+    }));
+    const ui = renderDraft(updatedDraft);
     await interaction.update({ components: ui.components });
     return;
   }
 
   if (step === 'rank') {
     const gameId = parts[2];
-    const type = parts[3];
-    const modeId = parts[4];
     const rankValue = interaction.values[0];
-
     const draft = getDraft(interaction.user.id);
-    const ui = GroupUIService.buildStep3(gameId, type, modeId, rankValue, draft.description, draft.sessionTime);
+    const updatedDraft = setDraft(interaction.user.id, sanitizeDraft({
+      ...draft,
+      gameId,
+      selectedRank: rankValue,
+    }));
+    const ui = renderDraft(updatedDraft);
     await interaction.update({ components: ui.components });
     return;
   }
@@ -95,11 +188,11 @@ export async function handleGroupButton(
   const prefix = parts[0] + ':' + parts[1];
 
   if (prefix === GROUP_DESC_MODAL_PREFIX) {
-    const [, , gameId, type, modeId, rankValue] = parts;
+    const [, , gameId] = parts;
     const draft = getDraft(interaction.user.id);
 
     const modal = new ModalBuilder()
-      .setCustomId(`${GROUP_DESC_MODAL_PREFIX}:${gameId}:${type}:${modeId}:${rankValue}`)
+      .setCustomId(`${GROUP_DESC_MODAL_PREFIX}:${gameId}`)
       .setTitle('Description du groupe');
 
     modal.addComponents(
@@ -120,11 +213,11 @@ export async function handleGroupButton(
   }
 
   if (prefix === GROUP_TIME_MODAL_PREFIX) {
-    const [, , gameId, type, modeId, rankValue] = parts;
+    const [, , gameId] = parts;
     const draft = getDraft(interaction.user.id);
 
     const modal = new ModalBuilder()
-      .setCustomId(`${GROUP_TIME_MODAL_PREFIX}:${gameId}:${type}:${modeId}:${rankValue}`)
+      .setCustomId(`${GROUP_TIME_MODAL_PREFIX}:${gameId}`)
       .setTitle('Heure de la session');
 
     modal.addComponents(
@@ -147,8 +240,8 @@ export async function handleGroupButton(
   const action = parts[1];
 
   if (action === 'create') {
-    const [, , gameId, type, modeId, rankValue] = parts;
-    await createGroup(interaction, gameId, type, modeId, rankValue);
+    const [, , gameId] = parts;
+    await createGroup(interaction, gameId);
     return;
   }
 
@@ -218,36 +311,33 @@ export async function handleGroupButton(
 
 export async function handleGroupDescModal(interaction: ModalSubmitInteraction): Promise<void> {
   const parts = interaction.customId.split(':');
-  const [, , gameId, type, modeId, rankValue] = parts;
+  const [, , gameId] = parts;
 
   const description = interaction.fields.getTextInputValue('group_description').trim() || undefined;
 
   const draft = getDraft(interaction.user.id);
-  groupDraftMap.set(interaction.user.id, { ...draft, description });
+  const updatedDraft = setDraft(interaction.user.id, sanitizeDraft({ ...draft, gameId, description }));
 
-  const ui = GroupUIService.buildStep3(gameId, type, modeId, rankValue, description, draft.sessionTime);
+  const ui = renderDraft(updatedDraft);
   await (interaction as any).update({ components: ui.components });
 }
 
 export async function handleGroupTimeModal(interaction: ModalSubmitInteraction): Promise<void> {
   const parts = interaction.customId.split(':');
-  const [, , gameId, type, modeId, rankValue] = parts;
+  const [, , gameId] = parts;
 
   const sessionTime = interaction.fields.getTextInputValue('group_time').trim() || undefined;
 
   const draft = getDraft(interaction.user.id);
-  groupDraftMap.set(interaction.user.id, { ...draft, sessionTime });
+  const updatedDraft = setDraft(interaction.user.id, sanitizeDraft({ ...draft, gameId, sessionTime }));
 
-  const ui = GroupUIService.buildStep3(gameId, type, modeId, rankValue, draft.description, sessionTime);
+  const ui = renderDraft(updatedDraft);
   await (interaction as any).update({ components: ui.components });
 }
 
 async function createGroup(
   interaction: ButtonInteraction | StringSelectMenuInteraction,
   gameId: string,
-  type: string,
-  modeId: string,
-  rankValue: string,
 ): Promise<void> {
   const game = getGame(gameId);
   if (!game) {
@@ -255,30 +345,34 @@ async function createGroup(
     return;
   }
 
-  const draft = getDraft(interaction.user.id);
-  groupDraftMap.delete(interaction.user.id);
+  const draft = sanitizeDraft({ ...getDraft(interaction.user.id), gameId });
 
-  const resolvedModeId = modeId !== NONE ? modeId : undefined;
-  const resolvedRank = rankValue !== NONE ? rankValue : undefined;
-
-  let totalSlots: number;
-  if (type === 'Privé') {
-    totalSlots = 10;
-  } else if (resolvedModeId && game.modes) {
-    totalSlots = game.modes.find((m) => m.id === resolvedModeId)?.slots ?? 4;
-  } else {
-    totalSlots = 4;
+  if (draft.selectedTypes.length === 0) {
+    await interaction.reply({ content: 'Choisis au moins un type de partie.', flags: MessageFlags.Ephemeral });
+    return;
   }
+
+  if (needsMode(gameId, draft.selectedTypes) && draft.selectedModes.length === 0) {
+    await interaction.reply({ content: 'Choisis au moins un mode de jeu.', flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  if (needsRank(gameId, draft.selectedTypes) && !draft.selectedRank) {
+    await interaction.reply({ content: 'Choisis un rank minimum.', flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  groupDraftMap.delete(interaction.user.id);
 
   await interaction.deferUpdate();
 
   const group = await groupService.createGroup({
     creatorId: interaction.user.id,
     gameId,
-    type,
-    mode: resolvedModeId,
-    rankMin: resolvedRank,
-    totalSlots,
+    types: draft.selectedTypes,
+    modes: draft.selectedModes.length > 0 ? draft.selectedModes : undefined,
+    rankMin: draft.selectedRank,
+    totalSlots: getTotalSlots(gameId, draft.selectedTypes, draft.selectedModes),
     description: draft.description,
     sessionTime: draft.sessionTime,
   });

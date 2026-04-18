@@ -14,6 +14,12 @@ export class Group {
   @prop()
   mode?: string;
 
+  @prop({ type: () => [String], default: [] })
+  types!: string[];
+
+  @prop({ type: () => [String], default: [] })
+  modes!: string[];
+
   @prop()
   rankMin?: string;
 

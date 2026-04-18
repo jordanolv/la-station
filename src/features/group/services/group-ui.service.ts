@@ -2,7 +2,6 @@ import {
   ContainerBuilder,
   TextDisplayBuilder,
   SeparatorBuilder,
-  SectionBuilder,
   MediaGalleryBuilder,
   MediaGalleryItemBuilder,
   ActionRowBuilder,
@@ -13,7 +12,7 @@ import {
   MessageFlags,
 } from 'discord.js';
 import { IGroup } from '../models/group.model';
-import { Game, GAMES, getGame, NONE } from '../data/games';
+import { Game, GameTypeOption, GAMES, getGame } from '../data/games';
 
 export const GROUP_PREFIX = 'group';
 export const GROUP_DESC_MODAL_PREFIX = 'group:modal_desc';
@@ -21,6 +20,51 @@ export const GROUP_TIME_MODAL_PREFIX = 'group:modal_time';
 
 function cid(...parts: string[]): string {
   return parts.join(':');
+}
+
+function getTypeOption(game: Game, value: string): GameTypeOption | undefined {
+  return game.typeOptions.find((type) => type.value === value);
+}
+
+function getTypeLabels(game: Game | undefined, values: string[]): string[] {
+  return values.map((value) => game?.typeOptions.find((type) => type.value === value)?.label ?? value);
+}
+
+function getModeLabels(game: Game | undefined, values: string[]): string[] {
+  return values.map((value) => game?.modes?.find((mode) => mode.id === value)?.label ?? value);
+}
+
+function getSelectedTypes(group: IGroup): string[] {
+  return Array.isArray(group.types) && group.types.length > 0
+    ? group.types
+    : group.type
+      ? [group.type]
+      : [];
+}
+
+function getSelectedModes(group: IGroup): string[] {
+  return Array.isArray(group.modes) && group.modes.length > 0
+    ? group.modes
+    : group.mode
+      ? [group.mode]
+      : [];
+}
+
+function needsMode(game: Game, selectedTypes: string[]): boolean {
+  return selectedTypes.some((type) => getTypeOption(game, type)?.requiresMode);
+}
+
+function needsRank(game: Game, selectedTypes: string[]): boolean {
+  return selectedTypes.some((type) => getTypeOption(game, type)?.requiresRank) && game.rankOptions !== null;
+}
+
+function getTotalSlots(game: Game, selectedTypes: string[], selectedModes: string[]): number {
+  const typeSlots = selectedTypes
+    .map((type) => getTypeOption(game, type)?.slots ?? 0);
+  const modeSlots = selectedModes
+    .map((modeId) => game.modes?.find((mode) => mode.id === modeId)?.slots ?? 0);
+
+  return Math.max(0, ...typeSlots, ...modeSlots, selectedTypes.length > 0 ? 4 : 0);
 }
 
 function buildGameSelect(): ContainerBuilder {
@@ -46,48 +90,27 @@ function buildGameHeader(game: Game): ContainerBuilder {
     .addTextDisplayComponents(new TextDisplayBuilder().setContent(`${game.emoji} **${game.name}**`));
 }
 
-function buildTypeSelect(game: Game): ContainerBuilder {
-  const options = game.typeOptions.map((t) =>
-    new StringSelectMenuOptionBuilder().setLabel(t.label).setValue(t.value),
-  );
-
-  return new ContainerBuilder()
-    .addTextDisplayComponents(new TextDisplayBuilder().setContent('Type de partie :'))
-    .addActionRowComponents(
-      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-        new StringSelectMenuBuilder()
-          .setCustomId(cid(GROUP_PREFIX, 'type', game.id))
-          .setPlaceholder('Casual, Ranked...')
-          .addOptions(options),
-      ),
-    );
-}
-
-function buildTypeHeader(game: Game, type: string): ContainerBuilder {
-  return new ContainerBuilder()
-    .setAccentColor(game.color)
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`${game.emoji} **${game.name}**  ·  ${type}`),
-    );
-}
-
 function buildSettingsContainer(
   game: Game,
-  type: string,
-  selectedModeId: string = NONE,
-  selectedRank: string = NONE,
+  selectedTypes: string[] = [],
+  selectedModes: string[] = [],
+  selectedRank?: string,
   description?: string,
   sessionTime?: string,
 ): ContainerBuilder {
-  const needsMode = game.modes !== null && type !== 'Privé' && type !== 'Aram';
-  const needsRank = type === 'Ranked' && game.rankOptions !== null;
+  const shouldPickMode = game.modes !== null && needsMode(game, selectedTypes);
+  const shouldPickRank = needsRank(game, selectedTypes);
+  const previewSlots = getTotalSlots(game, selectedTypes, selectedModes);
 
   const summaryParts: string[] = [];
-  if (needsMode && selectedModeId !== NONE) {
-    const modeLabel = game.modes?.find((m) => m.id === selectedModeId)?.label ?? selectedModeId;
-    summaryParts.push(`Mode : **${modeLabel}**`);
+  if (selectedTypes.length > 0) {
+    summaryParts.push(`Types : **${getTypeLabels(game, selectedTypes).join(' / ')}**`);
   }
-  if (needsRank && selectedRank !== NONE) summaryParts.push(`Rank min : **${selectedRank}**`);
+  if (selectedModes.length > 0) {
+    summaryParts.push(`Modes : **${getModeLabels(game, selectedModes).join(' / ')}**`);
+  }
+  if (shouldPickRank && selectedRank) summaryParts.push(`Rank min : **${selectedRank}**`);
+  if (previewSlots > 0) summaryParts.push(`Slots : **${previewSlots}**`);
   if (sessionTime) summaryParts.push(`🕐 **${sessionTime}**`);
   if (description) summaryParts.push(`📝 *${description}*`);
 
@@ -99,25 +122,52 @@ function buildSettingsContainer(
     new TextDisplayBuilder().setContent(headerText),
   );
 
-  if (needsMode && game.modes) {
+  const typeOptions = game.typeOptions.map((type) =>
+    new StringSelectMenuOptionBuilder()
+      .setLabel(type.label)
+      .setValue(type.value)
+      .setDescription(
+        type.slots
+          ? `${type.slots} joueurs`
+          : type.requiresMode
+            ? 'Choix du mode requis'
+            : 'Sans mode spécifique',
+      )
+      .setDefault(selectedTypes.includes(type.value)),
+  );
+
+  container.addActionRowComponents(
+    new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId(cid(GROUP_PREFIX, 'type', game.id))
+        .setPlaceholder('Choisis un ou plusieurs types...')
+        .setMinValues(0)
+        .setMaxValues(typeOptions.length)
+        .addOptions(typeOptions),
+    ),
+  );
+
+  if (shouldPickMode && game.modes) {
     const modeOptions = game.modes.map((m) =>
       new StringSelectMenuOptionBuilder()
         .setLabel(m.label)
         .setValue(m.id)
         .setDescription(`${m.slots} joueurs`)
-        .setDefault(m.id === selectedModeId),
+        .setDefault(selectedModes.includes(m.id)),
     );
     container.addActionRowComponents(
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
-          .setCustomId(cid(GROUP_PREFIX, 'mode', game.id, type))
-          .setPlaceholder('Mode de jeu...')
+          .setCustomId(cid(GROUP_PREFIX, 'mode', game.id))
+          .setPlaceholder('Choisis un ou plusieurs modes...')
+          .setMinValues(0)
+          .setMaxValues(modeOptions.length)
           .addOptions(modeOptions),
       ),
     );
   }
 
-  if (needsRank && game.rankOptions) {
+  if (shouldPickRank && game.rankOptions) {
     const rankOptions = game.rankOptions.map((r) =>
       new StringSelectMenuOptionBuilder()
         .setLabel(r.label)
@@ -127,29 +177,31 @@ function buildSettingsContainer(
     container.addActionRowComponents(
       new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
         new StringSelectMenuBuilder()
-          .setCustomId(cid(GROUP_PREFIX, 'rank', game.id, type, selectedModeId))
+          .setCustomId(cid(GROUP_PREFIX, 'rank', game.id))
           .setPlaceholder('Rank minimum...')
           .addOptions(rankOptions),
       ),
     );
   }
 
-  const canCreate = (!needsMode || selectedModeId !== NONE) && (!needsRank || selectedRank !== NONE);
+  const canCreate = selectedTypes.length > 0
+    && (!shouldPickMode || selectedModes.length > 0)
+    && (!shouldPickRank || Boolean(selectedRank));
   const descLabel = description ? '📝 Modifier la description' : '📝 Ajouter une description';
   const timeLabel = sessionTime ? '🕐 Modifier l\'heure' : '🕐 Définir l\'heure';
 
   container.addActionRowComponents(
     new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId(cid(GROUP_DESC_MODAL_PREFIX, game.id, type, selectedModeId, selectedRank))
+        .setCustomId(cid(GROUP_DESC_MODAL_PREFIX, game.id))
         .setLabel(descLabel)
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId(cid(GROUP_TIME_MODAL_PREFIX, game.id, type, selectedModeId, selectedRank))
+        .setCustomId(cid(GROUP_TIME_MODAL_PREFIX, game.id))
         .setLabel(timeLabel)
         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
-        .setCustomId(cid(GROUP_PREFIX, 'create', game.id, type, selectedModeId, selectedRank))
+        .setCustomId(cid(GROUP_PREFIX, 'create', game.id))
         .setLabel('Créer le groupe')
         .setStyle(ButtonStyle.Success)
         .setDisabled(!canCreate),
@@ -167,19 +219,11 @@ export class GroupUIService {
     };
   }
 
-  buildStep2(gameId: string): { components: ContainerBuilder[]; flags: number } {
-    const game = getGame(gameId)!;
-    return {
-      components: [buildGameHeader(game), buildTypeSelect(game)],
-      flags: MessageFlags.IsComponentsV2,
-    };
-  }
-
-  buildStep3(
+  buildConfigurator(
     gameId: string,
-    type: string,
-    selectedModeId: string = NONE,
-    selectedRank: string = NONE,
+    selectedTypes: string[] = [],
+    selectedModes: string[] = [],
+    selectedRank?: string,
     description?: string,
     sessionTime?: string,
   ): { components: ContainerBuilder[]; flags: number } {
@@ -187,8 +231,7 @@ export class GroupUIService {
     return {
       components: [
         buildGameHeader(game),
-        buildTypeHeader(game, type),
-        buildSettingsContainer(game, type, selectedModeId, selectedRank, description, sessionTime),
+        buildSettingsContainer(game, selectedTypes, selectedModes, selectedRank, description, sessionTime),
       ],
       flags: MessageFlags.IsComponentsV2,
     };
@@ -198,21 +241,21 @@ export class GroupUIService {
     const filled = group.joinedUserIds.length;
     const total = group.totalSlots;
     const spotsBar = '🟦'.repeat(filled) + '⬜'.repeat(Math.max(0, total - filled));
+    const types = getSelectedTypes(group);
+    const modes = getSelectedModes(group);
 
     const labels: string[] = [];
-    if (group.mode) {
-      const modeLabel = game?.modes?.find((m) => m.id === group.mode)?.label ?? group.mode;
-      labels.push(modeLabel);
-    }
+    if (types.length > 0) labels.push(getTypeLabels(game, types).join(' / '));
+    if (modes.length > 0) labels.push(getModeLabels(game, modes).join(' / '));
     if (group.rankMin) labels.push(`${group.rankMin}+`);
-    const subtitle = [group.type, ...labels].filter(Boolean).join('  ·  ');
-
-    const subtitleWithRole = roleId ? `${subtitle}  ·  <@&${roleId}>` : subtitle;
+    const subtitle = labels.join('  ·  ');
+    const subtitleWithRole = [subtitle, roleId ? `<@&${roleId}>` : undefined].filter(Boolean).join('  ·  ');
 
     const lines: string[] = [
       `## ${game?.emoji ?? '🎮'} ${game?.name ?? group.gameId}`,
-      `-# ${subtitleWithRole}`,
     ];
+
+    if (subtitleWithRole) lines.push(`-# ${subtitleWithRole}`);
 
     if (group.description) lines.push('', group.description);
     if (group.sessionTime) lines.push(`\n🕐 ${group.sessionTime}`);
@@ -260,20 +303,20 @@ export class GroupUIService {
   }
 
   buildClosedPost(group: IGroup, game: Game | undefined): ContainerBuilder[] {
+    const types = getSelectedTypes(group);
+    const modes = getSelectedModes(group);
     const labels: string[] = [];
-    if (group.mode) {
-      const modeLabel = game?.modes?.find((m) => m.id === group.mode)?.label ?? group.mode;
-      labels.push(modeLabel);
-    }
+    if (types.length > 0) labels.push(getTypeLabels(game, types).join(' / '));
+    if (modes.length > 0) labels.push(getModeLabels(game, modes).join(' / '));
     if (group.rankMin) labels.push(`${group.rankMin}+`);
-    const subtitle = [group.type, ...labels].filter(Boolean).join('  ·  ');
+    const subtitle = labels.join('  ·  ');
 
     const lines = [
       `## ~~${game?.emoji ?? '🎮'} ${game?.name ?? group.gameId}~~`,
-      `-# ${subtitle}`,
-      '',
-      '*Groupe fermé.*',
     ];
+
+    if (subtitle) lines.push(`-# ${subtitle}`);
+    lines.push('', '*Groupe fermé.*');
 
     return [
       new ContainerBuilder()

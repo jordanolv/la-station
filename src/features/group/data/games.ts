@@ -4,6 +4,14 @@ export interface GameMode {
   slots: number;
 }
 
+export interface GameTypeOption {
+  label: string;
+  value: string;
+  slots?: number;
+  requiresMode?: boolean;
+  requiresRank?: boolean;
+}
+
 export interface Game {
   id: string;
   name: string;
@@ -12,7 +20,7 @@ export interface Game {
   banner?: string;
   roleId: string;
   modes: GameMode[] | null;
-  typeOptions: { label: string; value: string }[];
+  typeOptions: GameTypeOption[];
   rankOptions: { label: string; value: string }[] | null;
 }
 
@@ -30,10 +38,10 @@ export const GAMES: Game[] = [
       { id: 'fivestack', label: 'Five Stack', slots: 5 },
     ],
     typeOptions: [
-      { label: 'Casual', value: 'Casual' },
-      { label: 'ARAM', value: 'Aram' },
-      { label: 'Ranked', value: 'Ranked' },
-      { label: 'Privé', value: 'Privé' },
+      { label: 'Casual', value: 'Casual', requiresMode: true },
+      { label: 'ARAM', value: 'Aram', slots: 5 },
+      { label: 'Ranked', value: 'Ranked', requiresMode: true, requiresRank: true },
+      { label: 'Privé', value: 'Privé', slots: 10 },
     ],
     rankOptions: [
       { label: 'Fer', value: 'Fer' },
@@ -59,9 +67,9 @@ export const GAMES: Game[] = [
       { id: '3v3', label: '3v3', slots: 3 },
     ],
     typeOptions: [
-      { label: 'Casual', value: 'Casual' },
-      { label: 'Ranked', value: 'Ranked' },
-      { label: 'Privé', value: 'Privé' },
+      { label: 'Casual', value: 'Casual', requiresMode: true },
+      { label: 'Ranked', value: 'Ranked', requiresMode: true, requiresRank: true },
+      { label: 'Privé', value: 'Privé', slots: 10 },
     ],
     rankOptions: [
       { label: 'Bronze', value: 'Bronze' },
@@ -86,9 +94,10 @@ export const GAMES: Game[] = [
       { id: 'fivestack', label: 'Five Stack', slots: 5 },
     ],
     typeOptions: [
-      { label: 'Casual', value: 'Casual' },
-      { label: 'Ranked', value: 'Ranked' },
-      { label: 'Privé', value: 'Privé' },
+      { label: 'Casual', value: 'Casual', requiresMode: true },
+      { label: 'Ranked', value: 'Ranked', requiresMode: true, requiresRank: true },
+      { label: 'Autres', value: 'Autres' },
+      { label: 'Privé', value: 'Privé', slots: 10 },
     ],
     rankOptions: [
       { label: 'Fer', value: 'Fer' },
@@ -114,9 +123,9 @@ export const GAMES: Game[] = [
       { id: 'fivestack', label: 'Five Stack', slots: 5 },
     ],
     typeOptions: [
-      { label: 'Casual', value: 'Casual' },
-      { label: 'Ranked', value: 'Ranked' },
-      { label: 'Privé', value: 'Privé' },
+      { label: 'Casual', value: 'Casual', requiresMode: true },
+      { label: 'Ranked', value: 'Ranked', requiresMode: true, requiresRank: true },
+      { label: 'Privé', value: 'Privé', slots: 10 },
     ],
     rankOptions: [
       { label: 'Argent', value: 'Argent' },
@@ -137,7 +146,7 @@ export const GAMES: Game[] = [
     modes: null,
     typeOptions: [
       { label: 'Casual', value: 'Casual' },
-      { label: 'Ranked', value: 'Ranked' },
+      { label: 'Ranked', value: 'Ranked', requiresRank: true },
     ],
     rankOptions: [
       { label: 'Fer', value: 'Fer' },

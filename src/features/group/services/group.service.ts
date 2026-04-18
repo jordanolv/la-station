@@ -8,8 +8,8 @@ export class GroupService {
   async createGroup(data: {
     creatorId: string;
     gameId: string;
-    type: string;
-    mode: string | undefined;
+    types: string[];
+    modes?: string[];
     rankMin: string | undefined;
     totalSlots: number;
     description?: string;

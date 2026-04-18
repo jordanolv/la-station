@@ -4,8 +4,8 @@ export class GroupRepository {
   async create(data: {
     creatorId: string;
     gameId: string;
-    type: string;
-    mode?: string;
+    types: string[];
+    modes?: string[];
     rankMin?: string;
     totalSlots: number;
     description?: string;
@@ -16,6 +16,8 @@ export class GroupRepository {
 
     return GroupModel.create({
       ...data,
+      type: data.types[0] ?? 'Autres',
+      mode: data.modes?.[0],
       joinedUserIds: [data.creatorId],
       status: 'open',
       createdAt: now,
