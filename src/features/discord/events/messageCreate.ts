@@ -6,6 +6,7 @@ import { LevelingService } from '@/features/leveling/services/leveling.service';
 import { ChatGamingService } from '../../chat-gaming/services/chat-gaming.service';
 import { SuggestionService } from '../../suggestion/services/suggestion.service';
 import { UserService } from '../../user/services/user.service';
+import { BingoService } from '../../arcade/bingo/services/bingo.service';
 import { getGuildId } from '../../../shared/guild';
 
 export default {
@@ -43,6 +44,7 @@ export default {
       await LevelingService.giveXpToUser(client, message);
       await ChatGamingService.checkAndRemindGamingRole(message);
       await SuggestionService.handleMessage(message);
+      await BingoService.handleMessage(message, client);
 
     } catch (error) {
       console.error('Erreur dans l\'événement messageCreate:', error);

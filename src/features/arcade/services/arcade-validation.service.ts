@@ -16,7 +16,8 @@ export class ArcadeValidationService {
         shifumi: 'Le shifumi',
         puissance4: 'Le puissance 4',
         battle: 'La battle',
-        morpion: 'Le morpion'
+        morpion: 'Le morpion',
+        bingo: 'Le bingo'
       };
 
       await interaction.reply({

@@ -19,6 +19,7 @@ const GAMES = [
   { key: 'puissance4', label: 'Puissance 4', emoji: '🔴' },
   { key: 'morpion', label: 'Morpion', emoji: '❌' },
   { key: 'battle', label: 'Battle', emoji: '⚔️' },
+  { key: 'bingo', label: 'Bingo', emoji: '🎯' },
 ] as const;
 
 export const arcadePanel: ConfigPanel = {

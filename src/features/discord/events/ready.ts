@@ -17,6 +17,7 @@ import { activityRolesPanel } from '../../activity-roles/panels/activity-roles.p
 import { suggestionPanel } from '../../suggestion/panels/suggestion.panel';
 import { SpawnService } from '../../peak-hunters/services/spawn.service';
 import { QuizService } from '../../quiz/services/quiz.service';
+import { BingoService } from '../../arcade/bingo/services/bingo.service';
 
 panelRegistry.register(generalPanel);
 panelRegistry.register(logsPanel);
@@ -54,6 +55,7 @@ export default {
     await VoiceService.rehydrate(client);
     await SpawnService.rehydrate(client);
     await QuizService.rehydrate(client);
+    await BingoService.rehydrate(client);
     await ConfigPanelService.init(client).catch((err) =>
       console.error('[ConfigPanel] Erreur init:', err),
     );
