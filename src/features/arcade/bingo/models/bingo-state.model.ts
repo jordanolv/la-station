@@ -19,6 +19,9 @@ export class BingoState {
   @prop()
   activeLastGuesserId?: string;
 
+  @prop({ type: () => [Number], default: [] })
+  activeGuesses?: number[];
+
   @prop()
   activeStartedAt?: Date;
 }

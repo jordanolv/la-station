@@ -35,6 +35,7 @@ export class BingoRepository {
     doc.activeTarget = params.target;
     doc.activeStartedAt = params.startedAt;
     doc.activeLastGuesserId = undefined;
+    doc.activeGuesses = [];
     doc.nextSpawnAt = undefined;
     await doc.save();
   }
@@ -49,6 +50,7 @@ export class BingoRepository {
           activeThreadId: '',
           activeTarget: '',
           activeLastGuesserId: '',
+          activeGuesses: '',
           activeStartedAt: '',
         },
       },
@@ -57,5 +59,16 @@ export class BingoRepository {
 
   static async setLastGuesser(userId: string): Promise<void> {
     await BingoStateModel.updateOne({}, { $set: { activeLastGuesserId: userId } });
+  }
+
+  static async registerGuess(userId: string, guess: number): Promise<IBingoStateDoc | null> {
+    return BingoStateModel.findOneAndUpdate(
+      {},
+      {
+        $set: { activeLastGuesserId: userId },
+        $push: { activeGuesses: guess },
+      },
+      { new: true },
+    );
   }
 }
