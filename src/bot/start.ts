@@ -3,9 +3,27 @@ import { connectToDatabase } from '../shared/db';
 import { loadFeatures } from './handlers/feature';
 import { loadEvents } from './handlers/event';
 import path from 'path';
-import { REST, Routes } from 'discord.js';
+import { Events, REST, Routes } from 'discord.js';
 import chalk from 'chalk';
 import { CronManager } from '../shared/cron/cron-manager';
+
+function attachGatewayHealthLogs(client: BotClient): void {
+  client.on(Events.ShardDisconnect, (event, shardId) => {
+    console.warn(chalk.yellow('📡 [GATEWAY]') + chalk.gray(` Shard ${shardId} déconnecté (code ${event.code})`));
+  });
+  client.on(Events.ShardReconnecting, (shardId) => {
+    console.warn(chalk.yellow('📡 [GATEWAY]') + chalk.gray(` Shard ${shardId} reconnexion...`));
+  });
+  client.on(Events.ShardResume, (shardId, replayedEvents) => {
+    console.log(chalk.cyan('📡 [GATEWAY]') + chalk.green(` Shard ${shardId} repris (${replayedEvents} events rejoués)`));
+  });
+  client.on(Events.ShardError, (error, shardId) => {
+    console.error(chalk.red('📡 [GATEWAY]') + ` Shard ${shardId} erreur:`, error);
+  });
+  client.on(Events.ShardReady, (shardId) => {
+    console.log(chalk.cyan('📡 [GATEWAY]') + chalk.green(` Shard ${shardId} prêt`));
+  });
+}
 
 export async function startBot() {
   try {
@@ -69,6 +87,8 @@ export async function startBot() {
     const cronManager = new CronManager(client);
     cronManager.startAll();
     console.log(chalk.yellow('⏰ [CRON]') + chalk.green(` Démarré (${Date.now() - cronStart}ms)`));
+
+    attachGatewayHealthLogs(client);
 
     const loginStart = Date.now();
     console.log(chalk.blueBright('🔐 [LOGIN]') + chalk.gray(' Connexion à Discord...'));

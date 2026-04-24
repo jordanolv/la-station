@@ -64,7 +64,7 @@ export default {
     if (!user) {
       await interaction.reply({
         content: '❌ Utilisateur introuvable dans la base. Réessayez plus tard.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -121,7 +121,7 @@ export default {
     if (!user) {
       await interaction.reply({
         content: '❌ Utilisateur introuvable dans la base. Réessayez plus tard.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -159,7 +159,7 @@ export default {
 
     await interaction.reply({
       content: `✅ Profil mis à jour !\n• **Bio:** ${bioDisplay}\n• **Anniversaire:** ${birthDisplay}`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   },
 };

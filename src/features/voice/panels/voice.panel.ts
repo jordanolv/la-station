@@ -10,6 +10,7 @@ import {
   ChannelType,
   ButtonInteraction,
   ChannelSelectMenuInteraction,
+  MessageFlags,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { ConfigPanel, panelCustomId } from '../../config-panel/services/config-panel.registry';
@@ -113,7 +114,7 @@ export const voicePanel: ConfigPanel = {
       await VoiceService.toggleFeature(!config.enabled);
       await interaction.reply({
         content: !config.enabled ? '✅ Salons vocaux activés !' : '❌ Salons vocaux désactivés.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       await ConfigPanelService.refreshPanel(client, PANEL_ID);
       return;
@@ -124,7 +125,7 @@ export const voicePanel: ConfigPanel = {
       await VoiceService.removeJoinChannel(channelId);
       await interaction.reply({
         content: `✅ Salon <#${channelId}> retiré de la liste join-to-create.`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       await ConfigPanelService.refreshPanel(client, PANEL_ID);
     }
@@ -143,7 +144,7 @@ export const voicePanel: ConfigPanel = {
       await VoiceService.addJoinChannel(channelId, categoryId);
       await interaction.reply({
         content: `✅ Salon join-to-create ajouté : <#${channelId}>`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -151,7 +152,7 @@ export const voicePanel: ConfigPanel = {
       await VoiceConfigRepository.setNotificationChannel(channelId);
       await interaction.reply({
         content: `✅ Channel de notification défini : <#${channelId}>`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 

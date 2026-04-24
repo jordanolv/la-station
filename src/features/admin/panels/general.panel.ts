@@ -192,7 +192,7 @@ export const generalPanel: ConfigPanel = {
 
     await interaction.reply({
       content: `✅ ${def.emoji} **${def.label}** → <#${channelId}>`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     await ConfigPanelService.refreshPanel(client, PANEL_ID);
   },

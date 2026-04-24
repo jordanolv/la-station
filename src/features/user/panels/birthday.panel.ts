@@ -10,6 +10,7 @@ import {
   ChannelType,
   ButtonInteraction,
   ChannelSelectMenuInteraction,
+  MessageFlags,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { ConfigPanel, panelCustomId } from '../../config-panel/services/config-panel.registry';
@@ -83,7 +84,7 @@ export const birthdayPanel: ConfigPanel = {
     const now = appConfig.features.birthday!.enabled;
     await interaction.reply({
       content: now ? '✅ Anniversaires activés !' : '❌ Anniversaires désactivés.',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     await ConfigPanelService.refreshPanel(client, PANEL_ID);
   },
@@ -103,7 +104,7 @@ export const birthdayPanel: ConfigPanel = {
 
     await interaction.reply({
       content: `✅ Salon des anniversaires : <#${channelId}>`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     await ConfigPanelService.refreshPanel(client, PANEL_ID);
   },

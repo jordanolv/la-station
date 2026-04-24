@@ -52,6 +52,7 @@ import {
   handleDraftStringSelect,
 } from '../../draft/events/draft-interactions';
 import { QuizService, QUIZ_BUTTON_PREFIX } from '../../quiz/services/quiz.service';
+import { isSilentDiscordError } from '../../../shared/utils/discord-errors';
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
 async function routeToPanelSelectMenu(
@@ -104,10 +105,12 @@ export default {
           }
           await command.execute(interaction, client);
         } catch (error) {
+          if (isSilentDiscordError(error)) return;
+          console.error(`[InteractionCreate] Erreur dans /${interaction.commandName}:`, error);
           if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: 64 }).catch(() => {});
+            await interaction.followUp({ content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: MessageFlags.Ephemeral }).catch(() => {});
           } else {
-            await interaction.reply({ content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: 64 }).catch(() => {});
+            await interaction.reply({ content: 'Une erreur est survenue lors de l\'exécution de cette commande.', flags: MessageFlags.Ephemeral }).catch(() => {});
           }
         }
       }
@@ -223,6 +226,7 @@ export default {
         }
       }
     } catch (error) {
+      if (isSilentDiscordError(error)) return;
       console.error('[InteractionCreate] Erreur non gérée:', error);
     }
   }

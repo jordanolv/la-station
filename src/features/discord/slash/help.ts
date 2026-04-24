@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, MessageFlags } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import commandsConfig from '../../../config/commands.json';
 
@@ -103,7 +103,7 @@ export default {
 
         await interaction.followUp({
           embeds: [adminEmbed],
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
       }
     }
@@ -122,7 +122,7 @@ export default {
       if (!selectedCategory) {
         await selectInteraction.reply({
           content: '❌ Catégorie introuvable.',
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
         return;
       }

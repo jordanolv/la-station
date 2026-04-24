@@ -6,6 +6,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ButtonInteraction,
+  MessageFlags,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { ConfigPanel, panelCustomId } from '../../config-panel/services/config-panel.registry';
@@ -91,7 +92,7 @@ export const arcadePanel: ConfigPanel = {
     const now = arcadeData[gameKey].enabled;
     await interaction.reply({
       content: `${game.emoji} **${game.label}** ${now ? 'activé' : 'désactivé'} !`,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     await ConfigPanelService.refreshPanel(client, PANEL_ID);
   },

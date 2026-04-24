@@ -174,7 +174,7 @@ export const peakHuntersPanel: ConfigPanel = {
 
     await interaction.reply({
       content: !config.enabled ? '✅ Montagnes activées !' : '❌ Montagnes désactivées.',
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     await ConfigPanelService.refreshPanel(client, PANEL_ID);
   },
@@ -190,7 +190,7 @@ export const peakHuntersPanel: ConfigPanel = {
       await PeakHuntersConfigRepository.setSpawnChannel(channelId);
       await interaction.reply({
         content: `✅ Salon de spawn : <#${channelId}>`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -198,7 +198,7 @@ export const peakHuntersPanel: ConfigPanel = {
       await PeakHuntersConfigRepository.setNotificationChannel(channelId);
       await interaction.reply({
         content: `✅ Salon de notification montagne : <#${channelId}>`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -206,7 +206,7 @@ export const peakHuntersPanel: ConfigPanel = {
       await PeakHuntersConfigRepository.setRaidChannel(channelId);
       await interaction.reply({
         content: `✅ Salon des raids : <#${channelId}>`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 

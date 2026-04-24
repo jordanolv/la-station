@@ -213,7 +213,7 @@ export class BingoService {
       startedAt: new Date(),
     });
 
-    LogService.info(`Bingo lancé dans <#${channel.id}> — cible : **${target}**`, {
+    LogService.info(`Bingo lancé dans <#${channel.id}>`, {
       feature: LOG_FEATURE,
       title: '🎯 Spawn',
     }).catch(() => {});

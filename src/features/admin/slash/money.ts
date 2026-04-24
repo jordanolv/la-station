@@ -69,7 +69,7 @@ export default {
     if (isNaN(amount) || amount === 0) {
       await interaction.reply({
         content: '❌ Montant invalide. Entrez un nombre entier non nul (ex: `500` ou `-200`).',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }

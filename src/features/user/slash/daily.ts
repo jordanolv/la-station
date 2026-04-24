@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import UserModel from '../models/user.model';
 import { LogService } from '../../../shared/logs/logs.service';
@@ -147,7 +147,7 @@ export default {
       } else {
         await interaction.reply({
           content: '❌ Une erreur est survenue lors de l\'exécution de la commande.',
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
       }
     }

@@ -116,7 +116,7 @@ export const levelingPanel: ConfigPanel = {
       const now = appConfig.features.leveling!.notifLevelUp;
       await interaction.reply({
         content: now ? '🔔 Notifications level-up activées.' : '🔕 Notifications level-up désactivées.',
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       await ConfigPanelService.refreshPanel(client, PANEL_ID);
     }

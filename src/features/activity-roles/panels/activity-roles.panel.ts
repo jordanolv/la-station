@@ -9,6 +9,7 @@ import {
   RoleSelectMenuBuilder,
   RoleSelectMenuInteraction,
   ButtonInteraction,
+  MessageFlags,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { ConfigPanel, panelCustomId } from '../../config-panel/services/config-panel.registry';
@@ -131,13 +132,13 @@ export const activityRolesPanel: ConfigPanel = {
     if (id === 'toggle') {
       const config = await ActivityRolesConfigRepository.getOrCreate();
       await ActivityRolesConfigRepository.update({ enabled: !config.enabled });
-      await interaction.reply({ content: !config.enabled ? '✅ Rôles d\'activité activés !' : '❌ Rôles d\'activité désactivés.', ephemeral: true });
+      await interaction.reply({ content: !config.enabled ? '✅ Rôles d\'activité activés !' : '❌ Rôles d\'activité désactivés.', flags: MessageFlags.Ephemeral });
       await ConfigPanelService.refreshPanel(client, PANEL_ID);
       return;
     }
 
     if (id === 'run_now') {
-      await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
       await ActivityRolesService.run(client);
       await interaction.editReply({ content: '✅ Rotation des rôles effectuée.' });
       return;
@@ -158,7 +159,7 @@ export const activityRolesPanel: ConfigPanel = {
     const field = fieldMap[id];
     if (field) {
       await ActivityRolesConfigRepository.update({ [field]: roleId });
-      await interaction.reply({ content: '✅ Rôle mis à jour.', ephemeral: true });
+      await interaction.reply({ content: '✅ Rôle mis à jour.', flags: MessageFlags.Ephemeral });
       await ConfigPanelService.refreshPanel(client, PANEL_ID);
     }
   },
