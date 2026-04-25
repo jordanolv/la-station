@@ -1,11 +1,13 @@
 import { AppConfigService } from '../../discord/services/app-config.service';
 import { IVoiceConfig, IJoinChannel } from '../models/voice-config.model';
+import { toParisDayYMD } from '../../../shared/time/day-split';
 
 const DEFAULT_VOICE_CONFIG: IVoiceConfig = {
   enabled: false,
   joinChannels: [],
   createdChannels: [],
-  channelCount: 0,
+  voiceStreak: 1,
+  voiceStreakDate: '',
   notificationChannelId: undefined,
 };
 
@@ -71,22 +73,34 @@ export class VoiceConfigRepository {
     return config.features.voice;
   }
 
+  static async getAndUpdateStreak(): Promise<number> {
+    const config = await AppConfigService.getOrCreateConfig();
+    const voice = config.features?.voice;
+    if (!voice) return 1;
+
+    const today = toParisDayYMD(new Date());
+    if (voice.voiceStreakDate !== today) {
+      const yesterday = toParisDayYMD(new Date(Date.now() - 86400000));
+      voice.voiceStreak = voice.voiceStreakDate === yesterday ? (voice.voiceStreak ?? 1) + 1 : 1;
+      voice.voiceStreakDate = today;
+      await config.save();
+    }
+
+    return voice.voiceStreak;
+  }
+
   static async addCreatedChannel(channelId: string): Promise<IVoiceConfig | null> {
     const config = await AppConfigService.getOrCreateConfig();
     if (!config.features?.voice) return null;
     config.features.voice.createdChannels.push(channelId);
-    config.features.voice.channelCount += 1;
     await config.save();
     return config.features.voice;
   }
 
-  static async removeCreatedChannel(channelId: string, decrementCount = false): Promise<IVoiceConfig | null> {
+  static async removeCreatedChannel(channelId: string): Promise<IVoiceConfig | null> {
     const config = await AppConfigService.getOrCreateConfig();
     if (!config.features?.voice) return null;
     config.features.voice.createdChannels = config.features.voice.createdChannels.filter(id => id !== channelId);
-    if (decrementCount && config.features.voice.channelCount > 0) {
-      config.features.voice.channelCount -= 1;
-    }
     await config.save();
     return config.features.voice;
   }

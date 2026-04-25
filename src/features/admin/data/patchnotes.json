@@ -298,5 +298,58 @@
         ]
       }
     ]
+  },
+  {
+    "version": "1.7.0",
+    "timestamp": 1777117471,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "⛰️ Montagne du jour — un objectif commun",
+            "items": [
+              "Chaque jour à minuit, une montagne est tirée au sort pour tout le serveur",
+              "Cumule **1h de vocal dans la journée** (peu importe le channel) pour la débloquer automatiquement",
+              "Si tu la possèdes déjà, tu reçois des fragments à la place",
+              "La montagne est annoncée dans le nom du channel vocal dès sa création"
+            ]
+          },
+          {
+            "title": "🎁 Drop de montagne dans `/daily`",
+            "items": [
+              "La récompense quotidienne inclut désormais une montagne aléatoire — tier tiré selon les mêmes probabilités que les expéditions",
+              "La photo de la montagne s'affiche directement dans l'embed"
+            ]
+          },
+          {
+            "title": "🔥 Streak du serveur dans le nom du vocal",
+            "items": [
+              "Le numéro dans le nom du channel vocal reflète maintenant le streak global du serveur — le nombre de jours consécutifs où quelqu'un a créé un vocal",
+              "Si personne ne crée de channel pendant une journée, le compteur repart à 1"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "⚙️ Peak Hunters — refonte du système vocal",
+            "items": [
+              "L'ancien système récompensait le temps passé dans un channel précis, ce qui encourageait le farm AFK et avantagait ceux qui restaient connectés toute la journée sans rien faire — on a voulu corriger ça",
+              "Les **fragments passent à 4 par heure de vocal** (au lieu d'une expédition automatique toutes les 3h) — tu accumules librement, sans logique de palier artificielle",
+              "Le récap de session n'est envoyé que si tu as été actif **au moins 5 minutes** — fini les notifications pour les micro-sessions"
+            ]
+          },
+          {
+            "title": "✍️ Récompense quotidienne `/daily`",
+            "items": [
+              "L'histoire générée par l'IA est maintenant plus courte — une seule phrase percutante au lieu de deux"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

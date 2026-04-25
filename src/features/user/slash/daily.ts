@@ -4,6 +4,7 @@ import UserModel from '../models/user.model';
 import { LogService } from '../../../shared/logs/logs.service';
 import { DailyStoryService } from '../services/daily-story.service';
 import { awardExpeditions } from '../../peak-hunters/services/expedition.service';
+import { dropMountain } from '../../peak-hunters/services/mountain.service';
 
 const MAX_MONEY = 100;
 const MAX_XP = 100;
@@ -104,12 +105,12 @@ export default {
       const fields = [
         {
           name: '💰 Argent',
-          value: `+${moneyReward} 💵\nTotal: **${user.profil.money}** 💵`,
+          value: `+${moneyReward} 💵`,
           inline: true
         },
         {
           name: '⭐ Expérience',
-          value: `+${xpReward} XP\nTotal: **${user.profil.exp}** XP`,
+          value: `+${xpReward} XP`,
           inline: true
         },
       ];
@@ -119,6 +120,18 @@ export default {
           name: '🗺️ Expéditions',
           value: `+${packsReward} expédition${packsReward > 1 ? 's' : ''} ${expeditionSummary}`,
           inline: true
+        });
+      }
+
+      const mountainDrop = await dropMountain(interaction.user.id);
+      if (mountainDrop) {
+        const { rarityEmoji, rarityLabel, mountainLabel, isDuplicate, fragmentsGained } = mountainDrop;
+        fields.push({
+          name: '⛰️ Montagne',
+          value: isDuplicate
+            ? `${rarityEmoji} **${mountainLabel}** — ${rarityLabel}\n🔁 Déjà possédée → +${fragmentsGained} fragment${fragmentsGained > 1 ? 's' : ''} 🧩`
+            : `${rarityEmoji} **${mountainLabel}** — ${rarityLabel}\n✅ Nouvelle montagne débloquée !`,
+          inline: false
         });
       }
 
@@ -132,6 +145,8 @@ export default {
           iconURL: interaction.user.displayAvatarURL()
         })
         .setTimestamp();
+
+      if (mountainDrop) embed.setImage(mountainDrop.image);
 
       await interaction.editReply({
         embeds: [embed]

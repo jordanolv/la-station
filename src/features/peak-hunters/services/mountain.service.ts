@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { MountainRarity, ExpeditionTier } from '../types/peak-hunters.types';
-import { RARITY_CONFIG, EXPEDITION_TIER_RARITY_WEIGHTS } from '../constants/peak-hunters.constants';
+import { RARITY_CONFIG, EXPEDITION_TIER_CHANCES, EXPEDITION_TIER_RARITY_WEIGHTS, rollExpeditionTier } from '../constants/peak-hunters.constants';
+import { UserMountainsRepository } from '../repositories/user-mountains.repository';
 
 export interface MountainInfo {
   id: string;
@@ -98,4 +99,30 @@ export class MountainService {
   static get count(): number {
     return this.mountains.length;
   }
+}
+
+export interface MountainDropResult {
+  mountainLabel: string;
+  rarityEmoji: string;
+  rarityLabel: string;
+  image: string;
+  isDuplicate: boolean;
+  fragmentsGained: number;
+}
+
+export async function dropMountain(userId: string): Promise<MountainDropResult | null> {
+  const tier = rollExpeditionTier(EXPEDITION_TIER_CHANCES);
+  const mountain = MountainService.getRandomByTier(tier);
+  if (!mountain) return null;
+
+  const rarity = MountainService.getRarity(mountain);
+  const { emoji, label, fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
+  const unlockResult = await UserMountainsRepository.unlock(userId, mountain.id, rarity);
+  const isDuplicate = unlockResult === null;
+
+  if (isDuplicate) {
+    await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
+  }
+
+  return { mountainLabel: mountain.mountainLabel, rarityEmoji: emoji, rarityLabel: label, image: mountain.image, isDuplicate, fragmentsGained: isDuplicate ? fragmentsOnDuplicate : 0 };
 }

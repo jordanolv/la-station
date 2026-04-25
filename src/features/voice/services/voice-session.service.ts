@@ -218,7 +218,7 @@ export class VoiceSessionService {
 
     const joinChannel = vocConfig.joinChannels.find(c => c.id === newState.channelId);
     if (joinChannel) {
-      await this.createUserChannel(client, newState, joinChannel, vocConfig.channelCount);
+      await this.createUserChannel(client, newState, joinChannel);
     }
   }
 
@@ -581,7 +581,6 @@ export class VoiceSessionService {
     _client: BotClient,
     newState: VoiceState,
     joinChannel: { id: string; category: string; nameTemplate: string },
-    channelCount: number,
   ): Promise<void> {
     const username = newState.member?.user.username ?? 'Utilisateur';
     const userId = newState.member!.user.id;
@@ -601,11 +600,13 @@ export class VoiceSessionService {
       } catch {}
     }
 
+    const streak = await VoiceConfigRepository.getAndUpdateStreak();
+
     let channelName = (joinChannel.nameTemplate ?? '{mountain} #{count}')
       .replace('{username}', username)
       .replace('{user}', username)
-      .replace('{count}', (channelCount + 1).toString())
-      .replace('{total}', (channelCount + 1).toString());
+      .replace('{count}', streak.toString())
+      .replace('{total}', streak.toString());
 
     for (const [key, value] of Object.entries(extraVars)) {
       channelName = channelName.replace(`{${key}}`, value);

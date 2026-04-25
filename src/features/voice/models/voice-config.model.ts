@@ -21,8 +21,11 @@ export class VoiceConfig {
   @prop({ type: () => [String], default: [] })
   createdChannels!: string[];
 
-  @prop({ default: 0 })
-  channelCount!: number;
+  @prop({ default: 1 })
+  voiceStreak!: number;
+
+  @prop({ default: '' })
+  voiceStreakDate!: string;
 
   @prop()
   notificationChannelId?: string;
