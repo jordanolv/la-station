@@ -138,31 +138,6 @@ export class StatsService {
     }
   }
 
-  // ─── Daily segment splitting (used by StatsPlugin) ────────────────────────
-
-  static splitIntoDailySegments(start: Date, end: Date, expectedTotalSeconds: number): VoiceHistorySegment[] {
-    const segments: VoiceHistorySegment[] = [];
-    let cursor = new Date(start);
-
-    while (cursor < end) {
-      const dayStart = this.normalizeDate(cursor);
-      const nextDay = new Date(dayStart);
-      nextDay.setDate(nextDay.getDate() + 1);
-
-      const segmentEnd = new Date(Math.min(nextDay.getTime(), end.getTime()));
-      const diffSeconds = Math.floor((segmentEnd.getTime() - cursor.getTime()) / 1000);
-
-      if (diffSeconds > 0) segments.push({ date: dayStart, seconds: diffSeconds });
-      cursor = segmentEnd;
-    }
-
-    const accumulated = segments.reduce((acc, s) => acc + s.seconds, 0);
-    const delta = expectedTotalSeconds - accumulated;
-    if (delta > 0 && segments.length > 0) segments[segments.length - 1].seconds += delta;
-
-    return segments;
-  }
-
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
   private static toParisDay(d: Date): string {

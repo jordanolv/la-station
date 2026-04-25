@@ -34,10 +34,6 @@ export class UserMountains {
   /** Fragments accumulés (convertis en expéditions tous les 20) */
   @prop({ default: 0 })
   fragments!: number;
-
-  /** Secondes de vocal accumulées pour la prochaine expédition (reset à chaque gain) */
-  @prop({ default: 0 })
-  vocSecondsAccumulated!: number;
 }
 
 const UserMountainsModel = getModelForClass(UserMountains, {

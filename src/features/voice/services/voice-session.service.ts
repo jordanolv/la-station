@@ -1,13 +1,16 @@
-import { ChannelType, TextChannel, VoiceChannel, VoiceState, ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, SectionBuilder, ThumbnailBuilder, MessageFlags } from 'discord.js';
+import { ChannelType, TextChannel, VoiceState, ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { LogService } from '../../../shared/logs/logs.service';
+import { BotEventBus } from '../../../shared/events/bot-event-bus';
+import { splitSessionByDay, toParisDayYMD, type DayChunk } from '../../../shared/time/day-split';
+import '../events/voice.events';
+import type { VoiceTickSession } from '../events/voice.events';
 import { VoiceConfigRepository } from '../repositories/voice-config.repository';
 import { VoiceSessionRepository } from '../repositories/voice-session.repository';
-import { VOICE_XP_PER_MINUTE, VOICE_MONEY_PER_MINUTE, VOICE_MIN_ACTIVE_SECONDS, VOICE_MIN_COUNT_SECONDS } from '../constants/voice.constants';
+import { VOICE_XP_PER_MINUTE, VOICE_MONEY_PER_MINUTE, VOICE_MIN_RECAP_SECONDS } from '../constants/voice.constants';
 import UserModel from '../../user/models/user.model';
 import { LevelingService } from '../../leveling/services/leveling.service';
-import type { PeakHuntersSessionResult } from '../../peak-hunters/services/peak-hunters.plugin';
 
 // ─── Plugin contract ────────────────────────────────────────────────────────
 
@@ -26,22 +29,17 @@ export interface VoiceSession {
   activePeriods: ActivePeriod[];
 }
 
+/**
+ * Seule méthode restante: onBeforeChannelCreate (sync, retourne le nom/prefix du channel).
+ * Tout le reste (session start/end, channel created/deleted, tick) passe par le BotEventBus.
+ */
 export interface VoicePlugin {
   init?(): Promise<void>;
-  onSessionStart?(userId: string, channelId: string, client: BotClient): void;
-  onSessionEnd?(session: VoiceSession, client: BotClient): Promise<Record<string, unknown> | void>;
   onBeforeChannelCreate?(userId: string): {
     templateVars?: Record<string, string>;
     metadata?: Record<string, unknown>;
     channelNamePrefix?: string;
   };
-  onChannelCreated?(
-    channel: VoiceChannel,
-    userId: string,
-    metadata: Record<string, unknown>,
-    client: BotClient,
-  ): Promise<void>;
-  onChannelDeleted?(channelId: string): void;
 }
 
 // ─── Internal session ───────────────────────────────────────────────────────
@@ -83,7 +81,7 @@ export class VoiceSessionService {
 
   // ─── Session lifecycle ────────────────────────────────────────────────────
 
-  private static async startSession(userId: string, channelId: string, channelName: string, active: boolean, client: BotClient): Promise<void> {
+  private static async startSession(userId: string, channelId: string, channelName: string, active: boolean, _client: BotClient): Promise<void> {
     const now = Date.now();
     const session: InternalSession = {
       startedAt: now,
@@ -105,9 +103,12 @@ export class VoiceSessionService {
     });
     console.log(`[VoiceSession] Session démarrée: user=${userId} channel=${channelId} active=${active}`);
 
-    for (const plugin of this.plugins) {
-      try { plugin.onSessionStart?.(userId, channelId, client); } catch {}
-    }
+    BotEventBus.emit('voice:session:started', {
+      userId,
+      channelId,
+      channelName,
+      startedAt: new Date(session.startedAt),
+    });
   }
 
   private static endSession(userId: string): (VoiceSession & { channelName: string }) | null {
@@ -243,17 +244,18 @@ export class VoiceSessionService {
         });
       }
 
-      const pluginResults: Record<string, unknown>[] = [];
-      for (const plugin of this.plugins) {
-        try {
-          const result = await plugin.onSessionEnd?.(session, client);
-          if (result) pluginResults.push(result);
-        } catch (err) {
-          console.error('[VoiceSession] Erreur plugin onSessionEnd:', err);
-        }
-      }
+      BotEventBus.emit('voice:session:ended', {
+        userId: session.userId,
+        channelId: session.channelId,
+        channelName: session.channelName,
+        startedAt: new Date(session.startedAt),
+        endedAt: new Date(session.endedAt),
+        totalSeconds: session.durationSeconds,
+        activeSeconds: session.activeSeconds,
+        byDay: this.buildByDay(session.activePeriods),
+      });
 
-      await this.processSessionRewards(client, session, pluginResults, isJoinChannel);
+      await this.processSessionRewards(client, session, isJoinChannel);
     }
 
     if (!vocConfig?.enabled || !vocConfig.createdChannels.includes(channelId)) return;
@@ -262,13 +264,9 @@ export class VoiceSessionService {
     if (channel && channel.members.size === 0) {
       try {
         await channel.delete();
-        for (const plugin of this.plugins) {
-          try { plugin.onChannelDeleted?.(channelId); } catch {}
-        }
-        const createdAt = this.channelCreatedAt.get(channelId);
+        BotEventBus.emit('voice:channel:deleted', { channelId });
         this.channelCreatedAt.delete(channelId);
-        const tooShort = createdAt !== undefined && (Date.now() - createdAt) / 1000 < VOICE_MIN_COUNT_SECONDS;
-        await VoiceConfigRepository.removeCreatedChannel(channelId, tooShort);
+        await VoiceConfigRepository.removeCreatedChannel(channelId);
         console.log(`[VoiceSession] Canal supprimé: ${channel.name}`);
       } catch (err) {
         console.error('[VoiceSession] Erreur suppression canal:', err);
@@ -316,61 +314,71 @@ export class VoiceSessionService {
     const guild = client.guilds.cache.get(getGuildId());
     if (!guild) return;
 
-    let count = 0;
-    for (const [, state] of guild.voiceStates.cache) {
-      if (!state.channelId || state.member?.user.bot) continue;
-      if (!this.isTrackableChannel(state)) continue;
+    const states = Array.from(guild.voiceStates.cache.values()).filter(state =>
+      state.channelId && !state.member?.user.bot && this.isTrackableChannel(state),
+    );
 
-      const userId = state.id;
-      const active = this.isActiveState(state);
-      const channelName = state.channel?.name ?? state.channelId;
+    const results = await Promise.all(
+      states.map(state => this.rehydrateOne(client, state).catch(err => {
+        console.error('[VoiceSession] Erreur réhydratation:', err);
+        return false;
+      })),
+    );
 
-      const persisted = await VoiceSessionRepository.getByUserId(userId);
-      const now = Date.now();
-      const guildId = getGuildId();
-
-      if (persisted) {
-        const startedAt = persisted.startedAt.getTime();
-        let totalActiveSeconds = persisted.totalActiveSeconds;
-        if (persisted.currentActiveStart) {
-          totalActiveSeconds += Math.floor((now - persisted.currentActiveStart.getTime()) / 1000);
-        }
-        const currentActiveStart = active ? now : null;
-        const session: InternalSession = {
-          startedAt,
-          channelId: state.channelId,
-          channelName,
-          activePeriods: [],
-          currentActiveStart,
-          totalActiveSeconds,
-        };
-        this.sessions.set(userId, session);
-        await VoiceSessionRepository.upsert({
-          userId,
-          guildId,
-          channelId: state.channelId,
-          channelName,
-          startedAt: new Date(startedAt),
-          totalActiveSeconds,
-          currentActiveStart: currentActiveStart ? new Date(currentActiveStart) : null,
-        });
-        console.log(
-          `[VoiceSession] Réhydratée: ${state.member?.user.tag || userId} ` +
-          `channel=${channelName} active=${active} (timer préservé)`,
-        );
-      } else {
-        await this.startSession(userId, state.channelId, channelName, active, client);
-        console.log(
-          `[VoiceSession] Réhydratée: ${state.member?.user.tag || userId} ` +
-          `channel=${channelName} active=${active}`,
-        );
-      }
-      count++;
-    }
-
+    const count = results.filter(Boolean).length;
     if (count > 0) {
       console.log(`[VoiceSession] ${count} session(s) réhydratée(s)`);
     }
+  }
+
+  private static async rehydrateOne(client: BotClient, state: VoiceState): Promise<boolean> {
+    if (!state.channelId) return false;
+
+    const userId = state.id;
+    const active = this.isActiveState(state);
+    const channelName = state.channel?.name ?? state.channelId;
+
+    const persisted = await VoiceSessionRepository.getByUserId(userId);
+    const now = Date.now();
+    const guildId = getGuildId();
+
+    if (persisted) {
+      const startedAt = persisted.startedAt.getTime();
+      let totalActiveSeconds = persisted.totalActiveSeconds;
+      if (persisted.currentActiveStart) {
+        totalActiveSeconds += Math.floor((now - persisted.currentActiveStart.getTime()) / 1000);
+      }
+      const currentActiveStart = active ? now : null;
+      const session: InternalSession = {
+        startedAt,
+        channelId: state.channelId,
+        channelName,
+        activePeriods: [],
+        currentActiveStart,
+        totalActiveSeconds,
+      };
+      this.sessions.set(userId, session);
+      await VoiceSessionRepository.upsert({
+        userId,
+        guildId,
+        channelId: state.channelId,
+        channelName,
+        startedAt: new Date(startedAt),
+        totalActiveSeconds,
+        currentActiveStart: currentActiveStart ? new Date(currentActiveStart) : null,
+      });
+      console.log(
+        `[VoiceSession] Réhydratée: ${state.member?.user.tag || userId} ` +
+        `channel=${channelName} active=${active} (timer préservé)`,
+      );
+    } else {
+      await this.startSession(userId, state.channelId, channelName, active, client);
+      console.log(
+        `[VoiceSession] Réhydratée: ${state.member?.user.tag || userId} ` +
+        `channel=${channelName} active=${active}`,
+      );
+    }
+    return true;
   }
 
   // ─── Session rewards & recap ──────────────────────────────────────────────
@@ -378,13 +386,11 @@ export class VoiceSessionService {
   private static async processSessionRewards(
     client: BotClient,
     session: VoiceSession & { channelName: string },
-    pluginResults: Record<string, unknown>[],
     skipRecapEmbed: boolean = false,
   ): Promise<void> {
-    const hasEnoughActive = session.activeSeconds >= VOICE_MIN_ACTIVE_SECONDS;
     const activeMinutes = Math.floor(session.activeSeconds / 60);
-    const xpGained = hasEnoughActive ? activeMinutes * VOICE_XP_PER_MINUTE : 0;
-    const moneyGained = hasEnoughActive ? activeMinutes * VOICE_MONEY_PER_MINUTE : 0;
+    const xpGained = activeMinutes * VOICE_XP_PER_MINUTE;
+    const moneyGained = activeMinutes * VOICE_MONEY_PER_MINUTE;
 
     let leveledUp = false;
     let newLevel = 0;
@@ -410,17 +416,25 @@ export class VoiceSessionService {
       }
     }
 
-    const mountainResult = pluginResults.find(r => r.mountain)?.mountain as PeakHuntersSessionResult | undefined;
-
-    if (!skipRecapEmbed) {
+    if (!skipRecapEmbed && session.activeSeconds >= VOICE_MIN_RECAP_SECONDS) {
       await this.sendSessionRecap(client, session, {
         xpGained,
         moneyGained,
         leveledUp,
         newLevel,
-        mountain: mountainResult,
       });
     }
+  }
+
+  private static buildByDay(periods: ActivePeriod[]): DayChunk[] {
+    const totals = new Map<string, number>();
+    for (const period of periods) {
+      const chunks = splitSessionByDay(new Date(period.startedAt), new Date(period.endedAt));
+      for (const chunk of chunks) {
+        totals.set(chunk.dateYMD, (totals.get(chunk.dateYMD) ?? 0) + chunk.seconds);
+      }
+    }
+    return Array.from(totals.entries()).map(([dateYMD, seconds]) => ({ dateYMD, seconds }));
   }
 
   private static async sendSessionRecap(
@@ -431,16 +445,20 @@ export class VoiceSessionService {
       moneyGained: number;
       leveledUp: boolean;
       newLevel: number;
-      mountain?: PeakHuntersSessionResult;
     },
   ): Promise<void> {
+
+
     const vocConfig = await VoiceConfigRepository.get();
+    console.log(`[VoiceSession] sendSessionRecap — notificationChannelId=${vocConfig?.notificationChannelId}`);
     if (!vocConfig?.notificationChannelId) return;
 
     const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
+    console.log(`[VoiceSession] sendSessionRecap — guild=${guild?.id}`);
     if (!guild) return;
 
     const channel = await guild.channels.fetch(vocConfig.notificationChannelId).catch(() => null);
+    console.log(`[VoiceSession] sendSessionRecap — channel=${channel?.id} isTextBased=${channel?.isTextBased()}`);
     if (!channel?.isTextBased()) return;
 
     const member = await guild.members.fetch(session.userId).catch(() => null);
@@ -451,17 +469,11 @@ export class VoiceSessionService {
     const duration = this.formatDuration(session.durationSeconds);
     const activeDuration = this.formatDuration(session.activeSeconds);
 
-    const accentColor = rewards.mountain?.color ?? 0x5865f2;
-
     let rewardLines = `+**${rewards.xpGained}** XP ✨  ·  +**${rewards.moneyGained}** <:ridgecoin:1424543836029325492>`;
     if (rewards.leveledUp) rewardLines += `\n🎉 **Level up !** Niveau **${rewards.newLevel}**`;
-    const vocExpeditions = rewards.mountain?.expeditionsGained ?? 0;
-    if (vocExpeditions > 0 && (rewards.mountain?.isNew || !rewards.mountain?.unlocked)) {
-      rewardLines += `\n+**${vocExpeditions}** 🗺️ expédition${vocExpeditions > 1 ? 's' : ''}${rewards.mountain?.tierSummary ? ` ${rewards.mountain.tierSummary}` : ''}`;
-    }
 
     const container = new ContainerBuilder()
-      .setAccentColor(accentColor)
+      .setAccentColor(0x5865f2)
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
           `### 🔇 ${displayName} a quitté **${session.channelName}**`,
@@ -478,45 +490,6 @@ export class VoiceSessionService {
         new TextDisplayBuilder().setContent(rewardLines),
       );
 
-    if (rewards.mountain?.unlocked) {
-      const m = rewards.mountain;
-      const displayName = m.mountain.mountainLabel;
-
-      container.addSeparatorComponents(new SeparatorBuilder().setDivider(true));
-
-      if (m.isNew) {
-        let mountainText = [
-          `### ${m.emoji} ${displayName}`,
-          `${MountainService.getCountryDisplay(m.mountain)}  ·  📏 ${MountainService.getAltitude(m.mountain)}  ·  ${m.emoji} ${m.label}`,
-          `✅ **Nouvelle montagne débloquée !**  ·  📊 \`${m.totalUnlocked}/${MountainService.count}\``,
-        ].join('\n');
-
-        container.addSectionComponents(
-          new SectionBuilder()
-            .addTextDisplayComponents(new TextDisplayBuilder().setContent(mountainText))
-            .setThumbnailAccessory(new ThumbnailBuilder().setURL(m.mountain.image)),
-        );
-      } else {
-        let dupeText = [
-          `### 🔁 ${displayName} — déjà possédée`,
-          `${MountainService.getCountryDisplay(m.mountain)}  ·  📏 ${MountainService.getAltitude(m.mountain)}  ·  ${m.emoji} ${m.label}`,
-          `+**${m.fragmentsGained}** fragment${(m.fragmentsGained ?? 0) > 1 ? 's' : ''} 🧩 (\`${m.totalFragments}/20\`)`,
-        ].join('\n');
-        if ((m.expeditionsGained ?? 0) > 0) {
-          dupeText += `\n+**${m.expeditionsGained}** 🗺️ expédition${(m.expeditionsGained ?? 0) > 1 ? 's' : ''}${m.tierSummary ? ` ${m.tierSummary}` : ''}`;
-        }
-
-        container.addSectionComponents(
-          new SectionBuilder()
-            .addTextDisplayComponents(new TextDisplayBuilder().setContent(dupeText))
-            .setThumbnailAccessory(new ThumbnailBuilder().setURL(m.mountain.image)),
-        );
-      }
-    }
-
-    const hasRewards = rewards.xpGained > 0 || rewards.moneyGained > 0 || rewards.mountain != null;
-    if (!hasRewards) return;
-
     try {
       await (channel as TextChannel).send({
         components: [container],
@@ -525,6 +498,72 @@ export class VoiceSessionService {
     } catch (err) {
       console.error('[VoiceSession] Erreur envoi recap:', err);
     }
+  }
+
+  // ─── Read-only API ────────────────────────────────────────────────────────
+
+  static getActiveSessionsSnapshot(): VoiceTickSession[] {
+    const now = new Date();
+    const nowMs = now.getTime();
+    const todayYMD = toParisDayYMD(now);
+    const startedAtYMD = (ts: number) => toParisDayYMD(new Date(ts));
+    const snapshot: VoiceTickSession[] = [];
+
+    for (const [userId, s] of this.sessions) {
+      const periodsSeconds = s.activePeriods.reduce(
+        (acc, p) => acc + Math.floor((p.endedAt - p.startedAt) / 1000),
+        0,
+      );
+      const currentPeriodSeconds = s.currentActiveStart !== null
+        ? Math.floor((nowMs - s.currentActiveStart) / 1000)
+        : 0;
+      const activeSecondsSoFar = (s.totalActiveSeconds ?? 0) + periodsSeconds + currentPeriodSeconds;
+
+      let activeSecondsTodayParis = 0;
+      if (startedAtYMD(s.startedAt) === todayYMD) {
+        activeSecondsTodayParis += s.totalActiveSeconds ?? 0;
+      }
+      for (const p of s.activePeriods) {
+        for (const chunk of splitSessionByDay(new Date(p.startedAt), new Date(p.endedAt))) {
+          if (chunk.dateYMD === todayYMD) activeSecondsTodayParis += chunk.seconds;
+        }
+      }
+      if (s.currentActiveStart !== null) {
+        for (const chunk of splitSessionByDay(new Date(s.currentActiveStart), now)) {
+          if (chunk.dateYMD === todayYMD) activeSecondsTodayParis += chunk.seconds;
+        }
+      }
+
+      snapshot.push({
+        userId,
+        channelId: s.channelId,
+        sessionStartedAt: new Date(s.startedAt),
+        activeSecondsSoFar,
+        activeSecondsTodayParis,
+      });
+    }
+    return snapshot;
+  }
+
+  // ─── Tick loop ────────────────────────────────────────────────────────────
+
+  private static tickIntervalHandle: NodeJS.Timeout | null = null;
+  private static readonly TICK_INTERVAL_MS = 60_000;
+
+  static startTickLoop(): void {
+    if (this.tickIntervalHandle !== null) return;
+    this.tickIntervalHandle = setInterval(() => {
+      BotEventBus.emit('voice:tick', {
+        tickAt: new Date(),
+        sessions: this.getActiveSessionsSnapshot(),
+      });
+    }, this.TICK_INTERVAL_MS);
+  }
+
+  static stopTickLoop(): void {
+    if (this.tickIntervalHandle === null) return;
+    clearInterval(this.tickIntervalHandle);
+    this.tickIntervalHandle = null;
   }
 
   // ─── Private helpers ──────────────────────────────────────────────────────
@@ -539,7 +578,7 @@ export class VoiceSessionService {
   }
 
   private static async createUserChannel(
-    client: BotClient,
+    _client: BotClient,
     newState: VoiceState,
     joinChannel: { id: string; category: string; nameTemplate: string },
     channelCount: number,
@@ -596,13 +635,11 @@ export class VoiceSessionService {
       await VoiceConfigRepository.addCreatedChannel(newChannel.id);
       this.channelCreatedAt.set(newChannel.id, Date.now());
 
-      for (const plugin of this.plugins) {
-        try {
-          await plugin.onChannelCreated?.(newChannel, userId, metadata, client);
-        } catch (err) {
-          console.error('[VoiceSession] Erreur plugin onChannelCreated:', err);
-        }
-      }
+      BotEventBus.emit('voice:channel:created', {
+        channel: newChannel,
+        userId,
+        metadata,
+      });
 
       console.log(`[VoiceSession] Canal créé: ${newChannel.name} pour ${username}`);
     } catch (err) {
@@ -611,5 +648,3 @@ export class VoiceSessionService {
   }
 }
 
-// Avoid circular import — resolved at runtime
-import { MountainService } from '../../peak-hunters/services/mountain.service';

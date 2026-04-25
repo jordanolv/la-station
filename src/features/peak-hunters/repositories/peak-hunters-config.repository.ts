@@ -91,4 +91,18 @@ export class PeakHuntersConfigRepository {
     const obj = (doc?.activeChannelMountains ?? {}) as Record<string, string>;
     return new Map(Object.entries(obj));
   }
+
+  static async getDailyMountain(): Promise<{ date: string; mountainId: string } | null> {
+    const doc = await this.get();
+    if (!doc?.dailyMountain) return null;
+    return { date: doc.dailyMountain.date, mountainId: doc.dailyMountain.mountainId };
+  }
+
+  static async setDailyMountain(date: string, mountainId: string): Promise<void> {
+    await MountainConfigModel.updateOne(
+      {},
+      { $set: { dailyMountain: { date, mountainId } } },
+      { upsert: true },
+    );
+  }
 }

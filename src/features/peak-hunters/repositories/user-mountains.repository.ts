@@ -1,6 +1,6 @@
 import UserMountainsModel, { IUserMountainsDoc } from '../models/user-mountains.model';
 import type { MountainRarity, ExpeditionTier } from '../types/peak-hunters.types';
-import { FRAGMENTS_PER_EXPEDITION, EXPEDITION_INTERVAL_SECONDS } from '../constants/peak-hunters.constants';
+import { FRAGMENTS_PER_EXPEDITION } from '../constants/peak-hunters.constants';
 
 export interface UnlockedMountainEntry {
   mountainId: string;
@@ -16,7 +16,7 @@ export class UserMountainsRepository {
   static async getOrCreate(userId: string): Promise<IUserMountainsDoc> {
     let doc = await this.getByUserId(userId);
     if (!doc) {
-      doc = new UserMountainsModel({ userId, unlockedMountains: [], sentierTickets: 0, falaiseTickets: 0, sommetTickets: 0, fragments: 0, vocSecondsAccumulated: 0 });
+      doc = new UserMountainsModel({ userId, unlockedMountains: [], sentierTickets: 0, falaiseTickets: 0, sommetTickets: 0, fragments: 0 });
       await doc.save();
     }
     doc.falaiseTickets ??= 0;
@@ -122,26 +122,6 @@ export class UserMountainsRepository {
     }
     await doc.save();
     return true;
-  }
-
-  /**
-   * Ajoute du temps vocal et retourne le nombre d'expéditions à créditer via `awardExpeditions`
-   * (roll de tier côté appelant). Ne modifie pas les tickets.
-   */
-  static async addVocSeconds(userId: string, seconds: number): Promise<{ expeditionsToAward: number }> {
-    const doc = await this.getOrCreate(userId);
-
-    doc.vocSecondsAccumulated += seconds;
-    const expeditionsToAward = Math.floor(doc.vocSecondsAccumulated / EXPEDITION_INTERVAL_SECONDS);
-
-    if (expeditionsToAward > 0) {
-      doc.vocSecondsAccumulated = doc.vocSecondsAccumulated % EXPEDITION_INTERVAL_SECONDS;
-    }
-
-    doc.markModified('vocSecondsAccumulated');
-    await doc.save();
-
-    return { expeditionsToAward };
   }
 
   /** Transfère une montagne d'un user à un autre (pour les échanges). */

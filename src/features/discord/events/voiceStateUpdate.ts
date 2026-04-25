@@ -20,7 +20,9 @@ export default {
       if (isJoining) {
         await VoiceService.handleJoin(client, oldState, newState);
         if (newState.member) {
-          await UserService.updateDailyStreak(newState.member.user.id);
+          UserService.updateDailyStreak(newState.member.user.id).catch(err =>
+            console.error('[voiceStateUpdate] updateDailyStreak failed:', err),
+          );
         }
       } else if (isLeaving) {
         await VoiceService.handleLeave(client, oldState, newState);

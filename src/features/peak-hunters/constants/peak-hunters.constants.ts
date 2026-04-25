@@ -1,9 +1,8 @@
 import type { MountainRarity, RarityConfig, RaidRarityConfig, ExpeditionTier, ExpeditionTierConfig } from '../types/peak-hunters.types';
 
-export const MOUNTAIN_REQUIRED_SECONDS = 2700; // 45 minutes en voc pour débloquer
-export const EXPEDITION_INTERVAL_SECONDS = 5400;  // 3h de voc pour gagner une expédition
-export const MOUNTAIN_LOCK_MIN_SECONDS = 180;  // 3 minutes min pour activer le lock de montagne
 export const FRAGMENTS_PER_EXPEDITION = 20;
+export const MOUNTAIN_UNLOCK_SECONDS = 3600;
+export const FRAGMENTS_PER_HOUR = 4;
 
 export const SPAWN_MAX_PER_DAY = 2;
 export const SPAWN_HOUR_START = 7;

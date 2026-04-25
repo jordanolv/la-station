@@ -13,15 +13,8 @@ import { BotClient } from '../../../bot/client';
 import { IVoiceConfig, IJoinChannel } from '../models/voice-config.model';
 import { VoiceConfigRepository } from '../repositories/voice-config.repository';
 import { VoiceSessionService } from './voice-session.service';
-import { PeakHuntersPlugin } from '../../peak-hunters/services/peak-hunters.plugin';
-import { StatsPlugin } from '../../stats/services/stats.plugin';
-import { RaidPlugin } from '../../peak-hunters/services/raid.plugin';
 
 export { VOC_CONFIG_BUTTON_ID, VOC_INVITE_USER_SELECT_ID } from '../constants/voice.constants';
-
-VoiceSessionService.registerPlugin(new PeakHuntersPlugin());
-VoiceSessionService.registerPlugin(new StatsPlugin());
-VoiceSessionService.registerPlugin(new RaidPlugin());
 
 export class VoiceService {
   // ─── Config ────────────────────────────────────────────────────────────────

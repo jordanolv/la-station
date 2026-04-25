@@ -18,6 +18,10 @@ import { suggestionPanel } from '../../suggestion/panels/suggestion.panel';
 import { SpawnService } from '../../peak-hunters/services/spawn.service';
 import { QuizService } from '../../quiz/services/quiz.service';
 import { BingoService } from '../../arcade/bingo/services/bingo.service';
+import { VoiceSessionService } from '../../voice/services/voice-session.service';
+import { registerPeakHuntersVoiceListeners } from '../../peak-hunters/services/peak-hunters.register';
+import { registerStatsVoiceListeners } from '../../stats/services/stats.voice-listener';
+import { registerRaidListeners } from '../../peak-hunters/services/raid.voice-listener';
 
 panelRegistry.register(generalPanel);
 panelRegistry.register(logsPanel);
@@ -52,6 +56,12 @@ export default {
 
     setStatus();
     setInterval(setStatus, 8000);
+
+    registerStatsVoiceListeners(client);
+    registerRaidListeners();
+    registerPeakHuntersVoiceListeners(client);
+    VoiceSessionService.startTickLoop();
+
     await VoiceService.rehydrate(client);
     await SpawnService.rehydrate(client);
     await QuizService.rehydrate(client);

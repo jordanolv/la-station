@@ -3,5 +3,4 @@ export const VOC_INVITE_USER_SELECT_ID = 'voc-invite-user-select';
 
 export const VOICE_XP_PER_MINUTE = 1.5;
 export const VOICE_MONEY_PER_MINUTE = 2.5;
-export const VOICE_MIN_ACTIVE_SECONDS = 60;
-export const VOICE_MIN_COUNT_SECONDS = 180;
+export const VOICE_MIN_RECAP_SECONDS = 300;

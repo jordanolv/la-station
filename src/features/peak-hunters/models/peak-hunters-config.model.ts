@@ -1,5 +1,13 @@
 import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
 
+export class DailyMountainRef {
+  @prop({ required: true })
+  date!: string;
+
+  @prop({ required: true })
+  mountainId!: string;
+}
+
 export class PeakHuntersConfig {
   @prop({ default: false })
   enabled!: boolean;
@@ -24,6 +32,9 @@ export class PeakHuntersConfig {
 
   @prop()
   activeSpawnMessageId?: string;
+
+  @prop({ _id: false, type: () => DailyMountainRef })
+  dailyMountain?: DailyMountainRef;
 }
 
 const MountainConfigModel = getModelForClass(PeakHuntersConfig, {
