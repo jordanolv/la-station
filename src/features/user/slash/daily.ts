@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, MessageFlags } from 'discord.js';
+import { isSilentDiscordError } from '../../../shared/utils/discord-errors';
 import { BotClient } from '../../../bot/client';
 import UserModel from '../models/user.model';
 import { LogService } from '../../../shared/logs/logs.service';
@@ -153,17 +154,18 @@ export default {
       });
 
     } catch (error) {
+      if (isSilentDiscordError(error)) return;
       console.error('Erreur dans la commande /daily:', error);
 
       if (interaction.replied || interaction.deferred) {
         await interaction.editReply({
           content: '❌ Une erreur est survenue lors de l\'exécution de la commande.'
-        });
+        }).catch(() => {});
       } else {
         await interaction.reply({
           content: '❌ Une erreur est survenue lors de l\'exécution de la commande.',
           flags: MessageFlags.Ephemeral
-        });
+        }).catch(() => {});
       }
     }
   }

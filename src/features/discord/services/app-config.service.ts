@@ -1,6 +1,7 @@
 import AppConfigModel, { IAppConfig } from '../models/app-config.model';
 
 export class AppConfigService {
+  private static commandChannelsCache: { [key: string]: string } | null = null;
   static async getConfig(): Promise<IAppConfig | null> {
     return AppConfigModel.findOne();
   }
@@ -27,6 +28,7 @@ export class AppConfigService {
       { $set: { [`config.commandChannels.${commandName}`]: channelId } },
       { upsert: true }
     );
+    this.commandChannelsCache = null;
   }
 
   static async removeCommandChannel(commandName: string): Promise<void> {
@@ -34,10 +36,13 @@ export class AppConfigService {
       {},
       { $unset: { [`config.commandChannels.${commandName}`]: '' } }
     );
+    this.commandChannelsCache = null;
   }
 
   static async getCommandChannels(): Promise<{ [key: string]: string }> {
+    if (this.commandChannelsCache !== null) return this.commandChannelsCache;
     const config = await this.getConfig();
-    return config?.config?.commandChannels ?? {};
+    this.commandChannelsCache = config?.config?.commandChannels ?? {};
+    return this.commandChannelsCache;
   }
 }
