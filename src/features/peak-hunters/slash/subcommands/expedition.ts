@@ -385,8 +385,9 @@ export async function handleExpeditionButton(interaction: ButtonInteraction, _cl
 }
 
 export async function executeExpedition(interaction: ChatInputCommandInteraction | ButtonInteraction, _client: BotClient): Promise<void> {
+  await interaction.deferReply();
   const userId = interaction.user.id;
   const doc = await UserMountainsRepository.getOrCreate(userId);
   const container = buildExpeditionContainer(interaction.user, doc.sentierTickets, doc.falaiseTickets, doc.sommetTickets, doc.fragments);
-  await interaction.reply({ components: [container], flags: MessageFlags.IsComponentsV2 });
+  await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
 }
