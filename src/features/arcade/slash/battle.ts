@@ -45,39 +45,30 @@ export default {
     ),
 
   async execute(interaction: ChatInputCommandInteraction) {
+    await interaction.deferReply();
+
     const opponent = interaction.options.getUser('adversaire', true);
     const challenger = interaction.user;
     const bet = interaction.options.getInteger('mise') || 0;
 
-    // Validations mutualisées
-    if (!await ArcadeValidationService.validatePvPGame(interaction, challenger, opponent, bet, 'battle')) {
+    const error = await ArcadeValidationService.validatePvPGame(challenger, opponent, bet, 'battle');
+    if (error) {
+      await interaction.editReply({ content: error });
       return;
     }
 
-    // Demander confirmation
     const accepted = await ChallengeService.requestChallenge(interaction, {
       challenger,
       opponent,
       gameName: 'Battle',
       gameEmoji: '⚔️',
-      bet
+      bet,
     });
-
     if (!accepted) return;
 
-    // Démarrer la partie
     const gameId = `${challenger.id}-${opponent.id}-${Date.now()}`;
-    const game: BattleGame = {
-      player1: challenger,
-      player2: opponent,
-      ropePosition: 0, // Commence au milieu
-      bet,
-      currentRound: 1
-    };
-
+    const game: BattleGame = { player1: challenger, player2: opponent, ropePosition: 0, bet, currentRound: 1 };
     pendingGames.set(gameId, game);
-
-    // Lancer le premier défi
     await this.startChallenge(game, interaction, gameId);
   },
 

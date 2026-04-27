@@ -107,6 +107,8 @@ export class SpawnService {
       return;
     }
 
+    await interaction.deferUpdate();
+
     const alreadyOwned = await UserMountainsRepository.isUnlocked(userId, mountainId);
     if (alreadyOwned) {
       const rarity = MountainService.getRarity(mountain);
@@ -117,17 +119,16 @@ export class SpawnService {
         const { summary } = await awardExpeditions(userId, expeditionsToAward);
         expeditionLine = `\n→ +${expeditionsToAward} 🗺️ expédition${expeditionsToAward > 1 ? 's' : ''} ${summary}`;
       }
-      await interaction.reply({
+      await interaction.followUp({
         content: `Tu possèdes déjà **${mountain.mountainLabel}** ${emoji} ${label} !\n→ +${fragmentsOnDuplicate} fragment${fragmentsOnDuplicate > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)${expeditionLine}`,
         flags: MessageFlags.Ephemeral,
       }).catch(() => {});
       return;
     }
 
-    // Claim atomique en BDD — seul le premier à trouver activeSpawnMessageId réussit
     const claimed = await PeakHuntersConfigRepository.claimSpawn(messageId);
     if (!claimed) {
-      await interaction.reply({ content: '❌ Cette montagne a déjà été revendiquée !', flags: MessageFlags.Ephemeral }).catch(() => {});
+      await interaction.followUp({ content: '❌ Cette montagne a déjà été revendiquée !', flags: MessageFlags.Ephemeral }).catch(() => {});
       return;
     }
 
@@ -162,7 +163,7 @@ export class SpawnService {
 
     PeakHuntersConfigRepository.setLastSpawnWinner(userId).catch(() => {});
 
-    await interaction.update({ embeds: [updatedEmbed], components: [disabledRow] }).catch(() => {});
+    await interaction.editReply({ embeds: [updatedEmbed], components: [disabledRow] }).catch(() => {});
 
     await LogService.success(`<@${userId}> a revendiqué **${mountain.mountainLabel}** ${emoji} ${label}`,
       { feature: LOG_FEATURE, title: '🏔️ Spawn revendiqué' },

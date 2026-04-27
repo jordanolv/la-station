@@ -6,6 +6,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
+  MessageFlags,
   User
 } from 'discord.js';
 import { ChallengeService } from '../services/challenge.service';
@@ -48,33 +49,29 @@ export default {
     const opponent = interaction.options.getUser('adversaire');
     const bet = interaction.options.getInteger('mise') ?? 0;
 
-    // Mode PvP
-    if (opponent) {
-      // Validations mutualisées
-      if (!await ArcadeValidationService.validatePvPGame(interaction, interaction.user, opponent, bet, 'morpion')) {
-        return;
-      }
-
-      // Demander confirmation
-      const accepted = await ChallengeService.requestChallenge(interaction, {
-        challenger: interaction.user,
-        opponent,
-        gameName: 'Morpion',
-        gameEmoji: '❌',
-        bet
-      });
-
-      if (!accepted) return;
-
-      // Démarrer la partie
-      await this.startPvPGame(interaction, interaction.user, opponent, bet);
-    } else {
-      // Mode solo contre bot (non implémenté pour l'instant)
-      return interaction.reply({
-        content: '❌ Le mode solo n\'est pas encore disponible. Utilisez `/morpion adversaire:@user` pour jouer contre un joueur.',
-        flags: ['Ephemeral']
-      });
+    if (!opponent) {
+      await interaction.reply({ content: '❌ Le mode solo n\'est pas encore disponible. Utilisez `/morpion adversaire:@user` pour jouer contre un joueur.', flags: MessageFlags.Ephemeral });
+      return;
     }
+
+    await interaction.deferReply();
+
+    const error = await ArcadeValidationService.validatePvPGame(interaction.user, opponent, bet, 'morpion');
+    if (error) {
+      await interaction.editReply({ content: error });
+      return;
+    }
+
+    const accepted = await ChallengeService.requestChallenge(interaction, {
+      challenger: interaction.user,
+      opponent,
+      gameName: 'Morpion',
+      gameEmoji: '❌',
+      bet,
+    });
+    if (!accepted) return;
+
+    await this.startPvPGame(interaction, interaction.user, opponent, bet);
   },
 
   async startPvPGame(interaction: ChatInputCommandInteraction, player1: User, player2: User, bet: number) {

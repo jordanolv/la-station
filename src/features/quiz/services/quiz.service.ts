@@ -138,6 +138,8 @@ export class QuizService {
   }
 
   static async handleAnswer(client: BotClient, interaction: ButtonInteraction): Promise<void> {
+    await interaction.deferReply({ ephemeral: true });
+
     const parts = interaction.customId.split(':');
     const questionId = parts[2];
     const choiceIndex = parseInt(parts[3], 10);
@@ -146,12 +148,12 @@ export class QuizService {
     const question = config.activeQuestion;
 
     if (!question || question.id !== questionId) {
-      await interaction.reply({ content: 'Cette question est déjà terminée.', flags: 64 });
+      await interaction.editReply({ content: 'Cette question est déjà terminée.' });
       return;
     }
 
     if (config.activeAnswers?.[interaction.user.id] !== undefined) {
-      await interaction.reply({ content: 'Tu as déjà répondu à cette question.', flags: 64 });
+      await interaction.editReply({ content: 'Tu as déjà répondu à cette question.' });
       return;
     }
 
@@ -164,14 +166,13 @@ export class QuizService {
       const packs = isFirst ? 2 : 1;
       const { summary } = await awardExpeditions(interaction.user.id, packs);
       await LogService.info(`<@${interaction.user.id}> a remporté **${packs} expédition${packs > 1 ? 's' : ''}** ${summary}${isFirst ? ' (premier à répondre)' : ''}`, { feature: 'Quiz', title: '🗺️ Expéditions gagnées' });
-      await interaction.reply({
+      await interaction.editReply({
         content: isFirst
           ? `✅ Bonne réponse ! Premier à répondre — tu remportes **2 expéditions** ${summary}`
           : `✅ Bonne réponse ! Tu remportes **1 expédition** ${summary}`,
-        flags: 64,
       });
     } else {
-      await interaction.reply({ content: `❌ Mauvaise réponse.`, flags: 64 });
+      await interaction.editReply({ content: '❌ Mauvaise réponse.' });
     }
 
     const channel = await this.getChannel(client);

@@ -157,8 +157,9 @@ export async function executeHome(
   interaction: ChatInputCommandInteraction,
   _client: BotClient,
 ): Promise<void> {
+  await interaction.deferReply();
   const container = await buildHomeContainer(interaction.user);
-  await interaction.reply({
+  await interaction.editReply({
     components: [container],
     flags: MessageFlags.IsComponentsV2,
   });

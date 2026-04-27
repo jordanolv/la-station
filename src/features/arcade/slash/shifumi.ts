@@ -62,7 +62,9 @@ export default {
       const bet = interaction.options.getInteger('mise') || 0;
       const targetScore = interaction.options.getInteger('points') || 3;
 
-      if (!await ArcadeValidationService.validatePvPGame(interaction, challenger, opponent, bet, 'shifumi')) {
+      const validationError = await ArcadeValidationService.validatePvPGame(challenger, opponent, bet, 'shifumi');
+      if (validationError) {
+        await interaction.editReply({ content: validationError });
         return;
       }
 

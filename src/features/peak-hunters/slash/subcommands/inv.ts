@@ -153,8 +153,10 @@ export async function handleInventaireButton(
     const ownerId = parts[3];
     const page = parseInt(parts[4], 10);
 
+    await interaction.deferUpdate();
+
     if (interaction.user.id !== ownerId) {
-      await interaction.reply({ content: '❌ Ce n\'est pas ton inventaire.', flags: MessageFlags.Ephemeral });
+      await interaction.followUp({ content: '❌ Ce n\'est pas ton inventaire.', flags: MessageFlags.Ephemeral });
       return;
     }
 
@@ -162,12 +164,12 @@ export async function handleInventaireButton(
     const unlocked = await UserMountainsRepository.getUnlocked(ownerId);
     const containers = buildInventoryContainer(interaction.user, unlocked, doc.sentierTickets, doc.fragments, page, doc.falaiseTickets, doc.sommetTickets);
 
-    await interaction.update({ components: containers });
-    return;
+    await interaction.editReply({ components: containers });
   }
 }
 
-export async function executeInv(interaction: ChatInputCommandInteraction | ButtonInteraction, _client: BotClient): Promise<void> {
+export async function executeInv(interaction: ChatInputCommandInteraction, _client: BotClient): Promise<void> {
+  await interaction.deferReply();
   const { user } = interaction;
   const [doc, unlocked] = await Promise.all([
     UserMountainsRepository.getOrCreate(user.id),
@@ -176,7 +178,7 @@ export async function executeInv(interaction: ChatInputCommandInteraction | Butt
 
   const containers = buildInventoryContainer(user, unlocked, doc.sentierTickets, doc.fragments, 0, doc.falaiseTickets, doc.sommetTickets);
 
-  await interaction.reply({
+  await interaction.editReply({
     components: containers,
     flags: MessageFlags.IsComponentsV2,
   });

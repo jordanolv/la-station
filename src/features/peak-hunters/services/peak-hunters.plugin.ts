@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, EmbedBuilder, MessageFlags, TextChannel, VoiceChannel } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, EmbedBuilder, TextChannel, VoiceChannel } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { BotEventBus } from '../../../shared/events/bot-event-bus';
@@ -225,10 +225,12 @@ export class PeakHuntersPlugin implements VoicePlugin {
   }
 
   static async handleVoiceCheck(interaction: ButtonInteraction): Promise<void> {
+    await interaction.deferReply({ ephemeral: true });
+
     const mountainId = interaction.customId.split(':')[3];
     const mountain = MountainService.getById(mountainId);
     if (!mountain) {
-      await interaction.reply({ content: '❌ Montagne introuvable.', flags: MessageFlags.Ephemeral });
+      await interaction.editReply({ content: '❌ Montagne introuvable.' });
       return;
     }
 
@@ -236,17 +238,11 @@ export class PeakHuntersPlugin implements VoicePlugin {
     const rarity = MountainService.getRarity(mountain);
     const { emoji, label } = RARITY_CONFIG[rarity];
 
-    if (owned) {
-      await interaction.reply({
-        content: `✅ Tu possèdes déjà **${mountain.mountainLabel}** ${emoji} ${label} !`,
-        flags: MessageFlags.Ephemeral,
-      });
-    } else {
-      await interaction.reply({
-        content: `❌ Tu ne possèdes pas encore **${mountain.mountainLabel}** ${emoji} ${label}.\n🕐 Cumule **1 heure de voc aujourd'hui** pour la débloquer !`,
-        flags: MessageFlags.Ephemeral,
-      });
-    }
+    await interaction.editReply({
+      content: owned
+        ? `✅ Tu possèdes déjà **${mountain.mountainLabel}** ${emoji} ${label} !`
+        : `❌ Tu ne possèdes pas encore **${mountain.mountainLabel}** ${emoji} ${label}.\n🕐 Cumule **1 heure de voc aujourd'hui** pour la débloquer !`,
+    });
   }
 
   private async getNotificationChannel(client: BotClient): Promise<TextChannel | null> {

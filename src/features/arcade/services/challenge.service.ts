@@ -5,7 +5,8 @@ import {
   ButtonStyle,
   User,
   ChatInputCommandInteraction,
-  ComponentType
+  ComponentType,
+  MessageFlags,
 } from 'discord.js';
 
 export interface ChallengeOptions {
@@ -19,29 +20,16 @@ export interface ChallengeOptions {
 }
 
 export class ChallengeService {
-  /**
-   * Demande confirmation à l'adversaire pour accepter le défi
-   * @returns true si accepté, false si refusé ou timeout
-   */
   static async requestChallenge(
     interaction: ChatInputCommandInteraction,
-    options: ChallengeOptions
+    options: ChallengeOptions,
   ): Promise<boolean> {
     const { challenger, opponent, gameName, gameEmoji, bet = 0, targetScore, customDescription } = options;
 
-    // Créer l'embed de défi
     let description = `${challenger} vous défie à une partie de **${gameName}** !\n\n`;
-
-    if (customDescription) {
-      description += `${customDescription}\n\n`;
-    } else if (targetScore) {
-      description += `🎯 Premier à **${targetScore}** points\n`;
-    }
-
-    if (bet > 0) {
-      description += `💰 Mise : **${bet}** RidgeCoins\n\n`;
-    }
-
+    if (customDescription) description += `${customDescription}\n\n`;
+    else if (targetScore) description += `🎯 Premier à **${targetScore}** points\n`;
+    if (bet > 0) description += `💰 Mise : **${bet}** RidgeCoins\n\n`;
     description += `${opponent}, acceptez-vous ce défi ?`;
 
     const challengeEmbed = new EmbedBuilder()
@@ -51,85 +39,52 @@ export class ChallengeService {
       .setFooter({ text: 'Vous avez 30 secondes pour répondre' })
       .setTimestamp();
 
-    // Créer les boutons de confirmation
-    const row = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(
-        new ButtonBuilder()
-          .setCustomId('challenge_accept')
-          .setLabel('Accepter')
-          .setEmoji('✅')
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId('challenge_decline')
-          .setLabel('Refuser')
-          .setEmoji('❌')
-          .setStyle(ButtonStyle.Danger)
-      );
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder().setCustomId('challenge_accept').setLabel('Accepter').setEmoji('✅').setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId('challenge_decline').setLabel('Refuser').setEmoji('❌').setStyle(ButtonStyle.Danger),
+    );
 
-    const message = await interaction.reply({
+    const message = await interaction.editReply({
       content: `${opponent}`,
       embeds: [challengeEmbed],
-      components: [row]
-    }).then(msg => interaction.fetchReply());
+      components: [row],
+    });
 
-    // Créer le collecteur pour les boutons
     return new Promise((resolve) => {
       const collector = message.createMessageComponentCollector({
         componentType: ComponentType.Button,
-        time: 30000 // 30 secondes
+        time: 30_000,
       });
 
       collector.on('collect', async (buttonInteraction) => {
-        // Seul l'adversaire peut répondre
         if (buttonInteraction.user.id !== opponent.id) {
-          await buttonInteraction.reply({
-            content: '❌ Seul le joueur défié peut répondre à ce défi !',
-            flags: ['Ephemeral']
-          });
+          await buttonInteraction.reply({ content: '❌ Seul le joueur défié peut répondre à ce défi !', flags: MessageFlags.Ephemeral });
           return;
         }
 
         if (buttonInteraction.customId === 'challenge_accept') {
-          const acceptEmbed = new EmbedBuilder()
-            .setTitle(`${gameEmoji} Défi accepté !`)
-            .setDescription(`${opponent.username} a accepté le défi ! La partie commence...`)
-            .setColor(0x00ff00);
-
           await buttonInteraction.update({
-            embeds: [acceptEmbed],
-            components: []
+            embeds: [new EmbedBuilder().setTitle(`${gameEmoji} Défi accepté !`).setDescription(`${opponent.username} a accepté le défi ! La partie commence...`).setColor(0x00ff00)],
+            components: [],
           });
-
           collector.stop('accepted');
           resolve(true);
         } else {
-          const declineEmbed = new EmbedBuilder()
-            .setTitle(`${gameEmoji} Défi refusé`)
-            .setDescription(`${opponent.username} a refusé le défi.`)
-            .setColor(0xff0000);
-
           await buttonInteraction.update({
-            embeds: [declineEmbed],
-            components: []
+            embeds: [new EmbedBuilder().setTitle(`${gameEmoji} Défi refusé`).setDescription(`${opponent.username} a refusé le défi.`).setColor(0xff0000)],
+            components: [],
           });
-
           collector.stop('declined');
           resolve(false);
         }
       });
 
-      collector.on('end', (collected, reason) => {
+      collector.on('end', (_collected, reason) => {
         if (reason === 'time') {
-          const timeoutEmbed = new EmbedBuilder()
-            .setTitle(`${gameEmoji} Temps écoulé`)
-            .setDescription(`${opponent.username} n'a pas répondu à temps. Le défi est annulé.`)
-            .setColor(0xff9900);
-
           interaction.editReply({
-            embeds: [timeoutEmbed],
-            components: []
+            embeds: [new EmbedBuilder().setTitle(`${gameEmoji} Temps écoulé`).setDescription(`${opponent.username} n'a pas répondu à temps. Le défi est annulé.`).setColor(0xff9900)],
+            components: [],
           }).catch(() => {});
-
           resolve(false);
         }
       });

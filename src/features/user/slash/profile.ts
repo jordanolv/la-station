@@ -113,22 +113,21 @@ export default {
   },
 
   async handleModal(interaction: ModalSubmitInteraction) {
+    await interaction.deferReply({ ephemeral: true });
+
     const bioRaw = interaction.fields.getTextInputValue(BIO_INPUT_ID)?.trim() ?? '';
     const birthdayRaw = interaction.fields.getTextInputValue(BIRTHDAY_INPUT_ID)?.trim() ?? '';
+
+    const { date: birthDate, error } = validateBirthday(birthdayRaw);
+    if (error) {
+      await interaction.editReply({ content: error });
+      return;
+    }
 
     const user = await UserService.getUserByDiscordId(interaction.user.id);
 
     if (!user) {
-      await interaction.reply({
-        content: '❌ Utilisateur introuvable dans la base. Réessayez plus tard.',
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-
-    const { date: birthDate, error } = validateBirthday(birthdayRaw);
-    if (error) {
-      await interaction.reply({ content: error, flags: MessageFlags.Ephemeral });
+      await interaction.editReply({ content: '❌ Utilisateur introuvable dans la base. Réessayez plus tard.' });
       return;
     }
 
@@ -139,10 +138,7 @@ export default {
         existing.getMonth() === birthDate.getMonth() &&
         existing.getDate() === birthDate.getDate();
       if (!isSameDate) {
-        await interaction.reply({
-          content: '❌ Ton anniversaire est déjà enregistré et ne peut plus être modifié.',
-          flags: MessageFlags.Ephemeral,
-        });
+        await interaction.editReply({ content: '❌ Ton anniversaire est déjà enregistré et ne peut plus être modifié.' });
         return;
       }
     }
@@ -157,9 +153,8 @@ export default {
     const birthDisplay = birthDate ? formatDate(birthDate) : 'Non défini';
     const bioDisplay = user.bio ?? 'Aucune bio définie.';
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `✅ Profil mis à jour !\n• **Bio:** ${bioDisplay}\n• **Anniversaire:** ${birthDisplay}`,
-      flags: MessageFlags.Ephemeral,
     });
   },
 };
