@@ -7,6 +7,7 @@ const DEFAULTS: IPeakHuntersConfig = {
   raidChannelId: undefined,
   spawnSchedule: [],
   activeChannelMountains: {},
+  activeSpawnMessages: {},
 };
 
 export class PeakHuntersConfigRepository {
@@ -70,21 +71,21 @@ export class PeakHuntersConfigRepository {
     await MountainConfigModel.updateOne({}, { $set: { lastSpawnWinnerId: userId } });
   }
 
-  static async setActiveSpawnMessage(messageId: string): Promise<void> {
-    await MountainConfigModel.updateOne({}, { $set: { activeSpawnMessageId: messageId } });
+  static async addActiveSpawnMessage(messageId: string, mountainId: string): Promise<void> {
+    await MountainConfigModel.updateOne(
+      {},
+      { $set: { [`activeSpawnMessages.${messageId}`]: mountainId } },
+    );
   }
 
   static async claimSpawn(messageId: string): Promise<boolean> {
     const result = await MountainConfigModel.findOneAndUpdate(
-      { activeSpawnMessageId: messageId },
-      { $unset: { activeSpawnMessageId: '' } },
+      { [`activeSpawnMessages.${messageId}`]: { $exists: true } },
+      { $unset: { [`activeSpawnMessages.${messageId}`]: '' } },
     );
     return result !== null;
   }
 
-  static async clearActiveSpawn(): Promise<void> {
-    await MountainConfigModel.updateOne({}, { $unset: { activeSpawnMessageId: '' } });
-  }
 
   static async getActiveChannelMountains(): Promise<Map<string, string>> {
     const doc = await this.get();

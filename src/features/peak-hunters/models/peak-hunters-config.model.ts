@@ -30,8 +30,8 @@ export class PeakHuntersConfig {
   @prop()
   lastSpawnWinnerId?: string;
 
-  @prop()
-  activeSpawnMessageId?: string;
+  @prop({ type: Object, default: {} })
+  activeSpawnMessages!: Record<string, string>;
 
   @prop({ _id: false, type: () => DailyMountainRef })
   dailyMountain?: DailyMountainRef;

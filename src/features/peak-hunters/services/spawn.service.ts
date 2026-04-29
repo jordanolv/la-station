@@ -84,14 +84,14 @@ export class SpawnService {
     );
 
     const message = await (channel as TextChannel).send({ embeds: [embed], components: [row] });
-    await PeakHuntersConfigRepository.setActiveSpawnMessage(message.id);
+    await PeakHuntersConfigRepository.addActiveSpawnMessage(message.id, mountain.id);
 
     await LogService.info(`Spawn montagne : **${mountain.mountainLabel}** ${emoji} ${label} (${MountainService.getAltitude(mountain)})`,
       { feature: LOG_FEATURE, title: '🌄 Nouveau spawn' },
     );
   }
 
-  static async handleClaim(interaction: ButtonInteraction, client: BotClient): Promise<void> {
+  static async handleClaim(interaction: ButtonInteraction, _client: BotClient): Promise<void> {
     const messageId = interaction.message.id;
     const userId = interaction.user.id;
 

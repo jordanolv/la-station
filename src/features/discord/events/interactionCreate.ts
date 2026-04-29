@@ -52,6 +52,7 @@ import {
   handleDraftStringSelect,
 } from '../../draft/events/draft-interactions';
 import { QuizService, QUIZ_BUTTON_PREFIX } from '../../quiz/services/quiz.service';
+import { PersonalityTestService, PTEST_BUTTON_PREFIX } from '../../personality-test/services/personality-test.service';
 import { isSilentDiscordError } from '../../../shared/utils/discord-errors';
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
@@ -151,6 +152,8 @@ export default {
           await handleDraftButton(interaction, client);
         } else if (interaction.customId.startsWith(QUIZ_BUTTON_PREFIX + ':')) {
           await QuizService.handleAnswer(client, interaction);
+        } else if (interaction.customId.startsWith(PTEST_BUTTON_PREFIX + ':')) {
+          await PersonalityTestService.handleButton(client, interaction);
         } else if (interaction.customId.startsWith(GIVE_EXPEDITION_BUTTON_PREFIX)) {
           await giveExpeditionCommand.handleButton(interaction, client);
         }
@@ -223,6 +226,8 @@ export default {
         } else if (interaction.customId.startsWith(EMBED_EDIT_MODAL_PREFIX)) {
           const embedCommand = client.slashCommands.get('embed');
           if (embedCommand?.handleEditModal) await embedCommand.handleEditModal(interaction, client);
+        } else if (interaction.customId.startsWith(PTEST_BUTTON_PREFIX + ':')) {
+          await PersonalityTestService.handleModal(client, interaction);
         }
       }
     } catch (error) {

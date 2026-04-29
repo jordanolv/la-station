@@ -41,7 +41,6 @@ export class SpawnCron {
   }
 
   private async planDay(): Promise<void> {
-    // Vérifie qu'un schedule n'a pas déjà été posé (ex: reboot à minuit pile)
     const config = await PeakHuntersConfigRepository.get();
     const now = Date.now();
     const todayStart = (() => {

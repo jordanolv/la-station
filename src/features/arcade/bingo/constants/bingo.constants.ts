@@ -1,4 +1,4 @@
-export const BINGO_SPAWN_CHANCE = 0.25;
+export const BINGO_SPAWN_CHANCE = 1 / 3;
 
 export const BINGO_HOUR_START = 10;
 export const BINGO_HOUR_END = 15;

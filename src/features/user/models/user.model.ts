@@ -87,6 +87,9 @@ class UserStats {
   /** Points d'activité de la semaine précédente (snapshot au moment du reset) */
   @prop({ default: 0 })
   lastWeekActivityPoints!: number;
+
+  @prop({ default: 0 })
+  personalityTestsCount!: number;
 }
 
 class UserInfos {
