@@ -54,13 +54,5 @@
     "tsc-alias": "^1.8.15",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.2.2"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@discordjs/opus",
-      "@swc/core",
-      "ffmpeg-static",
-      "sodium-native"
-    ]
   }
 }
