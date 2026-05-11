@@ -21,7 +21,7 @@ export class QuizCron {
     );
 
     this.revealJob = new CronJob(
-      '0 0 21 * * *',
+      '0 0 22 * * *',
       () => QuizService.revealActive(this.client),
       null,
       false,
@@ -35,7 +35,7 @@ export class QuizCron {
     const chalk = require('chalk');
     console.log(
       chalk.yellow('   ├─ ❓ Quiz') +
-        chalk.gray(` • 1 question/jour à 13h, révélation 21h`),
+        chalk.gray(` • 1 question/jour à 13h, révélation 22h`),
     );
   }
 

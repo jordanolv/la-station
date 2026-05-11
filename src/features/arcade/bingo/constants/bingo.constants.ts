@@ -1,12 +1,12 @@
-export const BINGO_SPAWN_CHANCE = 1 / 3;
+export const BINGO_SPAWN_CHANCE = 1 / 2;
 
 export const BINGO_HOUR_START = 10;
 export const BINGO_HOUR_END = 15;
 
 export const BINGO_NUMBER_MIN = 1;
-export const BINGO_NUMBER_MAX = 50;
+export const BINGO_NUMBER_MAX = 75;
 
-export const BINGO_THREAD_SLOWMODE_SECONDS = 900;
+export const BINGO_THREAD_SLOWMODE_SECONDS = 600;
 export const BINGO_THREAD_AUTO_ARCHIVE_MINUTES = 1440;
 
 export const BINGO_REWARD = {

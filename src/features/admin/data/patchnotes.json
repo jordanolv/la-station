@@ -351,5 +351,30 @@
         ]
       }
     ]
+  },
+  {
+    "version": "1.7.1",
+    "timestamp": 1778491955,
+    "sections": [
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "❓ Quiz",
+            "items": [
+              "La révélation des réponses passe de **21h à 22h** — vous avez une heure de plus pour participer"
+            ]
+          },
+          {
+            "title": "🎯 Bingo",
+            "items": [
+              "Spawn rythmé : **1 jour sur 2** en moyenne (au lieu d'1 chance sur 3 chaque jour)",
+              "Plage de tirage élargie : les numéros vont désormais de **1 à 75** (au lieu de 1 à 50)",
+              "Cooldown entre deux réponses réduit à **10 minutes** (au lieu de 15)"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
