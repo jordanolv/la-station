@@ -21,6 +21,7 @@ export const SPAWN_BUTTON_PREFIX = 'mountain:spawn:claim';
 
 export class SpawnService {
   private static lastSpawnWinnerId: string | null = null;
+  private static duplicateClaimers = new Map<string, Set<string>>();
 
   static async rehydrate(client: BotClient): Promise<void> {
     const config = await PeakHuntersConfigRepository.get();
@@ -111,6 +112,17 @@ export class SpawnService {
 
     const alreadyOwned = await UserMountainsRepository.isUnlocked(userId, mountainId);
     if (alreadyOwned) {
+      let claimers = this.duplicateClaimers.get(messageId);
+      if (!claimers) {
+        claimers = new Set();
+        this.duplicateClaimers.set(messageId, claimers);
+      }
+      if (claimers.has(userId)) {
+        await interaction.followUp({ content: '❌ Tu as déjà récupéré tes fragments sur ce spawn !', flags: MessageFlags.Ephemeral }).catch(() => {});
+        return;
+      }
+      claimers.add(userId);
+
       const rarity = MountainService.getRarity(mountain);
       const { emoji, label, fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
       const { newFragments, expeditionsToAward } = await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
@@ -133,6 +145,7 @@ export class SpawnService {
     }
 
     this.lastSpawnWinnerId = userId;
+    this.duplicateClaimers.delete(messageId);
 
     const rarity = MountainService.getRarity(mountain);
     const { emoji, label, color } = RARITY_CONFIG[rarity];
