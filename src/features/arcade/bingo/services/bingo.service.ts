@@ -21,6 +21,7 @@ import {
   BINGO_FINISHED_ACCENT_COLOR,
   BINGO_NUMBER_MAX,
   BINGO_NUMBER_MIN,
+  BINGO_RECAP_EVERY,
   BINGO_REWARD,
   BINGO_SPAWN_CHANCE,
   BINGO_THREAD_AUTO_ARCHIVE_MINUTES,
@@ -248,6 +249,41 @@ export class BingoService {
     }
 
     await message.react(isDuplicateGuess ? '🔁' : '❌').catch(() => {});
+
+    if (guessCount > 0 && guessCount % BINGO_RECAP_EVERY === 0) {
+      await this.sendRemainingRecap(message.channel as ThreadChannel, updatedState ?? state);
+    }
+  }
+
+  private static buildRemainingNumbers(guesses: number[]): number[] {
+    const guessed = new Set(guesses);
+    const remaining: number[] = [];
+    for (let n = BINGO_NUMBER_MIN; n <= BINGO_NUMBER_MAX; n++) {
+      if (!guessed.has(n)) remaining.push(n);
+    }
+    return remaining;
+  }
+
+  private static async sendRemainingRecap(thread: ThreadChannel, state: IBingoStateDoc): Promise<void> {
+    const remaining = this.buildRemainingNumbers(state.activeGuesses ?? []);
+    if (remaining.length === 0) return;
+
+    const container = new ContainerBuilder()
+      .setAccentColor(BINGO_ACCENT_COLOR)
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+          `## 🔢 Numéros encore disponibles — ${remaining.length}/${BINGO_NUMBER_MAX}`,
+        ),
+      )
+      .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(remaining.join(' · ')),
+      );
+
+    await thread.send({
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+    }).catch(() => {});
   }
 
   private static async handleWin(

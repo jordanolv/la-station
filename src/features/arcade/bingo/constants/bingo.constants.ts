@@ -6,6 +6,8 @@ export const BINGO_HOUR_END = 15;
 export const BINGO_NUMBER_MIN = 1;
 export const BINGO_NUMBER_MAX = 75;
 
+export const BINGO_RECAP_EVERY = 3;
+
 export const BINGO_THREAD_SLOWMODE_SECONDS = 600;
 export const BINGO_THREAD_AUTO_ARCHIVE_MINUTES = 1440;
 
