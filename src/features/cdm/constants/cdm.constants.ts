@@ -4,8 +4,8 @@ export const CDM_TITLE = 'Coupe du Monde 2026';
 
 /** Récompenses fixes attribuées par bon pronostic. Éditable librement. */
 export const CDM_REWARD = {
-  team: { money: 10, expeditions: 10 },
-  outsider: { money: 10, expeditions: 10 },
+  team: { money: 1500, expeditions: 10 },
+  outsider: { money: 1500, expeditions: 10 },
 } as const;
 
 export type Confederation = 'UEFA' | 'CONMEBOL' | 'CAF' | 'AFC' | 'CONCACAF' | 'OFC';
