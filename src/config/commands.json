@@ -51,6 +51,11 @@
           "name": "battle",
           "description": "Défiez un joueur dans un combat de stats",
           "usage": "adversaire:@user mise:100"
+        },
+        {
+          "name": "cdm",
+          "description": "Pronostiquez le vainqueur et l'outsider de la Coupe du Monde",
+          "usage": ""
         }
       ]
     },
@@ -97,6 +102,11 @@
           "name": "reply",
           "description": "Fait répondre le bot à un message spécifique",
           "usage": "channel-id:123456 message-id:789012 contenu:\"Message\""
+        },
+        {
+          "name": "cdm-admin",
+          "description": "Gérez les pronostics CDM (verrouiller, désigner les résultats, payer)",
+          "usage": ""
         }
       ]
     }

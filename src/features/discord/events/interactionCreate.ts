@@ -51,6 +51,11 @@ import {
   handleDraftUserSelect,
   handleDraftStringSelect,
 } from '../../draft/events/draft-interactions';
+import {
+  handleCdmButton,
+  handleCdmSelect,
+  handleCdmChannelSelect,
+} from '../../cdm/events/cdm-interactions';
 import { QuizService, QUIZ_BUTTON_PREFIX } from '../../quiz/services/quiz.service';
 import { PersonalityTestService, PTEST_BUTTON_PREFIX } from '../../personality-test/services/personality-test.service';
 import { isSilentDiscordError } from '../../../shared/utils/discord-errors';
@@ -150,6 +155,8 @@ export default {
           await handleBetButton(interaction, client);
         } else if (interaction.customId.startsWith('draft:')) {
           await handleDraftButton(interaction, client);
+        } else if (interaction.customId.startsWith('cdm:')) {
+          await handleCdmButton(interaction, client);
         } else if (interaction.customId.startsWith(QUIZ_BUTTON_PREFIX + ':')) {
           await QuizService.handleAnswer(client, interaction);
         } else if (interaction.customId.startsWith(PTEST_BUTTON_PREFIX + ':')) {
@@ -173,13 +180,19 @@ export default {
           await handleBetPlaceSelect(interaction, client);
         } else if (interaction.customId.startsWith('draft:pick:')) {
           await handleDraftStringSelect(interaction, client);
+        } else if (interaction.customId.startsWith('cdm:')) {
+          await handleCdmSelect(interaction, client);
         } else if (interaction.customId.startsWith('impostor_')) {
           await handleImpostorSelectMenu(interaction, client);
         }
       }
 
       else if (interaction.isChannelSelectMenu()) {
-        await routeToPanelSelectMenu(interaction, client);
+        if (interaction.customId.startsWith('cdm:')) {
+          await handleCdmChannelSelect(interaction, client);
+        } else {
+          await routeToPanelSelectMenu(interaction, client);
+        }
       }
 
       else if (interaction.isRoleSelectMenu()) {
