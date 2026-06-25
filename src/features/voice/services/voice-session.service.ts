@@ -99,6 +99,7 @@ export class VoiceSessionService {
       channelName,
       startedAt: new Date(session.startedAt),
       totalActiveSeconds: 0,
+      activePeriods: [],
       currentActiveStart: session.currentActiveStart ? new Date(session.currentActiveStart) : null,
     });
     console.log(`[VoiceSession] Session démarrée: user=${userId} channel=${channelId} active=${active}`);
@@ -156,17 +157,14 @@ export class VoiceSessionService {
     session.activePeriods.push({ startedAt: session.currentActiveStart, endedAt: now });
     session.currentActiveStart = null;
 
-    const totalActiveSeconds = session.activePeriods.reduce(
-      (acc, p) => acc + Math.floor((p.endedAt - p.startedAt) / 1000),
-      0,
-    );
     await VoiceSessionRepository.upsert({
       userId,
       guildId: getGuildId(),
       channelId: session.channelId,
       channelName: session.channelName,
       startedAt: new Date(session.startedAt),
-      totalActiveSeconds,
+      totalActiveSeconds: session.totalActiveSeconds ?? 0,
+      activePeriods: this.serializePeriods(session),
       currentActiveStart: null,
     });
   }
@@ -176,17 +174,14 @@ export class VoiceSessionService {
     const now = Date.now();
     session.currentActiveStart = now;
 
-    const totalActiveSeconds = session.activePeriods.reduce(
-      (acc, p) => acc + Math.floor((p.endedAt - p.startedAt) / 1000),
-      0,
-    );
     await VoiceSessionRepository.upsert({
       userId,
       guildId: getGuildId(),
       channelId: session.channelId,
       channelName: session.channelName,
       startedAt: new Date(session.startedAt),
-      totalActiveSeconds,
+      totalActiveSeconds: session.totalActiveSeconds ?? 0,
+      activePeriods: this.serializePeriods(session),
       currentActiveStart: new Date(now),
     });
   }
@@ -290,10 +285,8 @@ export class VoiceSessionService {
         channelId: session.channelId,
         channelName: session.channelName,
         startedAt: new Date(session.startedAt),
-        totalActiveSeconds: session.activePeriods.reduce(
-          (acc, p) => acc + Math.floor((p.endedAt - p.startedAt) / 1000),
-          0,
-        ),
+        totalActiveSeconds: session.totalActiveSeconds ?? 0,
+        activePeriods: this.serializePeriods(session),
         currentActiveStart: session.currentActiveStart ? new Date(session.currentActiveStart) : null,
       }).catch(() => {});
     }
@@ -344,18 +337,22 @@ export class VoiceSessionService {
 
     if (persisted) {
       const startedAt = persisted.startedAt.getTime();
-      let totalActiveSeconds = persisted.totalActiveSeconds;
+      const activePeriods: ActivePeriod[] = (persisted.activePeriods ?? []).map(p => ({
+        startedAt: p.startedAt.getTime(),
+        endedAt: p.endedAt.getTime(),
+      }));
       if (persisted.currentActiveStart) {
-        totalActiveSeconds += Math.floor((now - persisted.currentActiveStart.getTime()) / 1000);
+        activePeriods.push({ startedAt: persisted.currentActiveStart.getTime(), endedAt: now });
       }
+      const legacySeconds = persisted.totalActiveSeconds ?? 0;
       const currentActiveStart = active ? now : null;
       const session: InternalSession = {
         startedAt,
         channelId: state.channelId,
         channelName,
-        activePeriods: [],
+        activePeriods,
         currentActiveStart,
-        totalActiveSeconds,
+        totalActiveSeconds: legacySeconds,
       };
       this.sessions.set(userId, session);
       await VoiceSessionRepository.upsert({
@@ -364,7 +361,8 @@ export class VoiceSessionService {
         channelId: state.channelId,
         channelName,
         startedAt: new Date(startedAt),
-        totalActiveSeconds,
+        totalActiveSeconds: legacySeconds,
+        activePeriods: this.serializePeriods(session),
         currentActiveStart: currentActiveStart ? new Date(currentActiveStart) : null,
       });
       console.log(
@@ -424,6 +422,13 @@ export class VoiceSessionService {
         newLevel,
       });
     }
+  }
+
+  private static serializePeriods(session: InternalSession): { startedAt: Date; endedAt: Date }[] {
+    return session.activePeriods.map(p => ({
+      startedAt: new Date(p.startedAt),
+      endedAt: new Date(p.endedAt),
+    }));
   }
 
   private static buildByDay(periods: ActivePeriod[]): DayChunk[] {

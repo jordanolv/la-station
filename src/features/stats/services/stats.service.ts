@@ -31,14 +31,14 @@ export class StatsService {
       const guildUser = await this.userRepo.findUserById(userId);
 
       if (guildUser) {
-        const addedSeconds = this.applyVoiceSegmentsToUser(guildUser, segments);
+        this.applyVoiceSegmentsToUser(guildUser, segments);
         guildUser.infos.updatedAt = new Date();
-        guildUser.stats.voiceTime += addedSeconds;
+        guildUser.stats.voiceTime += totalSeconds;
         await guildUser.save();
       } else {
         const newUser = await this.userRepo.createUser({ discordId: userId, name: username || 'Unknown User' });
-        const addedSeconds = this.applyVoiceSegmentsToUser(newUser, segments, 'replace');
-        newUser.stats.voiceTime = addedSeconds;
+        this.applyVoiceSegmentsToUser(newUser, segments, 'replace');
+        newUser.stats.voiceTime = totalSeconds;
         newUser.infos.updatedAt = new Date();
         await newUser.save();
       }

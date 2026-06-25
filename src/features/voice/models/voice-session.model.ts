@@ -1,5 +1,14 @@
 import { prop, getModelForClass, index, DocumentType } from '@typegoose/typegoose';
 
+/** Période active (sans mute/deaf) déjà clôturée, conservée pour le découpage par jour. */
+export class ActivePeriodEntry {
+  @prop({ required: true })
+  startedAt!: Date;
+
+  @prop({ required: true })
+  endedAt!: Date;
+}
+
 /**
  * Session vocale persistée pour survivre aux redémarrages du bot.
  * Permet de conserver le timer (startedAt, activeSeconds) lors de la réhydratation.
@@ -23,9 +32,16 @@ export class VoiceSession {
   @prop({ required: true })
   startedAt!: Date;
 
-  /** Secondes actives cumulées (sans mute/deaf) */
+  /**
+   * Secondes actives héritées sans découpage par jour (anciens docs uniquement).
+   * Les nouveaux docs stockent tout dans `activePeriods` et laissent ce champ à 0.
+   */
   @prop({ default: 0 })
   totalActiveSeconds!: number;
+
+  /** Périodes actives clôturées, pour préserver l'attribution par jour au redémarrage. */
+  @prop({ type: () => [ActivePeriodEntry], default: [] })
+  activePeriods!: ActivePeriodEntry[];
 
   /** Début de la période active en cours, ou null si en pause */
   @prop({ type: () => Date, required: false, default: null })

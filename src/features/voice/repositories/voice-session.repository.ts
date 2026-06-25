@@ -7,6 +7,7 @@ export interface VoiceSessionData {
   channelName: string;
   startedAt: Date;
   totalActiveSeconds: number;
+  activePeriods: { startedAt: Date; endedAt: Date }[];
   currentActiveStart: Date | null;
 }
 
@@ -21,6 +22,7 @@ export class VoiceSessionRepository {
           channelName: data.channelName,
           startedAt: data.startedAt,
           totalActiveSeconds: data.totalActiveSeconds,
+          activePeriods: data.activePeriods,
           currentActiveStart: data.currentActiveStart,
           updatedAt: new Date(),
         },

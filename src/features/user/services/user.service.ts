@@ -1,6 +1,7 @@
 import { User as DiscordUser, Guild } from 'discord.js';
 import UserModel, { IUser } from '../models/user.model';
 import { ArcadeGameName } from '../../arcade/types/arcade.types';
+import { toParisDayYMD, parisMidnightUTC } from '../../../shared/time/day-split';
 
 export class UserService {
 
@@ -38,73 +39,33 @@ export class UserService {
     );
   }
 
-  static async incrementVoiceTime(discordId: string, seconds: number) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return UserModel.findOneAndUpdate(
-      { discordId },
-      {
-        $inc: { 'stats.voiceTime': seconds },
-        $push: {
-          'stats.voiceHistory': {
-            date: today,
-            time: seconds
-          }
-        }
-      },
-      { new: true }
-    );
-  }
-
   static async getVoiceStatsLast14Days(discordId: string): Promise<{ date: Date; time: number }[]> {
-    const user = await UserModel.findOne({ discordId });
-    if (!user) return [];
-
-    const fourteenDaysAgo = new Date();
-    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
-    fourteenDaysAgo.setHours(0, 0, 0, 0);
-
-    const dailyStats = new Map<string, number>();
-    user.stats.voiceHistory.forEach(entry => {
-      const entryDate = new Date(entry.date);
-      entryDate.setHours(0, 0, 0, 0);
-      if (entryDate >= fourteenDaysAgo) {
-        const dateKey = entryDate.toISOString().split('T')[0];
-        dailyStats.set(dateKey, (dailyStats.get(dateKey) || 0) + entry.time);
-      }
-    });
-
-    return Array.from(dailyStats.entries())
-      .map(([date, time]) => ({ date: new Date(date), time }))
-      .sort((a, b) => a.date.getTime() - b.date.getTime());
+    return this.aggregateVoiceHistoryByParisDay(discordId, 14);
   }
 
-  static async getVoiceStatsLast7Days(discordId: string) {
+  static async getVoiceStatsLast7Days(discordId: string): Promise<{ date: Date; time: number }[]> {
+    return this.aggregateVoiceHistoryByParisDay(discordId, 7);
+  }
+
+  private static async aggregateVoiceHistoryByParisDay(
+    discordId: string,
+    days: number,
+  ): Promise<{ date: Date; time: number }[]> {
     const user = await UserModel.findOne({ discordId });
     if (!user) return [];
 
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
+    const cutoffYMD = toParisDayYMD(new Date(Date.now() - days * 86_400_000));
 
     const dailyStats = new Map<string, number>();
-
     user.stats.voiceHistory.forEach(entry => {
-      const entryDate = new Date(entry.date);
-      entryDate.setHours(0, 0, 0, 0);
-
-      if (entryDate >= sevenDaysAgo) {
-        const dateKey = entryDate.toISOString().split('T')[0];
-        dailyStats.set(dateKey, (dailyStats.get(dateKey) || 0) + entry.time);
+      const dayYMD = toParisDayYMD(new Date(entry.date));
+      if (dayYMD >= cutoffYMD) {
+        dailyStats.set(dayYMD, (dailyStats.get(dayYMD) || 0) + entry.time);
       }
     });
 
     return Array.from(dailyStats.entries())
-      .map(([date, time]) => ({
-        date: new Date(date),
-        time
-      }))
+      .map(([dayYMD, time]) => ({ date: parisMidnightUTC(dayYMD), time }))
       .sort((a, b) => a.date.getTime() - b.date.getTime());
   }
 
