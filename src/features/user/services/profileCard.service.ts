@@ -2,6 +2,7 @@ import { Resvg } from '@resvg/resvg-js';
 import { createCanvas, loadImage, GlobalFonts, type SKRSContext2D } from '@napi-rs/canvas';
 import * as fs from 'fs';
 import * as path from 'path';
+import { toParisDayYMD } from '../../../shared/time/day-split';
 
 // Enregistrer Roboto pour un rendu cohérent sur tous les serveurs
 GlobalFonts.registerFromPath(path.join(process.cwd(), 'assets/fonts/Roboto-Regular.ttf'), 'Roboto');
@@ -351,16 +352,18 @@ export class ProfileCardService {
     const chartH = height - paddingTop - paddingBottom;
     const baseY = chartY + chartH;
 
-    // Construire 7 jours glissants (semaine courante) et 7 précédents
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const toKey = (d: Date) => { const n = new Date(d); n.setHours(0,0,0,0); return n.toISOString().split('T')[0]; };
+    // Construire 7 jours glissants (semaine courante) et 7 précédents — en jour Paris
+    const todayYMD = toParisDayYMD(new Date());
+    const [ty, tm, td] = todayYMD.split('-').map(Number);
+    const dayAt = (offset: number) => new Date(Date.UTC(ty, tm - 1, td - offset, 12, 0, 0));
+    const toKey = (d: Date) => toParisDayYMD(d);
     const byDay = new Map(activity.map(e => [toKey(e.date), e.time]));
 
     const currentWeek: { date: Date; time: number }[] = [];
     const prevWeek: { date: Date; time: number }[] = [];
     for (let i = 6; i >= 0; i--) {
-      const dc = new Date(today); dc.setDate(today.getDate() - i);
-      const dp = new Date(today); dp.setDate(today.getDate() - i - 7);
+      const dc = dayAt(i);
+      const dp = dayAt(i + 7);
       currentWeek.push({ date: dc, time: byDay.get(toKey(dc)) ?? 0 });
       prevWeek.push({ date: dp, time: byDay.get(toKey(dp)) ?? 0 });
     }
@@ -423,7 +426,7 @@ export class ProfileCardService {
 
     currentWeek.forEach((d, i) => {
       const { px, py } = getPoint(i, d.time);
-      const dayIdx = (currentWeek[i].date.getDay() + 6) % 7; // 0=Lun
+      const dayIdx = (currentWeek[i].date.getUTCDay() + 6) % 7; // 0=Lun
 
       // Point
       ctx.beginPath();
