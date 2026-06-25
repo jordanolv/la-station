@@ -56,6 +56,11 @@
           "name": "cdm",
           "description": "Pronostiquez le vainqueur et l'outsider de la Coupe du Monde",
           "usage": ""
+        },
+        {
+          "name": "cdm-pronos",
+          "description": "Voir les pronostics CDM de tout le monde",
+          "usage": ""
         }
       ]
     },

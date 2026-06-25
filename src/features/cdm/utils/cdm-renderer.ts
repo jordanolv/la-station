@@ -176,6 +176,31 @@ export function buildPickView(
   return [container];
 }
 
+// ─── Liste des pronos (commande /cdm-pronos) ───────────────────────────────────
+
+export function buildPronosList(event: ICdmEvent): ContainerBuilder[] {
+  const container = new ContainerBuilder()
+    .setAccentColor(STATUS_COLOR[event.status] ?? COLOR_OPEN)
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        `# 🏆 Pronos — ${CDM_TITLE}\n👥 **${event.predictions.length}** participant${event.predictions.length !== 1 ? 's' : ''}`,
+      ),
+    )
+    .addSeparatorComponents(new SeparatorBuilder().setDivider(true));
+
+  if (event.predictions.length === 0) {
+    container.addTextDisplayComponents(new TextDisplayBuilder().setContent('*Personne n\'a encore pronostiqué.*'));
+    return [container];
+  }
+
+  const lines = event.predictions.map(
+    p => `<@${p.userId}> — 🥇 ${teamLabel(p.team)} · 🐎 ${teamLabel(p.outsider)}`,
+  );
+
+  container.addTextDisplayComponents(new TextDisplayBuilder().setContent(lines.join('\n')));
+  return [container];
+}
+
 // ─── Vues admin (commande /cdm-admin, éphémère) ────────────────────────────────
 
 const COLOR_ADMIN = 0xe74c3c;
