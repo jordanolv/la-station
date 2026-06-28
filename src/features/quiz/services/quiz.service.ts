@@ -56,7 +56,11 @@ export class QuizService {
       choiceIndex === question.answer ? correct++ : wrong++;
     }
 
-    const lines = ['## 🏔️ Question du jour', '', `**${question.question}**`];
+    const lines = ['## 🏔️ Question du jour', '', `**${question.question}**`, ''];
+    question.choices.forEach((choice, i) => {
+      const isCorrect = disabled && i === question.answer;
+      lines.push(`${CHOICE_EMOJIS[i]}  ${isCorrect ? `**${choice}** ✅` : choice}`);
+    });
 
     if (Object.keys(answers).length > 0) {
       lines.push('');
@@ -72,10 +76,10 @@ export class QuizService {
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(lines.join('\n')));
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      ...question.choices.map((choice, i) =>
+      ...question.choices.map((_, i) =>
         new ButtonBuilder()
           .setCustomId(`${QUIZ_BUTTON_PREFIX}:${question.id}:${i}`)
-          .setLabel(`${CHOICE_EMOJIS[i]}  ${choice}`)
+          .setLabel(CHOICE_EMOJIS[i])
           .setStyle(disabled && i === question.answer ? ButtonStyle.Success : ButtonStyle.Secondary)
           .setDisabled(disabled),
       ),
