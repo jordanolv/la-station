@@ -15,6 +15,7 @@ import { PeakHuntersConfigRepository } from '../repositories/peak-hunters-config
 import { RARITY_CONFIG, MOUNTAIN_UNLOCK_SECONDS, FRAGMENTS_PER_HOUR } from '../constants/peak-hunters.constants';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
 import { MountainService, type MountainInfo } from './mountain.service';
+import { addFragmentsAndAward } from './expedition.service';
 import type { MountainRarity } from '../types/peak-hunters.types';
 import { LogService } from '../../../shared/logs/logs.service';
 import { DailyMountainService } from './daily-mountain.service';
@@ -118,7 +119,7 @@ export class PeakHuntersPlugin implements VoicePlugin {
         const unlockResult = await UserMountainsRepository.unlock(session.userId, mountain.id, rarity);
         if (!unlockResult) {
           const { fragmentsOnDuplicate } = RARITY_CONFIG[rarity];
-          await UserMountainsRepository.addFragments(session.userId, fragmentsOnDuplicate);
+          await addFragmentsAndAward(session.userId, fragmentsOnDuplicate);
           this.postDailyReveal(client, session.userId, mountain, rarity, {
             fragments: fragmentsOnDuplicate,
           }).catch(() => {});
@@ -139,11 +140,11 @@ export class PeakHuntersPlugin implements VoicePlugin {
     const fragments = Math.floor((event.activeSeconds / 3600) * FRAGMENTS_PER_HOUR);
     if (fragments <= 0) return;
 
-    const { newFragments, expeditionsToAward } = await UserMountainsRepository.addFragments(event.userId, fragments);
+    const { newFragments, expeditionsAwarded, summary } = await addFragmentsAndAward(event.userId, fragments);
 
     let msg = `<@${event.userId}> a gagné **${fragments}** fragment${fragments > 1 ? 's' : ''} 🧩 (\`${newFragments}/20\`)`;
-    if (expeditionsToAward > 0) {
-      msg += ` → conversion en **${expeditionsToAward}** expédition${expeditionsToAward > 1 ? 's' : ''}`;
+    if (expeditionsAwarded > 0) {
+      msg += ` → conversion en **${expeditionsAwarded}** expédition${expeditionsAwarded > 1 ? 's' : ''} ${summary}`;
     }
     LogService.info(msg, { feature: LOG_FEATURE, title: '🧩 Fragments de voc' });
   }

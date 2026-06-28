@@ -21,6 +21,24 @@ export async function awardExpeditions(userId: string, count: number): Promise<E
   return { tiers, summary: tiers.map(t => EXPEDITION_TIER_CONFIG[t].emoji).join('') };
 }
 
+export interface FragmentGainResult {
+  newFragments: number;
+  expeditionsAwarded: number;
+  summary: string;
+}
+
+/**
+ * Ajoute des fragments et crédite automatiquement les expéditions converties.
+ * Point d'entrée unique pour tout gain de fragments : garantit qu'un palier
+ * atteint donne toujours l'expédition correspondante.
+ */
+export async function addFragmentsAndAward(userId: string, amount: number): Promise<FragmentGainResult> {
+  const { newFragments, expeditionsToAward } = await UserMountainsRepository.addFragments(userId, amount);
+  if (expeditionsToAward <= 0) return { newFragments, expeditionsAwarded: 0, summary: '' };
+  const { summary } = await awardExpeditions(userId, expeditionsToAward);
+  return { newFragments, expeditionsAwarded: expeditionsToAward, summary };
+}
+
 /** Ligne avec emotes custom — pour TextDisplay (Components V2) */
 export function formatExpeditionsLine(sentier: number, falaise: number, sommet: number): string {
   return [

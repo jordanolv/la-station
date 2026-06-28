@@ -126,12 +126,16 @@ export default {
 
       const mountainDrop = await dropMountain(interaction.user.id);
       if (mountainDrop) {
-        const { rarityEmoji, rarityLabel, mountainLabel, isDuplicate, fragmentsGained } = mountainDrop;
+        const { rarityEmoji, rarityLabel, mountainLabel, isDuplicate, fragmentsGained, expeditionsAwarded, expeditionsSummary } = mountainDrop;
+        let mountainValue = isDuplicate
+          ? `${rarityEmoji} **${mountainLabel}** — ${rarityLabel}\n🔁 Déjà possédée → +${fragmentsGained} fragment${fragmentsGained > 1 ? 's' : ''} 🧩`
+          : `${rarityEmoji} **${mountainLabel}** — ${rarityLabel}\n✅ Nouvelle montagne débloquée !`;
+        if (expeditionsAwarded > 0) {
+          mountainValue += `\n→ +${expeditionsAwarded} expédition${expeditionsAwarded > 1 ? 's' : ''} ${expeditionsSummary}`;
+        }
         fields.push({
           name: '⛰️ Montagne',
-          value: isDuplicate
-            ? `${rarityEmoji} **${mountainLabel}** — ${rarityLabel}\n🔁 Déjà possédée → +${fragmentsGained} fragment${fragmentsGained > 1 ? 's' : ''} 🧩`
-            : `${rarityEmoji} **${mountainLabel}** — ${rarityLabel}\n✅ Nouvelle montagne débloquée !`,
+          value: mountainValue,
           inline: false
         });
       }

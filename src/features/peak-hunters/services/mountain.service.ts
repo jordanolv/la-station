@@ -3,6 +3,7 @@ import * as path from 'path';
 import type { MountainRarity, ExpeditionTier } from '../types/peak-hunters.types';
 import { RARITY_CONFIG, EXPEDITION_TIER_CHANCES, EXPEDITION_TIER_RARITY_WEIGHTS, rollExpeditionTier } from '../constants/peak-hunters.constants';
 import { UserMountainsRepository } from '../repositories/user-mountains.repository';
+import { addFragmentsAndAward } from './expedition.service';
 
 export interface MountainInfo {
   id: string;
@@ -108,6 +109,8 @@ export interface MountainDropResult {
   image: string;
   isDuplicate: boolean;
   fragmentsGained: number;
+  expeditionsAwarded: number;
+  expeditionsSummary: string;
 }
 
 export async function dropMountain(userId: string): Promise<MountainDropResult | null> {
@@ -120,9 +123,13 @@ export async function dropMountain(userId: string): Promise<MountainDropResult |
   const unlockResult = await UserMountainsRepository.unlock(userId, mountain.id, rarity);
   const isDuplicate = unlockResult === null;
 
+  let expeditionsAwarded = 0;
+  let expeditionsSummary = '';
   if (isDuplicate) {
-    await UserMountainsRepository.addFragments(userId, fragmentsOnDuplicate);
+    const result = await addFragmentsAndAward(userId, fragmentsOnDuplicate);
+    expeditionsAwarded = result.expeditionsAwarded;
+    expeditionsSummary = result.summary;
   }
 
-  return { mountainLabel: mountain.mountainLabel, rarityEmoji: emoji, rarityLabel: label, image: mountain.image, isDuplicate, fragmentsGained: isDuplicate ? fragmentsOnDuplicate : 0 };
+  return { mountainLabel: mountain.mountainLabel, rarityEmoji: emoji, rarityLabel: label, image: mountain.image, isDuplicate, fragmentsGained: isDuplicate ? fragmentsOnDuplicate : 0, expeditionsAwarded, expeditionsSummary };
 }
