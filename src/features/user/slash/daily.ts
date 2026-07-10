@@ -78,7 +78,8 @@ export default {
         {
           $inc: {
             'profil.money': moneyReward,
-            'profil.exp': xpReward
+            'profil.exp': xpReward,
+            'stats.totalDailies': 1
           },
           $set: {
             'stats.lastDailyClaimDate': now

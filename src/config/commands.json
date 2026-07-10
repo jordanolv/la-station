@@ -16,6 +16,11 @@
           "usage": ""
         },
         {
+          "name": "stats",
+          "description": "Affiche tes statistiques détaillées (arcade, expéditions, collection, activité)",
+          "usage": ""
+        },
+        {
           "name": "leaderboard",
           "description": "Consultez les classements du serveur (Messages, Vocal, Arcade, Streak, Soirées)",
           "usage": ""

@@ -93,12 +93,15 @@ export class UserMountainsRepository {
     if (tier === 'falaise') {
       if (doc.falaiseTickets <= 0) return false;
       doc.falaiseTickets -= 1;
+      doc.falaiseOpened = (doc.falaiseOpened ?? 0) + 1;
     } else if (tier === 'sommet') {
       if (doc.sommetTickets <= 0) return false;
       doc.sommetTickets -= 1;
+      doc.sommetOpened = (doc.sommetOpened ?? 0) + 1;
     } else {
       if (doc.sentierTickets <= 0) return false;
       doc.sentierTickets -= 1;
+      doc.sentierOpened = (doc.sentierOpened ?? 0) + 1;
     }
     await doc.save();
     return true;
@@ -113,12 +116,15 @@ export class UserMountainsRepository {
     if (tier === 'falaise') {
       if (doc.falaiseTickets < amount) return false;
       doc.falaiseTickets -= amount;
+      doc.falaiseOpened = (doc.falaiseOpened ?? 0) + amount;
     } else if (tier === 'sommet') {
       if (doc.sommetTickets < amount) return false;
       doc.sommetTickets -= amount;
+      doc.sommetOpened = (doc.sommetOpened ?? 0) + amount;
     } else {
       if (doc.sentierTickets < amount) return false;
       doc.sentierTickets -= amount;
+      doc.sentierOpened = (doc.sentierOpened ?? 0) + amount;
     }
     await doc.save();
     return true;

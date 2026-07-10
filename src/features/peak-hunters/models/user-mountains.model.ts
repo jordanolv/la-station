@@ -34,6 +34,18 @@ export class UserMountains {
   /** Fragments accumulés (convertis en expéditions tous les 20) */
   @prop({ default: 0 })
   fragments!: number;
+
+  /** Total d'expéditions Sentier ouvertes (cumulatif, jamais décrémenté) */
+  @prop({ default: 0 })
+  sentierOpened!: number;
+
+  /** Total d'expéditions Falaise ouvertes (cumulatif) */
+  @prop({ default: 0 })
+  falaiseOpened!: number;
+
+  /** Total d'expéditions Sommet ouvertes (cumulatif) */
+  @prop({ default: 0 })
+  sommetOpened!: number;
 }
 
 const UserMountainsModel = getModelForClass(UserMountains, {

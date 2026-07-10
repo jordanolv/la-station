@@ -33,6 +33,9 @@ class GameStats {
 
   @prop({ default: 0 })
   losses!: number;
+
+  @prop({ default: 0 })
+  attempts!: number;
 }
 
 class ArcadeStats {
@@ -70,6 +73,9 @@ class UserStats {
 
   @prop({ default: 0 })
   dailyStreak!: number;
+
+  @prop({ default: 0 })
+  totalDailies!: number;
 
   @prop({ default: 0 })
   partyParticipated!: number;

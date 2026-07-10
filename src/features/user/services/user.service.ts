@@ -90,6 +90,14 @@ export class UserService {
     );
   }
 
+  static async recordArcadeAttempt(discordId: string, gameName: ArcadeGameName) {
+    return UserModel.findOneAndUpdate(
+      { discordId },
+      { $inc: { [`stats.arcade.${gameName}.attempts`]: 1 } },
+      { new: true, upsert: true }
+    );
+  }
+
   static async recordArcadeLoss(discordId: string, gameName: ArcadeGameName) {
     return UserModel.findOneAndUpdate(
       { discordId },
