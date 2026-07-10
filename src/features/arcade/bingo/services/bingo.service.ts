@@ -18,6 +18,8 @@ import { BingoRepository } from '../repositories/bingo.repository';
 import type { IBingoStateDoc } from '../models/bingo-state.model';
 import {
   BINGO_ACCENT_COLOR,
+  BINGO_BONUS_COUNT,
+  BINGO_BONUS_EXPEDITIONS,
   BINGO_FINISHED_ACCENT_COLOR,
   BINGO_NUMBER_MAX,
   BINGO_NUMBER_MIN,
@@ -57,13 +59,31 @@ export class BingoService {
       .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
-          `🏆 Récompense : **${BINGO_REWARD.money}** 💰 · **${BINGO_REWARD.xp}** XP · **${BINGO_REWARD.expeditions}** pack(s)`,
+          [
+            `🏆 Numéro gagnant : **${BINGO_REWARD.money}** 💰 · **${BINGO_REWARD.xp}** XP · **${BINGO_REWARD.expeditions}** pack(s) (termine le bingo)`,
+            `🎁 ${BINGO_BONUS_COUNT} numéros bonus cachés : **${BINGO_BONUS_EXPEDITIONS}** pack chacun (sans arrêter le bingo !)`,
+          ].join('\n'),
         ),
       );
   }
 
-  private static buildFinishedContainer(winnerId: string, target: number, guessCount: number): ContainerBuilder {
-    return new ContainerBuilder()
+  private static buildParticipantLines(guessers: string[]): string[] {
+    const total = guessers.length;
+    if (total === 0) return [];
+    const counts = new Map<string, number>();
+    for (const id of guessers) counts.set(id, (counts.get(id) ?? 0) + 1);
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([id, n]) => `<@${id}> — **${n}** coup${n > 1 ? 's' : ''} (${Math.round((n / total) * 100)}%)`);
+  }
+
+  private static buildFinishedContainer(
+    winnerId: string,
+    target: number,
+    guessCount: number,
+    guessers: string[],
+  ): ContainerBuilder {
+    const container = new ContainerBuilder()
       .setAccentColor(BINGO_FINISHED_ACCENT_COLOR)
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent('# ✅ BINGO TERMINÉ'),
@@ -77,7 +97,20 @@ export class BingoService {
             `🎲 Trouvé en : **${guessCount}** coup${guessCount > 1 ? 's' : ''}`,
           ].join('\n'),
         ),
-      )
+      );
+
+    const participantLines = this.buildParticipantLines(guessers);
+    if (participantLines.length > 0) {
+      container
+        .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(
+            [`## 👥 Participants — ${guessers.length} coup${guessers.length > 1 ? 's' : ''}`, ...participantLines].join('\n'),
+          ),
+        );
+    }
+
+    return container
       .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
@@ -184,6 +217,7 @@ export class BingoService {
     }
 
     const target = Math.floor(Math.random() * BINGO_NUMBER_MAX) + BINGO_NUMBER_MIN;
+    const bonusNumbers = this.pickBonusNumbers(target);
 
     const message = await (channel as TextChannel).send({
       components: [this.buildSpawnContainer()],
@@ -211,6 +245,7 @@ export class BingoService {
       messageId: message.id,
       threadId: thread.id,
       target,
+      bonusNumbers,
       startedAt: new Date(),
     });
 
@@ -218,6 +253,19 @@ export class BingoService {
       feature: LOG_FEATURE,
       title: '🎯 Spawn',
     }).catch(() => {});
+  }
+
+  private static pickBonusNumbers(target: number): number[] {
+    const pool: number[] = [];
+    for (let n = BINGO_NUMBER_MIN; n <= BINGO_NUMBER_MAX; n++) {
+      if (n !== target) pool.push(n);
+    }
+    const picked: number[] = [];
+    for (let i = 0; i < BINGO_BONUS_COUNT && pool.length > 0; i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      picked.push(pool.splice(idx, 1)[0]);
+    }
+    return picked;
   }
 
   static async handleMessage(message: Message, client: BotClient): Promise<void> {
@@ -241,14 +289,27 @@ export class BingoService {
 
     const isDuplicateGuess = state.activeGuesses?.includes(num) ?? false;
     const updatedState = await BingoRepository.registerGuess(message.author.id, num);
+    await UserService.recordArcadeAttempt(message.author.id, 'bingo');
     const guessCount = updatedState?.activeGuesses?.length ?? (state.activeGuesses?.length ?? 0) + 1;
 
     if (num === state.activeTarget) {
-      await this.handleWin(message, client, state, guessCount);
+      await this.handleWin(message, client, updatedState ?? state, guessCount);
       return;
     }
 
-    await message.react(isDuplicateGuess ? '🔁' : '❌').catch(() => {});
+    if (state.activeBonusNumbers?.includes(num) && (await BingoRepository.claimBonus(num))) {
+      const expeditions = await awardExpeditions(message.author.id, BINGO_BONUS_EXPEDITIONS);
+      await message.react('🎁').catch(() => {});
+      await message.reply({
+        content: `🎁 **NUMÉRO BONUS !** <@${message.author.id}> décroche **${BINGO_BONUS_EXPEDITIONS}** pack ${expeditions.summary} — le bingo continue !`,
+      }).catch(() => {});
+      LogService.info(
+        `<@${message.author.id}> a trouvé un numéro bonus (**${num}**) — ${expeditions.summary}`,
+        { feature: LOG_FEATURE, title: '🎁 Bonus' },
+      ).catch(() => {});
+    } else {
+      await message.react(isDuplicateGuess ? '🔁' : '❌').catch(() => {});
+    }
 
     if (guessCount > 0 && guessCount % BINGO_RECAP_EVERY === 0) {
       await this.sendRemainingRecap(message.channel as ThreadChannel, updatedState ?? state);
@@ -307,7 +368,7 @@ export class BingoService {
       await appConfig.save();
     }
 
-    await this.updateMainMessage(message, state, user.id, target, guessCount);
+    await this.updateMainMessage(message, state, user.id, target, guessCount, state.activeGuessers ?? []);
 
     await message.reply({
       content: [
@@ -334,6 +395,7 @@ export class BingoService {
     winnerId: string,
     target: number,
     guessCount: number,
+    guessers: string[],
   ): Promise<void> {
     if (!state.activeMessageId) return;
 
@@ -347,7 +409,7 @@ export class BingoService {
     if (!starterMessage) return;
 
     await starterMessage.edit({
-      components: [this.buildFinishedContainer(winnerId, target, guessCount)],
+      components: [this.buildFinishedContainer(winnerId, target, guessCount, guessers)],
       flags: MessageFlags.IsComponentsV2,
     }).catch(() => {});
   }

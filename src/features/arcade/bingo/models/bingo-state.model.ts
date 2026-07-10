@@ -22,6 +22,12 @@ export class BingoState {
   @prop({ type: () => [Number], default: [] })
   activeGuesses?: number[];
 
+  @prop({ type: () => [String], default: [] })
+  activeGuessers?: string[];
+
+  @prop({ type: () => [Number], default: [] })
+  activeBonusNumbers?: number[];
+
   @prop()
   activeStartedAt?: Date;
 }

@@ -17,5 +17,8 @@ export const BINGO_REWARD = {
   expeditions: 3,
 };
 
+export const BINGO_BONUS_COUNT = 5;
+export const BINGO_BONUS_EXPEDITIONS = 1;
+
 export const BINGO_ACCENT_COLOR = 0xffd166;
 export const BINGO_FINISHED_ACCENT_COLOR = 0x57cc99;
