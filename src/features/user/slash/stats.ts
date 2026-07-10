@@ -15,7 +15,6 @@ import { EXPEDITION_TIER_CONFIG, RARITY_CONFIG } from '../../peak-hunters/consta
 import type { MountainRarity } from '../../peak-hunters/types/peak-hunters.types';
 
 const ARCADE_LABELS: Record<string, string> = {
-  bingo: '🎯 Bingo',
   shifumi: '✊ Shifumi',
   puissance4: '🔴 Puissance 4',
   morpion: '⭕ Morpion',
@@ -52,11 +51,20 @@ export default {
       const stats = user.stats;
       const arcade = stats.arcade;
 
+      const bingo = (arcade as any)?.bingo ?? { wins: 0, attempts: 0 };
+      const bingoWins = bingo.wins ?? 0;
+      const bingoAttempts = bingo.attempts ?? 0;
+      const bingoLines = [
+        `🏆 Victoires : **${bingoWins}**`,
+        `🎲 Coups joués (total) : **${bingoAttempts}**`,
+      ];
+      if (bingoWins > 0) {
+        bingoLines.push(`📊 Moyenne : **${(bingoAttempts / bingoWins).toFixed(1)}** coups/victoire`);
+      }
+
       const arcadeLines = Object.entries(ARCADE_LABELS).map(([game, label]) => {
-        const g = (arcade as any)?.[game] ?? { wins: 0, losses: 0, attempts: 0 };
-        const parts = [`🏆 **${g.wins ?? 0}** · 💀 **${g.losses ?? 0}**`];
-        if ((g.attempts ?? 0) > 0) parts.push(`🎲 **${g.attempts}** tentatives`);
-        return `${label} — ${parts.join(' · ')}`;
+        const g = (arcade as any)?.[game] ?? { wins: 0, losses: 0 };
+        return `${label} — 🏆 **${g.wins ?? 0}** · 💀 **${g.losses ?? 0}**`;
       });
 
       const opened = {
@@ -93,6 +101,10 @@ export default {
         .setAccentColor(0x5865f2)
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(`# 📊 Statistiques de ${interaction.user.displayName}`),
+        )
+        .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(['## 🎯 Bingo', ...bingoLines].join('\n')),
         )
         .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
         .addTextDisplayComponents(
