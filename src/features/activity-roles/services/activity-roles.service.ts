@@ -12,12 +12,6 @@ const userRepo = new UserRepository();
 
 export class ActivityRolesService {
   static async run(client: BotClient): Promise<void> {
-    const config = await ActivityRolesConfigRepository.get();
-    if (!config?.enabled) return;
-
-    const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
-    if (!guild) return;
-
     const users = await userRepo.findAllUsers();
     console.log(`[ActivityRoles] ${users.length} users trouvés en BDD`);
     if (!users.length) return;
@@ -29,15 +23,23 @@ export class ActivityRolesService {
 
     console.log(`[ActivityRoles] ${scores.length} users actifs:`, scores.map(s => `${s.userId}=${s.points}pts`));
 
-    const total = scores.length;
-    const { podiumRoleId, activeRoleId, regularRoleId, inactiveRoleId, activeThresholdPercent, regularThresholdPercent } = config;
-    console.log(`[ActivityRoles] Config rôles — podium:${podiumRoleId} actif:${activeRoleId} présent:${regularRoleId} inactif:${inactiveRoleId}`);
-
+    // Le reset hebdo tourne même si l'attribution de rôles est désactivée,
+    // sinon les activityPoints s'accumulent sans fin.
     await UserModel.updateMany(
       {},
       [{ $set: { 'stats.lastWeekActivityPoints': '$stats.activityPoints', 'stats.activityPoints': 0 } }],
     );
     console.log(`[ActivityRoles] activityPoints remis à 0 pour tous les users`);
+
+    const config = await ActivityRolesConfigRepository.get();
+    if (!config?.enabled) return;
+
+    const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
+    if (!guild) return;
+
+    const total = scores.length;
+    const { podiumRoleId, activeRoleId, regularRoleId, inactiveRoleId, activeThresholdPercent, regularThresholdPercent } = config;
+    console.log(`[ActivityRoles] Config rôles — podium:${podiumRoleId} actif:${activeRoleId} présent:${regularRoleId} inactif:${inactiveRoleId}`);
 
     let assigned = 0;
     let removed = 0;
