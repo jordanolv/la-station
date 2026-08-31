@@ -31,6 +31,10 @@ class AppSettings {
 
   @prop()
   originalBannerUrl?: string;
+
+  /** Rôle opt-in pingé au lancement des jeux (quiz du jour, bingo…) */
+  @prop()
+  gamesPingRoleId?: string;
 }
 
 class AppFeatures {
