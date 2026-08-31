@@ -62,6 +62,12 @@ export default {
         bingoLines.push(`📊 Moyenne : **${(bingoAttempts / bingoWins).toFixed(1)}** coups/victoire`);
       }
 
+      const justePrix = (arcade as any)?.justePrix ?? { wins: 0, attempts: 0 };
+      const jpLines = [
+        `🏆 Victoires : **${justePrix.wins ?? 0}**`,
+        `🎲 Manches jouées : **${justePrix.attempts ?? 0}**`,
+      ];
+
       const arcadeLines = Object.entries(ARCADE_LABELS).map(([game, label]) => {
         const g = (arcade as any)?.[game] ?? { wins: 0, losses: 0 };
         return `${label} — 🏆 **${g.wins ?? 0}** · 💀 **${g.losses ?? 0}**`;
@@ -105,6 +111,10 @@ export default {
         .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(['## 🎯 Bingo', ...bingoLines].join('\n')),
+        )
+        .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(['## 💰 Juste Prix', ...jpLines].join('\n')),
         )
         .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
         .addTextDisplayComponents(
