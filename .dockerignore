@@ -4,3 +4,5 @@ dist
 .env.*
 .git
 *.log
+# pnpm 11 local uniquement (allowBuilds) — pnpm 9 de l'image Docker plante dessus
+pnpm-workspace.yaml
