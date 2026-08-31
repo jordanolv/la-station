@@ -376,5 +376,68 @@
         ]
       }
     ]
+  },
+  {
+    "version": "1.8.0",
+    "timestamp": 1788209400,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🗂️ Le Forum des Jeux",
+            "items": [
+              "Tous les jeux ont déménagé dans un **channel forum dédié** — un post permanent par jeu : ❓ Quiz du jour, 🎯 Bingo, 💰 Juste Prix et 🕹️ Arcade",
+              "Nouveau rôle **@🎮 Jeux** : clique le bouton du post 🔔 Notifications pour être pingé à chaque lancement de jeu (et re-clique pour le retirer)",
+              "Quand un jeu démarre, une **annonce avec lien** est postée dans le channel général — supprimée automatiquement à la fin"
+            ]
+          },
+          {
+            "title": "💰 Juste Prix — nouveau jeu !",
+            "items": [
+              "Un nombre mystère entre **1 et 1000** est tiré — propose **UN SEUL** nombre, modifiable jusqu'à la révélation à **21h**",
+              "**Le plus proche gagne** : 300 💰 · 200 XP · 1 pack d'expédition",
+              "Tomber sur le nombre **exact** = **+2 packs bonus** 🎯",
+              "Podium des 3 meilleures propositions à chaque révélation",
+              "Tout le monde a les mêmes chances : une proposition par joueur, camper ne sert à rien 😌"
+            ]
+          },
+          {
+            "title": "🔥 Séries de bonnes réponses (Quiz)",
+            "items": [
+              "Enchaîne les bonnes réponses jour après jour pour faire monter ta **série** 🔥",
+              "Tous les **5 jours de série** : une **expédition bonus** !",
+              "Le récap de 22h affiche le **top 3 des séries en cours**",
+              "Chaque **dimanche soir** : podium des **champions de la semaine** 🏆"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "❓ Quiz du jour — refonte complète",
+            "items": [
+              "À 13h, ce n'est plus une question mais un **choix de 4 thèmes** — chacun choisit le sien et reçoit SA question (premier clic = thème verrouillé !)",
+              "**7 grands thèmes** : 🏔️ Montagne (toujours présent), 🌍 Géographie, 🧠 Culture G, 🐾 Animaux, 🌿 Faune & Flore, 🎵 Musique, 🎮 Jeux vidéo",
+              "Nouveaux formats montagne : **📸 Photo mystère**, altitude, pays, duel de sommets, plus haut ou plus bas",
+              "Les questions sont désormais **vérifiées** — fini les réponses fausses et les répétitions",
+              "Le **premier à bien répondre sur chaque thème** remporte 2 packs au lieu d'1",
+              "Récap de 22h enrichi : toutes les questions, réponses, explications et scores"
+            ]
+          },
+          {
+            "title": "🎯 Bingo — place à l'équité",
+            "items": [
+              "**3 tentatives maximum par joueur** par partie — chaque coup compte, réfléchis avant de tirer !",
+              "À **minuit**, si personne n'a trouvé : le nombre est révélé et la **cagnotte roule** sur le prochain bingo (**+1 pack**) 💰",
+              "**Tous les participants** gagnent **2 fragments** quand quelqu'un trouve le nombre — jouer paie toujours",
+              "La cagnotte accumulée s'affiche en gros au lancement de la partie"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
