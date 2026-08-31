@@ -20,5 +20,9 @@ export const BINGO_REWARD = {
 export const BINGO_BONUS_COUNT = 5;
 export const BINGO_BONUS_EXPEDITIONS = 1;
 
+export const BINGO_MAX_GUESSES_PER_PLAYER = 3;
+export const BINGO_PARTICIPATION_FRAGMENTS = 2;
+export const BINGO_JACKPOT_INCREMENT = 1;
+
 export const BINGO_ACCENT_COLOR = 0xffd166;
 export const BINGO_FINISHED_ACCENT_COLOR = 0x57cc99;

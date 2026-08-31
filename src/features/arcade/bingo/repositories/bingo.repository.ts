@@ -28,6 +28,7 @@ export class BingoRepository {
     target: number;
     bonusNumbers: number[];
     startedAt: Date;
+    announceMessageId?: string | null;
   }): Promise<void> {
     const doc = await this.getOrCreate();
     doc.activeChannelId = params.channelId;
@@ -36,6 +37,7 @@ export class BingoRepository {
     doc.activeTarget = params.target;
     doc.activeBonusNumbers = params.bonusNumbers;
     doc.activeStartedAt = params.startedAt;
+    doc.announceMessageId = params.announceMessageId ?? undefined;
     doc.activeLastGuesserId = undefined;
     doc.activeGuesses = [];
     doc.activeGuessers = [];
@@ -57,9 +59,18 @@ export class BingoRepository {
           activeGuesses: '',
           activeGuessers: '',
           activeStartedAt: '',
+          announceMessageId: '',
         },
       },
     );
+  }
+
+  static async addJackpot(amount: number): Promise<void> {
+    await BingoStateModel.updateOne({}, { $inc: { jackpotBonus: amount } });
+  }
+
+  static async resetJackpot(): Promise<void> {
+    await BingoStateModel.updateOne({}, { $set: { jackpotBonus: 0 } });
   }
 
   static async setLastGuesser(userId: string): Promise<void> {

@@ -10,6 +10,8 @@ import {
 import { BotClient } from '../../../../bot/client';
 import { getGuildId } from '../../../../shared/guild';
 import { AppConfigService } from '../../../discord/services/app-config.service';
+import { GamesForumService } from '../../../discord/services/games-forum.service';
+import { ArcadeStatsService } from '../../services/arcade-stats.service';
 import { UserService } from '../../../user/services/user.service';
 import { LevelingService } from '../../../leveling/services/leveling.service';
 import { awardExpeditions } from '../../../peak-hunters/services/expedition.service';
@@ -20,6 +22,9 @@ import {
   BINGO_ACCENT_COLOR,
   BINGO_BONUS_COUNT,
   BINGO_BONUS_EXPEDITIONS,
+  BINGO_JACKPOT_INCREMENT,
+  BINGO_MAX_GUESSES_PER_PLAYER,
+  BINGO_PARTICIPATION_FRAGMENTS,
   BINGO_FINISHED_ACCENT_COLOR,
   BINGO_NUMBER_MAX,
   BINGO_NUMBER_MIN,
@@ -30,11 +35,13 @@ import {
   BINGO_THREAD_SLOWMODE_SECONDS,
 } from '../constants/bingo.constants';
 import { generateBingoDate } from '../utils/bingo-date.utils';
+import { toZonedTime } from 'date-fns-tz';
+import { addFragmentsAndAward } from '../../../peak-hunters/services/expedition.service';
 
 const LOG_FEATURE = '🎯 Bingo';
 
 export class BingoService {
-  private static buildSpawnContainer(): ContainerBuilder {
+  private static buildSpawnContainer(jackpot = 0): ContainerBuilder {
     return new ContainerBuilder()
       .setAccentColor(BINGO_ACCENT_COLOR)
       .addTextDisplayComponents(
@@ -51,8 +58,10 @@ export class BingoService {
           [
             '**Règles :**',
             `• Réponds avec un nombre entre ${BINGO_NUMBER_MIN} et ${BINGO_NUMBER_MAX} dans le fil`,
+            `• **${BINGO_MAX_GUESSES_PER_PLAYER} tentatives maximum** par joueur — choisis bien !`,
             '• Pas deux réponses d\'affilée (attends qu\'un autre joueur tente)',
             `• Cooldown de ${Math.floor(BINGO_THREAD_SLOWMODE_SECONDS / 60)} minutes entre chaque réponse`,
+            '• À minuit, si personne n\'a trouvé : la cagnotte roule sur le prochain bingo',
           ].join('\n'),
         ),
       )
@@ -60,8 +69,10 @@ export class BingoService {
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent(
           [
-            `🏆 Numéro gagnant : **${BINGO_REWARD.money}** 💰 · **${BINGO_REWARD.xp}** XP · **${BINGO_REWARD.expeditions}** pack(s) (termine le bingo)`,
+            `🏆 Numéro gagnant : **${BINGO_REWARD.money}** 💰 · **${BINGO_REWARD.xp}** XP · **${BINGO_REWARD.expeditions + jackpot}** pack(s) (termine le bingo)`,
             `🎁 ${BINGO_BONUS_COUNT} numéros bonus cachés : **${BINGO_BONUS_EXPEDITIONS}** pack chacun (sans arrêter le bingo !)`,
+            `🤝 Tous les participants gagnent **${BINGO_PARTICIPATION_FRAGMENTS}** fragments à la victoire`,
+            ...(jackpot > 0 ? [`💰 **CAGNOTTE : +${jackpot} pack${jackpot > 1 ? 's' : ''} reportés des bingos précédents !**`] : []),
           ].join('\n'),
         ),
       );
@@ -120,8 +131,12 @@ export class BingoService {
   }
 
   static async planDay(client: BotClient): Promise<void> {
-    const state = await BingoRepository.getOrCreate();
+    let state = await BingoRepository.getOrCreate();
 
+    if (state.activeThreadId && this.isStale(state)) {
+      await this.expire(client, state);
+      state = await BingoRepository.getOrCreate();
+    }
     if (state.activeThreadId) return;
     if (state.nextSpawnAt && state.nextSpawnAt.getTime() > Date.now()) return;
 
@@ -146,6 +161,10 @@ export class BingoService {
 
   static async rehydrate(client: BotClient): Promise<void> {
     const state = await BingoRepository.get();
+    if (state?.activeThreadId && this.isStale(state)) {
+      await this.expire(client, state);
+      return;
+    }
     if (!state?.nextSpawnAt) return;
 
     const ts = state.nextSpawnAt.getTime();
@@ -189,8 +208,9 @@ export class BingoService {
       return;
     }
 
-    if (!channelId) {
-      LogService.warning('Aucun salon arcade configuré, bingo annulé.', {
+    const forumConfig = await GamesForumService.getConfig();
+    if (!channelId && !forumConfig.bingoThreadId) {
+      LogService.warning('Aucun salon arcade ni post forum configuré, bingo annulé.', {
         feature: LOG_FEATURE,
         title: '⚠️ Spawn annulé',
       }).catch(() => {});
@@ -207,7 +227,43 @@ export class BingoService {
       return;
     }
 
-    const channel = await guild.channels.fetch(channelId).catch(() => null);
+    const target = Math.floor(Math.random() * BINGO_NUMBER_MAX) + BINGO_NUMBER_MIN;
+    const bonusNumbers = this.pickBonusNumbers(target);
+    const jackpot = (await BingoRepository.get())?.jackpotBonus ?? 0;
+
+    // Mode forum : la partie se joue dans le post permanent 🎯 Bingo
+    if (forumConfig.bingoThreadId) {
+      const post = await guild.channels.fetch(forumConfig.bingoThreadId).catch(() => null);
+      if (post?.isThread()) {
+        const message = await post.send({
+          components: [this.buildSpawnContainer(jackpot)],
+          flags: MessageFlags.IsComponentsV2,
+        });
+        await GamesForumService.pingInThread(post, `Un bingo démarre — devinez le nombre entre ${BINGO_NUMBER_MIN} et ${BINGO_NUMBER_MAX} !`);
+        const announceMessageId = await GamesForumService.announce(
+          client,
+          `🎯 **Un bingo vient de démarrer !** Trouvez le nombre mystère → <#${post.id}>`,
+        );
+
+        await BingoRepository.setActive({
+          channelId: post.parentId ?? post.id,
+          messageId: message.id,
+          threadId: post.id,
+          target,
+          bonusNumbers,
+          startedAt: new Date(),
+          announceMessageId,
+        });
+
+        LogService.info(`Bingo lancé dans <#${post.id}>`, {
+          feature: LOG_FEATURE,
+          title: '🎯 Spawn',
+        }).catch(() => {});
+        return;
+      }
+    }
+
+    const channel = channelId ? await guild.channels.fetch(channelId).catch(() => null) : null;
     if (!channel || !channel.isTextBased() || channel.isThread()) {
       LogService.warning(`Salon arcade invalide ou introuvable (${channelId}), bingo annulé.`, {
         feature: LOG_FEATURE,
@@ -216,11 +272,8 @@ export class BingoService {
       return;
     }
 
-    const target = Math.floor(Math.random() * BINGO_NUMBER_MAX) + BINGO_NUMBER_MIN;
-    const bonusNumbers = this.pickBonusNumbers(target);
-
     const message = await (channel as TextChannel).send({
-      components: [this.buildSpawnContainer()],
+      components: [this.buildSpawnContainer(jackpot)],
       flags: MessageFlags.IsComponentsV2,
     });
 
@@ -268,6 +321,65 @@ export class BingoService {
     return picked;
   }
 
+  /** Une partie est périmée si elle a démarré un jour précédent (heure de Paris). */
+  private static isStale(state: IBingoStateDoc): boolean {
+    if (!state.activeStartedAt) return false;
+    const day = (d: Date) => toZonedTime(d, 'Europe/Paris').toDateString();
+    return day(new Date(state.activeStartedAt)) !== day(new Date());
+  }
+
+  /** Personne n'a trouvé avant minuit : la cagnotte roule sur la prochaine partie. */
+  private static async expire(client: BotClient, state: IBingoStateDoc): Promise<void> {
+    const target = state.activeTarget;
+    const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
+    const thread = state.activeThreadId
+      ? await guild?.channels.fetch(state.activeThreadId).catch(() => null)
+      : null;
+
+    if (thread?.isThread()) {
+      if (state.activeMessageId) {
+        const mainMessage =
+          (await thread.messages.fetch(state.activeMessageId).catch(() => null)) ??
+          (thread.parent?.isTextBased() && !thread.parent.isThread()
+            ? await thread.parent.messages.fetch(state.activeMessageId).catch(() => null)
+            : null);
+        await mainMessage?.edit({
+          components: [
+            new ContainerBuilder()
+              .setAccentColor(BINGO_ACCENT_COLOR)
+              .addTextDisplayComponents(new TextDisplayBuilder().setContent('# ⏳ BINGO EXPIRÉ'))
+              .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
+              .addTextDisplayComponents(new TextDisplayBuilder().setContent(
+                [
+                  `Personne n'a trouvé le nombre mystère… c'était **${target}** !`,
+                  `💰 La cagnotte grossit : **+${BINGO_JACKPOT_INCREMENT}** pack sur le prochain bingo.`,
+                ].join('\n'),
+              )),
+          ],
+          flags: MessageFlags.IsComponentsV2,
+        }).catch(() => {});
+      }
+      await thread.send(
+        `⏳ **Minuit !** Personne n'a trouvé le **${target}**. La cagnotte roule : **+${BINGO_JACKPOT_INCREMENT}** pack sur le prochain bingo ! 💰`,
+      ).catch(() => {});
+
+      const forumConfig = await GamesForumService.getConfig();
+      if (thread.id !== forumConfig.bingoThreadId) {
+        await thread.setLocked(true).catch(() => {});
+        await thread.setArchived(true).catch(() => {});
+      }
+    }
+
+    await GamesForumService.deleteAnnounce(client, state.announceMessageId);
+    await BingoRepository.addJackpot(BINGO_JACKPOT_INCREMENT);
+    await BingoRepository.clearActive();
+
+    LogService.info(`Bingo expiré sans gagnant (cible **${target}**) — cagnotte +${BINGO_JACKPOT_INCREMENT} pack`, {
+      feature: LOG_FEATURE,
+      title: '⏳ Expiration',
+    }).catch(() => {});
+  }
+
   static async handleMessage(message: Message, client: BotClient): Promise<void> {
     if (message.author.bot) return;
     if (!message.channel.isThread()) return;
@@ -283,6 +395,15 @@ export class BingoService {
     if (state.activeLastGuesserId === message.author.id) {
       await message.reply({
         content: '⏳ Pas deux réponses d\'affilée ! Laisse un autre joueur tenter sa chance.',
+      }).catch(() => {});
+      return;
+    }
+
+    const usedGuesses = (state.activeGuessers ?? []).filter((id) => id === message.author.id).length;
+    if (usedGuesses >= BINGO_MAX_GUESSES_PER_PLAYER) {
+      await message.react('🚫').catch(() => {});
+      await message.reply({
+        content: `🚫 Tu as épuisé tes **${BINGO_MAX_GUESSES_PER_PLAYER}** tentatives pour ce bingo. Rendez-vous à la prochaine partie !`,
       }).catch(() => {});
       return;
     }
@@ -357,30 +478,41 @@ export class BingoService {
     const target = state.activeTarget;
     if (!target) return;
 
+    const jackpot = state.jackpotBonus ?? 0;
+    const totalPacks = BINGO_REWARD.expeditions + jackpot;
+
     await UserService.updateUserMoney(user.id, BINGO_REWARD.money);
     await LevelingService.giveXpDirectly(client, user.id, BINGO_REWARD.xp);
-    const expeditions = await awardExpeditions(user.id, BINGO_REWARD.expeditions);
+    const expeditions = await awardExpeditions(user.id, totalPacks);
     await UserService.recordArcadeWin(user.id, 'bingo' as any);
+    if (jackpot > 0) await BingoRepository.resetJackpot();
 
-    const appConfig = await AppConfigService.getOrCreateConfig();
-    if (appConfig.features.arcade?.bingo) {
-      appConfig.features.arcade.bingo.stats.totalGames += 1;
-      await appConfig.save();
+    const participants = [...new Set(state.activeGuessers ?? [])].filter((id) => id !== user.id);
+    for (const participantId of participants) {
+      await addFragmentsAndAward(participantId, BINGO_PARTICIPATION_FRAGMENTS).catch(() => {});
     }
+
+    await ArcadeStatsService.incrementTotalGames('bingo');
 
     await this.updateMainMessage(message, state, user.id, target, guessCount, state.activeGuessers ?? []);
 
     await message.reply({
       content: [
         `🎉 **BINGO !** <@${user.id}> a trouvé le nombre **${target}** en **${guessCount}** coup${guessCount > 1 ? 's' : ''} !`,
-        `🏆 +**${BINGO_REWARD.money}** 💰 · +**${BINGO_REWARD.xp}** XP · +**${BINGO_REWARD.expeditions}** pack(s) ${expeditions.summary}`,
+        `🏆 +**${BINGO_REWARD.money}** 💰 · +**${BINGO_REWARD.xp}** XP · +**${totalPacks}** pack(s) ${expeditions.summary}${jackpot > 0 ? ` (dont **${jackpot}** de cagnotte 💰)` : ''}`,
+        ...(participants.length > 0 ? [`🤝 ${participants.length} participant${participants.length > 1 ? 's' : ''} repartent avec **${BINGO_PARTICIPATION_FRAGMENTS}** fragments chacun !`] : []),
       ].join('\n'),
     }).catch(() => {});
 
+    // En mode forum, le post 🎯 Bingo est permanent : on ne le verrouille pas
+    const forumConfig = await GamesForumService.getConfig();
     const thread = message.channel as ThreadChannel;
-    await thread.setLocked(true).catch(() => {});
-    await thread.setArchived(true).catch(() => {});
+    if (thread.id !== forumConfig.bingoThreadId) {
+      await thread.setLocked(true).catch(() => {});
+      await thread.setArchived(true).catch(() => {});
+    }
 
+    await GamesForumService.deleteAnnounce(client, state.announceMessageId);
     await BingoRepository.clearActive();
 
     LogService.success(
@@ -402,10 +534,13 @@ export class BingoService {
     const thread = message.channel;
     if (!thread.isThread()) return;
 
+    // Mode forum : le message principal vit dans le post ; mode legacy : dans le channel parent
     const parent = thread?.parent;
-    if (!parent || !parent.isTextBased() || parent.isThread()) return;
-
-    const starterMessage = await parent.messages.fetch(state.activeMessageId).catch(() => null);
+    const starterMessage =
+      (await thread.messages.fetch(state.activeMessageId).catch(() => null)) ??
+      (parent && parent.isTextBased() && !parent.isThread()
+        ? await parent.messages.fetch(state.activeMessageId).catch(() => null)
+        : null);
     if (!starterMessage) return;
 
     await starterMessage.edit({
