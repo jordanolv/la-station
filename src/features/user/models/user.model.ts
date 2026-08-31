@@ -38,6 +38,27 @@ class GameStats {
   attempts!: number;
 }
 
+class QuizStats {
+  @prop({ default: 0 })
+  streak!: number;
+
+  @prop({ default: 0 })
+  bestStreak!: number;
+
+  @prop({ default: 0 })
+  totalCorrect!: number;
+
+  @prop({ default: 0 })
+  totalAnswered!: number;
+
+  /** Bonnes réponses de la semaine, reset au récap du dimanche soir */
+  @prop({ default: 0 })
+  weeklyCorrect!: number;
+
+  @prop()
+  lastCorrectAt?: Date;
+}
+
 class ArcadeStats {
   @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
   shifumi!: GameStats;
@@ -53,6 +74,9 @@ class ArcadeStats {
 
   @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
   bingo!: GameStats;
+
+  @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
+  justePrix!: GameStats;
 }
 
 class UserStats {
@@ -70,6 +94,9 @@ class UserStats {
 
   @prop({ type: () => ArcadeStats, default: () => ({}) })
   arcade!: ArcadeStats;
+
+  @prop({ type: () => QuizStats, default: () => ({}) })
+  quiz!: QuizStats;
 
   @prop({ default: 0 })
   dailyStreak!: number;

@@ -8,28 +8,42 @@ export class QuizConfigRepository {
     return QuizConfigModel.create({ activeAnswers: {} });
   }
 
-  static async setActiveQuestion(messageId: string, question: QuizQuestion, activeUntil: Date): Promise<void> {
+  static async setActiveQuestions(messageId: string, questions: QuizQuestion[], activeUntil: Date): Promise<void> {
     const doc = await this.getOrCreate();
     doc.activeMessageId = messageId;
-    doc.activeQuestion = question;
+    doc.activeQuestions = questions;
     doc.activeUntil = activeUntil;
+    doc.activeThemeChoices = {};
     doc.activeAnswers = {};
-    doc.firstCorrectUserId = undefined;
+    doc.firstCorrectByQuestion = {};
     const prev = doc.recentQuestionTexts ?? [];
-    doc.recentQuestionTexts = [...prev, question.question].slice(-25);
-    doc.markModified('activeQuestion');
+    doc.recentQuestionTexts = [...prev, ...questions.map((q) => q.id)].slice(-60);
+    doc.markModified('activeQuestions');
+    doc.markModified('activeThemeChoices');
     doc.markModified('activeAnswers');
+    doc.markModified('firstCorrectByQuestion');
     doc.markModified('recentQuestionTexts');
     await doc.save();
   }
 
-  static async saveAnswer(userId: string, choiceIndex: number, isFirstCorrect: boolean): Promise<void> {
+  static async setAnnounceMessage(messageId: string | null): Promise<void> {
+    await QuizConfigModel.updateOne(
+      {},
+      messageId ? { $set: { announceMessageId: messageId } } : { $unset: { announceMessageId: '' } },
+    );
+  }
+
+  static async saveThemeChoice(userId: string, questionId: string): Promise<void> {
+    await QuizConfigModel.updateOne({}, { $set: { [`activeThemeChoices.${userId}`]: questionId } });
+  }
+
+  static async saveAnswer(userId: string, choiceIndex: number, questionId: string, isFirstCorrect: boolean): Promise<void> {
     await QuizConfigModel.updateOne(
       {},
       {
         $set: {
           [`activeAnswers.${userId}`]: choiceIndex,
-          ...(isFirstCorrect ? { firstCorrectUserId: userId } : {}),
+          ...(isFirstCorrect ? { [`firstCorrectByQuestion.${questionId}`]: userId } : {}),
         },
       },
     );
@@ -38,11 +52,15 @@ export class QuizConfigRepository {
   static async clearActiveQuestion(): Promise<void> {
     const doc = await this.getOrCreate();
     doc.activeMessageId = undefined;
-    doc.activeQuestion = undefined;
+    doc.activeQuestions = [];
     doc.activeUntil = undefined;
+    doc.activeThemeChoices = {};
     doc.activeAnswers = {};
-    doc.firstCorrectUserId = undefined;
+    doc.firstCorrectByQuestion = {};
+    doc.markModified('activeQuestions');
+    doc.markModified('activeThemeChoices');
     doc.markModified('activeAnswers');
+    doc.markModified('firstCorrectByQuestion');
     await doc.save();
   }
 }

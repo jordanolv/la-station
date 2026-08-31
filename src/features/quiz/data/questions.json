@@ -1,42 +1,329 @@
 [
   {
     "id": "q001",
-    "question": "Quelle est la plus haute montagne du monde ?",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale de l'Australie ?",
     "choices": [
-      "Mont Blanc",
-      "K2",
-      "Everest",
-      "Kangchenjunga"
+      "Sydney",
+      "Melbourne",
+      "Canberra",
+      "Perth"
     ],
     "answer": 2,
-    "explanation": "L'Everest culmine à 8 848 m, c'est le plus haut sommet du monde."
-  },
-  {
-    "id": "q001",
-    "question": "Quelle est la plus longue chaîne de montagnes du monde ?",
-    "choices": [
-      "Les montagnes Rocheuses",
-      "L'Himalaya",
-      "La cordillère des Andes",
-      "Les Alpes"
-    ],
-    "answer": 2,
-    "explanation": "La cordillère des Andes, en Amérique du Sud, s'étend sur environ 7 000 km, ce qui en fait la plus longue chaîne de montagnes continentale au monde."
+    "explanation": "Canberra a été choisie en 1908 comme compromis entre Sydney et Melbourne.",
+    "category": "geographie"
   },
   {
     "id": "q002",
-    "question": "Quel est le plus haut sommet des Alpes ?",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale du Canada ?",
     "choices": [
-      "Le mont Cervin",
-      "Le mont Blanc",
-      "Le mont Elbrouz",
-      "Le Grossglockner"
+      "Toronto",
+      "Ottawa",
+      "Montréal",
+      "Vancouver"
     ],
     "answer": 1,
-    "explanation": "Le mont Blanc culmine à 4 805 mètres, c'est le point culminant de la chaîne des Alpes."
+    "explanation": "Ottawa est la capitale fédérale du Canada, bien que Toronto soit la ville la plus peuplée.",
+    "category": "geographie"
   },
   {
     "id": "q003",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale du Brésil ?",
+    "choices": [
+      "Rio de Janeiro",
+      "São Paulo",
+      "Salvador",
+      "Brasília"
+    ],
+    "answer": 3,
+    "explanation": "Brasília, ville planifiée inaugurée en 1960, a remplacé Rio de Janeiro comme capitale.",
+    "category": "geographie"
+  },
+  {
+    "id": "q004",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale de la Turquie ?",
+    "choices": [
+      "Istanbul",
+      "Ankara",
+      "Izmir",
+      "Bursa"
+    ],
+    "answer": 1,
+    "explanation": "Ankara est la capitale depuis 1923, même si Istanbul reste la plus grande ville du pays.",
+    "category": "geographie"
+  },
+  {
+    "id": "q005",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale de la Suisse ?",
+    "choices": [
+      "Zurich",
+      "Genève",
+      "Berne",
+      "Lausanne"
+    ],
+    "answer": 2,
+    "explanation": "Berne est la ville fédérale de la Suisse, devant Zurich et Genève pourtant plus peuplées.",
+    "category": "geographie"
+  },
+  {
+    "id": "q006",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale de la Nouvelle-Zélande ?",
+    "choices": [
+      "Auckland",
+      "Wellington",
+      "Christchurch",
+      "Hamilton"
+    ],
+    "answer": 1,
+    "explanation": "Wellington est la capitale, Auckland étant la ville la plus peuplée du pays.",
+    "category": "geographie"
+  },
+  {
+    "id": "q007",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale du Maroc ?",
+    "choices": [
+      "Casablanca",
+      "Marrakech",
+      "Fès",
+      "Rabat"
+    ],
+    "answer": 3,
+    "explanation": "Rabat est la capitale administrative du Maroc, Casablanca sa capitale économique.",
+    "category": "geographie"
+  },
+  {
+    "id": "q008",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale du Kazakhstan ?",
+    "choices": [
+      "Almaty",
+      "Astana",
+      "Tachkent",
+      "Bichkek"
+    ],
+    "answer": 1,
+    "explanation": "Astana (brièvement renommée Nour-Soultan) est la capitale depuis 1997.",
+    "category": "geographie"
+  },
+  {
+    "id": "q009",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale de la Birmanie (Myanmar) ?",
+    "choices": [
+      "Rangoun",
+      "Mandalay",
+      "Naypyidaw",
+      "Bagan"
+    ],
+    "answer": 2,
+    "explanation": "Naypyidaw, ville construite ex nihilo, est devenue capitale en 2005 à la place de Rangoun.",
+    "category": "geographie"
+  },
+  {
+    "id": "q010",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale du Vietnam ?",
+    "choices": [
+      "Hô Chi Minh-Ville",
+      "Hanoï",
+      "Da Nang",
+      "Huê"
+    ],
+    "answer": 1,
+    "explanation": "Hanoï est la capitale du Vietnam, Hô Chi Minh-Ville (ex-Saïgon) étant la plus grande ville.",
+    "category": "geographie"
+  },
+  {
+    "id": "q011",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale du Nigeria ?",
+    "choices": [
+      "Lagos",
+      "Abuja",
+      "Kano",
+      "Ibadan"
+    ],
+    "answer": 1,
+    "explanation": "Abuja a remplacé Lagos comme capitale en 1991 pour sa position centrale dans le pays.",
+    "category": "geographie"
+  },
+  {
+    "id": "q012",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale constitutionnelle de la Bolivie ?",
+    "choices": [
+      "La Paz",
+      "Sucre",
+      "Santa Cruz",
+      "Cochabamba"
+    ],
+    "answer": 1,
+    "explanation": "Sucre est la capitale constitutionnelle, mais La Paz est le siège du gouvernement.",
+    "category": "geographie"
+  },
+  {
+    "id": "q013",
+    "theme": "Capitales",
+    "question": "Quelle capitale européenne est construite sur 14 îles ?",
+    "choices": [
+      "Copenhague",
+      "Amsterdam",
+      "Stockholm",
+      "Helsinki"
+    ],
+    "answer": 2,
+    "explanation": "Stockholm s'étend sur 14 îles reliées par une cinquantaine de ponts.",
+    "category": "geographie"
+  },
+  {
+    "id": "q014",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale la plus haute du monde ?",
+    "choices": [
+      "Quito",
+      "Bogota",
+      "La Paz",
+      "Katmandou"
+    ],
+    "answer": 2,
+    "explanation": "La Paz, siège du gouvernement bolivien, culmine à environ 3 640 m d'altitude.",
+    "category": "geographie"
+  },
+  {
+    "id": "q015",
+    "theme": "Capitales",
+    "question": "Quelle est la capitale la plus septentrionale du monde ?",
+    "choices": [
+      "Oslo",
+      "Helsinki",
+      "Reykjavik",
+      "Stockholm"
+    ],
+    "answer": 2,
+    "explanation": "Reykjavik, en Islande, est la capitale d'État la plus proche du pôle Nord.",
+    "category": "geographie"
+  },
+  {
+    "id": "q016",
+    "theme": "Fleuves",
+    "question": "Quel est le plus long fleuve d'Europe ?",
+    "choices": [
+      "Le Danube",
+      "La Volga",
+      "Le Rhin",
+      "Le Dniepr"
+    ],
+    "answer": 1,
+    "explanation": "La Volga s'étire sur environ 3 530 km à travers la Russie avant de rejoindre la mer Caspienne.",
+    "category": "geographie"
+  },
+  {
+    "id": "q017",
+    "theme": "Fleuves",
+    "question": "Quel fleuve traverse Vienne, Budapest et Belgrade ?",
+    "choices": [
+      "Le Rhin",
+      "L'Elbe",
+      "Le Danube",
+      "La Vistule"
+    ],
+    "answer": 2,
+    "explanation": "Le Danube traverse dix pays, un record mondial, dont l'Autriche, la Hongrie et la Serbie.",
+    "category": "geographie"
+  },
+  {
+    "id": "q018",
+    "theme": "Fleuves",
+    "question": "Quel fleuve se jette dans la Méditerranée après avoir traversé Lyon ?",
+    "choices": [
+      "La Loire",
+      "Le Rhône",
+      "La Garonne",
+      "La Seine"
+    ],
+    "answer": 1,
+    "explanation": "Le Rhône naît en Suisse, traverse Lyon et se jette dans la Méditerranée par la Camargue.",
+    "category": "geographie"
+  },
+  {
+    "id": "q019",
+    "theme": "Fleuves",
+    "question": "Quel est le plus long fleuve d'Afrique ?",
+    "choices": [
+      "Le Congo",
+      "Le Niger",
+      "Le Zambèze",
+      "Le Nil"
+    ],
+    "answer": 3,
+    "explanation": "Le Nil parcourt environ 6 650 km, de la région des Grands Lacs à la Méditerranée.",
+    "category": "geographie"
+  },
+  {
+    "id": "q020",
+    "theme": "Fleuves",
+    "question": "Quel fleuve possède le plus grand débit du monde ?",
+    "choices": [
+      "Le Nil",
+      "L'Amazone",
+      "Le Congo",
+      "Le Yangzi Jiang"
+    ],
+    "answer": 1,
+    "explanation": "L'Amazone déverse à lui seul près de 20 % de l'eau douce arrivant dans les océans.",
+    "category": "geographie"
+  },
+  {
+    "id": "q021",
+    "theme": "Fleuves",
+    "question": "Quel fleuve forme une partie de la frontière entre les États-Unis et le Mexique ?",
+    "choices": [
+      "Le Colorado",
+      "Le Mississippi",
+      "Le Rio Grande",
+      "Le Missouri"
+    ],
+    "answer": 2,
+    "explanation": "Le Rio Grande sert de frontière naturelle entre le Texas et le Mexique.",
+    "category": "geographie"
+  },
+  {
+    "id": "q022",
+    "theme": "Fleuves",
+    "question": "Sur quel fleuve se trouvent les chutes Victoria ?",
+    "choices": [
+      "Le Zambèze",
+      "Le Congo",
+      "Le Nil",
+      "L'Orange"
+    ],
+    "answer": 0,
+    "explanation": "Les chutes Victoria, sur le Zambèze, marquent la frontière entre la Zambie et le Zimbabwe.",
+    "category": "geographie"
+  },
+  {
+    "id": "q023",
+    "theme": "Fleuves",
+    "question": "Quel est le plus long fleuve entièrement situé en France ?",
+    "choices": [
+      "La Seine",
+      "Le Rhône",
+      "La Garonne",
+      "La Loire"
+    ],
+    "answer": 3,
+    "explanation": "La Loire parcourt environ 1 000 km, du mont Gerbier-de-Jonc à l'estuaire de Saint-Nazaire.",
+    "category": "geographie"
+  },
+  {
+    "id": "q024",
+    "theme": "Fleuves",
     "question": "Quel fleuve a creusé le Grand Canyon aux États-Unis ?",
     "choices": [
       "Le Mississippi",
@@ -45,270 +332,5173 @@
       "Le Missouri"
     ],
     "answer": 1,
-    "explanation": "Le Grand Canyon a été sculpté au fil de millions d'années par le fleuve Colorado, dans l'État de l'Arizona."
+    "explanation": "Le Grand Canyon a été sculpté pendant des millions d'années par le fleuve Colorado, en Arizona.",
+    "category": "geographie"
   },
   {
-    "id": "q004",
-    "question": "Quel pays possède le plus grand nombre de volcans actifs au monde ?",
+    "id": "q025",
+    "theme": "Fleuves",
+    "question": "Quel grand fleuve de Chine est surnommé le « fleuve Jaune » ?",
+    "choices": [
+      "Le Yangzi Jiang",
+      "Le Mékong",
+      "Le Huang He",
+      "La rivière des Perles"
+    ],
+    "answer": 2,
+    "explanation": "Le Huang He doit son surnom à la couleur des limons qu'il charrie.",
+    "category": "geographie"
+  },
+  {
+    "id": "q026",
+    "theme": "Déserts",
+    "question": "Quel est le plus grand désert chaud du monde ?",
+    "choices": [
+      "Le désert de Gobi",
+      "Le Kalahari",
+      "Le Sahara",
+      "Le désert d'Arabie"
+    ],
+    "answer": 2,
+    "explanation": "Le Sahara couvre environ 9 millions de km², soit près de 17 fois la France.",
+    "category": "geographie"
+  },
+  {
+    "id": "q027",
+    "theme": "Déserts",
+    "question": "Quel est le désert non polaire le plus aride du monde ?",
+    "choices": [
+      "Le Sahara",
+      "L'Atacama",
+      "Le désert de Mojave",
+      "Le Taklamakan"
+    ],
+    "answer": 1,
+    "explanation": "Certaines stations de l'Atacama, au Chili, n'ont jamais enregistré la moindre pluie.",
+    "category": "geographie"
+  },
+  {
+    "id": "q028",
+    "theme": "Déserts",
+    "question": "Le désert de Gobi s'étend sur la Chine et quel autre pays ?",
+    "choices": [
+      "Le Kazakhstan",
+      "La Russie",
+      "La Mongolie",
+      "Le Kirghizistan"
+    ],
+    "answer": 2,
+    "explanation": "Le Gobi couvre le sud de la Mongolie et le nord de la Chine.",
+    "category": "geographie"
+  },
+  {
+    "id": "q029",
+    "theme": "Déserts",
+    "question": "Dans quel pays se trouve principalement le désert du Kalahari ?",
+    "choices": [
+      "La Namibie",
+      "Le Botswana",
+      "L'Afrique du Sud",
+      "L'Angola"
+    ],
+    "answer": 1,
+    "explanation": "Le Kalahari couvre environ 70 % du territoire du Botswana.",
+    "category": "geographie"
+  },
+  {
+    "id": "q030",
+    "theme": "Déserts",
+    "question": "Quel désert couvre une grande partie du sud de la péninsule arabique ?",
+    "choices": [
+      "Le Néguev",
+      "Le Rub al-Khali",
+      "Le Thar",
+      "Le Karakoum"
+    ],
+    "answer": 1,
+    "explanation": "Le Rub al-Khali, « le quart vide », est le plus grand désert de sable continu du monde.",
+    "category": "geographie"
+  },
+  {
+    "id": "q031",
+    "theme": "Mers & océans",
+    "question": "Quel est le plus grand océan du monde ?",
+    "choices": [
+      "L'Atlantique",
+      "L'Indien",
+      "Le Pacifique",
+      "L'Arctique"
+    ],
+    "answer": 2,
+    "explanation": "Le Pacifique couvre environ un tiers de la surface du globe, plus que toutes les terres réunies.",
+    "category": "geographie"
+  },
+  {
+    "id": "q032",
+    "theme": "Mers & océans",
+    "question": "Quel est le plus petit océan du monde ?",
+    "choices": [
+      "L'Arctique",
+      "L'Indien",
+      "L'Atlantique",
+      "L'Austral"
+    ],
+    "answer": 0,
+    "explanation": "L'océan Arctique est le plus petit et le moins profond des océans.",
+    "category": "geographie"
+  },
+  {
+    "id": "q033",
+    "theme": "Mers & océans",
+    "question": "Où se trouve le point le plus profond des océans ?",
+    "choices": [
+      "La fosse de Porto Rico",
+      "La fosse des Mariannes",
+      "La fosse des Tonga",
+      "La fosse du Japon"
+    ],
+    "answer": 1,
+    "explanation": "La fosse des Mariannes descend à près de 11 000 m sous le niveau de la mer.",
+    "category": "geographie"
+  },
+  {
+    "id": "q034",
+    "theme": "Mers & océans",
+    "question": "Quel est le point le plus bas de la surface terrestre émergée ?",
+    "choices": [
+      "La vallée de la Mort",
+      "Les rives de la mer Morte",
+      "La dépression de Qattara",
+      "Le lac Assal"
+    ],
+    "answer": 1,
+    "explanation": "Les rives de la mer Morte se situent à environ 430 m sous le niveau de la mer.",
+    "category": "geographie"
+  },
+  {
+    "id": "q035",
+    "theme": "Mers & océans",
+    "question": "Quel détroit sépare l'Espagne du Maroc ?",
+    "choices": [
+      "Le détroit du Bosphore",
+      "Le détroit de Messine",
+      "Le détroit de Gibraltar",
+      "Le détroit d'Ormuz"
+    ],
+    "answer": 2,
+    "explanation": "Le détroit de Gibraltar, large de 14 km à peine, sépare l'Europe de l'Afrique.",
+    "category": "geographie"
+  },
+  {
+    "id": "q036",
+    "theme": "Mers & océans",
+    "question": "Quel détroit sépare l'Asie de l'Amérique ?",
+    "choices": [
+      "Le détroit de Magellan",
+      "Le détroit de Béring",
+      "Le détroit de Malacca",
+      "Le détroit de Torres"
+    ],
+    "answer": 1,
+    "explanation": "Le détroit de Béring sépare la Sibérie de l'Alaska sur environ 85 km.",
+    "category": "geographie"
+  },
+  {
+    "id": "q037",
+    "theme": "Mers & océans",
+    "question": "Quelle mer borde à la fois la Turquie, l'Ukraine et la Roumanie ?",
+    "choices": [
+      "La mer Égée",
+      "La mer Caspienne",
+      "La mer Noire",
+      "La mer d'Azov"
+    ],
+    "answer": 2,
+    "explanation": "La mer Noire est bordée par six pays, dont la Turquie, l'Ukraine et la Roumanie.",
+    "category": "geographie"
+  },
+  {
+    "id": "q038",
+    "theme": "Mers & océans",
+    "question": "Quel canal relie la Méditerranée à la mer Rouge ?",
+    "choices": [
+      "Le canal de Panama",
+      "Le canal de Suez",
+      "Le canal de Corinthe",
+      "Le canal de Kiel"
+    ],
+    "answer": 1,
+    "explanation": "Le canal de Suez, inauguré en 1869, évite aux navires de contourner l'Afrique.",
+    "category": "geographie"
+  },
+  {
+    "id": "q039",
+    "theme": "Mers & océans",
+    "question": "Quel canal relie l'océan Atlantique au Pacifique ?",
+    "choices": [
+      "Le canal de Suez",
+      "Le canal de Panama",
+      "Le canal de Kiel",
+      "Le canal du Mozambique"
+    ],
+    "answer": 1,
+    "explanation": "Le canal de Panama, ouvert en 1914, traverse l'isthme d'Amérique centrale.",
+    "category": "geographie"
+  },
+  {
+    "id": "q040",
+    "theme": "Mers & océans",
+    "question": "Quelle est la plus grande étendue d'eau fermée du monde ?",
+    "choices": [
+      "Le lac Supérieur",
+      "La mer Caspienne",
+      "Le lac Victoria",
+      "La mer d'Aral"
+    ],
+    "answer": 1,
+    "explanation": "La mer Caspienne, avec ses 371 000 km², est en réalité le plus grand lac du monde.",
+    "category": "geographie"
+  },
+  {
+    "id": "q041",
+    "theme": "Mers & océans",
+    "question": "Quel courant marin réchauffe les côtes de l'Europe de l'Ouest ?",
+    "choices": [
+      "Le courant de Humboldt",
+      "Le Gulf Stream",
+      "Le Kuroshio",
+      "Le courant des Canaries"
+    ],
+    "answer": 1,
+    "explanation": "Le Gulf Stream transporte des eaux chaudes des Caraïbes vers l'Atlantique Nord.",
+    "category": "geographie"
+  },
+  {
+    "id": "q042",
+    "theme": "Mers & océans",
+    "question": "Dans quel océan se trouve le point Nemo, l'endroit le plus éloigné de toute terre ?",
+    "choices": [
+      "L'Atlantique",
+      "L'Indien",
+      "Le Pacifique",
+      "L'Austral"
+    ],
+    "answer": 2,
+    "explanation": "Le point Nemo, dans le Pacifique Sud, est à plus de 2 600 km de la terre la plus proche.",
+    "category": "geographie"
+  },
+  {
+    "id": "q043",
+    "theme": "Lacs",
+    "question": "Quel est le plus grand lac d'eau douce du monde en superficie ?",
+    "choices": [
+      "Le lac Baïkal",
+      "Le lac Victoria",
+      "Le lac Supérieur",
+      "Le lac Michigan"
+    ],
+    "answer": 2,
+    "explanation": "Le lac Supérieur, entre les États-Unis et le Canada, couvre environ 82 000 km².",
+    "category": "geographie"
+  },
+  {
+    "id": "q044",
+    "theme": "Lacs",
+    "question": "Quel est le lac le plus profond du monde ?",
+    "choices": [
+      "Le lac Tanganyika",
+      "Le lac Baïkal",
+      "Le lac Supérieur",
+      "La mer Caspienne"
+    ],
+    "answer": 1,
+    "explanation": "Le lac Baïkal, en Sibérie, atteint 1 642 m de profondeur et contient 20 % de l'eau douce liquide de la planète.",
+    "category": "geographie"
+  },
+  {
+    "id": "q045",
+    "theme": "Lacs",
+    "question": "Quel est le plus grand lac d'Afrique ?",
+    "choices": [
+      "Le lac Tanganyika",
+      "Le lac Malawi",
+      "Le lac Victoria",
+      "Le lac Tchad"
+    ],
+    "answer": 2,
+    "explanation": "Le lac Victoria, partagé entre trois pays, est la principale source du Nil.",
+    "category": "geographie"
+  },
+  {
+    "id": "q046",
+    "theme": "Lacs",
+    "question": "Le lac Titicaca est partagé entre la Bolivie et quel autre pays ?",
+    "choices": [
+      "Le Chili",
+      "Le Pérou",
+      "L'Équateur",
+      "L'Argentine"
+    ],
+    "answer": 1,
+    "explanation": "Le lac Titicaca, à 3 812 m d'altitude, est le plus haut lac navigable du monde.",
+    "category": "geographie"
+  },
+  {
+    "id": "q047",
+    "theme": "Lacs",
+    "question": "Dans quel pays se trouve le lac Balaton ?",
+    "choices": [
+      "L'Autriche",
+      "La Roumanie",
+      "La Hongrie",
+      "La Slovaquie"
+    ],
+    "answer": 2,
+    "explanation": "Le Balaton, surnommé la « mer hongroise », est le plus grand lac d'Europe centrale.",
+    "category": "geographie"
+  },
+  {
+    "id": "q048",
+    "theme": "Îles",
+    "question": "Quelle est la plus grande île du monde ?",
+    "choices": [
+      "La Nouvelle-Guinée",
+      "Bornéo",
+      "Madagascar",
+      "Le Groenland"
+    ],
+    "answer": 3,
+    "explanation": "Le Groenland s'étend sur près de 2,2 millions de km² (l'Australie est considérée comme un continent).",
+    "category": "geographie"
+  },
+  {
+    "id": "q049",
+    "theme": "Îles",
+    "question": "Quelle est la plus grande île de la Méditerranée ?",
+    "choices": [
+      "La Sardaigne",
+      "La Sicile",
+      "Chypre",
+      "La Corse"
+    ],
+    "answer": 1,
+    "explanation": "La Sicile devance de peu la Sardaigne avec ses 25 700 km².",
+    "category": "geographie"
+  },
+  {
+    "id": "q050",
+    "theme": "Îles",
+    "question": "À quel pays appartient l'archipel des Galápagos ?",
+    "choices": [
+      "Le Pérou",
+      "La Colombie",
+      "L'Équateur",
+      "Le Chili"
+    ],
+    "answer": 2,
+    "explanation": "Les Galápagos, célèbres pour leur faune unique, sont équatoriennes depuis 1832.",
+    "category": "geographie"
+  },
+  {
+    "id": "q051",
+    "theme": "Îles",
+    "question": "À quel pays appartient l'île de Pâques ?",
+    "choices": [
+      "Le Chili",
+      "Le Pérou",
+      "La Polynésie française",
+      "L'Équateur"
+    ],
+    "answer": 0,
+    "explanation": "L'île de Pâques et ses moaï appartiennent au Chili, pourtant distant de 3 500 km.",
+    "category": "geographie"
+  },
+  {
+    "id": "q052",
+    "theme": "Îles",
+    "question": "Dans quel océan se trouve Madagascar ?",
+    "choices": [
+      "L'Atlantique",
+      "L'océan Indien",
+      "Le Pacifique",
+      "L'océan Austral"
+    ],
+    "answer": 1,
+    "explanation": "Madagascar, quatrième plus grande île du monde, se situe dans l'océan Indien.",
+    "category": "geographie"
+  },
+  {
+    "id": "q053",
+    "theme": "Îles",
+    "question": "Quelle île est partagée entre trois pays ?",
+    "choices": [
+      "La Nouvelle-Guinée",
+      "Bornéo",
+      "Sumatra",
+      "Hispaniola"
+    ],
+    "answer": 1,
+    "explanation": "Bornéo est partagée entre l'Indonésie, la Malaisie et le sultanat de Brunei.",
+    "category": "geographie"
+  },
+  {
+    "id": "q054",
+    "theme": "Îles",
+    "question": "Quelle est la plus grande île du Japon ?",
+    "choices": [
+      "Hokkaidō",
+      "Kyūshū",
+      "Honshū",
+      "Shikoku"
+    ],
+    "answer": 2,
+    "explanation": "Honshū abrite Tokyo, Osaka et Kyoto, et concentre l'essentiel de la population japonaise.",
+    "category": "geographie"
+  },
+  {
+    "id": "q055",
+    "theme": "Îles",
+    "question": "Quel pays forme le plus grand archipel du monde ?",
+    "choices": [
+      "Les Philippines",
+      "L'Indonésie",
+      "Le Japon",
+      "Les Maldives"
+    ],
+    "answer": 1,
+    "explanation": "L'Indonésie compte plus de 17 000 îles, dont environ 6 000 habitées.",
+    "category": "geographie"
+  },
+  {
+    "id": "q056",
+    "theme": "Pays & frontières",
+    "question": "Quel est le plus grand pays du monde par la superficie ?",
+    "choices": [
+      "Le Canada",
+      "La Chine",
+      "Les États-Unis",
+      "La Russie"
+    ],
+    "answer": 3,
+    "explanation": "La Russie couvre plus de 17 millions de km², soit près du double du deuxième.",
+    "category": "geographie"
+  },
+  {
+    "id": "q057",
+    "theme": "Pays & frontières",
+    "question": "Quel est le plus petit État du monde ?",
+    "choices": [
+      "Monaco",
+      "Le Vatican",
+      "Saint-Marin",
+      "Le Liechtenstein"
+    ],
+    "answer": 1,
+    "explanation": "Le Vatican s'étend sur 44 hectares seulement, au cœur de Rome.",
+    "category": "geographie"
+  },
+  {
+    "id": "q058",
+    "theme": "Pays & frontières",
+    "question": "Quel est le seul pays traversé à la fois par l'équateur et le tropique du Capricorne ?",
+    "choices": [
+      "La RD Congo",
+      "L'Indonésie",
+      "Le Brésil",
+      "La Colombie"
+    ],
+    "answer": 2,
+    "explanation": "Le Brésil est si vaste qu'il est traversé par ces deux lignes imaginaires.",
+    "category": "geographie"
+  },
+  {
+    "id": "q059",
+    "theme": "Pays & frontières",
+    "question": "Quel pays occupe, avec l'Espagne, l'essentiel de la péninsule Ibérique ?",
+    "choices": [
+      "L'Andorre",
+      "Le Portugal",
+      "La France",
+      "L'Italie"
+    ],
+    "answer": 1,
+    "explanation": "Le Portugal occupe la façade atlantique de la péninsule Ibérique.",
+    "category": "geographie"
+  },
+  {
+    "id": "q060",
+    "theme": "Pays & frontières",
+    "question": "Quel pays est entièrement enclavé dans l'Afrique du Sud ?",
+    "choices": [
+      "L'Eswatini",
+      "Le Botswana",
+      "Le Lesotho",
+      "Le Zimbabwe"
+    ],
+    "answer": 2,
+    "explanation": "Le Lesotho est l'un des trois seuls pays au monde totalement enclavés dans un autre.",
+    "category": "geographie"
+  },
+  {
+    "id": "q061",
+    "theme": "Pays & frontières",
+    "question": "Lequel de ces pays d'Amérique du Sud n'a pas d'accès à la mer ?",
+    "choices": [
+      "L'Uruguay",
+      "L'Équateur",
+      "La Bolivie",
+      "Le Pérou"
+    ],
+    "answer": 2,
+    "explanation": "La Bolivie a perdu son accès au Pacifique lors de la guerre du Pacifique (1879-1884).",
+    "category": "geographie"
+  },
+  {
+    "id": "q062",
+    "theme": "Pays & frontières",
+    "question": "Quel est le pays le plus peuplé d'Afrique ?",
+    "choices": [
+      "L'Égypte",
+      "L'Éthiopie",
+      "La RD Congo",
+      "Le Nigeria"
+    ],
+    "answer": 3,
+    "explanation": "Le Nigeria dépasse les 220 millions d'habitants, loin devant l'Éthiopie et l'Égypte.",
+    "category": "geographie"
+  },
+  {
+    "id": "q063",
+    "theme": "Pays & frontières",
+    "question": "Quel pays possède la plus longue côte du monde ?",
+    "choices": [
+      "La Russie",
+      "Le Canada",
+      "L'Australie",
+      "L'Indonésie"
+    ],
+    "answer": 1,
+    "explanation": "Grâce à ses innombrables îles arctiques, le Canada aligne plus de 200 000 km de côtes.",
+    "category": "geographie"
+  },
+  {
+    "id": "q064",
+    "theme": "Pays & frontières",
+    "question": "Quel continent est traversé par tous les méridiens ?",
+    "choices": [
+      "L'Afrique",
+      "L'Asie",
+      "L'Antarctique",
+      "L'Océanie"
+    ],
+    "answer": 2,
+    "explanation": "L'Antarctique entoure le pôle Sud, où tous les méridiens convergent.",
+    "category": "geographie"
+  },
+  {
+    "id": "q065",
+    "theme": "Pays & frontières",
+    "question": "Quel pays s'étend sur 11 fuseaux horaires ?",
+    "choices": [
+      "Le Canada",
+      "Les États-Unis",
+      "La Chine",
+      "La Russie"
+    ],
+    "answer": 3,
+    "explanation": "De Kaliningrad au Kamtchatka, la Russie couvre 11 fuseaux horaires.",
+    "category": "geographie"
+  },
+  {
+    "id": "q066",
+    "theme": "Pays & frontières",
+    "question": "Quelle ville est à cheval sur deux continents ?",
+    "choices": [
+      "Le Caire",
+      "Istanbul",
+      "Moscou",
+      "Dubaï"
+    ],
+    "answer": 1,
+    "explanation": "Istanbul s'étend sur l'Europe et l'Asie, de part et d'autre du Bosphore.",
+    "category": "geographie"
+  },
+  {
+    "id": "q067",
+    "theme": "Pays & frontières",
+    "question": "Quel pays était autrefois appelé la Perse ?",
+    "choices": [
+      "L'Irak",
+      "L'Iran",
+      "La Syrie",
+      "L'Afghanistan"
+    ],
+    "answer": 1,
+    "explanation": "La Perse a officiellement pris le nom d'Iran en 1935.",
+    "category": "geographie"
+  },
+  {
+    "id": "q068",
+    "theme": "Pays & frontières",
+    "question": "Quel pays était autrefois appelé Ceylan ?",
+    "choices": [
+      "Le Bangladesh",
+      "La Thaïlande",
+      "Le Sri Lanka",
+      "Le Cambodge"
+    ],
+    "answer": 2,
+    "explanation": "Ceylan est devenu le Sri Lanka en 1972.",
+    "category": "geographie"
+  },
+  {
+    "id": "q069",
+    "theme": "Pays & frontières",
+    "question": "Dans quel pays se trouve la ville de Tombouctou ?",
+    "choices": [
+      "Le Niger",
+      "Le Mali",
+      "La Mauritanie",
+      "Le Tchad"
+    ],
+    "answer": 1,
+    "explanation": "Tombouctou, au Mali, fut un grand centre commercial et intellectuel du Sahara.",
+    "category": "geographie"
+  },
+  {
+    "id": "q070",
+    "theme": "Pays & frontières",
+    "question": "Quel micro-État est enclavé entre la France et l'Espagne ?",
+    "choices": [
+      "Monaco",
+      "Saint-Marin",
+      "Le Liechtenstein",
+      "L'Andorre"
+    ],
+    "answer": 3,
+    "explanation": "L'Andorre, nichée dans les Pyrénées, a pour co-princes le président français et un évêque espagnol.",
+    "category": "geographie"
+  },
+  {
+    "id": "q071",
+    "theme": "Pays & frontières",
+    "question": "Quel est le plus grand pays d'Afrique par la superficie ?",
+    "choices": [
+      "La RD Congo",
+      "Le Soudan",
+      "L'Algérie",
+      "La Libye"
+    ],
+    "answer": 2,
+    "explanation": "L'Algérie est devenue le plus grand pays d'Afrique après la partition du Soudan en 2011.",
+    "category": "geographie"
+  },
+  {
+    "id": "q072",
+    "theme": "Pays & frontières",
+    "question": "Sur quel continent se trouve la Guyane française ?",
+    "choices": [
+      "L'Afrique",
+      "L'Amérique du Sud",
+      "L'Océanie",
+      "L'Amérique du Nord"
+    ],
+    "answer": 1,
+    "explanation": "La Guyane, frontalière du Brésil et du Suriname, est le plus grand département français.",
+    "category": "geographie"
+  },
+  {
+    "id": "q073",
+    "theme": "Volcans",
+    "question": "Dans quel pays se trouve le volcan Krakatoa ?",
+    "choices": [
+      "Les Philippines",
+      "Le Japon",
+      "L'Indonésie",
+      "La Papouasie-Nouvelle-Guinée"
+    ],
+    "answer": 2,
+    "explanation": "L'éruption du Krakatoa en 1883, en Indonésie, fut l'une des plus violentes de l'histoire.",
+    "category": "geographie"
+  },
+  {
+    "id": "q074",
+    "theme": "Volcans",
+    "question": "Quel volcan a détruit Pompéi en 79 après J.-C. ?",
+    "choices": [
+      "L'Etna",
+      "Le Stromboli",
+      "Le Vésuve",
+      "Le Vulcano"
+    ],
+    "answer": 2,
+    "explanation": "L'éruption du Vésuve a enseveli Pompéi et Herculanum sous les cendres.",
+    "category": "geographie"
+  },
+  {
+    "id": "q075",
+    "theme": "Volcans",
+    "question": "Sur quelle île italienne se trouve l'Etna ?",
+    "choices": [
+      "La Sardaigne",
+      "La Sicile",
+      "Stromboli",
+      "Ischia"
+    ],
+    "answer": 1,
+    "explanation": "L'Etna, en Sicile, est le plus haut volcan actif d'Europe (environ 3 350 m).",
+    "category": "geographie"
+  },
+  {
+    "id": "q076",
+    "theme": "Volcans",
+    "question": "Quel pays compte le plus grand nombre de volcans actifs ?",
     "choices": [
       "Le Japon",
       "L'Islande",
       "L'Indonésie",
-      "L'Italie"
+      "Le Chili"
     ],
     "answer": 2,
-    "explanation": "Située sur la ceinture de feu du Pacifique, l'Indonésie compte près de 130 volcans actifs."
+    "explanation": "L'Indonésie compte environ 130 volcans actifs le long de la ceinture de feu.",
+    "category": "geographie"
   },
   {
-    "id": "q005",
-    "question": "Qu'est-ce qu'un fjord d'un point de vue géographique ?",
+    "id": "q077",
+    "theme": "Volcans",
+    "question": "Quel volcan domine la vallée de Mexico ?",
     "choices": [
-      "Un lac d'origine volcanique",
-      "Une ancienne vallée glaciaire envahie par la mer",
-      "Un canyon situé en plein désert",
-      "Une rivière souterraine"
+      "Le Popocatépetl",
+      "Le Nevado del Ruiz",
+      "Le Cotopaxi",
+      "Le Fuego"
+    ],
+    "answer": 0,
+    "explanation": "Le Popocatépetl, à 5 426 m, surveille Mexico à moins de 70 km de distance.",
+    "category": "geographie"
+  },
+  {
+    "id": "q078",
+    "theme": "Volcans",
+    "question": "Quelle zone concentre environ 75 % des volcans actifs du monde ?",
+    "choices": [
+      "La dorsale atlantique",
+      "La ceinture de feu du Pacifique",
+      "Le rift est-africain",
+      "La Méditerranée"
     ],
     "answer": 1,
-    "explanation": "Un fjord se forme lorsqu'un glacier se retire et que la mer s'engouffre dans la vallée en forme de U qu'il a creusée."
+    "explanation": "La ceinture de feu du Pacifique borde presque tout le pourtour de cet océan.",
+    "category": "geographie"
   },
   {
-    "id": "q006",
-    "question": "Quel est le point le plus profond des océans ?",
+    "id": "q079",
+    "theme": "Records",
+    "question": "Où a été enregistrée la température la plus chaude de l'histoire ?",
     "choices": [
-      "La fosse des Kouriles",
-      "La fosse de Tonga",
-      "La fosse des Mariannes",
-      "La fosse de Porto Rico"
+      "Dans le Sahara",
+      "Dans la vallée de la Mort",
+      "En Australie",
+      "Au Koweït"
+    ],
+    "answer": 1,
+    "explanation": "56,7 °C ont été relevés à Furnace Creek, dans la vallée de la Mort, en 1913.",
+    "category": "geographie"
+  },
+  {
+    "id": "q080",
+    "theme": "Records",
+    "question": "Quel village sibérien est considéré comme le lieu habité le plus froid du monde ?",
+    "choices": [
+      "Norilsk",
+      "Iakoutsk",
+      "Oïmiakon",
+      "Mourmansk"
     ],
     "answer": 2,
-    "explanation": "La fosse des Mariannes, dans l'océan Pacifique, descend à près de 11 000 mètres de profondeur."
+    "explanation": "Oïmiakon a enregistré −67,7 °C, record pour un lieu habité en permanence.",
+    "category": "geographie"
   },
   {
-    "id": "q007",
-    "question": "Quelle est la plus haute montagne d'Afrique ?",
+    "id": "q081",
+    "theme": "Records",
+    "question": "Dans quel pays se trouve Mawsynram, l'endroit le plus pluvieux du monde ?",
     "choices": [
-      "Le mont Kenya",
-      "Le Kilimandjaro",
-      "Le massif de l'Atlas",
-      "Le mont Rwenzori"
+      "Le Bangladesh",
+      "L'Inde",
+      "La Birmanie",
+      "L'Indonésie"
     ],
     "answer": 1,
-    "explanation": "Le Kilimandjaro, situé en Tanzanie, est un volcan inactif qui culmine à 5 895 mètres d'altitude."
+    "explanation": "Mawsynram, dans le nord-est de l'Inde, reçoit près de 12 mètres de pluie par an.",
+    "category": "geographie"
   },
   {
-    "id": "q008",
-    "question": "Quel est le plus petit pays du monde en termes de superficie ?",
+    "id": "q082",
+    "theme": "Records",
+    "question": "Quelle est la plus haute chute d'eau du monde ?",
     "choices": [
+      "Les chutes du Niagara",
+      "Les chutes Victoria",
+      "Le Salto Ángel",
+      "Les chutes d'Iguazú"
+    ],
+    "answer": 2,
+    "explanation": "Le Salto Ángel, au Venezuela, chute de 979 m depuis un plateau de la Gran Sabana.",
+    "category": "geographie"
+  },
+  {
+    "id": "q083",
+    "theme": "Records",
+    "question": "Quelle est la plus grande forêt tropicale du monde ?",
+    "choices": [
+      "La forêt du Congo",
+      "L'Amazonie",
+      "La forêt de Bornéo",
+      "La taïga"
+    ],
+    "answer": 1,
+    "explanation": "L'Amazonie couvre environ 5,5 millions de km², répartis sur neuf pays.",
+    "category": "geographie"
+  },
+  {
+    "id": "q084",
+    "theme": "Records",
+    "question": "Où se trouve environ 70 % de l'eau douce de la planète ?",
+    "choices": [
+      "Dans les océans",
+      "Dans la calotte antarctique",
+      "Dans les nappes phréatiques",
+      "Dans les fleuves et lacs"
+    ],
+    "answer": 1,
+    "explanation": "La calotte glaciaire de l'Antarctique stocke l'essentiel de l'eau douce mondiale.",
+    "category": "geographie"
+  },
+  {
+    "id": "q085",
+    "theme": "Records",
+    "question": "Quelle est l'agglomération la plus peuplée du monde ?",
+    "choices": [
+      "Delhi",
+      "Shanghai",
+      "Tokyo",
+      "São Paulo"
+    ],
+    "answer": 2,
+    "explanation": "Le Grand Tokyo regroupe environ 37 millions d'habitants.",
+    "category": "geographie"
+  },
+  {
+    "id": "q086",
+    "theme": "Records",
+    "question": "Quel est le plus long réseau de grottes connu au monde ?",
+    "choices": [
+      "Mammoth Cave",
+      "Le gouffre de Padirac",
+      "Les grottes de Škocjan",
+      "Son Doong"
+    ],
+    "answer": 0,
+    "explanation": "Mammoth Cave, aux États-Unis, compte plus de 680 km de galeries cartographiées.",
+    "category": "geographie"
+  },
+  {
+    "id": "q087",
+    "theme": "France",
+    "question": "Quel est le plus grand département français ?",
+    "choices": [
+      "La Gironde",
+      "La Guyane",
+      "Les Landes",
+      "La Dordogne"
+    ],
+    "answer": 1,
+    "explanation": "La Guyane, avec ses 83 500 km², représente à elle seule environ 15 % du territoire national.",
+    "category": "geographie"
+  },
+  {
+    "id": "q088",
+    "theme": "France",
+    "question": "Combien de régions compte la France métropolitaine depuis 2016 ?",
+    "choices": [
+      "11",
+      "13",
+      "15",
+      "22"
+    ],
+    "answer": 1,
+    "explanation": "La réforme territoriale de 2016 a ramené le nombre de régions métropolitaines de 22 à 13.",
+    "category": "geographie"
+  },
+  {
+    "id": "q089",
+    "theme": "France",
+    "question": "Quels cours d'eau forment l'estuaire de la Gironde ?",
+    "choices": [
+      "La Loire et le Cher",
+      "La Garonne et la Dordogne",
+      "Le Rhône et la Saône",
+      "L'Adour et la Nive"
+    ],
+    "answer": 1,
+    "explanation": "La Garonne et la Dordogne confluent au bec d'Ambès pour former la Gironde, plus grand estuaire d'Europe occidentale.",
+    "category": "geographie"
+  },
+  {
+    "id": "q090",
+    "theme": "France",
+    "question": "Quelle est la plus haute dune d'Europe ?",
+    "choices": [
+      "La dune du Pilat",
+      "La dune de l'Espiguette",
+      "La dune Marchand",
+      "La dune du Perroquet"
+    ],
+    "answer": 0,
+    "explanation": "La dune du Pilat, près d'Arcachon, culmine à plus de 100 m et avance chaque année vers la forêt.",
+    "category": "geographie"
+  },
+  {
+    "id": "q091",
+    "theme": "Divers",
+    "question": "Comment s'appelle un bras de mer étroit creusé par un glacier, typique de la Norvège ?",
+    "choices": [
+      "Un estuaire",
+      "Un fjord",
+      "Une ria",
+      "Un delta"
+    ],
+    "answer": 1,
+    "explanation": "Les fjords sont d'anciennes vallées glaciaires envahies par la mer.",
+    "category": "geographie"
+  },
+  {
+    "id": "q092",
+    "theme": "Divers",
+    "question": "Quel est le nom du supercontinent unique d'il y a 250 millions d'années ?",
+    "choices": [
+      "Gondwana",
+      "Laurasia",
+      "La Pangée",
+      "Rodinia"
+    ],
+    "answer": 2,
+    "explanation": "La Pangée s'est fragmentée pour donner naissance aux continents actuels.",
+    "category": "geographie"
+  },
+  {
+    "id": "q093",
+    "theme": "Divers",
+    "question": "Quelle chute d'eau se trouve à la frontière du Brésil et de l'Argentine ?",
+    "choices": [
+      "Les chutes Victoria",
+      "Le Salto Ángel",
+      "Les chutes d'Iguazú",
+      "Les chutes du Niagara"
+    ],
+    "answer": 2,
+    "explanation": "Les chutes d'Iguazú alignent 275 cascades sur près de 3 km de large.",
+    "category": "geographie"
+  },
+  {
+    "id": "q094",
+    "theme": "Divers",
+    "question": "Dans quelle ville se trouve le siège principal de l'ONU ?",
+    "choices": [
+      "Genève",
+      "New York",
+      "La Haye",
+      "Vienne"
+    ],
+    "answer": 1,
+    "explanation": "Le siège principal de l'ONU est à New York ; Genève abrite son siège européen.",
+    "category": "geographie"
+  },
+  {
+    "id": "q095",
+    "theme": "Divers",
+    "question": "Quel pays scandinave n'est pas membre de l'Union européenne ?",
+    "choices": [
+      "Le Danemark",
+      "La Suède",
+      "La Norvège",
+      "La Finlande"
+    ],
+    "answer": 2,
+    "explanation": "La Norvège a refusé l'adhésion par référendum en 1972 et 1994.",
+    "category": "geographie"
+  },
+  {
+    "id": "q096",
+    "theme": "Divers",
+    "question": "Quel golfe est la plus grande baie du monde ?",
+    "choices": [
+      "La baie d'Hudson",
+      "Le golfe du Bengale",
+      "Le golfe du Mexique",
+      "La baie de Baffin"
+    ],
+    "answer": 1,
+    "explanation": "Le golfe du Bengale, bordé par l'Inde et le Bangladesh, couvre plus de 2 millions de km².",
+    "category": "geographie"
+  },
+  {
+    "id": "q097",
+    "theme": "Drapeaux",
+    "question": "À quel pays appartient ce drapeau 🇳🇵 ?",
+    "choices": [
+      "L'Inde",
+      "Le Népal",
+      "Le Bhoutan",
+      "Le Sri Lanka"
+    ],
+    "answer": 1,
+    "explanation": "Le Népal possède le seul drapeau national non quadrilatéral au monde, formé de deux fanions.",
+    "category": "geographie"
+  },
+  {
+    "id": "q098",
+    "theme": "Drapeaux",
+    "question": "Quel pays possède, avec le Vatican, un drapeau parfaitement carré ?",
+    "choices": [
+      "Le Luxembourg",
       "Monaco",
-      "Nauru",
-      "Tuvalu",
-      "Le Vatican"
+      "La Suisse",
+      "La Belgique"
+    ],
+    "answer": 2,
+    "explanation": "Le drapeau suisse est carré, sauf dans la marine marchande où il est rectangulaire.",
+    "category": "geographie"
+  },
+  {
+    "id": "q099",
+    "theme": "Drapeaux",
+    "question": "À quel pays appartient ce drapeau 🇧🇹 ?",
+    "choices": [
+      "La Mongolie",
+      "Le Bhoutan",
+      "La Thaïlande",
+      "Le Laos"
+    ],
+    "answer": 1,
+    "explanation": "Le dragon-tonnerre (Druk) orne le drapeau du Bhoutan, le « pays du Dragon ».",
+    "category": "geographie"
+  },
+  {
+    "id": "q100",
+    "theme": "Drapeaux",
+    "question": "Quel pays a un drapeau quasi identique à celui de Monaco ?",
+    "choices": [
+      "La Pologne",
+      "L'Indonésie",
+      "L'Autriche",
+      "Singapour"
+    ],
+    "answer": 1,
+    "explanation": "L'Indonésie et Monaco ont le même drapeau rouge et blanc, seules les proportions diffèrent.",
+    "category": "geographie"
+  },
+  {
+    "id": "q101",
+    "theme": "Drapeaux",
+    "question": "Quel est le seul drapeau national représentant un bâtiment ?",
+    "choices": [
+      "Le Cambodge",
+      "L'Inde",
+      "L'Égypte",
+      "La Grèce"
+    ],
+    "answer": 0,
+    "explanation": "Le drapeau cambodgien représente le temple d'Angkor Vat.",
+    "category": "geographie"
+  },
+  {
+    "id": "q102",
+    "theme": "Drapeaux",
+    "question": "Quel pays affiche la carte de son territoire sur son drapeau ?",
+    "choices": [
+      "Malte",
+      "Chypre",
+      "L'Islande",
+      "La Croatie"
+    ],
+    "answer": 1,
+    "explanation": "Chypre affiche la silhouette de l'île, accompagnée de deux rameaux d'olivier.",
+    "category": "geographie"
+  },
+  {
+    "id": "q103",
+    "theme": "Drapeaux",
+    "question": "Combien d'étoiles compte le drapeau des États-Unis ?",
+    "choices": [
+      "48",
+      "50",
+      "51",
+      "52"
+    ],
+    "answer": 1,
+    "explanation": "Une étoile par État : la 50e a été ajoutée en 1960 pour Hawaï.",
+    "category": "geographie"
+  },
+  {
+    "id": "q104",
+    "theme": "Drapeaux",
+    "question": "Quel arbre figure sur le drapeau du Liban ?",
+    "choices": [
+      "Un olivier",
+      "Un palmier",
+      "Un cèdre",
+      "Un chêne"
+    ],
+    "answer": 2,
+    "explanation": "Le cèdre du Liban est le symbole du pays depuis l'Antiquité.",
+    "category": "geographie"
+  },
+  {
+    "id": "q105",
+    "theme": "Drapeaux",
+    "question": "Quel pays affiche un aigle dévorant un serpent sur son drapeau ?",
+    "choices": [
+      "L'Égypte",
+      "Le Mexique",
+      "L'Albanie",
+      "La Serbie"
+    ],
+    "answer": 1,
+    "explanation": "Cette scène renvoie à la légende aztèque de la fondation de Tenochtitlan, l'actuelle Mexico.",
+    "category": "geographie"
+  },
+  {
+    "id": "q106",
+    "theme": "Drapeaux",
+    "question": "À quel pays appartient ce drapeau 🇿🇦 ?",
+    "choices": [
+      "Le Kenya",
+      "L'Afrique du Sud",
+      "Le Mozambique",
+      "Le Zimbabwe"
+    ],
+    "answer": 1,
+    "explanation": "Le drapeau sud-africain à six couleurs symbolise l'unité du pays depuis 1994.",
+    "category": "geographie"
+  },
+  {
+    "id": "q107",
+    "theme": "Drapeaux",
+    "question": "À quel pays appartient ce drapeau 🇦🇷 ?",
+    "choices": [
+      "L'Uruguay",
+      "Le Guatemala",
+      "L'Argentine",
+      "Le Nicaragua"
+    ],
+    "answer": 2,
+    "explanation": "Le drapeau argentin porte le Soleil de Mai, symbole de l'indépendance.",
+    "category": "geographie"
+  },
+  {
+    "id": "q108",
+    "theme": "Drapeaux",
+    "question": "Quel pays nordique n'a PAS de croix scandinave sur son drapeau ?",
+    "choices": [
+      "La Norvège",
+      "L'Islande",
+      "Le Groenland",
+      "La Finlande"
+    ],
+    "answer": 2,
+    "explanation": "Le drapeau du Groenland est le seul drapeau nordique sans croix : un disque rouge et blanc.",
+    "category": "geographie"
+  },
+  {
+    "id": "q109",
+    "theme": "Villes & monuments",
+    "question": "Dans quel pays se trouve le Machu Picchu ?",
+    "choices": [
+      "La Bolivie",
+      "Le Pérou",
+      "L'Équateur",
+      "Le Chili"
+    ],
+    "answer": 1,
+    "explanation": "La cité inca du Machu Picchu perche à 2 430 m dans les Andes péruviennes.",
+    "category": "geographie"
+  },
+  {
+    "id": "q110",
+    "theme": "Villes & monuments",
+    "question": "Dans quel pays se trouve la cité antique de Petra ?",
+    "choices": [
+      "L'Égypte",
+      "La Syrie",
+      "La Jordanie",
+      "Israël"
+    ],
+    "answer": 2,
+    "explanation": "Petra, capitale des Nabatéens, est taillée dans le grès rose du sud de la Jordanie.",
+    "category": "geographie"
+  },
+  {
+    "id": "q111",
+    "theme": "Villes & monuments",
+    "question": "Dans quelle ville se trouve le Taj Mahal ?",
+    "choices": [
+      "New Delhi",
+      "Agra",
+      "Jaipur",
+      "Bombay"
+    ],
+    "answer": 1,
+    "explanation": "Le Taj Mahal a été construit à Agra par l'empereur Shah Jahan pour son épouse.",
+    "category": "geographie"
+  },
+  {
+    "id": "q112",
+    "theme": "Villes & monuments",
+    "question": "Quelle ville brésilienne est dominée par le Christ Rédempteur ?",
+    "choices": [
+      "São Paulo",
+      "Brasília",
+      "Salvador",
+      "Rio de Janeiro"
     ],
     "answer": 3,
-    "explanation": "Le Vatican est un État indépendant situé au cœur de Rome, avec une superficie d'environ 0,44 kilomètre carré."
+    "explanation": "La statue de 38 m surplombe Rio depuis le mont Corcovado.",
+    "category": "geographie"
   },
   {
-    "id": "q009",
-    "question": "Quel est le plus long fleuve du continent africain ?",
+    "id": "q113",
+    "theme": "Villes & monuments",
+    "question": "Dans quelle ville se trouve la Sagrada Família ?",
     "choices": [
-      "Le Congo",
-      "Le Niger",
-      "Le Nil",
-      "Le Zambèze"
+      "Madrid",
+      "Séville",
+      "Barcelone",
+      "Valence"
     ],
     "answer": 2,
-    "explanation": "Le Nil parcourt environ 6 650 km avant de se jeter dans la mer Méditerranée, ce qui en fait l'un des plus longs fleuves du monde."
+    "explanation": "La basilique de Gaudí, commencée en 1882, est toujours en construction.",
+    "category": "geographie"
   },
   {
-    "id": "q010",
-    "question": "Sur quel continent se trouve le désert d'Atacama, considéré comme le plus aride du monde ?",
+    "id": "q114",
+    "theme": "Villes & monuments",
+    "question": "Quelle ville abrite la Mosquée bleue ?",
     "choices": [
-      "L'Afrique",
-      "L'Asie",
+      "Le Caire",
+      "Istanbul",
+      "Ispahan",
+      "Marrakech"
+    ],
+    "answer": 1,
+    "explanation": "La mosquée Sultanahmet d'Istanbul doit son surnom à ses faïences bleues d'Iznik.",
+    "category": "geographie"
+  },
+  {
+    "id": "q115",
+    "theme": "Villes & monuments",
+    "question": "Dans quel pays se trouve la pyramide de Chichén Itzá ?",
+    "choices": [
+      "Le Guatemala",
+      "Le Pérou",
+      "Le Mexique",
+      "Le Honduras"
+    ],
+    "answer": 2,
+    "explanation": "Chichén Itzá, dans le Yucatán, est l'une des grandes cités mayas.",
+    "category": "geographie"
+  },
+  {
+    "id": "q116",
+    "theme": "Villes & monuments",
+    "question": "Quelle ville est surnommée la « Ville éternelle » ?",
+    "choices": [
+      "Athènes",
+      "Jérusalem",
+      "Rome",
+      "Le Caire"
+    ],
+    "answer": 2,
+    "explanation": "Rome porte ce surnom depuis l'Antiquité romaine.",
+    "category": "geographie"
+  },
+  {
+    "id": "q117",
+    "theme": "Villes & monuments",
+    "question": "Quelle ville abrite un opéra célèbre en forme de voiles ?",
+    "choices": [
+      "Melbourne",
+      "Sydney",
+      "Auckland",
+      "Le Cap"
+    ],
+    "answer": 1,
+    "explanation": "L'opéra de Sydney et ses voiles blanches dominent la baie depuis 1973.",
+    "category": "geographie"
+  },
+  {
+    "id": "q118",
+    "theme": "Villes & monuments",
+    "question": "Dans quel désert se trouve Las Vegas ?",
+    "choices": [
+      "Le désert de Sonora",
+      "Le désert de Mojave",
+      "Le Grand Bassin",
+      "Le désert de Chihuahua"
+    ],
+    "answer": 1,
+    "explanation": "Las Vegas a surgi au milieu du désert de Mojave, dans le Nevada.",
+    "category": "geographie"
+  },
+  {
+    "id": "q119",
+    "theme": "Villes & monuments",
+    "question": "Quelle capitale abrite la porte de Brandebourg ?",
+    "choices": [
+      "Vienne",
+      "Berlin",
+      "Munich",
+      "Amsterdam"
+    ],
+    "answer": 1,
+    "explanation": "La porte de Brandebourg, à Berlin, est devenue le symbole de la réunification allemande.",
+    "category": "geographie"
+  },
+  {
+    "id": "q120",
+    "theme": "Villes & monuments",
+    "question": "Dans quel pays se trouve le site mégalithique de Stonehenge ?",
+    "choices": [
+      "L'Irlande",
+      "L'Écosse",
+      "L'Angleterre",
+      "Le pays de Galles"
+    ],
+    "answer": 2,
+    "explanation": "Stonehenge se dresse dans la plaine de Salisbury, au sud de l'Angleterre.",
+    "category": "geographie"
+  },
+  {
+    "id": "q121",
+    "theme": "Villes & monuments",
+    "question": "Dans quelle ville se trouve le Kremlin ?",
+    "choices": [
+      "Saint-Pétersbourg",
+      "Kiev",
+      "Moscou",
+      "Minsk"
+    ],
+    "answer": 2,
+    "explanation": "Le Kremlin de Moscou, forteresse historique, est le siège du pouvoir russe.",
+    "category": "geographie"
+  },
+  {
+    "id": "q122",
+    "theme": "Faune & nature",
+    "question": "Sur quel continent les manchots empereurs vivent-ils à l'état sauvage ?",
+    "choices": [
+      "L'Arctique",
+      "L'Antarctique",
       "L'Amérique du Sud",
       "L'Océanie"
     ],
-    "answer": 2,
-    "explanation": "Le désert d'Atacama se trouve au Chili, en Amérique du Sud. Certaines de ses régions n'ont pas connu de pluie depuis des décennies."
-  },
-  {
-    "id": "q011",
-    "question": "Quel est le plus haut sommet d'Amérique du Nord ?",
-    "choices": [
-      "Le mont Logan",
-      "Le Denali (mont McKinley)",
-      "Le mont Whitney",
-      "Le mont Elbert"
-    ],
     "answer": 1,
-    "explanation": "Le Denali, situé en Alaska, culmine à 6 190 mètres, ce qui en fait le point culminant de l'Amérique du Nord."
+    "explanation": "Les manchots empereurs se reproduisent sur la banquise antarctique, par −60 °C.",
+    "category": "animaux"
   },
   {
-    "id": "q012",
-    "question": "Quelle chaîne de montagnes marque traditionnellement la frontière entre l'Europe et l'Asie ?",
+    "id": "q123",
+    "theme": "Faune & nature",
+    "question": "Dans quelle région du monde vit l'ours polaire ?",
     "choices": [
-      "Les Carpates",
-      "Le Caucase",
-      "L'Oural",
-      "L'Altaï"
-    ],
-    "answer": 2,
-    "explanation": "Les monts Oural, situés en Russie, sont considérés comme la frontière géographique naturelle entre l'Europe et l'Asie."
-  },
-  {
-    "id": "q013",
-    "question": "Quelle est la montagne la plus célèbre et la plus haute du Japon ?",
-    "choices": [
-      "Le mont Kita",
-      "Le mont Tate",
-      "Le mont Yari",
-      "Le mont Fuji"
-    ],
-    "answer": 3,
-    "explanation": "Le mont Fuji est un stratovolcan emblématique du Japon, culminant à 3 776 mètres."
-  },
-  {
-    "id": "q014",
-    "question": "Quelles montagnes forment une frontière naturelle entre la France et l'Espagne ?",
-    "choices": [
-      "Les Alpes",
-      "Les Pyrénées",
-      "Le Massif central",
-      "Le Jura"
-    ],
-    "answer": 1,
-    "explanation": "Les Pyrénées s'étendent sur environ 430 km entre la mer Méditerranée et l'océan Atlantique, séparant la France de la péninsule Ibérique."
-  },
-  {
-    "id": "q015",
-    "question": "Quel est le plus haut sommet de l'Antarctique ?",
-    "choices": [
-      "Le mont Erebus",
-      "Le massif Vinson",
-      "Le mont Tyree",
-      "Le mont Sidley"
-    ],
-    "answer": 1,
-    "explanation": "Le massif Vinson (ou mont Vinson) est le point culminant de l'Antarctique, avec une altitude de 4 892 mètres."
-  },
-  {
-    "id": "q016",
-    "question": "Quelle est la deuxième plus haute montagne du monde ?",
-    "choices": [
-      "Le K2",
-      "Le Kangchenjunga",
-      "Le Lhotse",
-      "Le Makalu"
+      "L'Arctique",
+      "L'Antarctique",
+      "Les deux pôles",
+      "La Sibérie uniquement"
     ],
     "answer": 0,
-    "explanation": "Le K2, situé à la frontière entre la Chine et le Pakistan, culmine à 8 611 mètres, juste derrière l'Everest."
+    "explanation": "L'ours polaire ne vit qu'autour du pôle Nord ; il n'y a pas d'ours en Antarctique.",
+    "category": "animaux"
   },
   {
-    "id": "q017",
-    "question": "Dans quelle chaîne de montagnes se trouve le mont Elbrouz ?",
+    "id": "q124",
+    "theme": "Faune & nature",
+    "question": "Quel est le seul grand singe vivant en Asie ?",
     "choices": [
-      "Les Alpes",
-      "Le Caucase",
-      "L'Oural",
-      "Le Pamir"
-    ],
-    "answer": 1,
-    "explanation": "Le mont Elbrouz se trouve dans le Caucase, en Russie, et culmine à 5 642 m, ce qui en fait le plus haut sommet d'Europe."
-  },
-  {
-    "id": "q018",
-    "question": "Quelle chaîne de montagnes ancienne longe la côte est des États-Unis ?",
-    "choices": [
-      "Les montagnes Rocheuses",
-      "La chaîne des Cascades",
-      "Les Appalaches",
-      "La Sierra Nevada"
+      "Le gorille",
+      "Le chimpanzé",
+      "L'orang-outan",
+      "Le bonobo"
     ],
     "answer": 2,
-    "explanation": "Les Appalaches sont une très ancienne chaîne de montagnes qui s'étend de Terre-Neuve (Canada) jusqu'au centre de l'Alabama (États-Unis)."
+    "explanation": "L'orang-outan vit uniquement dans les forêts de Bornéo et de Sumatra.",
+    "category": "animaux"
   },
   {
-    "id": "q019",
-    "question": "Quel sommet d'Amérique du Sud est le point culminant en dehors de l'Asie ?",
+    "id": "q125",
+    "theme": "Faune & nature",
+    "question": "Dans quel pays le panda géant vit-il à l'état sauvage ?",
     "choices": [
-      "L'Aconcagua",
-      "L'Ojos del Salado",
-      "Le Huascarán",
-      "Le Chimborazo"
+      "Le Japon",
+      "La Chine",
+      "Le Vietnam",
+      "La Thaïlande"
     ],
-    "answer": 0,
-    "explanation": "L'Aconcagua, situé en Argentine, culmine à 6 960 mètres, c'est le plus haut sommet des Amériques et du monde hors Asie."
+    "answer": 1,
+    "explanation": "Les derniers pandas sauvages vivent dans les montagnes du centre de la Chine.",
+    "category": "animaux"
   },
   {
-    "id": "q020",
-    "question": "Quelle montagne, si l'on mesure de sa base sous-marine à son sommet, est la plus haute du monde ?",
+    "id": "q126",
+    "theme": "Faune & nature",
+    "question": "Où les lémuriens vivent-ils à l'état sauvage ?",
     "choices": [
-      "L'Everest",
-      "Le Mauna Loa",
-      "Le Mauna Kea",
-      "Le Teide"
+      "Au Brésil",
+      "En Indonésie",
+      "À Madagascar",
+      "En Tanzanie"
     ],
     "answer": 2,
-    "explanation": "Le Mauna Kea à Hawaï dépasse les 10 000 mètres de hauteur totale si l'on compte sa partie immergée sous l'océan Pacifique."
+    "explanation": "Les lémuriens sont endémiques de Madagascar, isolée depuis 90 millions d'années.",
+    "category": "animaux"
   },
   {
-    "id": "q021",
-    "question": "Dans quel pays se trouve le massif du Drakensberg ?",
+    "id": "q127",
+    "theme": "Faune & nature",
+    "question": "Quel désert abrite le chameau de Bactriane sauvage ?",
     "choices": [
-      "En Éthiopie",
-      "Au Kenya",
-      "Au Maroc",
-      "En Afrique du Sud"
-    ],
-    "answer": 3,
-    "explanation": "Le Drakensberg (la « montagne du Dragon ») est la plus haute chaîne de montagnes d'Afrique du Sud."
-  },
-  {
-    "id": "q022",
-    "question": "Quelle est la capitale la plus haute du monde ?",
-    "choices": [
-      "Katmandou (Népal)",
-      "Lhassa (Tibet, Chine)",
-      "Quito (Équateur)",
-      "La Paz (Bolivie)"
-    ],
-    "answer": 3,
-    "explanation": "La Paz en Bolivie se trouve à une altitude moyenne de 3 650 mètres, ce qui en fait la capitale administrative la plus haute du monde."
-  },
-  {
-    "id": "q023",
-    "question": "Où se trouve la cordillère de l'Atlas ?",
-    "choices": [
-      "Au Moyen-Orient",
-      "En Afrique du Nord",
-      "En Europe de l'Est",
-      "En Asie centrale"
+      "Le Sahara",
+      "Le désert de Gobi",
+      "Le Kalahari",
+      "L'Atacama"
     ],
     "answer": 1,
-    "explanation": "Le massif de l'Atlas s'étend sur le Maroc, l'Algérie et la Tunisie en Afrique du Nord."
+    "explanation": "Le chameau à deux bosses survit à l'état sauvage dans le Gobi, entre Chine et Mongolie.",
+    "category": "animaux"
   },
   {
-    "id": "q024",
-    "question": "Quelle montagne grecque était considérée comme le domaine des dieux dans la mythologie ?",
+    "id": "q128",
+    "theme": "Faune & nature",
+    "question": "Quel félin vit le plus haut en altitude ?",
     "choices": [
-      "Le mont Parnasse",
-      "Le mont Olympe",
-      "Le mont Athos",
-      "Le mont Pélion"
+      "Le puma",
+      "Le léopard",
+      "La panthère des neiges",
+      "Le lynx"
+    ],
+    "answer": 2,
+    "explanation": "La panthère des neiges chasse jusqu'à 5 500 m dans les montagnes d'Asie centrale.",
+    "category": "animaux"
+  },
+  {
+    "id": "q129",
+    "theme": "Faune & nature",
+    "question": "Quel pays abrite le dragon de Komodo ?",
+    "choices": [
+      "L'Australie",
+      "L'Indonésie",
+      "Les Philippines",
+      "La Malaisie"
     ],
     "answer": 1,
-    "explanation": "Le mont Olympe, point culminant de la Grèce (2 917 m), était le lieu de résidence des douze dieux olympiens."
+    "explanation": "Le plus grand lézard du monde vit sur quelques îles indonésiennes, dont Komodo.",
+    "category": "animaux"
   },
   {
-    "id": "q025",
-    "question": "Comment s'appelle le plus grand lac de montagne du monde, situé dans les Andes ?",
+    "id": "q130",
+    "theme": "Faune & nature",
+    "question": "Quel est le plus grand récif corallien du monde ?",
     "choices": [
-      "Le lac Titicaca",
-      "Le lac Poopó",
-      "Le lac Maracaibo",
-      "Le lac de cratère Quilotoa"
+      "Le récif de Belize",
+      "La Grande Barrière de corail",
+      "Le récif de Nouvelle-Calédonie",
+      "Les récifs des Maldives"
+    ],
+    "answer": 1,
+    "explanation": "La Grande Barrière, au large de l'Australie, s'étend sur 2 300 km.",
+    "category": "faune-flore"
+  },
+  {
+    "id": "q131",
+    "theme": "Faune & nature",
+    "question": "Quel oiseau est l'emblème de la Nouvelle-Zélande ?",
+    "choices": [
+      "L'émeu",
+      "Le kakapo",
+      "Le kiwi",
+      "Le kea"
+    ],
+    "answer": 2,
+    "explanation": "Le kiwi, incapable de voler, est si emblématique qu'il désigne aussi les Néo-Zélandais.",
+    "category": "animaux"
+  },
+  {
+    "id": "q132",
+    "theme": "Faune & nature",
+    "question": "Quel est le plus grand animal terrestre actuel ?",
+    "choices": [
+      "Le rhinocéros blanc",
+      "L'éléphant d'Afrique",
+      "L'hippopotame",
+      "La girafe"
+    ],
+    "answer": 1,
+    "explanation": "L'éléphant de savane d'Afrique peut dépasser 6 tonnes.",
+    "category": "animaux"
+  },
+  {
+    "id": "q133",
+    "theme": "Faune & nature",
+    "question": "Quel arbre détient le record de hauteur au monde ?",
+    "choices": [
+      "Le baobab",
+      "L'eucalyptus",
+      "Le séquoia à feuilles d'if",
+      "Le sapin de Douglas"
+    ],
+    "answer": 2,
+    "explanation": "Hyperion, un séquoia sempervirens de Californie, dépasse 115 m.",
+    "category": "faune-flore"
+  },
+  {
+    "id": "q134",
+    "theme": "Faune & nature",
+    "question": "Quel rapace des Andes possède la plus grande envergure ?",
+    "choices": [
+      "L'aigle royal",
+      "Le condor des Andes",
+      "Le vautour fauve",
+      "La harpie féroce"
+    ],
+    "answer": 1,
+    "explanation": "Le condor des Andes déploie jusqu'à 3,3 m d'envergure au-dessus de la cordillère.",
+    "category": "animaux"
+  },
+  {
+    "id": "q135",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "En quelle année l'Homme a-t-il marché sur la Lune pour la première fois ?",
+    "choices": [
+      "1959",
+      "1965",
+      "1969",
+      "1972"
+    ],
+    "answer": 2,
+    "explanation": "Neil Armstrong et Buzz Aldrin ont foulé la Lune le 21 juillet 1969 (mission Apollo 11)."
+  },
+  {
+    "id": "q136",
+    "category": "culture-g",
+    "theme": "Art",
+    "question": "Qui a peint la Joconde ?",
+    "choices": [
+      "Michel-Ange",
+      "Léonard de Vinci",
+      "Raphaël",
+      "Botticelli"
+    ],
+    "answer": 1,
+    "explanation": "Léonard de Vinci a peint la Joconde au début du XVIe siècle ; elle est exposée au Louvre."
+  },
+  {
+    "id": "q137",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Combien d'os compte le squelette humain adulte ?",
+    "choices": [
+      "186",
+      "206",
+      "226",
+      "256"
+    ],
+    "answer": 1,
+    "explanation": "L'adulte compte 206 os ; le nouveau-né en a environ 300, qui fusionnent en grandissant."
+  },
+  {
+    "id": "q138",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quel est le symbole chimique de l'or ?",
+    "choices": [
+      "Or",
+      "Au",
+      "Ag",
+      "Go"
+    ],
+    "answer": 1,
+    "explanation": "Au vient du latin aurum ; Ag désigne l'argent."
+  },
+  {
+    "id": "q139",
+    "category": "culture-g",
+    "theme": "Littérature",
+    "question": "Qui a écrit Les Misérables ?",
+    "choices": [
+      "Émile Zola",
+      "Honoré de Balzac",
+      "Victor Hugo",
+      "Alexandre Dumas"
+    ],
+    "answer": 2,
+    "explanation": "Victor Hugo a publié Les Misérables en 1862."
+  },
+  {
+    "id": "q140",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quelle planète est la plus proche du Soleil ?",
+    "choices": [
+      "Vénus",
+      "Mercure",
+      "Mars",
+      "La Terre"
+    ],
+    "answer": 1,
+    "explanation": "Mercure orbite à environ 58 millions de km du Soleil."
+  },
+  {
+    "id": "q141",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "En quelle année le mur de Berlin est-il tombé ?",
+    "choices": [
+      "1985",
+      "1989",
+      "1991",
+      "1993"
+    ],
+    "answer": 1,
+    "explanation": "Le mur est tombé le 9 novembre 1989, prélude à la réunification allemande."
+  },
+  {
+    "id": "q142",
+    "category": "culture-g",
+    "theme": "Littérature",
+    "question": "Qui a écrit Le Petit Prince ?",
+    "choices": [
+      "Albert Camus",
+      "Antoine de Saint-Exupéry",
+      "Jacques Prévert",
+      "Marcel Pagnol"
+    ],
+    "answer": 1,
+    "explanation": "Saint-Exupéry a publié Le Petit Prince en 1943, à New York."
+  },
+  {
+    "id": "q143",
+    "category": "culture-g",
+    "theme": "Art",
+    "question": "Quel peintre s'est tranché une partie de l'oreille ?",
+    "choices": [
+      "Paul Gauguin",
+      "Vincent van Gogh",
+      "Claude Monet",
+      "Pablo Picasso"
+    ],
+    "answer": 1,
+    "explanation": "Van Gogh s'est mutilé l'oreille à Arles en 1888, après une dispute avec Gauguin."
+  },
+  {
+    "id": "q144",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Qui a formulé la théorie de la relativité ?",
+    "choices": [
+      "Isaac Newton",
+      "Albert Einstein",
+      "Galilée",
+      "Stephen Hawking"
+    ],
+    "answer": 1,
+    "explanation": "Einstein a publié la relativité restreinte en 1905, puis la relativité générale en 1915."
+  },
+  {
+    "id": "q145",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Quel roi de France était surnommé le « Roi-Soleil » ?",
+    "choices": [
+      "Louis XIII",
+      "Louis XIV",
+      "Louis XV",
+      "Louis XVI"
+    ],
+    "answer": 1,
+    "explanation": "Louis XIV, monarque absolu et bâtisseur de Versailles, a régné 72 ans."
+  },
+  {
+    "id": "q146",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quelle est la vitesse approximative de la lumière dans le vide ?",
+    "choices": [
+      "3 000 km/s",
+      "30 000 km/s",
+      "300 000 km/s",
+      "3 000 000 km/s"
+    ],
+    "answer": 2,
+    "explanation": "La lumière parcourt environ 299 792 km par seconde."
+  },
+  {
+    "id": "q147",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quel organe du corps humain produit l'insuline ?",
+    "choices": [
+      "Le foie",
+      "Le pancréas",
+      "Les reins",
+      "La rate"
+    ],
+    "answer": 1,
+    "explanation": "Le pancréas régule la glycémie en sécrétant l'insuline."
+  },
+  {
+    "id": "q148",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Quelle civilisation a construit le Machu Picchu ?",
+    "choices": [
+      "Les Mayas",
+      "Les Aztèques",
+      "Les Incas",
+      "Les Olmèques"
+    ],
+    "answer": 2,
+    "explanation": "Les Incas ont bâti le Machu Picchu au XVe siècle, dans les Andes péruviennes."
+  },
+  {
+    "id": "q149",
+    "category": "culture-g",
+    "theme": "Langues",
+    "question": "Quelle langue compte le plus de locuteurs natifs au monde ?",
+    "choices": [
+      "L'anglais",
+      "Le mandarin",
+      "L'espagnol",
+      "L'hindi"
+    ],
+    "answer": 1,
+    "explanation": "Le mandarin compte environ 900 millions de locuteurs natifs."
+  },
+  {
+    "id": "q150",
+    "category": "animaux",
+    "theme": "Records",
+    "question": "Quel est le plus grand animal ayant jamais vécu ?",
+    "choices": [
+      "Le diplodocus",
+      "La baleine bleue",
+      "Le mégalodon",
+      "Le mammouth"
+    ],
+    "answer": 1,
+    "explanation": "La baleine bleue peut atteindre 30 m et 170 tonnes — plus qu'aucun dinosaure connu."
+  },
+  {
+    "id": "q151",
+    "category": "animaux",
+    "theme": "Records",
+    "question": "Quel est l'animal terrestre le plus rapide ?",
+    "choices": [
+      "Le guépard",
+      "L'antilope",
+      "Le lévrier",
+      "L'autruche"
     ],
     "answer": 0,
-    "explanation": "À environ 3 812 mètres d'altitude, le lac Titicaca (entre le Pérou et la Bolivie) est souvent considéré comme le plus haut lac navigable au monde."
+    "explanation": "Le guépard dépasse 110 km/h en pointe, mais seulement sur quelques centaines de mètres."
+  },
+  {
+    "id": "q152",
+    "category": "animaux",
+    "theme": "Anatomie",
+    "question": "Combien de cœurs possède une pieuvre ?",
+    "choices": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "answer": 2,
+    "explanation": "Deux cœurs alimentent les branchies, le troisième irrigue le reste du corps."
+  },
+  {
+    "id": "q153",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Comment s'appelle le cri du cerf ?",
+    "choices": [
+      "Le brame",
+      "Le barrissement",
+      "Le feulement",
+      "Le hennissement"
+    ],
+    "answer": 0,
+    "explanation": "Le brame résonne dans les forêts à l'automne, pendant la période de reproduction."
+  },
+  {
+    "id": "q154",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quel est le plus grand félin sauvage ?",
+    "choices": [
+      "Le lion",
+      "Le tigre",
+      "Le jaguar",
+      "Le puma"
+    ],
+    "answer": 1,
+    "explanation": "Le tigre de Sibérie peut dépasser 300 kg, devant le lion."
+  },
+  {
+    "id": "q155",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Lequel de ces mammifères pond des œufs ?",
+    "choices": [
+      "L'ornithorynque",
+      "Le paresseux",
+      "Le tatou",
+      "L'opossum"
+    ],
+    "answer": 0,
+    "explanation": "L'ornithorynque et l'échidné sont les seuls mammifères ovipares."
+  },
+  {
+    "id": "q156",
+    "category": "animaux",
+    "theme": "Insectes",
+    "question": "Combien de pattes possède une araignée ?",
+    "choices": [
+      "6",
+      "8",
+      "10",
+      "12"
+    ],
+    "answer": 1,
+    "explanation": "Huit pattes — c'est d'ailleurs ce qui distingue les arachnides des insectes."
+  },
+  {
+    "id": "q157",
+    "category": "animaux",
+    "theme": "Oiseaux",
+    "question": "Quel animal détient le record de vitesse en piqué ?",
+    "choices": [
+      "L'aigle royal",
+      "Le faucon pèlerin",
+      "Le martinet",
+      "L'albatros"
+    ],
+    "answer": 1,
+    "explanation": "Le faucon pèlerin peut approcher les 390 km/h en piqué."
+  },
+  {
+    "id": "q158",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Comment s'appelle la femelle du sanglier ?",
+    "choices": [
+      "La truie",
+      "La laie",
+      "La hase",
+      "La daine"
+    ],
+    "answer": 1,
+    "explanation": "La laie est la femelle du sanglier ; la hase est celle du lièvre."
+  },
+  {
+    "id": "q159",
+    "category": "animaux",
+    "theme": "Oiseaux",
+    "question": "Quel est le plus grand oiseau du monde ?",
+    "choices": [
+      "Le condor",
+      "L'autruche",
+      "L'émeu",
+      "L'albatros"
+    ],
+    "answer": 1,
+    "explanation": "L'autruche peut atteindre 2,80 m — incapable de voler, elle court à 70 km/h."
+  },
+  {
+    "id": "q160",
+    "category": "animaux",
+    "theme": "Reptiles",
+    "question": "Quel est le plus grand reptile vivant ?",
+    "choices": [
+      "Le crocodile marin",
+      "L'anaconda",
+      "Le dragon de Komodo",
+      "La tortue luth"
+    ],
+    "answer": 0,
+    "explanation": "Le crocodile marin peut dépasser 6 m et une tonne."
+  },
+  {
+    "id": "q161",
+    "category": "animaux",
+    "theme": "Anatomie",
+    "question": "Combien de compartiments compte l'estomac d'une vache ?",
+    "choices": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "answer": 3,
+    "explanation": "Panse, bonnet, feuillet et caillette permettent aux ruminants de digérer l'herbe."
+  },
+  {
+    "id": "q162",
+    "category": "animaux",
+    "theme": "Insectes",
+    "question": "Quel insecte ne vit que quelques heures à quelques jours à l'état adulte ?",
+    "choices": [
+      "La luciole",
+      "L'éphémère",
+      "Le moustique",
+      "La cigale"
+    ],
+    "answer": 1,
+    "explanation": "L'éphémère adulte ne se nourrit même pas : il ne vit que pour se reproduire."
+  },
+  {
+    "id": "q163",
+    "category": "animaux",
+    "theme": "Records",
+    "question": "Quel amphibien est capable de régénérer ses membres ?",
+    "choices": [
+      "L'axolotl",
+      "Le hérisson",
+      "La chauve-souris",
+      "L'écureuil"
+    ],
+    "answer": 0,
+    "explanation": "L'axolotl régénère pattes, queue et même des parties d'organes."
+  },
+  {
+    "id": "q164",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quel est le seul mammifère capable de vol actif ?",
+    "choices": [
+      "L'écureuil volant",
+      "La chauve-souris",
+      "Le colugo",
+      "Le phalanger"
+    ],
+    "answer": 1,
+    "explanation": "Les autres planent ; seule la chauve-souris vole vraiment."
+  },
+  {
+    "id": "q165",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle plante détient le record de vitesse de croissance ?",
+    "choices": [
+      "Le bambou",
+      "Le maïs",
+      "L'eucalyptus",
+      "Le tournesol"
+    ],
+    "answer": 0,
+    "explanation": "Certains bambous poussent de près d'un mètre par jour."
+  },
+  {
+    "id": "q166",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Par quel processus les plantes produisent-elles leur énergie grâce à la lumière ?",
+    "choices": [
+      "La photosynthèse",
+      "La respiration",
+      "La germination",
+      "La pollinisation"
+    ],
+    "answer": 0,
+    "explanation": "La photosynthèse transforme lumière, eau et CO₂ en sucres et en oxygène."
+  },
+  {
+    "id": "q167",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Quel arbre produit des glands ?",
+    "choices": [
+      "Le hêtre",
+      "Le chêne",
+      "Le châtaignier",
+      "Le frêne"
+    ],
+    "answer": 1,
+    "explanation": "Le gland est le fruit du chêne."
+  },
+  {
+    "id": "q168",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Quel arbre est célébré au Japon pour sa floraison au printemps ?",
+    "choices": [
+      "L'érable",
+      "Le cerisier",
+      "Le ginkgo",
+      "Le camphrier"
+    ],
+    "answer": 1,
+    "explanation": "La floraison des cerisiers (sakura) donne lieu au hanami, tradition nationale."
+  },
+  {
+    "id": "q169",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle est la plus grande fleur du monde ?",
+    "choices": [
+      "La rafflésie",
+      "L'orchidée géante",
+      "Le lotus sacré",
+      "Le nénuphar géant"
+    ],
+    "answer": 0,
+    "explanation": "La rafflésie d'Asie du Sud-Est peut dépasser un mètre de diamètre… et sent la viande pourrie."
+  },
+  {
+    "id": "q170",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quel champignon souterrain est déniché à l'aide de chiens ou de cochons ?",
+    "choices": [
+      "Le cèpe",
+      "La truffe",
+      "La morille",
+      "La girolle"
+    ],
+    "answer": 1,
+    "explanation": "La truffe noire du Périgord peut se négocier à plus de 1 000 € le kilo."
+  },
+  {
+    "id": "q171",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Comment qualifie-t-on un arbre qui perd ses feuilles en hiver ?",
+    "choices": [
+      "Persistant",
+      "Caduc",
+      "Résineux",
+      "Vivace"
+    ],
+    "answer": 1,
+    "explanation": "On parle de feuillage caduc, par opposition au feuillage persistant."
+  },
+  {
+    "id": "q172",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Dans quelle partie du cactus l'eau est-elle principalement stockée ?",
+    "choices": [
+      "Les racines",
+      "Les épines",
+      "La tige",
+      "Les fleurs"
+    ],
+    "answer": 2,
+    "explanation": "La tige charnue stocke l'eau ; les épines limitent l'évaporation."
+  },
+  {
+    "id": "q173",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Quels sont les plus vieux arbres individuels du monde ?",
+    "choices": [
+      "Les séquoias",
+      "Les pins de Bristlecone",
+      "Les oliviers",
+      "Les baobabs"
+    ],
+    "answer": 1,
+    "explanation": "Certains pins de Bristlecone de Californie ont près de 5 000 ans."
+  },
+  {
+    "id": "q174",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "De quel continent le baobab emblématique est-il originaire ?",
+    "choices": [
+      "L'Asie",
+      "L'Afrique",
+      "L'Amérique du Sud",
+      "L'Océanie"
+    ],
+    "answer": 1,
+    "explanation": "Le baobab africain peut vivre plus de 1 000 ans et stocker des tonnes d'eau dans son tronc."
+  },
+  {
+    "id": "q175",
+    "category": "faune-flore",
+    "theme": "Nature",
+    "question": "Quelle algue géante forme de véritables forêts sous-marines ?",
+    "choices": [
+      "Le kelp",
+      "La spiruline",
+      "L'ulve",
+      "Le fucus"
+    ],
+    "answer": 0,
+    "explanation": "Les forêts de kelp, sur les côtes du Pacifique, peuvent atteindre 45 m de haut."
+  },
+  {
+    "id": "q176",
+    "category": "faune-flore",
+    "theme": "Nature",
+    "question": "Quelle part de l'oxygène terrestre est produite par les océans ?",
+    "choices": [
+      "Environ 10 %",
+      "Environ 25 %",
+      "Environ la moitié",
+      "La quasi-totalité"
+    ],
+    "answer": 2,
+    "explanation": "Le phytoplancton produit environ la moitié de l'oxygène de la planète."
+  },
+  {
+    "id": "q177",
+    "category": "musique",
+    "theme": "Instruments",
+    "question": "Combien de cordes possède une guitare classique ?",
+    "choices": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "answer": 2,
+    "explanation": "Six cordes, accordées mi-la-ré-sol-si-mi."
+  },
+  {
+    "id": "q178",
+    "category": "musique",
+    "theme": "Pop",
+    "question": "Qui est surnommé le « King of Pop » ?",
+    "choices": [
+      "Prince",
+      "Michael Jackson",
+      "Elvis Presley",
+      "Stevie Wonder"
+    ],
+    "answer": 1,
+    "explanation": "Michael Jackson, dont l'album Thriller reste le plus vendu de l'histoire."
+  },
+  {
+    "id": "q179",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "De quelle ville anglaise viennent les Beatles ?",
+    "choices": [
+      "Londres",
+      "Manchester",
+      "Liverpool",
+      "Birmingham"
+    ],
+    "answer": 2,
+    "explanation": "Les Beatles se sont formés à Liverpool en 1960."
+  },
+  {
+    "id": "q180",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Quel compositeur a continué à écrire après être devenu sourd ?",
+    "choices": [
+      "Mozart",
+      "Beethoven",
+      "Bach",
+      "Chopin"
+    ],
+    "answer": 1,
+    "explanation": "Beethoven a composé sa 9e symphonie alors qu'il était presque totalement sourd."
+  },
+  {
+    "id": "q181",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Qui a composé l'opéra La Flûte enchantée ?",
+    "choices": [
+      "Verdi",
+      "Mozart",
+      "Wagner",
+      "Rossini"
+    ],
+    "answer": 1,
+    "explanation": "Mozart l'a composée en 1791, l'année de sa mort."
+  },
+  {
+    "id": "q182",
+    "category": "musique",
+    "theme": "Instruments",
+    "question": "Combien de touches compte un piano standard ?",
+    "choices": [
+      "66",
+      "76",
+      "88",
+      "96"
+    ],
+    "answer": 2,
+    "explanation": "88 touches : 52 blanches et 36 noires."
+  },
+  {
+    "id": "q183",
+    "category": "musique",
+    "theme": "Chanson française",
+    "question": "Qui chante « Ne me quitte pas » ?",
+    "choices": [
+      "Charles Aznavour",
+      "Jacques Brel",
+      "Serge Gainsbourg",
+      "Georges Brassens"
+    ],
+    "answer": 1,
+    "explanation": "Jacques Brel l'a écrite en 1959 ; elle a été reprise dans le monde entier."
+  },
+  {
+    "id": "q184",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "Quel groupe a enregistré « Bohemian Rhapsody » ?",
+    "choices": [
+      "Led Zeppelin",
+      "Queen",
+      "The Rolling Stones",
+      "Pink Floyd"
+    ],
+    "answer": 1,
+    "explanation": "Queen a sorti ce titre de six minutes en 1975, porté par la voix de Freddie Mercury."
+  },
+  {
+    "id": "q185",
+    "category": "musique",
+    "theme": "Électro",
+    "question": "Quel duo électro français se cachait derrière des casques de robots ?",
+    "choices": [
+      "Justice",
+      "Daft Punk",
+      "Air",
+      "Cassius"
+    ],
+    "answer": 1,
+    "explanation": "Daft Punk a gardé l'anonymat derrière ses casques de 1993 à sa séparation en 2021."
+  },
+  {
+    "id": "q186",
+    "category": "musique",
+    "theme": "Chanson française",
+    "question": "Quelle chanson emblématique est associée à Édith Piaf ?",
+    "choices": [
+      "La Bohème",
+      "La Vie en rose",
+      "Douce France",
+      "Sous le ciel de Paris"
+    ],
+    "answer": 1,
+    "explanation": "Piaf a écrit les paroles de La Vie en rose en 1945."
+  },
+  {
+    "id": "q187",
+    "category": "musique",
+    "theme": "Genres",
+    "question": "Dans quel pays est né le reggae ?",
+    "choices": [
+      "Le Brésil",
+      "La Jamaïque",
+      "Cuba",
+      "Trinidad"
+    ],
+    "answer": 1,
+    "explanation": "Le reggae est né en Jamaïque à la fin des années 1960, popularisé par Bob Marley."
+  },
+  {
+    "id": "q188",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Qui a composé Les Quatre Saisons ?",
+    "choices": [
+      "Bach",
+      "Vivaldi",
+      "Haendel",
+      "Telemann"
+    ],
+    "answer": 1,
+    "explanation": "Antonio Vivaldi a composé ces quatre concertos pour violon vers 1720."
+  },
+  {
+    "id": "q189",
+    "category": "musique",
+    "theme": "Instruments",
+    "question": "Quel instrument à cordes frottées est le plus aigu d'un quatuor ?",
+    "choices": [
+      "L'alto",
+      "Le violon",
+      "Le violoncelle",
+      "La contrebasse"
+    ],
+    "answer": 1,
+    "explanation": "Le violon joue les voix les plus aiguës du quatuor à cordes."
+  },
+  {
+    "id": "q190",
+    "category": "musique",
+    "theme": "Genres",
+    "question": "Quel genre musical est né à La Nouvelle-Orléans au début du XXe siècle ?",
+    "choices": [
+      "Le blues",
+      "Le jazz",
+      "Le rock",
+      "La soul"
+    ],
+    "answer": 1,
+    "explanation": "Le jazz est né du mélange des traditions afro-américaines de La Nouvelle-Orléans."
+  },
+  {
+    "id": "q191",
+    "category": "jeux-video",
+    "theme": "Nintendo",
+    "question": "Quel plombier moustachu est la mascotte de Nintendo ?",
+    "choices": [
+      "Luigi",
+      "Mario",
+      "Wario",
+      "Toad"
+    ],
+    "answer": 1,
+    "explanation": "Mario est apparu pour la première fois en 1981 dans Donkey Kong."
+  },
+  {
+    "id": "q192",
+    "category": "jeux-video",
+    "theme": "Sega",
+    "question": "Quel hérisson bleu est la mascotte de Sega ?",
+    "choices": [
+      "Sonic",
+      "Tails",
+      "Shadow",
+      "Knuckles"
+    ],
+    "answer": 0,
+    "explanation": "Sonic est né en 1991 pour concurrencer Mario."
+  },
+  {
+    "id": "q193",
+    "category": "jeux-video",
+    "theme": "Records",
+    "question": "Quel est le jeu vidéo le plus vendu de tous les temps ?",
+    "choices": [
+      "Tetris",
+      "Minecraft",
+      "GTA V",
+      "Wii Sports"
+    ],
+    "answer": 1,
+    "explanation": "Minecraft dépasse les 300 millions d'exemplaires vendus."
+  },
+  {
+    "id": "q194",
+    "category": "jeux-video",
+    "theme": "Nintendo",
+    "question": "Dans The Legend of Zelda, comment s'appelle le héros ?",
+    "choices": [
+      "Zelda",
+      "Link",
+      "Ganon",
+      "Epona"
+    ],
+    "answer": 1,
+    "explanation": "Link est le héros ; Zelda est la princesse qu'il doit souvent sauver."
+  },
+  {
+    "id": "q195",
+    "category": "jeux-video",
+    "theme": "Pokémon",
+    "question": "De quel type est Pikachu ?",
+    "choices": [
+      "Feu",
+      "Eau",
+      "Électrik",
+      "Plante"
+    ],
+    "answer": 2,
+    "explanation": "Pikachu est le Pokémon Électrik le plus célèbre de la licence."
+  },
+  {
+    "id": "q196",
+    "category": "jeux-video",
+    "theme": "Histoire du JV",
+    "question": "Dans quel pays Tetris a-t-il été créé en 1984 ?",
+    "choices": [
+      "Au Japon",
+      "En URSS",
+      "Aux États-Unis",
+      "En Allemagne"
+    ],
+    "answer": 1,
+    "explanation": "Alexeï Pajitnov a créé Tetris à Moscou, sur un ordinateur soviétique Elektronika 60."
+  },
+  {
+    "id": "q197",
+    "category": "jeux-video",
+    "theme": "Consoles",
+    "question": "Quelle entreprise fabrique la PlayStation ?",
+    "choices": [
+      "Nintendo",
+      "Sega",
+      "Sony",
+      "Microsoft"
+    ],
+    "answer": 2,
+    "explanation": "Sony a lancé la première PlayStation en 1994."
+  },
+  {
+    "id": "q198",
+    "category": "jeux-video",
+    "theme": "Studios",
+    "question": "Quel studio développe la série Grand Theft Auto ?",
+    "choices": [
+      "Ubisoft",
+      "Rockstar Games",
+      "EA",
+      "Activision"
+    ],
+    "answer": 1,
+    "explanation": "Rockstar Games édite la série GTA depuis 1997."
+  },
+  {
+    "id": "q199",
+    "category": "jeux-video",
+    "theme": "Héros",
+    "question": "Quelle aventurière est l'héroïne de Tomb Raider ?",
+    "choices": [
+      "Samus Aran",
+      "Lara Croft",
+      "Aloy",
+      "Jill Valentine"
+    ],
+    "answer": 1,
+    "explanation": "Lara Croft explore tombeaux et ruines depuis 1996."
+  },
+  {
+    "id": "q200",
+    "category": "jeux-video",
+    "theme": "Studios",
+    "question": "Quel studio a créé Fortnite ?",
+    "choices": [
+      "Epic Games",
+      "Valve",
+      "Riot Games",
+      "Blizzard"
+    ],
+    "answer": 0,
+    "explanation": "Epic Games a lancé Fortnite en 2017, aussi créateur de l'Unreal Engine."
+  },
+  {
+    "id": "q201",
+    "category": "jeux-video",
+    "theme": "Nintendo",
+    "question": "Dans Mario Kart, quelle carapace vise le premier de la course ?",
+    "choices": [
+      "La verte",
+      "La rouge",
+      "La bleue",
+      "La dorée"
+    ],
+    "answer": 2,
+    "explanation": "La carapace bleue traque impitoyablement le leader — la terreur des premières places."
+  },
+  {
+    "id": "q202",
+    "category": "jeux-video",
+    "theme": "Consoles",
+    "question": "Quelle console de Nintendo est à la fois portable et de salon ?",
+    "choices": [
+      "La Wii U",
+      "La Switch",
+      "La 3DS",
+      "La GameCube"
+    ],
+    "answer": 1,
+    "explanation": "La Switch, sortie en 2017, se joue en mode docké ou nomade."
+  },
+  {
+    "id": "q203",
+    "category": "jeux-video",
+    "theme": "Héros",
+    "question": "Comment s'appelle le héros de la saga Halo ?",
+    "choices": [
+      "Master Chief",
+      "Marcus Fenix",
+      "Doomguy",
+      "Kratos"
+    ],
+    "answer": 0,
+    "explanation": "Le Spartan John-117, alias Master Chief, est le visage de Halo depuis 2001."
+  },
+  {
+    "id": "q204",
+    "category": "jeux-video",
+    "theme": "Genres",
+    "question": "À quel genre appartient League of Legends ?",
+    "choices": [
+      "FPS",
+      "MOBA",
+      "RTS",
+      "MMORPG"
+    ],
+    "answer": 1,
+    "explanation": "League of Legends est le MOBA le plus joué au monde."
+  },
+  {
+    "id": "q205",
+    "category": "jeux-video",
+    "theme": "Histoire du JV",
+    "question": "Quel jeu d'arcade de 1980 met en scène un personnage jaune poursuivi par des fantômes ?",
+    "choices": [
+      "Space Invaders",
+      "Pac-Man",
+      "Donkey Kong",
+      "Galaga"
+    ],
+    "answer": 1,
+    "explanation": "Pac-Man, créé par Namco, est l'une des icônes fondatrices du jeu vidéo."
+  },
+  {
+    "id": "q206",
+    "category": "culture-g",
+    "theme": "Art",
+    "question": "Qui a peint le plafond de la chapelle Sixtine ?",
+    "choices": [
+      "Léonard de Vinci",
+      "Michel-Ange",
+      "Raphaël",
+      "Le Caravage"
+    ],
+    "answer": 1,
+    "explanation": "Michel-Ange y a travaillé quatre ans, allongé sur des échafaudages (1508-1512)."
+  },
+  {
+    "id": "q207",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "En quelle année a débuté la Première Guerre mondiale ?",
+    "choices": [
+      "1912",
+      "1914",
+      "1916",
+      "1918"
+    ],
+    "answer": 1,
+    "explanation": "L'assassinat de l'archiduc François-Ferdinand à Sarajevo déclenche la guerre en 1914."
+  },
+  {
+    "id": "q208",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "En quelle année s'est terminée la Seconde Guerre mondiale ?",
+    "choices": [
+      "1943",
+      "1944",
+      "1945",
+      "1946"
+    ],
+    "answer": 2,
+    "explanation": "Capitulation allemande en mai 1945, japonaise en septembre après Hiroshima et Nagasaki."
+  },
+  {
+    "id": "q209",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Qui fut le premier président de la Ve République française ?",
+    "choices": [
+      "René Coty",
+      "Charles de Gaulle",
+      "Georges Pompidou",
+      "Vincent Auriol"
+    ],
+    "answer": 1,
+    "explanation": "De Gaulle a fondé la Ve République en 1958 et l'a présidée jusqu'en 1969."
+  },
+  {
+    "id": "q210",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quel est l'élément chimique le plus abondant dans l'Univers ?",
+    "choices": [
+      "L'oxygène",
+      "Le carbone",
+      "L'hydrogène",
+      "L'hélium"
+    ],
+    "answer": 2,
+    "explanation": "L'hydrogène représente environ 75 % de la matière ordinaire de l'Univers."
+  },
+  {
+    "id": "q211",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Combien de dents compte une dentition adulte complète ?",
+    "choices": [
+      "28",
+      "30",
+      "32",
+      "36"
+    ],
+    "answer": 2,
+    "explanation": "32 dents, en comptant les quatre dents de sagesse."
+  },
+  {
+    "id": "q212",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quelle planète est surnommée la « planète rouge » ?",
+    "choices": [
+      "Vénus",
+      "Mars",
+      "Jupiter",
+      "Saturne"
+    ],
+    "answer": 1,
+    "explanation": "Mars doit sa couleur à l'oxyde de fer qui couvre sa surface."
+  },
+  {
+    "id": "q213",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Qui a découvert la pénicilline ?",
+    "choices": [
+      "Louis Pasteur",
+      "Alexander Fleming",
+      "Robert Koch",
+      "Marie Curie"
+    ],
+    "answer": 1,
+    "explanation": "Fleming l'a découverte par accident en 1928, dans une boîte de culture moisie."
+  },
+  {
+    "id": "q214",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quel savant a énoncé la loi de la gravitation universelle ?",
+    "choices": [
+      "Galilée",
+      "Kepler",
+      "Isaac Newton",
+      "Einstein"
+    ],
+    "answer": 2,
+    "explanation": "Newton l'a publiée en 1687 dans ses Principia Mathematica."
+  },
+  {
+    "id": "q215",
+    "category": "culture-g",
+    "theme": "Littérature",
+    "question": "Qui a écrit Roméo et Juliette ?",
+    "choices": [
+      "Molière",
+      "William Shakespeare",
+      "Racine",
+      "Oscar Wilde"
+    ],
+    "answer": 1,
+    "explanation": "Shakespeare a écrit cette tragédie vers 1595."
+  },
+  {
+    "id": "q216",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Quel philosophe grec fut le précepteur d'Alexandre le Grand ?",
+    "choices": [
+      "Socrate",
+      "Platon",
+      "Aristote",
+      "Épicure"
+    ],
+    "answer": 2,
+    "explanation": "Aristote a enseigné au jeune Alexandre à la cour de Macédoine."
+  },
+  {
+    "id": "q217",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "En quelle année a commencé la Révolution française ?",
+    "choices": [
+      "1776",
+      "1789",
+      "1793",
+      "1799"
+    ],
+    "answer": 1,
+    "explanation": "La prise de la Bastille, le 14 juillet 1789, en est l'événement fondateur."
+  },
+  {
+    "id": "q218",
+    "category": "culture-g",
+    "theme": "Philosophie",
+    "question": "Qui a écrit « Je pense, donc je suis » ?",
+    "choices": [
+      "Kant",
+      "Descartes",
+      "Spinoza",
+      "Voltaire"
+    ],
+    "answer": 1,
+    "explanation": "René Descartes, dans le Discours de la méthode (1637)."
+  },
+  {
+    "id": "q219",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quelle est la plus petite unité du vivant ?",
+    "choices": [
+      "L'atome",
+      "La molécule",
+      "La cellule",
+      "Le gène"
+    ],
+    "answer": 2,
+    "explanation": "La cellule est la brique de base de tous les organismes vivants."
+  },
+  {
+    "id": "q220",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Combien de planètes compte le Système solaire ?",
+    "choices": [
+      "7",
+      "8",
+      "9",
+      "10"
+    ],
+    "answer": 1,
+    "explanation": "Huit depuis 2006, quand Pluton a été reclassée en planète naine."
+  },
+  {
+    "id": "q221",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quel gaz les plantes absorbent-elles pour la photosynthèse ?",
+    "choices": [
+      "L'oxygène",
+      "L'azote",
+      "Le dioxyde de carbone",
+      "L'hydrogène"
+    ],
+    "answer": 2,
+    "explanation": "Les plantes absorbent le CO₂ et rejettent de l'oxygène."
+  },
+  {
+    "id": "q222",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Qui a introduit l'imprimerie à caractères mobiles en Europe ?",
+    "choices": [
+      "Gutenberg",
+      "Érasme",
+      "Léonard de Vinci",
+      "Luther"
+    ],
+    "answer": 0,
+    "explanation": "Gutenberg a imprimé sa célèbre Bible à Mayence vers 1455."
+  },
+  {
+    "id": "q223",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Quelle reine d'Égypte a séduit Jules César puis Marc Antoine ?",
+    "choices": [
+      "Néfertiti",
+      "Hatchepsout",
+      "Cléopâtre",
+      "Bérénice"
+    ],
+    "answer": 2,
+    "explanation": "Cléopâtre VII, dernière reine d'Égypte, alliée puis amante des deux Romains."
+  },
+  {
+    "id": "q224",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Sur quelle île Napoléon est-il mort en exil ?",
+    "choices": [
+      "L'île d'Elbe",
+      "Sainte-Hélène",
+      "La Corse",
+      "Malte"
+    ],
+    "answer": 1,
+    "explanation": "Exilé après Waterloo, Napoléon est mort à Sainte-Hélène en 1821."
+  },
+  {
+    "id": "q225",
+    "category": "culture-g",
+    "theme": "Littérature",
+    "question": "Qui a écrit Vingt Mille Lieues sous les mers ?",
+    "choices": [
+      "H.G. Wells",
+      "Jules Verne",
+      "Alexandre Dumas",
+      "Victor Hugo"
+    ],
+    "answer": 1,
+    "explanation": "Jules Verne y invente le capitaine Nemo et le Nautilus (1870)."
+  },
+  {
+    "id": "q226",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quel métal est liquide à température ambiante ?",
+    "choices": [
+      "Le plomb",
+      "Le mercure",
+      "L'étain",
+      "Le gallium"
+    ],
+    "answer": 1,
+    "explanation": "Le mercure ne gèle qu'à −39 °C — d'où son usage dans les anciens thermomètres."
+  },
+  {
+    "id": "q227",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quelle est la formule chimique de l'eau ?",
+    "choices": [
+      "CO2",
+      "H2O",
+      "O2",
+      "H2O2"
+    ],
+    "answer": 1,
+    "explanation": "Deux atomes d'hydrogène et un d'oxygène."
+  },
+  {
+    "id": "q228",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Combien de cavités compte le cœur humain ?",
+    "choices": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "answer": 2,
+    "explanation": "Deux oreillettes et deux ventricules."
+  },
+  {
+    "id": "q229",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Qui a réalisé le premier vol en avion motorisé ?",
+    "choices": [
+      "Clément Ader",
+      "Les frères Wright",
+      "Blériot",
+      "Lindbergh"
+    ],
+    "answer": 1,
+    "explanation": "Les frères Wright ont volé 12 secondes à Kitty Hawk le 17 décembre 1903."
+  },
+  {
+    "id": "q230",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quelle scientifique a reçu deux prix Nobel ?",
+    "choices": [
+      "Rosalind Franklin",
+      "Marie Curie",
+      "Ada Lovelace",
+      "Irène Joliot-Curie"
+    ],
+    "answer": 1,
+    "explanation": "Marie Curie : Nobel de physique en 1903 et de chimie en 1911."
+  },
+  {
+    "id": "q231",
+    "category": "culture-g",
+    "theme": "Art",
+    "question": "Quel peintre a fondé le cubisme avec Georges Braque ?",
+    "choices": [
+      "Matisse",
+      "Pablo Picasso",
+      "Dalí",
+      "Kandinsky"
+    ],
+    "answer": 1,
+    "explanation": "Picasso et Braque ont inventé le cubisme vers 1907-1908."
+  },
+  {
+    "id": "q232",
+    "category": "culture-g",
+    "theme": "Art",
+    "question": "Qui a sculpté Le Penseur ?",
+    "choices": [
+      "Michel-Ange",
+      "Auguste Rodin",
+      "Camille Claudel",
+      "Bernin"
+    ],
+    "answer": 1,
+    "explanation": "Rodin a conçu Le Penseur pour sa Porte de l'Enfer."
+  },
+  {
+    "id": "q233",
+    "category": "culture-g",
+    "theme": "Art",
+    "question": "Quel musée abrite la Vénus de Milo ?",
+    "choices": [
+      "Le British Museum",
+      "Le Louvre",
+      "Les Offices",
+      "Le Prado"
+    ],
+    "answer": 1,
+    "explanation": "La statue grecque est au Louvre depuis 1821."
+  },
+  {
+    "id": "q234",
+    "category": "culture-g",
+    "theme": "Littérature",
+    "question": "Qui a écrit L'Étranger ?",
+    "choices": [
+      "Sartre",
+      "Albert Camus",
+      "Malraux",
+      "Céline"
+    ],
+    "answer": 1,
+    "explanation": "Camus a publié L'Étranger en 1942 ; il ouvre son « cycle de l'absurde »."
+  },
+  {
+    "id": "q235",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Comment s'appelle la guerre civile américaine (1861-1865) ?",
+    "choices": [
+      "La guerre d'Indépendance",
+      "La guerre de Sécession",
+      "La guerre du Mexique",
+      "La Reconstruction"
+    ],
+    "answer": 1,
+    "explanation": "Elle a opposé le Nord (Union) au Sud (Confédération) et aboli l'esclavage."
+  },
+  {
+    "id": "q236",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "En quelle année Christophe Colomb a-t-il atteint l'Amérique ?",
+    "choices": [
+      "1453",
+      "1492",
+      "1519",
+      "1533"
+    ],
+    "answer": 1,
+    "explanation": "Le 12 octobre 1492, il débarque aux Bahamas en croyant atteindre les Indes."
+  },
+  {
+    "id": "q237",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quel est l'os le plus long du corps humain ?",
+    "choices": [
+      "L'humérus",
+      "Le tibia",
+      "Le fémur",
+      "La colonne vertébrale"
+    ],
+    "answer": 2,
+    "explanation": "Le fémur représente environ un quart de la taille d'une personne."
+  },
+  {
+    "id": "q238",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quelle vitamine notre peau produit-elle grâce au soleil ?",
+    "choices": [
+      "La vitamine A",
+      "La vitamine C",
+      "La vitamine D",
+      "La vitamine K"
+    ],
+    "answer": 2,
+    "explanation": "Les UVB déclenchent la synthèse de vitamine D, essentielle aux os."
+  },
+  {
+    "id": "q239",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Qui a formulé la théorie de l'évolution par sélection naturelle ?",
+    "choices": [
+      "Lamarck",
+      "Charles Darwin",
+      "Mendel",
+      "Wallace seul"
+    ],
+    "answer": 1,
+    "explanation": "Darwin l'a exposée dans L'Origine des espèces (1859)."
+  },
+  {
+    "id": "q240",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Quel pharaon est célèbre pour son tombeau découvert intact en 1922 ?",
+    "choices": [
+      "Ramsès II",
+      "Toutânkhamon",
+      "Khéops",
+      "Akhenaton"
+    ],
+    "answer": 1,
+    "explanation": "Howard Carter a découvert son tombeau quasi intact dans la Vallée des Rois."
+  },
+  {
+    "id": "q241",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "Qui a composé La Marseillaise ?",
+    "choices": [
+      "Berlioz",
+      "Rouget de Lisle",
+      "Lully",
+      "Gossec"
+    ],
+    "answer": 1,
+    "explanation": "Écrite en 1792 à Strasbourg comme chant de guerre pour l'armée du Rhin."
+  },
+  {
+    "id": "q242",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Combien de côtés possède un hexagone ?",
+    "choices": [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "answer": 1,
+    "explanation": "Six — d'où le surnom de la France métropolitaine."
+  },
+  {
+    "id": "q243",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quelle est la valeur approchée du nombre pi ?",
+    "choices": [
+      "2,72",
+      "3,14",
+      "3,41",
+      "4,13"
+    ],
+    "answer": 1,
+    "explanation": "Pi ≈ 3,14159 — le rapport entre circonférence et diamètre d'un cercle."
+  },
+  {
+    "id": "q244",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Combien de temps met la lumière du Soleil pour atteindre la Terre ?",
+    "choices": [
+      "8 secondes",
+      "8 minutes",
+      "8 heures",
+      "8 jours"
+    ],
+    "answer": 1,
+    "explanation": "Environ 8 minutes et 20 secondes pour parcourir 150 millions de km."
+  },
+  {
+    "id": "q245",
+    "category": "culture-g",
+    "theme": "Art",
+    "question": "Qui a peint La Nuit étoilée ?",
+    "choices": [
+      "Monet",
+      "Van Gogh",
+      "Cézanne",
+      "Gauguin"
+    ],
+    "answer": 1,
+    "explanation": "Van Gogh l'a peinte en 1889, depuis l'asile de Saint-Rémy-de-Provence."
+  },
+  {
+    "id": "q246",
+    "category": "culture-g",
+    "theme": "Littérature",
+    "question": "Quel écrivain a créé Sherlock Holmes ?",
+    "choices": [
+      "Agatha Christie",
+      "Arthur Conan Doyle",
+      "Edgar Poe",
+      "Gaston Leroux"
+    ],
+    "answer": 1,
+    "explanation": "Conan Doyle a fait apparaître Holmes en 1887 dans Une étude en rouge."
+  },
+  {
+    "id": "q247",
+    "category": "culture-g",
+    "theme": "Sciences",
+    "question": "Quelle molécule porte l'information génétique ?",
+    "choices": [
+      "L'ARN seul",
+      "L'ADN",
+      "Les protéines",
+      "Le glucose"
+    ],
+    "answer": 1,
+    "explanation": "L'ADN, découvert en double hélice par Watson et Crick en 1953."
+  },
+  {
+    "id": "q248",
+    "category": "culture-g",
+    "theme": "Histoire",
+    "question": "En quelle année les pièces et billets en euros sont-ils entrés en circulation ?",
+    "choices": [
+      "1999",
+      "2000",
+      "2002",
+      "2004"
+    ],
+    "answer": 2,
+    "explanation": "L'euro fiduciaire est arrivé le 1er janvier 2002 dans douze pays."
+  },
+  {
+    "id": "q249",
+    "category": "culture-g",
+    "theme": "Sport",
+    "question": "Quel sport se joue à Roland-Garros ?",
+    "choices": [
+      "Le golf",
+      "Le tennis",
+      "Le badminton",
+      "Le squash"
+    ],
+    "answer": 1,
+    "explanation": "Le tournoi parisien se joue sur terre battue depuis 1928."
+  },
+  {
+    "id": "q250",
+    "category": "culture-g",
+    "theme": "Sport",
+    "question": "Tous les combien d'années ont lieu les Jeux olympiques d'été ?",
+    "choices": [
+      "2 ans",
+      "3 ans",
+      "4 ans",
+      "5 ans"
+    ],
+    "answer": 2,
+    "explanation": "Tous les quatre ans, comme dans la Grèce antique."
+  },
+  {
+    "id": "q251",
+    "category": "animaux",
+    "theme": "Oiseaux",
+    "question": "Quel oiseau est capable de voler en arrière ?",
+    "choices": [
+      "Le martinet",
+      "Le colibri",
+      "L'hirondelle",
+      "Le martin-pêcheur"
+    ],
+    "answer": 1,
+    "explanation": "Le colibri bat des ailes jusqu'à 80 fois par seconde, dans tous les sens."
+  },
+  {
+    "id": "q252",
+    "category": "animaux",
+    "theme": "Records",
+    "question": "Quel est le plus gros rongeur du monde ?",
+    "choices": [
+      "Le castor",
+      "Le capybara",
+      "Le porc-épic",
+      "Le ragondin"
+    ],
+    "answer": 1,
+    "explanation": "Le capybara d'Amérique du Sud peut peser 65 kg."
+  },
+  {
+    "id": "q253",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Comment s'appelle le petit de la biche ?",
+    "choices": [
+      "Le faon",
+      "Le daguet",
+      "Le hère",
+      "Le chevreau"
+    ],
+    "answer": 0,
+    "explanation": "Le faon devient hère puis daguet en grandissant."
+  },
+  {
+    "id": "q254",
+    "category": "animaux",
+    "theme": "Insectes",
+    "question": "Combien d'yeux possèdent la plupart des araignées ?",
+    "choices": [
+      "2",
+      "4",
+      "6",
+      "8"
+    ],
+    "answer": 3,
+    "explanation": "Huit yeux, même si beaucoup d'espèces voient très mal."
+  },
+  {
+    "id": "q255",
+    "category": "animaux",
+    "theme": "Reptiles",
+    "question": "Quel animal change de couleur grâce à des cellules spéciales de sa peau ?",
+    "choices": [
+      "L'iguane",
+      "Le caméléon",
+      "Le gecko",
+      "La rainette"
+    ],
+    "answer": 1,
+    "explanation": "Les chromatophores du caméléon servent autant à communiquer qu'à se camoufler."
+  },
+  {
+    "id": "q256",
+    "category": "animaux",
+    "theme": "Océans",
+    "question": "Quel animal marin est considéré comme le plus venimeux ?",
+    "choices": [
+      "Le poisson-pierre",
+      "La cuboméduse",
+      "Le poulpe à anneaux bleus",
+      "La raie pastenague"
+    ],
+    "answer": 1,
+    "explanation": "Le venin de la cuboméduse d'Australie peut tuer un humain en quelques minutes."
+  },
+  {
+    "id": "q257",
+    "category": "animaux",
+    "theme": "Océans",
+    "question": "Combien de bras et tentacules possède un calmar au total ?",
+    "choices": [
+      "6",
+      "8",
+      "10",
+      "12"
+    ],
+    "answer": 2,
+    "explanation": "Huit bras et deux longs tentacules ravisseurs."
+  },
+  {
+    "id": "q258",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quel grand félin ne rugit pas mais ronronne ?",
+    "choices": [
+      "Le léopard",
+      "Le guépard",
+      "Le jaguar",
+      "Le tigre"
+    ],
+    "answer": 1,
+    "explanation": "Le guépard est plus proche des petits félins : il ronronne comme un chat."
+  },
+  {
+    "id": "q259",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quelle est la durée de gestation de l'éléphant ?",
+    "choices": [
+      "9 mois",
+      "12 mois",
+      "22 mois",
+      "30 mois"
+    ],
+    "answer": 2,
+    "explanation": "Près de deux ans — la plus longue gestation des mammifères terrestres."
+  },
+  {
+    "id": "q260",
+    "category": "animaux",
+    "theme": "Oiseaux",
+    "question": "Quel oiseau détient le record de migration la plus longue ?",
+    "choices": [
+      "L'albatros",
+      "La sterne arctique",
+      "L'oie sauvage",
+      "La cigogne"
+    ],
+    "answer": 1,
+    "explanation": "La sterne arctique parcourt jusqu'à 70 000 km par an, d'un pôle à l'autre."
+  },
+  {
+    "id": "q261",
+    "category": "animaux",
+    "theme": "Records",
+    "question": "Quel minuscule animal peut survivre au vide spatial ?",
+    "choices": [
+      "Le tardigrade",
+      "La fourmi",
+      "L'acarien",
+      "Le collembole"
+    ],
+    "answer": 0,
+    "explanation": "Le tardigrade survit au vide, aux radiations et à des températures extrêmes."
+  },
+  {
+    "id": "q262",
+    "category": "animaux",
+    "theme": "Reptiles",
+    "question": "Quel est le plus long serpent du monde ?",
+    "choices": [
+      "L'anaconda vert",
+      "Le python réticulé",
+      "Le cobra royal",
+      "Le boa constricteur"
+    ],
+    "answer": 1,
+    "explanation": "Le python réticulé peut dépasser 7 m ; l'anaconda est plus lourd mais plus court."
+  },
+  {
+    "id": "q263",
+    "category": "animaux",
+    "theme": "Oiseaux",
+    "question": "Quel est le plus petit oiseau du monde ?",
+    "choices": [
+      "Le roitelet",
+      "Le colibri d'Elena",
+      "Le troglodyte",
+      "La mésange"
+    ],
+    "answer": 1,
+    "explanation": "Le colibri d'Elena, à Cuba, mesure à peine 6 cm pour 2 grammes."
+  },
+  {
+    "id": "q264",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quel animal a des empreintes digitales presque identiques aux nôtres ?",
+    "choices": [
+      "Le chimpanzé",
+      "Le koala",
+      "Le gorille",
+      "Le raton laveur"
+    ],
+    "answer": 1,
+    "explanation": "Les empreintes du koala peuvent tromper les experts — une convergence évolutive."
+  },
+  {
+    "id": "q265",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quel grand singe partage environ 98 % de son ADN avec l'humain ?",
+    "choices": [
+      "Le gorille",
+      "L'orang-outan",
+      "Le chimpanzé",
+      "Le gibbon"
+    ],
+    "answer": 2,
+    "explanation": "Le chimpanzé (et le bonobo) sont nos plus proches cousins."
+  },
+  {
+    "id": "q266",
+    "category": "animaux",
+    "theme": "Océans",
+    "question": "Quel poisson remonte les rivières pour se reproduire là où il est né ?",
+    "choices": [
+      "L'anguille",
+      "Le saumon",
+      "La truite de mer",
+      "L'esturgeon"
+    ],
+    "answer": 1,
+    "explanation": "Le saumon retrouve sa rivière natale grâce à son odorat."
+  },
+  {
+    "id": "q267",
+    "category": "animaux",
+    "theme": "Insectes",
+    "question": "Comment s'appelle le mâle de l'abeille ?",
+    "choices": [
+      "Le frelon",
+      "Le faux-bourdon",
+      "Le bourdon",
+      "L'ouvrier"
+    ],
+    "answer": 1,
+    "explanation": "Le faux-bourdon n'a pas de dard et ne butine pas."
+  },
+  {
+    "id": "q268",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quel animal est l'emblème du WWF ?",
+    "choices": [
+      "Le tigre",
+      "Le panda géant",
+      "L'éléphant",
+      "Le gorille"
+    ],
+    "answer": 1,
+    "explanation": "Le panda Chi Chi du zoo de Londres a inspiré le logo en 1961."
+  },
+  {
+    "id": "q269",
+    "category": "animaux",
+    "theme": "Records",
+    "question": "Quel animal terrestre peut vivre plus de 150 ans ?",
+    "choices": [
+      "L'éléphant",
+      "La tortue géante",
+      "Le perroquet",
+      "La baleine"
+    ],
+    "answer": 1,
+    "explanation": "Jonathan, tortue géante des Seychelles, aurait plus de 190 ans."
+  },
+  {
+    "id": "q270",
+    "category": "animaux",
+    "theme": "Océans",
+    "question": "Quel cétacé possède une longue défense torsadée ?",
+    "choices": [
+      "Le béluga",
+      "Le narval",
+      "L'orque",
+      "Le cachalot"
+    ],
+    "answer": 1,
+    "explanation": "La « licorne des mers » porte une dent qui peut atteindre 3 m."
+  },
+  {
+    "id": "q271",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quel animal dort suspendu la tête en bas ?",
+    "choices": [
+      "Le paresseux",
+      "La chauve-souris",
+      "L'opossum",
+      "Le loris"
+    ],
+    "answer": 1,
+    "explanation": "Ses tendons verrouillent ses griffes sans effort musculaire."
+  },
+  {
+    "id": "q272",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quel canidé sauvage chasse en meute dans la savane africaine ?",
+    "choices": [
+      "Le chacal",
+      "Le lycaon",
+      "La hyène",
+      "Le fennec"
+    ],
+    "answer": 1,
+    "explanation": "Le lycaon affiche l'un des meilleurs taux de réussite à la chasse d'Afrique."
+  },
+  {
+    "id": "q273",
+    "category": "animaux",
+    "theme": "Insectes",
+    "question": "Combien d'ailes possède une libellule ?",
+    "choices": [
+      "2",
+      "4",
+      "6",
+      "8"
+    ],
+    "answer": 1,
+    "explanation": "Quatre ailes indépendantes, qui lui permettent même de voler en arrière."
+  },
+  {
+    "id": "q274",
+    "category": "animaux",
+    "theme": "Océans",
+    "question": "De quelle couleur est le sang de la pieuvre ?",
+    "choices": [
+      "Rouge",
+      "Bleu",
+      "Vert",
+      "Transparent"
+    ],
+    "answer": 1,
+    "explanation": "Son sang utilise l'hémocyanine, à base de cuivre, au lieu de l'hémoglobine."
+  },
+  {
+    "id": "q275",
+    "category": "animaux",
+    "theme": "Oiseaux",
+    "question": "Jusqu'à quel angle une chouette peut-elle tourner la tête ?",
+    "choices": [
+      "90°",
+      "180°",
+      "270°",
+      "360°"
+    ],
+    "answer": 2,
+    "explanation": "Ses yeux fixes l'obligent à tourner la tête — jusqu'à 270°."
+  },
+  {
+    "id": "q276",
+    "category": "animaux",
+    "theme": "Océans",
+    "question": "Quel poisson est réputé le plus rapide des océans ?",
+    "choices": [
+      "Le thon rouge",
+      "Le voilier",
+      "Le requin mako",
+      "Le barracuda"
+    ],
+    "answer": 1,
+    "explanation": "Le voilier (istiophore) dépasserait les 100 km/h en pointe."
+  },
+  {
+    "id": "q277",
+    "category": "animaux",
+    "theme": "Mammifères",
+    "question": "Quel est le plus grand carnivore terrestre ?",
+    "choices": [
+      "Le grizzly",
+      "L'ours polaire",
+      "Le tigre de Sibérie",
+      "Le lion"
+    ],
+    "answer": 1,
+    "explanation": "Un ours polaire mâle peut peser plus de 600 kg."
+  },
+  {
+    "id": "q278",
+    "category": "animaux",
+    "theme": "Oiseaux",
+    "question": "Quelle est la seule espèce de manchot vivant au nord de l'équateur ?",
+    "choices": [
+      "Le manchot pygmée",
+      "Le manchot des Galápagos",
+      "Le manchot du Cap",
+      "Le manchot royal"
+    ],
+    "answer": 1,
+    "explanation": "Le courant froid de Humboldt lui permet de vivre sur l'équateur, aux Galápagos."
+  },
+  {
+    "id": "q279",
+    "category": "animaux",
+    "theme": "Insectes",
+    "question": "Quelle chenille produit la soie ?",
+    "choices": [
+      "La processionnaire",
+      "Le ver à soie",
+      "La chenille du sphinx",
+      "L'arpenteuse"
+    ],
+    "answer": 1,
+    "explanation": "Le bombyx du mûrier tisse un cocon d'un fil de soie continu pouvant atteindre 1 500 m."
+  },
+  {
+    "id": "q280",
+    "category": "animaux",
+    "theme": "Océans",
+    "question": "Comment s'appelle le phénomène par lequel les crustacés changent de carapace ?",
+    "choices": [
+      "La métamorphose",
+      "La mue",
+      "La régénération",
+      "La desquamation"
+    ],
+    "answer": 1,
+    "explanation": "La mue permet au crabe ou au homard de grandir hors de sa carapace rigide."
+  },
+  {
+    "id": "q281",
+    "category": "animaux",
+    "theme": "Océans",
+    "question": "Quel est le plus grand prédateur des océans ?",
+    "choices": [
+      "Le grand requin blanc",
+      "L'orque",
+      "Le cachalot",
+      "Le requin-tigre"
+    ],
+    "answer": 1,
+    "explanation": "L'orque chasse même le grand requin blanc — aucun prédateur ne s'attaque à elle."
+  },
+  {
+    "id": "q282",
+    "category": "animaux",
+    "theme": "Records",
+    "question": "Quel animal possède le cerveau le plus lourd ?",
+    "choices": [
+      "L'éléphant",
+      "Le cachalot",
+      "La baleine bleue",
+      "L'orque"
+    ],
+    "answer": 1,
+    "explanation": "Le cerveau du cachalot pèse environ 8 kg, record absolu du règne animal."
+  },
+  {
+    "id": "q283",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle fleur suit la course du soleil quand elle est jeune ?",
+    "choices": [
+      "La tulipe",
+      "Le tournesol",
+      "La marguerite",
+      "Le coquelicot"
+    ],
+    "answer": 1,
+    "explanation": "Les jeunes tournesols s'orientent vers le soleil ; adultes, ils se figent vers l'est."
+  },
+  {
+    "id": "q284",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Quel arbre figure sur le drapeau du Canada ?",
+    "choices": [
+      "Le chêne",
+      "L'érable",
+      "Le bouleau",
+      "Le pin"
+    ],
+    "answer": 1,
+    "explanation": "La feuille d'érable rouge est l'emblème du pays."
+  },
+  {
+    "id": "q285",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Botaniquement, qu'est-ce que le bananier ?",
+    "choices": [
+      "Un arbre",
+      "Une herbe géante",
+      "Un arbuste",
+      "Une liane"
+    ],
+    "answer": 1,
+    "explanation": "Son « tronc » n'est pas du bois mais des gaines de feuilles enroulées."
+  },
+  {
+    "id": "q286",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle épice provient d'une orchidée ?",
+    "choices": [
+      "Le safran",
+      "La vanille",
+      "La cannelle",
+      "La cardamome"
+    ],
+    "answer": 1,
+    "explanation": "La vanille est le fruit d'une orchidée grimpante, pollinisée à la main."
+  },
+  {
+    "id": "q287",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle est l'épice la plus chère du monde ?",
+    "choices": [
+      "La vanille",
+      "Le safran",
+      "La cardamome",
+      "Le poivre de Kampot"
+    ],
+    "answer": 1,
+    "explanation": "Il faut environ 150 000 fleurs de crocus pour un kilo de safran."
+  },
+  {
+    "id": "q288",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Quel arbre fournit le liège ?",
+    "choices": [
+      "Le chêne-liège",
+      "Le bouleau",
+      "L'eucalyptus",
+      "Le hêtre"
+    ],
+    "answer": 0,
+    "explanation": "Son écorce se récolte tous les 9 à 12 ans sans abattre l'arbre."
+  },
+  {
+    "id": "q289",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "De quel arbre est extrait le sirop d'érable ?",
+    "choices": [
+      "L'érable champêtre",
+      "L'érable à sucre",
+      "L'érable sycomore",
+      "L'érable du Japon"
+    ],
+    "answer": 1,
+    "explanation": "Il faut environ 40 litres de sève pour produire 1 litre de sirop."
+  },
+  {
+    "id": "q290",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle plante carnivore referme ses « mâchoires » sur les insectes ?",
+    "choices": [
+      "La drosera",
+      "La dionée attrape-mouche",
+      "La sarracénie",
+      "L'utriculaire"
+    ],
+    "answer": 1,
+    "explanation": "Ses pièges se referment en un dixième de seconde."
+  },
+  {
+    "id": "q291",
+    "category": "faune-flore",
+    "theme": "Nature",
+    "question": "Quel organisme clonal de l'Utah, une forêt de peupliers, est l'un des plus lourds du monde ?",
+    "choices": [
+      "Pando",
+      "Hyperion",
+      "Matusalem",
+      "Général Sherman"
+    ],
+    "answer": 0,
+    "explanation": "Pando : 47 000 troncs issus d'un seul système racinaire, vieux de milliers d'années."
+  },
+  {
+    "id": "q292",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle céréale est la plus produite au monde ?",
+    "choices": [
+      "Le blé",
+      "Le riz",
+      "Le maïs",
+      "L'orge"
+    ],
+    "answer": 2,
+    "explanation": "Le maïs devance le blé et le riz en tonnage mondial."
+  },
+  {
+    "id": "q293",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Quel arbre urbain perd son écorce en larges plaques ?",
+    "choices": [
+      "Le platane",
+      "Le tilleul",
+      "Le marronnier",
+      "L'orme"
+    ],
+    "answer": 0,
+    "explanation": "L'écorce du platane s'exfolie naturellement, créant son camouflage caractéristique."
+  },
+  {
+    "id": "q294",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle plante aquatique d'Amazonie porte des feuilles pouvant dépasser 2 mètres ?",
+    "choices": [
+      "Le lotus",
+      "La victoria d'Amazonie",
+      "Le nénuphar blanc",
+      "La jacinthe d'eau"
+    ],
+    "answer": 1,
+    "explanation": "Ses feuilles géantes peuvent porter le poids d'un enfant."
+  },
+  {
+    "id": "q295",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Quel conifère perd ses aiguilles en hiver ?",
+    "choices": [
+      "Le sapin",
+      "L'épicéa",
+      "Le mélèze",
+      "Le cyprès"
+    ],
+    "answer": 2,
+    "explanation": "Le mélèze est le seul conifère européen à feuillage caduc."
+  },
+  {
+    "id": "q296",
+    "category": "faune-flore",
+    "theme": "Nature",
+    "question": "Pourquoi les flamants roses sont-ils roses ?",
+    "choices": [
+      "C'est génétique",
+      "À cause de leur alimentation",
+      "À cause du soleil",
+      "Pour se camoufler"
+    ],
+    "answer": 1,
+    "explanation": "Les caroténoïdes des crevettes et algues qu'ils filtrent colorent leur plumage."
+  },
+  {
+    "id": "q297",
+    "category": "faune-flore",
+    "theme": "Nature",
+    "question": "Quel grand biome de conifères couvre le nord de la Russie et du Canada ?",
+    "choices": [
+      "La toundra",
+      "La taïga",
+      "La steppe",
+      "La pampa"
+    ],
+    "answer": 1,
+    "explanation": "La taïga, ou forêt boréale, est le plus vaste biome forestier du monde."
+  },
+  {
+    "id": "q298",
+    "category": "faune-flore",
+    "theme": "Nature",
+    "question": "Quelle association entre un champignon et une algue forme un organisme unique ?",
+    "choices": [
+      "La mousse",
+      "Le lichen",
+      "Le mycélium",
+      "L'humus"
+    ],
+    "answer": 1,
+    "explanation": "Le lichen est une symbiose si étroite qu'on le classe comme un organisme à part."
+  },
+  {
+    "id": "q299",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle partie de la fleur produit le pollen ?",
+    "choices": [
+      "Le pistil",
+      "L'étamine",
+      "Le sépale",
+      "La corolle"
+    ],
+    "answer": 1,
+    "explanation": "Les étamines sont les organes mâles ; le pistil reçoit le pollen."
+  },
+  {
+    "id": "q300",
+    "category": "faune-flore",
+    "theme": "Nature",
+    "question": "Quel insecte est le principal pollinisateur des cultures ?",
+    "choices": [
+      "Le papillon",
+      "L'abeille",
+      "La mouche",
+      "Le scarabée"
+    ],
+    "answer": 1,
+    "explanation": "Environ un tiers de notre alimentation dépend de la pollinisation par les abeilles."
+  },
+  {
+    "id": "q301",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Quel arbre fruitier fleurit avant même d'avoir des feuilles ?",
+    "choices": [
+      "Le pommier",
+      "L'amandier",
+      "Le poirier",
+      "Le figuier"
+    ],
+    "answer": 1,
+    "explanation": "L'amandier fleurit dès février, avant la feuillaison."
+  },
+  {
+    "id": "q302",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle plante grasse produit un gel utilisé pour apaiser la peau ?",
+    "choices": [
+      "Le cactus",
+      "L'aloe vera",
+      "L'agave",
+      "La joubarbe"
+    ],
+    "answer": 1,
+    "explanation": "Le gel d'aloe vera est utilisé depuis l'Antiquité pour les brûlures."
+  },
+  {
+    "id": "q303",
+    "category": "faune-flore",
+    "theme": "Nature",
+    "question": "Quelle est la plus grande forêt de France métropolitaine ?",
+    "choices": [
+      "La forêt de Fontainebleau",
+      "La forêt des Landes",
+      "La forêt d'Orléans",
+      "La forêt de Tronçais"
+    ],
+    "answer": 1,
+    "explanation": "Le massif des Landes, planté au XIXe siècle, couvre près d'un million d'hectares."
+  },
+  {
+    "id": "q304",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quel champignon est le plus mortel d'Europe ?",
+    "choices": [
+      "L'amanite tue-mouches",
+      "L'amanite phalloïde",
+      "Le bolet Satan",
+      "Le cortinaire"
+    ],
+    "answer": 1,
+    "explanation": "L'amanite phalloïde cause la majorité des empoisonnements mortels par champignons."
+  },
+  {
+    "id": "q305",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle plante est réputée éloigner les moustiques ?",
+    "choices": [
+      "La lavande",
+      "La citronnelle",
+      "Le romarin",
+      "Le thym"
+    ],
+    "answer": 1,
+    "explanation": "Son huile essentielle masque les odeurs corporelles qui attirent les moustiques."
+  },
+  {
+    "id": "q306",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Quel bois est si dense qu'il coule dans l'eau ?",
+    "choices": [
+      "Le teck",
+      "L'ébène",
+      "Le chêne",
+      "L'acajou"
+    ],
+    "answer": 1,
+    "explanation": "L'ébène, presque noir, a une densité supérieure à celle de l'eau."
+  },
+  {
+    "id": "q307",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle fleur a provoqué une bulle spéculative aux Pays-Bas au XVIIe siècle ?",
+    "choices": [
+      "La rose",
+      "La tulipe",
+      "L'orchidée",
+      "Le lys"
+    ],
+    "answer": 1,
+    "explanation": "En 1637, un bulbe de tulipe rare valait le prix d'une maison à Amsterdam."
+  },
+  {
+    "id": "q308",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Lequel de ces fruits est botaniquement une baie ?",
+    "choices": [
+      "La fraise",
+      "La framboise",
+      "La tomate",
+      "La cerise"
+    ],
+    "answer": 2,
+    "explanation": "La tomate est une vraie baie ; la fraise est un « faux-fruit »."
+  },
+  {
+    "id": "q309",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "La nuit, sans photosynthèse, que rejettent principalement les plantes ?",
+    "choices": [
+      "De l'oxygène",
+      "Du dioxyde de carbone",
+      "De l'azote",
+      "De la vapeur seulement"
+    ],
+    "answer": 1,
+    "explanation": "La respiration continue la nuit : les plantes consomment de l'O₂ et rejettent du CO₂."
+  },
+  {
+    "id": "q310",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle est la plus petite plante à fleurs du monde ?",
+    "choices": [
+      "La pâquerette",
+      "La wolffia",
+      "Le mouron",
+      "La véronique"
+    ],
+    "answer": 1,
+    "explanation": "La wolffia, une lentille d'eau, mesure moins d'un millimètre."
+  },
+  {
+    "id": "q311",
+    "category": "faune-flore",
+    "theme": "Nature",
+    "question": "Quel phénomène fait rougir les feuilles en automne ?",
+    "choices": [
+      "Le gel des feuilles",
+      "La disparition de la chlorophylle",
+      "Le manque d'eau",
+      "L'excès de soleil"
+    ],
+    "answer": 1,
+    "explanation": "La chlorophylle se dégrade et révèle les pigments jaunes et rouges cachés."
+  },
+  {
+    "id": "q312",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quel cactus géant est l'emblème du désert de Sonora ?",
+    "choices": [
+      "Le figuier de Barbarie",
+      "Le saguaro",
+      "Le cierge du Pérou",
+      "L'euphorbe candélabre"
+    ],
+    "answer": 1,
+    "explanation": "Le saguaro peut atteindre 15 m et vivre 200 ans."
+  },
+  {
+    "id": "q313",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle fleur sacrée des Égyptiens s'épanouit sur l'eau ?",
+    "choices": [
+      "Le nénuphar",
+      "Le lotus",
+      "L'iris",
+      "Le papyrus"
+    ],
+    "answer": 1,
+    "explanation": "Le lotus, symbole de renaissance, ornait temples et colonnes."
+  },
+  {
+    "id": "q314",
+    "category": "faune-flore",
+    "theme": "Arbres",
+    "question": "Combien de temps un chêne peut-il vivre ?",
+    "choices": [
+      "100 ans",
+      "300 ans",
+      "Jusqu'à 1 000 ans",
+      "5 000 ans"
+    ],
+    "answer": 2,
+    "explanation": "Certains chênes millénaires sont encore debout en Europe."
+  },
+  {
+    "id": "q315",
+    "category": "faune-flore",
+    "theme": "Plantes",
+    "question": "Quelle plante constitue 99 % du régime alimentaire du panda ?",
+    "choices": [
+      "L'eucalyptus",
+      "Le bambou",
+      "Le roseau",
+      "La canne à sucre"
+    ],
+    "answer": 1,
+    "explanation": "Un panda adulte mange jusqu'à 20 kg de bambou par jour."
+  },
+  {
+    "id": "q316",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Qui a composé La Lettre à Élise ?",
+    "choices": [
+      "Chopin",
+      "Beethoven",
+      "Schubert",
+      "Liszt"
+    ],
+    "answer": 1,
+    "explanation": "Cette bagatelle pour piano de Beethoven est l'une des pièces les plus jouées au monde."
+  },
+  {
+    "id": "q317",
+    "category": "musique",
+    "theme": "Instruments",
+    "question": "Quel instrument possède 47 cordes et 7 pédales ?",
+    "choices": [
+      "Le clavecin",
+      "La harpe",
+      "La cithare",
+      "Le luth"
+    ],
+    "answer": 1,
+    "explanation": "La harpe de concert utilise ses pédales pour modifier la hauteur des cordes."
+  },
+  {
+    "id": "q318",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "Quel chanteur américain est surnommé « The Boss » ?",
+    "choices": [
+      "Bob Dylan",
+      "Bruce Springsteen",
+      "Tom Petty",
+      "Billy Joel"
+    ],
+    "answer": 1,
+    "explanation": "Bruce Springsteen, figure du rock américain depuis Born to Run (1975)."
+  },
+  {
+    "id": "q319",
+    "category": "musique",
+    "theme": "Pop",
+    "question": "Quel groupe suédois a chanté Dancing Queen ?",
+    "choices": [
+      "Roxette",
+      "ABBA",
+      "Ace of Base",
+      "Europe"
+    ],
+    "answer": 1,
+    "explanation": "ABBA a dominé le disco-pop des années 1970 après sa victoire à l'Eurovision 1974."
+  },
+  {
+    "id": "q320",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Quelle est la voix masculine la plus grave ?",
+    "choices": [
+      "Le ténor",
+      "Le baryton",
+      "La basse",
+      "Le contre-ténor"
+    ],
+    "answer": 2,
+    "explanation": "Du plus aigu au plus grave : contre-ténor, ténor, baryton, basse."
+  },
+  {
+    "id": "q321",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Quelle est la voix féminine la plus aiguë ?",
+    "choices": [
+      "L'alto",
+      "La mezzo-soprano",
+      "La soprano",
+      "La contralto"
+    ],
+    "answer": 2,
+    "explanation": "La soprano tient les rôles principaux de la plupart des opéras."
+  },
+  {
+    "id": "q322",
+    "category": "musique",
+    "theme": "Solfège",
+    "question": "Combien de lignes compte une portée musicale ?",
+    "choices": [
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "answer": 1,
+    "explanation": "Cinq lignes et quatre interlignes accueillent les notes."
+  },
+  {
+    "id": "q323",
+    "category": "musique",
+    "theme": "Solfège",
+    "question": "Quel symbole élève une note d'un demi-ton ?",
+    "choices": [
+      "Le bémol",
+      "Le dièse",
+      "Le bécarre",
+      "La clé"
+    ],
+    "answer": 1,
+    "explanation": "Le dièse (♯) monte d'un demi-ton, le bémol (♭) descend."
+  },
+  {
+    "id": "q324",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "Qui a écrit et chanté Imagine ?",
+    "choices": [
+      "Paul McCartney",
+      "John Lennon",
+      "George Harrison",
+      "David Bowie"
+    ],
+    "answer": 1,
+    "explanation": "Lennon a enregistré cet hymne pacifiste en 1971, après les Beatles."
+  },
+  {
+    "id": "q325",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "Quel guitariste gaucher a enflammé Woodstock en 1969 ?",
+    "choices": [
+      "Eric Clapton",
+      "Jimi Hendrix",
+      "Carlos Santana",
+      "Jimmy Page"
+    ],
+    "answer": 1,
+    "explanation": "Sa version de l'hymne américain à Woodstock est entrée dans la légende."
+  },
+  {
+    "id": "q326",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "Quel groupe a sorti l'album The Dark Side of the Moon ?",
+    "choices": [
+      "Led Zeppelin",
+      "Pink Floyd",
+      "Genesis",
+      "Yes"
+    ],
+    "answer": 1,
+    "explanation": "L'album de 1973 est resté plus de 900 semaines dans les charts américains."
+  },
+  {
+    "id": "q327",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "De quel pays vient le groupe AC/DC ?",
+    "choices": [
+      "Le Royaume-Uni",
+      "L'Australie",
+      "Les États-Unis",
+      "L'Écosse"
+    ],
+    "answer": 1,
+    "explanation": "Fondé à Sydney en 1973 par les frères Young."
+  },
+  {
+    "id": "q328",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "Quel « King » vivait dans sa propriété de Graceland ?",
+    "choices": [
+      "Chuck Berry",
+      "Elvis Presley",
+      "Johnny Cash",
+      "Little Richard"
+    ],
+    "answer": 1,
+    "explanation": "Elvis, le King du rock'n'roll, a fait de Graceland un lieu de pèlerinage."
+  },
+  {
+    "id": "q329",
+    "category": "musique",
+    "theme": "Chanson française",
+    "question": "Quelle chanteuse était surnommée « la Môme » ?",
+    "choices": [
+      "Barbara",
+      "Édith Piaf",
+      "Juliette Gréco",
+      "Dalida"
+    ],
+    "answer": 1,
+    "explanation": "Édith Piaf, la Môme Piaf, en référence à sa petite taille (1,47 m)."
+  },
+  {
+    "id": "q330",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Qui a composé le Boléro ?",
+    "choices": [
+      "Debussy",
+      "Maurice Ravel",
+      "Satie",
+      "Fauré"
+    ],
+    "answer": 1,
+    "explanation": "Le Boléro (1928) répète son thème pendant un long crescendo de 15 minutes."
+  },
+  {
+    "id": "q331",
+    "category": "musique",
+    "theme": "Jazz",
+    "question": "Quel instrument jouait Louis Armstrong ?",
+    "choices": [
+      "Le saxophone",
+      "La trompette",
+      "La clarinette",
+      "Le piano"
+    ],
+    "answer": 1,
+    "explanation": "Satchmo a révolutionné le jazz avec sa trompette et sa voix rocailleuse."
+  },
+  {
+    "id": "q332",
+    "category": "musique",
+    "theme": "Genres",
+    "question": "Quel genre musical est né dans le Bronx dans les années 1970 ?",
+    "choices": [
+      "Le funk",
+      "Le hip-hop",
+      "La house",
+      "Le disco"
+    ],
+    "answer": 1,
+    "explanation": "Les block parties du Bronx ont vu naître le rap, le DJing et le breakdance."
+  },
+  {
+    "id": "q333",
+    "category": "musique",
+    "theme": "Rap français",
+    "question": "Quel rappeur français a sorti « Qui sème le vent récolte le tempo » ?",
+    "choices": [
+      "IAM",
+      "MC Solaar",
+      "NTM",
+      "Oxmo Puccino"
+    ],
+    "answer": 1,
+    "explanation": "Cet album de 1991 a ouvert la voie au rap français grand public."
+  },
+  {
+    "id": "q334",
+    "category": "musique",
+    "theme": "Chanson française",
+    "question": "Quel était le vrai nom de Johnny Hallyday ?",
+    "choices": [
+      "Jean-Philippe Smet",
+      "Claude Moine",
+      "Daniel Bevilacqua",
+      "Hervé Forneri"
+    ],
+    "answer": 0,
+    "explanation": "Jean-Philippe Smet a pris son nom de scène en hommage à un cousin américain."
+  },
+  {
+    "id": "q335",
+    "category": "musique",
+    "theme": "Instruments",
+    "question": "Quel cuivre se joue avec une coulisse ?",
+    "choices": [
+      "La trompette",
+      "Le trombone",
+      "Le cor",
+      "Le tuba"
+    ],
+    "answer": 1,
+    "explanation": "Le trombone à coulisse change de note en allongeant son tube."
+  },
+  {
+    "id": "q336",
+    "category": "musique",
+    "theme": "Solfège",
+    "question": "Combien de notes compte une gamme majeure (sans répéter l'octave) ?",
+    "choices": [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "answer": 2,
+    "explanation": "Sept notes : do ré mi fa sol la si."
+  },
+  {
+    "id": "q337",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Quel opéra de Bizet se déroule à Séville ?",
+    "choices": [
+      "La Traviata",
+      "Carmen",
+      "Tosca",
+      "Le Barbier de Séville"
+    ],
+    "answer": 1,
+    "explanation": "Carmen (1875), l'opéra français le plus joué au monde."
+  },
+  {
+    "id": "q338",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "Qui était le chanteur de Queen ?",
+    "choices": [
+      "David Bowie",
+      "Freddie Mercury",
+      "Robert Plant",
+      "Mick Jagger"
+    ],
+    "answer": 1,
+    "explanation": "Freddie Mercury, né Farrokh Bulsara à Zanzibar."
+  },
+  {
+    "id": "q339",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Quel ténor italien a fait entrer l'opéra dans les stades ?",
+    "choices": [
+      "Domingo",
+      "Pavarotti",
+      "Carreras",
+      "Bocelli"
+    ],
+    "answer": 1,
+    "explanation": "Luciano Pavarotti et son Nessun dorma, hymne du Mondial 1990."
+  },
+  {
+    "id": "q340",
+    "category": "musique",
+    "theme": "Genres",
+    "question": "Quel instrument accompagne traditionnellement le flamenco ?",
+    "choices": [
+      "Le violon",
+      "La guitare",
+      "L'accordéon",
+      "La mandoline"
+    ],
+    "answer": 1,
+    "explanation": "Guitare, chant et palmas (claquements de mains) forment le trio du flamenco."
+  },
+  {
+    "id": "q341",
+    "category": "musique",
+    "theme": "Genres",
+    "question": "De quel pays vient la samba ?",
+    "choices": [
+      "L'Argentine",
+      "Le Brésil",
+      "Cuba",
+      "La Colombie"
+    ],
+    "answer": 1,
+    "explanation": "La samba rythme le carnaval de Rio depuis le début du XXe siècle."
+  },
+  {
+    "id": "q342",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Quel violoniste virtuose était surnommé « le violoniste du diable » ?",
+    "choices": [
+      "Vivaldi",
+      "Paganini",
+      "Sarasate",
+      "Kreisler"
+    ],
+    "answer": 1,
+    "explanation": "La virtuosité de Paganini semblait si surnaturelle qu'on l'accusait d'un pacte."
+  },
+  {
+    "id": "q343",
+    "category": "musique",
+    "theme": "Instruments",
+    "question": "À quelle famille appartient la clarinette ?",
+    "choices": [
+      "Les cuivres",
+      "Les bois",
+      "Les cordes",
+      "Les percussions"
+    ],
+    "answer": 1,
+    "explanation": "Malgré ses clés métalliques, la clarinette est un bois, comme la flûte."
+  },
+  {
+    "id": "q344",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "Quel groupe anglais a chanté Wonderwall ?",
+    "choices": [
+      "Blur",
+      "Oasis",
+      "Radiohead",
+      "The Verve"
+    ],
+    "answer": 1,
+    "explanation": "Le tube de 1995 des frères Gallagher, hymne de la Britpop."
+  },
+  {
+    "id": "q345",
+    "category": "musique",
+    "theme": "Pop",
+    "question": "Quelle chanteuse britannique a chanté Rolling in the Deep ?",
+    "choices": [
+      "Amy Winehouse",
+      "Adele",
+      "Duffy",
+      "Jessie J"
+    ],
+    "answer": 1,
+    "explanation": "Son album 21 s'est vendu à plus de 30 millions d'exemplaires."
+  },
+  {
+    "id": "q346",
+    "category": "musique",
+    "theme": "Pop",
+    "question": "Quel artiste a popularisé le moonwalk ?",
+    "choices": [
+      "Prince",
+      "Michael Jackson",
+      "James Brown",
+      "Usher"
+    ],
+    "answer": 1,
+    "explanation": "Michael Jackson l'a rendu mondial en 1983 en interprétant Billie Jean."
+  },
+  {
+    "id": "q347",
+    "category": "musique",
+    "theme": "Classique",
+    "question": "Qui a composé la valse Le Beau Danube bleu ?",
+    "choices": [
+      "Johann Strauss II",
+      "Franz Liszt",
+      "Brahms",
+      "Offenbach"
+    ],
+    "answer": 0,
+    "explanation": "Le « roi de la valse » viennoise l'a composée en 1866."
+  },
+  {
+    "id": "q348",
+    "category": "musique",
+    "theme": "Folk",
+    "question": "Quel duo a chanté The Sound of Silence ?",
+    "choices": [
+      "Les Everly Brothers",
+      "Simon & Garfunkel",
+      "Hall & Oates",
+      "The Righteous Brothers"
+    ],
+    "answer": 1,
+    "explanation": "Paul Simon et Art Garfunkel, duo folk mythique des années 1960."
+  },
+  {
+    "id": "q349",
+    "category": "musique",
+    "theme": "Instruments",
+    "question": "Quel est l'instrument emblématique de l'Écosse ?",
+    "choices": [
+      "Le fifre",
+      "La cornemuse",
+      "Le banjo",
+      "La harpe celtique"
+    ],
+    "answer": 1,
+    "explanation": "Le Great Highland Bagpipe accompagne défilés et cérémonies écossaises."
+  },
+  {
+    "id": "q350",
+    "category": "musique",
+    "theme": "Reggae",
+    "question": "Qui a popularisé No Woman No Cry ?",
+    "choices": [
+      "Peter Tosh",
+      "Bob Marley",
+      "Jimmy Cliff",
+      "Burning Spear"
+    ],
+    "answer": 1,
+    "explanation": "Bob Marley & The Wailers, sur l'album live de 1975."
+  },
+  {
+    "id": "q351",
+    "category": "musique",
+    "theme": "Jazz",
+    "question": "Quel musicien aveugle a immortalisé Georgia on My Mind ?",
+    "choices": [
+      "Stevie Wonder",
+      "Ray Charles",
+      "Nat King Cole",
+      "Art Tatum"
+    ],
+    "answer": 1,
+    "explanation": "La version de Ray Charles (1960) est devenue l'hymne officiel de la Géorgie."
+  },
+  {
+    "id": "q352",
+    "category": "musique",
+    "theme": "Solfège",
+    "question": "Quelle note vient juste après le fa dans la gamme ?",
+    "choices": [
+      "Mi",
+      "Sol",
+      "La",
+      "Ré"
+    ],
+    "answer": 1,
+    "explanation": "Do, ré, mi, fa, sol, la, si."
+  },
+  {
+    "id": "q353",
+    "category": "musique",
+    "theme": "Rock",
+    "question": "Quel groupe de rock français a chanté Antisocial ?",
+    "choices": [
+      "Téléphone",
+      "Trust",
+      "Noir Désir",
+      "Indochine"
+    ],
+    "answer": 1,
+    "explanation": "Trust a sorti ce brûlot en 1980, repris plus tard par Anthrax."
+  },
+  {
+    "id": "q354",
+    "category": "musique",
+    "theme": "Histoire",
+    "question": "Quel festival mythique s'est tenu en août 1969 dans l'État de New York ?",
+    "choices": [
+      "Monterey",
+      "Woodstock",
+      "L'île de Wight",
+      "Altamont"
+    ],
+    "answer": 1,
+    "explanation": "Trois jours de musique et 400 000 spectateurs, symbole de la contre-culture."
+  },
+  {
+    "id": "q355",
+    "category": "musique",
+    "theme": "Genres",
+    "question": "Quel genre cubain est l'ancêtre direct de la salsa ?",
+    "choices": [
+      "Le tango",
+      "Le son cubain",
+      "La bossa nova",
+      "Le merengue"
+    ],
+    "answer": 1,
+    "explanation": "Le son cubain, popularisé plus tard par le Buena Vista Social Club."
+  },
+  {
+    "id": "q356",
+    "category": "jeux-video",
+    "theme": "Consoles",
+    "question": "En quelle année est sortie la Game Boy ?",
+    "choices": [
+      "1985",
+      "1989",
+      "1992",
+      "1995"
+    ],
+    "answer": 1,
+    "explanation": "La portable de Nintendo s'est vendue à plus de 118 millions d'exemplaires."
+  },
+  {
+    "id": "q357",
+    "category": "jeux-video",
+    "theme": "Sega",
+    "question": "Que collecte Sonic dans ses courses folles ?",
+    "choices": [
+      "Des pièces",
+      "Des anneaux",
+      "Des étoiles",
+      "Des émeraudes seulement"
+    ],
+    "answer": 1,
+    "explanation": "Les rings protègent Sonic : il en perd tout à chaque coup reçu."
+  },
+  {
+    "id": "q358",
+    "category": "jeux-video",
+    "theme": "Minecraft",
+    "question": "Quelle créature verte de Minecraft explose en s'approchant ?",
+    "choices": [
+      "Le zombie",
+      "Le Creeper",
+      "L'Enderman",
+      "Le squelette"
+    ],
+    "answer": 1,
+    "explanation": "Le Creeper et son sifflement avant l'explosion traumatisent les joueurs depuis 2009."
+  },
+  {
+    "id": "q359",
+    "category": "jeux-video",
+    "theme": "Studios",
+    "question": "Quel jeu de Rockstar se déroule dans l'Ouest américain ?",
+    "choices": [
+      "Ghost of Tsushima",
+      "Red Dead Redemption",
+      "Far Cry",
+      "Days Gone"
+    ],
+    "answer": 1,
+    "explanation": "Red Dead Redemption 2 est l'un des jeux les plus primés de l'histoire."
+  },
+  {
+    "id": "q360",
+    "category": "jeux-video",
+    "theme": "Nintendo",
+    "question": "Quelle princesse Mario doit-il régulièrement sauver ?",
+    "choices": [
+      "Daisy",
+      "Peach",
+      "Rosalina",
+      "Pauline"
+    ],
+    "answer": 1,
+    "explanation": "La princesse Peach, enlevée par Bowser depuis 1985."
+  },
+  {
+    "id": "q361",
+    "category": "jeux-video",
+    "theme": "Genres",
+    "question": "Comment s'appelle le genre où le dernier joueur en vie l'emporte ?",
+    "choices": [
+      "Le MOBA",
+      "Le battle royale",
+      "Le hack'n'slash",
+      "Le roguelike"
+    ],
+    "answer": 1,
+    "explanation": "PUBG puis Fortnite ont popularisé le battle royale à partir de 2017."
+  },
+  {
+    "id": "q362",
+    "category": "jeux-video",
+    "theme": "Studios",
+    "question": "Quel studio polonais a créé The Witcher 3 ?",
+    "choices": [
+      "Techland",
+      "CD Projekt Red",
+      "11 bit studios",
+      "People Can Fly"
+    ],
+    "answer": 1,
+    "explanation": "Adapté des romans d'Andrzej Sapkowski, le jeu a marqué 2015."
+  },
+  {
+    "id": "q363",
+    "category": "jeux-video",
+    "theme": "Héros",
+    "question": "Quel guerrier spartiate affronte les dieux dans God of War ?",
+    "choices": [
+      "Ares",
+      "Kratos",
+      "Léonidas",
+      "Achille"
+    ],
+    "answer": 1,
+    "explanation": "Kratos, le Fantôme de Sparte, s'attaque d'abord à l'Olympe puis aux dieux nordiques."
+  },
+  {
+    "id": "q364",
+    "category": "jeux-video",
+    "theme": "Studios",
+    "question": "Quelle saga d'Ubisoft met en scène une confrérie d'assassins ?",
+    "choices": [
+      "Dishonored",
+      "Assassin's Creed",
+      "Hitman",
+      "Thief"
+    ],
+    "answer": 1,
+    "explanation": "Assassin's Creed traverse l'histoire, des croisades à l'Égypte antique."
+  },
+  {
+    "id": "q365",
+    "category": "jeux-video",
+    "theme": "Genres",
+    "question": "Quel MOBA de Valve est issu d'un mod de Warcraft III ?",
+    "choices": [
+      "League of Legends",
+      "Dota 2",
+      "Smite",
+      "Heroes of the Storm"
+    ],
+    "answer": 1,
+    "explanation": "Defense of the Ancients (DotA) était un mod avant de devenir Dota 2."
+  },
+  {
+    "id": "q366",
+    "category": "jeux-video",
+    "theme": "Nintendo",
+    "question": "Quelle est la monnaie dans The Legend of Zelda ?",
+    "choices": [
+      "Les pièces d'or",
+      "Les rubis",
+      "Les gemmes",
+      "Les écus"
+    ],
+    "answer": 1,
+    "explanation": "Link ramasse des rubis de différentes couleurs et valeurs."
+  },
+  {
+    "id": "q367",
+    "category": "jeux-video",
+    "theme": "Combat",
+    "question": "Quel personnage de Street Fighter lance des « Hadoken » ?",
+    "choices": [
+      "Ken uniquement",
+      "Ryu",
+      "Guile",
+      "Akuma seulement"
+    ],
+    "answer": 1,
+    "explanation": "Ryu (et Ken) projettent cette boule d'énergie depuis 1987."
+  },
+  {
+    "id": "q368",
+    "category": "jeux-video",
+    "theme": "Sport",
+    "question": "Quel jeu mélange football et voitures ?",
+    "choices": [
+      "FIFA Street",
+      "Rocket League",
+      "Mario Strikers",
+      "Speedball"
+    ],
+    "answer": 1,
+    "explanation": "Rocket League a transformé le foot en sport mécanique dès 2015."
+  },
+  {
+    "id": "q369",
+    "category": "jeux-video",
+    "theme": "Pokémon",
+    "question": "Combien de Pokémon comptait la première génération ?",
+    "choices": [
+      "100",
+      "151",
+      "201",
+      "251"
+    ],
+    "answer": 1,
+    "explanation": "151 Pokémon, de Bulbizarre à Mew."
+  },
+  {
+    "id": "q370",
+    "category": "jeux-video",
+    "theme": "Consoles",
+    "question": "En quelle année est sortie la première Xbox ?",
+    "choices": [
+      "1999",
+      "2001",
+      "2003",
+      "2005"
+    ],
+    "answer": 1,
+    "explanation": "Microsoft est entré sur le marché des consoles en 2001, avec Halo en fer de lance."
+  },
+  {
+    "id": "q371",
+    "category": "jeux-video",
+    "theme": "Horreur",
+    "question": "Quelle saga d'horreur de Capcom se déroule notamment à Raccoon City ?",
+    "choices": [
+      "Silent Hill",
+      "Resident Evil",
+      "Dead Space",
+      "The Evil Within"
+    ],
+    "answer": 1,
+    "explanation": "Resident Evil a défini le survival horror dès 1996."
+  },
+  {
+    "id": "q372",
+    "category": "jeux-video",
+    "theme": "Nintendo",
+    "question": "Comment s'appelle le frère de Mario ?",
+    "choices": [
+      "Wario",
+      "Luigi",
+      "Waluigi",
+      "Toad"
+    ],
+    "answer": 1,
+    "explanation": "Luigi, le frère en vert, star de ses propres jeux Luigi's Mansion."
+  },
+  {
+    "id": "q373",
+    "category": "jeux-video",
+    "theme": "Gestion",
+    "question": "Quel jeu classique consiste à bâtir et gérer une ville ?",
+    "choices": [
+      "Age of Empires",
+      "SimCity",
+      "Civilization",
+      "Anno"
+    ],
+    "answer": 1,
+    "explanation": "SimCity de Will Wright a inventé le city-builder en 1989."
+  },
+  {
+    "id": "q374",
+    "category": "jeux-video",
+    "theme": "Héros",
+    "question": "Quel marsupial était la mascotte officieuse de la première PlayStation ?",
+    "choices": [
+      "Spyro",
+      "Crash Bandicoot",
+      "Rayman",
+      "Gex"
+    ],
+    "answer": 1,
+    "explanation": "Crash Bandicoot, créé par Naughty Dog en 1996."
+  },
+  {
+    "id": "q375",
+    "category": "jeux-video",
+    "theme": "Gestion",
+    "question": "Quelle simulation de vie d'Electronic Arts permet de créer des familles ?",
+    "choices": [
+      "Second Life",
+      "Les Sims",
+      "Animal Crossing",
+      "Tomodachi Life"
+    ],
+    "answer": 1,
+    "explanation": "Les Sims est la simulation de vie la plus vendue de l'histoire."
+  },
+  {
+    "id": "q376",
+    "category": "jeux-video",
+    "theme": "Histoire du JV",
+    "question": "De combien de blocs est composée chaque pièce de Tetris ?",
+    "choices": [
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "answer": 1,
+    "explanation": "D'où leur nom : les tétrominos."
+  },
+  {
+    "id": "q377",
+    "category": "jeux-video",
+    "theme": "Histoire du JV",
+    "question": "Quel FPS d'id Software a lancé le genre en 1993 ?",
+    "choices": [
+      "Wolfenstein 3D",
+      "Doom",
+      "Quake",
+      "Duke Nukem 3D"
+    ],
+    "answer": 1,
+    "explanation": "Doom a popularisé le FPS, le multijoueur en réseau et le modding."
+  },
+  {
+    "id": "q378",
+    "category": "jeux-video",
+    "theme": "Blizzard",
+    "question": "Quel MMORPG de Blizzard oppose la Horde à l'Alliance ?",
+    "choices": [
+      "Guild Wars",
+      "World of Warcraft",
+      "Everquest",
+      "Final Fantasy XIV"
+    ],
+    "answer": 1,
+    "explanation": "WoW a dépassé les 12 millions d'abonnés à son apogée."
+  },
+  {
+    "id": "q379",
+    "category": "jeux-video",
+    "theme": "Nintendo",
+    "question": "Quel personnage rose de Nintendo aspire ses ennemis pour copier leurs pouvoirs ?",
+    "choices": [
+      "Jigglypuff",
+      "Kirby",
+      "Ditto",
+      "Yoshi"
+    ],
+    "answer": 1,
+    "explanation": "Kirby, créé par Masahiro Sakurai, également papa de Smash Bros."
+  },
+  {
+    "id": "q380",
+    "category": "jeux-video",
+    "theme": "Héros",
+    "question": "Quel héros sans bras ni jambes est né chez Ubisoft en 1995 ?",
+    "choices": [
+      "Sackboy",
+      "Rayman",
+      "Klonoa",
+      "Sparkster"
+    ],
+    "answer": 1,
+    "explanation": "Rayman, création de Michel Ancel, star du jeu de plateforme français."
+  },
+  {
+    "id": "q381",
+    "category": "jeux-video",
+    "theme": "Nintendo",
+    "question": "Quelle chasseuse de primes est l'héroïne de Metroid ?",
+    "choices": [
+      "Lara Croft",
+      "Samus Aran",
+      "Bayonetta",
+      "Zelda"
+    ],
+    "answer": 1,
+    "explanation": "La révélation que Samus était une femme a marqué 1986."
+  },
+  {
+    "id": "q382",
+    "category": "jeux-video",
+    "theme": "Blizzard",
+    "question": "Quel jeu de tir par équipes de Blizzard met en scène Tracer ?",
+    "choices": [
+      "Team Fortress 2",
+      "Overwatch",
+      "Paladins",
+      "Apex Legends"
+    ],
+    "answer": 1,
+    "explanation": "Overwatch a lancé le hero shooter grand public en 2016."
+  },
+  {
+    "id": "q383",
+    "category": "jeux-video",
+    "theme": "Studios",
+    "question": "Quel studio japonais a créé Final Fantasy ?",
+    "choices": [
+      "Capcom",
+      "Square",
+      "Konami",
+      "Sega"
+    ],
+    "answer": 1,
+    "explanation": "Square (aujourd'hui Square Enix) jouait sa survie sur ce jeu — d'où son nom."
+  },
+  {
+    "id": "q384",
+    "category": "jeux-video",
+    "theme": "Indé",
+    "question": "Quel jeu de ferme indé a été développé par une seule personne ?",
+    "choices": [
+      "Harvest Moon",
+      "Stardew Valley",
+      "Farming Simulator",
+      "My Time at Portia"
+    ],
+    "answer": 1,
+    "explanation": "Eric Barone a passé plus de quatre ans seul sur Stardew Valley."
+  },
+  {
+    "id": "q385",
+    "category": "jeux-video",
+    "theme": "Combat",
+    "question": "Quel personnage de Mortal Kombat lance son harpon en criant « Get over here! » ?",
+    "choices": [
+      "Sub-Zero",
+      "Scorpion",
+      "Raiden",
+      "Kano"
+    ],
+    "answer": 1,
+    "explanation": "Scorpion, le ninja spectre, icône de la saga depuis 1992."
+  },
+  {
+    "id": "q386",
+    "category": "jeux-video",
+    "theme": "Studios",
+    "question": "Quelle série de Konami met en scène Solid Snake ?",
+    "choices": [
+      "Splinter Cell",
+      "Metal Gear",
+      "Syphon Filter",
+      "Hitman"
+    ],
+    "answer": 1,
+    "explanation": "Metal Gear de Hideo Kojima a inventé le jeu d'infiltration moderne."
+  },
+  {
+    "id": "q387",
+    "category": "jeux-video",
+    "theme": "Consoles",
+    "question": "Quelle console Nintendo a démocratisé la détection de mouvement ?",
+    "choices": [
+      "La GameCube",
+      "La Wii",
+      "La DS",
+      "La N64"
+    ],
+    "answer": 1,
+    "explanation": "La Wii et sa Wiimote ont conquis 101 millions de foyers."
+  },
+  {
+    "id": "q388",
+    "category": "jeux-video",
+    "theme": "Blizzard",
+    "question": "Quel jeu de cartes de Blizzard se joue dans l'univers de Warcraft ?",
+    "choices": [
+      "Gwent",
+      "Hearthstone",
+      "Magic Arena",
+      "Legends of Runeterra"
+    ],
+    "answer": 1,
+    "explanation": "Hearthstone a popularisé le jeu de cartes numérique en 2014."
+  },
+  {
+    "id": "q389",
+    "category": "jeux-video",
+    "theme": "Studios",
+    "question": "Quel MMORPG français du studio Ankama est sorti en 2004 ?",
+    "choices": [
+      "Wakfu",
+      "Dofus",
+      "Ryzom",
+      "Dark Age"
+    ],
+    "answer": 1,
+    "explanation": "Dofus, phénomène français, a donné naissance à l'univers du Krosmoz."
+  },
+  {
+    "id": "q390",
+    "category": "jeux-video",
+    "theme": "Histoire du JV",
+    "question": "Quel gorille lançait des tonneaux sur Mario en 1981 ?",
+    "choices": [
+      "King K. Rool",
+      "Donkey Kong",
+      "Diddy Kong",
+      "Winston"
+    ],
+    "answer": 1,
+    "explanation": "Donkey Kong est le premier jeu de Shigeru Miyamoto — et la naissance de Mario."
+  },
+  {
+    "id": "q391",
+    "category": "jeux-video",
+    "theme": "Combat",
+    "question": "Quelle saga de combat 3D de Bandai Namco met en scène la famille Mishima ?",
+    "choices": [
+      "Virtua Fighter",
+      "Tekken",
+      "Soulcalibur",
+      "Dead or Alive"
+    ],
+    "answer": 1,
+    "explanation": "Tekken et la rivalité Kazuya/Heihachi durent depuis 1994."
+  },
+  {
+    "id": "q392",
+    "category": "jeux-video",
+    "theme": "Riot",
+    "question": "Quel FPS tactique de Riot Games est sorti en 2020 ?",
+    "choices": [
+      "Overwatch 2",
+      "Valorant",
+      "CS:GO",
+      "Rainbow Six Siege"
+    ],
+    "answer": 1,
+    "explanation": "Valorant mélange le gunplay de Counter-Strike et des pouvoirs d'agents."
+  },
+  {
+    "id": "q393",
+    "category": "jeux-video",
+    "theme": "Sega",
+    "question": "Quelle saga de Sega vous plonge dans la pègre japonaise ?",
+    "choices": [
+      "Shenmue",
+      "Yakuza",
+      "Judgment seul",
+      "Sleeping Dogs"
+    ],
+    "answer": 1,
+    "explanation": "La saga Yakuza (Like a Dragon) explore Kamurocho depuis 2005."
   }
 ]

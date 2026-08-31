@@ -2,23 +2,36 @@ import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
 import { QuizQuestion } from '../services/quiz.service';
 
 export class QuizConfig {
+  @prop({ default: true })
+  enabled!: boolean;
+
   @prop()
   activeMessageId?: string;
 
-  @prop({ type: Object })
-  activeQuestion?: QuizQuestion;
+  /** Une question par thème proposé aujourd'hui */
+  @prop({ type: () => [Object], default: [] })
+  activeQuestions!: QuizQuestion[];
 
   @prop()
   activeUntil?: Date;
+
+  /** Message d'annonce dans le channel général, supprimé au récap */
+  @prop()
+  announceMessageId?: string;
+
+  /** userId -> questionId du thème choisi (verrouillé au premier clic) */
+  @prop({ type: Object, default: {} })
+  activeThemeChoices!: Record<string, string>;
 
   /** userId -> choiceIndex (stocké comme objet JSON) */
   @prop({ type: Object, default: {} })
   activeAnswers!: Record<string, number>;
 
-  @prop()
-  firstCorrectUserId?: string;
+  /** questionId -> userId du premier à avoir bien répondu */
+  @prop({ type: Object, default: {} })
+  firstCorrectByQuestion!: Record<string, string>;
 
-  /** Dernières questions posées (évite les répétitions côté prompt IA) */
+  /** Ids des dernières questions posées (anti-répétition) */
   @prop({ type: () => [String], default: [] })
   recentQuestionTexts!: string[];
 }
