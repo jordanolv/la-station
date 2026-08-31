@@ -32,9 +32,13 @@ class AppSettings {
   @prop()
   originalBannerUrl?: string;
 
-  /** Rôle opt-in pingé au lancement des jeux (quiz du jour, bingo…) */
+  /** Rôle opt-in pingé au lancement des jeux (quiz du jour, bingo…) — legacy, remplacé par gamesPingRoles */
   @prop()
   gamesPingRoleId?: string;
+
+  /** Rôles de notification par jeu : { quiz, bingo, justePrix } -> roleId */
+  @prop({ default: () => ({}), type: () => Object })
+  gamesPingRoles?: { [key: string]: string };
 }
 
 class AppFeatures {

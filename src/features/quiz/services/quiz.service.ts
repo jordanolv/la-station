@@ -216,7 +216,7 @@ export class QuizService {
     await config.save();
 
     if (channel.isThread()) {
-      await GamesForumService.pingInThread(channel, 'La question du jour est là — choisis ton thème !');
+      await GamesForumService.pingInThread(channel, 'quiz', 'La question du jour est là — choisis ton thème !');
     }
     const announceId = await GamesForumService.announce(
       client,

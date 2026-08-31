@@ -503,7 +503,8 @@ export default function adminRoute(client: BotClient): Router {
       justePrixThreadName: name(config.justePrixThreadId),
       announceChannelId: config.announceChannelId,
       announceChannelName: name(config.announceChannelId),
-      pingRoleName: config.pingRoleId ? guild?.roles.cache.get(config.pingRoleId)?.name ?? '(inconnu)' : null,
+      pingRoleNames: Object.fromEntries(Object.entries(config.pingRoles).map(([k, id]) =>
+        [k, id ? guild?.roles.cache.get(id)?.name ?? '(inconnu)' : null])),
     });
   });
 

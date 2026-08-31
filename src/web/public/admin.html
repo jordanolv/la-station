@@ -261,9 +261,9 @@
     <div class="card">
       <strong>🗂️ Forum des jeux</strong>
       <p class="muted" style="margin-top:6px">
-        Un post permanent par jeu (❓ Quiz du jour, 🎯 Bingo, 🕹️ Arcade), un rôle 🎮 opt-in pour être
-        pingé, et un post 🔔 avec le bouton pour le récupérer. Choisis un forum existant ou laisse le bot
-        créer le sien.
+        Un post permanent par jeu (❓ Quiz, 🎯 Bingo, 💰 Juste Prix, 🕹️ Arcade). Chaque post notifiable
+        porte une réaction 🔔 : réagir = recevoir le rôle de notification du jeu, la retirer = ne plus être
+        pingé. Choisis un forum existant ou laisse le bot créer le sien.
       </p>
       <div id="forumStatus" class="muted" style="margin-top:12px"></div>
       <div class="grid2" style="margin-top:14px">
@@ -733,7 +733,9 @@ async function loadForum() {
         f.bingoThreadName ? '🎯 <b>' + esc(f.bingoThreadName) + '</b>' : '⚠️ post bingo manquant',
         f.arcadeThreadName ? '🕹️ <b>' + esc(f.arcadeThreadName) + '</b>' : '⚠️ post arcade manquant',
         f.justePrixThreadName ? '💰 <b>' + esc(f.justePrixThreadName) + '</b>' : '⚠️ post Juste Prix manquant',
-        f.pingRoleName ? '🎮 Rôle ping : <b>@' + esc(f.pingRoleName) + '</b>' : '⚠️ rôle ping manquant',
+        ['quiz', 'bingo', 'justePrix'].every((k) => f.pingRoleNames?.[k])
+          ? '🔔 Rôles notif : <b>' + ['quiz', 'bingo', 'justePrix'].map((k) => '@' + esc(f.pingRoleNames[k])).join(', ') + '</b>'
+          : '⚠️ rôles notif manquants',
         f.announceChannelName ? '📣 Annonces : <b>#' + esc(f.announceChannelName) + '</b>' : '📣 Annonces : désactivées',
       ].join(' · ')
     : 'Rien n\'est configuré — clique sur « Tout créer » et le bot fabrique le forum, le rôle et les posts.';

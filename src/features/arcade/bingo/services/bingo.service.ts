@@ -241,7 +241,7 @@ export class BingoService {
           components: [this.buildSpawnContainer(jackpot)],
           flags: MessageFlags.IsComponentsV2,
         });
-        await GamesForumService.pingInThread(post, `Un bingo démarre — devinez le nombre entre ${BINGO_NUMBER_MIN} et ${BINGO_NUMBER_MAX} !`);
+        await GamesForumService.pingInThread(post, 'bingo', `Un bingo démarre — devinez le nombre entre ${BINGO_NUMBER_MIN} et ${BINGO_NUMBER_MAX} !`);
         const announceMessageId = await GamesForumService.announce(
           client,
           `🎯 **Un bingo vient de démarrer !** Trouvez le nombre mystère → <#${post.id}>`,

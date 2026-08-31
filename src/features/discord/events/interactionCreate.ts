@@ -57,7 +57,6 @@ import {
   handleCdmChannelSelect,
 } from '../../cdm/events/cdm-interactions';
 import { QuizService, QUIZ_BUTTON_PREFIX, QUIZ_THEME_PREFIX } from '../../quiz/services/quiz.service';
-import { GamesForumService, GAMES_PING_BUTTON_ID } from '../services/games-forum.service';
 import { PersonalityTestService, PTEST_BUTTON_PREFIX } from '../../personality-test/services/personality-test.service';
 import { isSilentDiscordError } from '../../../shared/utils/discord-errors';
 const PROFILE_MODAL_ID = 'profile-config-modal';
@@ -162,8 +161,6 @@ export default {
           await QuizService.handleAnswer(client, interaction);
         } else if (interaction.customId.startsWith(QUIZ_THEME_PREFIX + ':')) {
           await QuizService.handleThemePick(client, interaction);
-        } else if (interaction.customId === GAMES_PING_BUTTON_ID) {
-          await GamesForumService.handlePingRoleButton(interaction);
         } else if (interaction.customId.startsWith(PTEST_BUTTON_PREFIX + ':')) {
           await PersonalityTestService.handleButton(client, interaction);
         } else if (interaction.customId.startsWith(GIVE_EXPEDITION_BUTTON_PREFIX)) {

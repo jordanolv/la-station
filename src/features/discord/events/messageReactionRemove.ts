@@ -2,6 +2,7 @@ import { Events, MessageReaction, User } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { ChatGamingService } from '../../chat-gaming/services/chat-gaming.service';
 import { PartyService } from '../../party/services/party.service';
+import { GamesForumService } from '../services/games-forum.service';
 
 export default {
   name: Events.MessageReactionRemove,
@@ -21,6 +22,7 @@ export default {
     if (!reaction.message.guild) return;
 
     await ChatGamingService.handleReactionRemove(reaction, user);
+    await GamesForumService.handleBellReaction(reaction, user, false);
     if (reaction.emoji.name === '🎉') {
       await PartyService.handleReactionRemove(client, reaction.message.id, user.id);
     }

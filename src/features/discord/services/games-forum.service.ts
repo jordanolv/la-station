@@ -1,21 +1,19 @@
 import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
   ChannelType,
   ForumChannel,
-  Guild,
-  MessageFlags,
+  MessageReaction,
   PermissionFlagsBits,
   ThreadChannel,
+  User,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { AppConfigService } from './app-config.service';
 import { BingoRepository } from '../../arcade/bingo/repositories/bingo.repository';
 import { JustePrixRepository } from '../../arcade/juste-prix/repositories/juste-prix.repository';
 
-export const GAMES_PING_BUTTON_ID = 'games:pingrole';
+export const GAMES_BELL_EMOJI = '🔔';
+
+export type NotifGameKey = 'quiz' | 'bingo' | 'justePrix';
 
 export interface GamesForumConfig {
   forumId: string | null;
@@ -24,19 +22,19 @@ export interface GamesForumConfig {
   arcadeThreadId: string | null;
   justePrixThreadId: string | null;
   announceChannelId: string | null;
-  pingRoleId: string | null;
+  pingRoles: Record<NotifGameKey, string | null>;
 }
 
 const POSTS: { key: 'quiz' | 'bingo' | 'arcadePost' | 'justePrix'; name: string; content: string }[] = [
   {
     key: 'quiz',
     name: '❓ Quiz du jour',
-    content: '**Bienvenue sur le quiz quotidien !**\nChaque jour à 13h : choisis ton thème, réponds à ta question, récap et classements à 22h.\n🔥 Enchaîne les bonnes réponses pour gagner des expéditions bonus.',
+    content: '**Bienvenue sur le quiz quotidien !**\nChaque jour à 13h : choisis ton thème, réponds à ta question, récap et classements à 22h.\n🔥 Enchaîne les bonnes réponses pour gagner des expéditions bonus.\n\n🔔 **Réagis à ce message pour être notifié à chaque question du jour !**',
   },
   {
     key: 'bingo',
     name: '🎯 Bingo',
-    content: '**Le repaire du bingo.**\nQuand une partie démarre, le nombre mystère se devine ici. Numéros bonus, gros lot… restez à l\'affût !',
+    content: '**Le repaire du bingo.**\nQuand une partie démarre, le nombre mystère se devine ici. Numéros bonus, gros lot… restez à l\'affût !\n\n🔔 **Réagis à ce message pour être notifié à chaque partie !**',
   },
   {
     key: 'arcadePost',
@@ -46,14 +44,21 @@ const POSTS: { key: 'quiz' | 'bingo' | 'arcadePost' | 'justePrix'; name: string;
   {
     key: 'justePrix',
     name: '💰 Juste Prix',
-    content: '**Le Juste Prix.**\nQuand une manche démarre, propose **UN** nombre — tu peux le changer jusqu\'à la révélation. Le plus proche gagne, le nombre exact fait sauter la banque ! 🎯',
+    content: '**Le Juste Prix.**\nQuand une manche démarre, propose **UN** nombre — tu peux le changer jusqu\'à la révélation. Le plus proche gagne, le nombre exact fait sauter la banque ! 🎯\n\n🔔 **Réagis à ce message pour être notifié à chaque manche !**',
   },
+];
+
+const NOTIF_GAMES: { key: NotifGameKey; roleName: string }[] = [
+  { key: 'quiz', roleName: '🔔 Quiz' },
+  { key: 'bingo', roleName: '🔔 Bingo' },
+  { key: 'justePrix', roleName: '🔔 Juste Prix' },
 ];
 
 export class GamesForumService {
   static async getConfig(): Promise<GamesForumConfig> {
     const app = await AppConfigService.getOrCreateConfig();
     const channels = app.config.channels ?? {};
+    const roles = app.config.gamesPingRoles ?? {};
     return {
       forumId: channels.gamesForum ?? null,
       quizThreadId: channels.quiz ?? null,
@@ -61,11 +66,19 @@ export class GamesForumService {
       arcadeThreadId: channels.arcadePost ?? null,
       justePrixThreadId: channels.justePrix ?? null,
       announceChannelId: channels.gamesAnnounce ?? null,
-      pingRoleId: app.config.gamesPingRoleId ?? null,
+      pingRoles: {
+        quiz: roles.quiz ?? null,
+        bingo: roles.bingo ?? null,
+        justePrix: roles.justePrix ?? null,
+      },
     };
   }
 
-  /** Crée tout : channel forum (ou réutilise celui fourni), rôle ping, posts par jeu, post d'inscription au ping. */
+  /**
+   * Crée tout : channel forum (ou réutilise celui fourni), rôles de notification par jeu,
+   * posts par jeu avec la cloche 🔔 en réaction. Idempotent : applique permissions et
+   * verrous sur l'existant, ne crée que ce qui manque.
+   */
   static async setup(client: BotClient, options: { announceChannelId?: string | null; forumChannelId?: string | null }): Promise<void> {
     const guild = client.guilds.cache.get(process.env.GUILD_ID!);
     if (!guild) throw new Error('Guild introuvable');
@@ -73,6 +86,8 @@ export class GamesForumService {
     const app = await AppConfigService.getOrCreateConfig();
     if (!app.config.channels) app.config.channels = {};
     const channels = app.config.channels as Record<string, string>;
+    if (!app.config.gamesPingRoles) app.config.gamesPingRoles = {};
+    const pingRoles = app.config.gamesPingRoles as Record<string, string>;
 
     const forumId = options.forumChannelId || channels.gamesForum;
     let forum = forumId ? (guild.channels.cache.get(forumId) as ForumChannel | undefined) : undefined;
@@ -81,7 +96,7 @@ export class GamesForumService {
       forum = await guild.channels.create({
         name: '🗂️・jeux',
         type: ChannelType.GuildForum,
-        topic: 'Un post par jeu : quiz du jour, bingo, arcade. Suis un post ou prends le rôle 🎮 pour être notifié.',
+        topic: 'Un post par jeu : quiz du jour, bingo, juste prix, arcade. Réagis 🔔 sur un post pour être notifié.',
       });
     }
     channels.gamesForum = forum.id;
@@ -105,37 +120,44 @@ export class GamesForumService {
           PermissionFlagsBits.SendMessagesInThreads,
           PermissionFlagsBits.ManageThreads,
           PermissionFlagsBits.ManageMessages,
+          PermissionFlagsBits.AddReactions,
         ],
       },
     ]).catch(() => {});
 
-    if (!app.config.gamesPingRoleId || !guild.roles.cache.has(app.config.gamesPingRoleId)) {
-      const role = await guild.roles.create({ name: '🎮 Jeux', mentionable: true, reason: 'Rôle opt-in notifications jeux' });
-      app.config.gamesPingRoleId = role.id;
+    // Un rôle de notification par jeu
+    for (const { key, roleName } of NOTIF_GAMES) {
+      if (!pingRoles[key] || !guild.roles.cache.has(pingRoles[key]!)) {
+        const role = await guild.roles.create({ name: roleName, mentionable: true, reason: `Rôle notifications ${roleName}` });
+        pingRoles[key] = role.id;
+      }
+    }
+
+    // Migration : suppression de l'ancien système (rôle unique + post 🔔 Notifications)
+    if (app.config.gamesPingRoleId) {
+      await guild.roles.cache.get(app.config.gamesPingRoleId)?.delete('Remplacé par les rôles de notification par jeu').catch(() => {});
+      app.config.gamesPingRoleId = undefined;
+    }
+    if (channels.gamesPingPost) {
+      const oldPost = await guild.channels.fetch(channels.gamesPingPost).catch(() => null);
+      if (oldPost?.isThread()) await oldPost.delete('Remplacé par les réactions 🔔 sur les posts').catch(() => {});
+      delete channels.gamesPingPost;
     }
 
     for (const post of POSTS) {
       const existing = channels[post.key] ? guild.channels.cache.get(channels[post.key]!) : null;
-      if (existing?.isThread() && existing.parentId === forum.id) continue;
-      const thread = await forum.threads.create({ name: post.name, message: { content: post.content } });
-      channels[post.key] = thread.id;
+      if (!existing?.isThread() || existing.parentId !== forum.id) {
+        const thread = await forum.threads.create({ name: post.name, message: { content: post.content } });
+        channels[post.key] = thread.id;
+      }
     }
 
-    if (!channels.gamesPingPost) {
-      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId(GAMES_PING_BUTTON_ID)
-          .setLabel('🔔 Être notifié des jeux')
-          .setStyle(ButtonStyle.Primary),
-      );
-      const thread = await forum.threads.create({
-        name: '🔔 Notifications',
-        message: {
-          content: 'Clique sur le bouton pour recevoir (ou retirer) le rôle **🎮 Jeux** — tu seras pingé à chaque question du jour et à chaque bingo.',
-          components: [row],
-        },
-      });
-      channels.gamesPingPost = thread.id;
+    // Cloche 🔔 par défaut sur les posts notifiables
+    for (const { key } of NOTIF_GAMES) {
+      const thread = await guild.channels.fetch(channels[key]!).catch(() => null);
+      if (!thread?.isThread()) continue;
+      const starter = await thread.fetchStarterMessage().catch(() => null);
+      await starter?.react(GAMES_BELL_EMOJI).catch(() => {});
     }
 
     if (options.announceChannelId !== undefined) {
@@ -144,14 +166,15 @@ export class GamesForumService {
     }
 
     app.markModified('config.channels');
+    app.markModified('config.gamesPingRoles');
     await app.save();
 
-    // Quiz et Notifications : verrouillés en permanence (tout passe par les boutons).
+    // Quiz : verrouillé en permanence (tout passe par les boutons).
     // Bingo et Juste Prix : verrouillés par défaut, les jeux les déverrouillent pendant les parties —
     // sauf si une partie est en cours au moment du setup.
     const [bingoState, jpState] = await Promise.all([BingoRepository.get(), JustePrixRepository.get()]);
     const activeThreads = new Set([bingoState?.activeThreadId, jpState?.activeThreadId].filter(Boolean));
-    for (const key of ['quiz', 'gamesPingPost', 'bingo', 'justePrix']) {
+    for (const key of ['quiz', 'bingo', 'justePrix']) {
       const threadId = channels[key];
       if (threadId && !activeThreads.has(threadId)) await this.setThreadLocked(client, threadId, true);
     }
@@ -188,32 +211,35 @@ export class GamesForumService {
     await message?.delete().catch(() => {});
   }
 
-  /** Ping le rôle opt-in dans un thread de jeu. */
-  static async pingInThread(thread: ThreadChannel, text: string): Promise<void> {
+  /** Ping le rôle de notification du jeu dans son post. */
+  static async pingInThread(thread: ThreadChannel, game: NotifGameKey, text: string): Promise<void> {
     const config = await this.getConfig();
-    if (!config.pingRoleId) return;
+    const roleId = config.pingRoles[game];
+    if (!roleId) return;
     await thread.send({
-      content: `<@&${config.pingRoleId}> ${text}`,
-      allowedMentions: { roles: [config.pingRoleId] },
+      content: `<@&${roleId}> ${text}`,
+      allowedMentions: { roles: [roleId] },
     }).catch(() => {});
   }
 
-  static async handlePingRoleButton(interaction: ButtonInteraction): Promise<void> {
-    const config = await this.getConfig();
-    if (!config.pingRoleId) {
-      await interaction.reply({ content: 'Le rôle de notification n\'est pas configuré.', flags: MessageFlags.Ephemeral });
-      return;
-    }
-    const guild = interaction.guild as Guild;
-    const member = await guild.members.fetch(interaction.user.id);
-    const has = member.roles.cache.has(config.pingRoleId);
-    if (has) await member.roles.remove(config.pingRoleId);
-    else await member.roles.add(config.pingRoleId);
-    await interaction.reply({
-      content: has
-        ? '🔕 Rôle **🎮 Jeux** retiré — plus de pings.'
-        : '🔔 Rôle **🎮 Jeux** ajouté — tu seras pingé au lancement des jeux !',
-      flags: MessageFlags.Ephemeral,
-    });
+  /** Réaction 🔔 sur le message d'intro d'un post de jeu = prendre/retirer le rôle de notification. */
+  static async handleBellReaction(reaction: MessageReaction, user: User, added: boolean): Promise<void> {
+    if (reaction.emoji.name !== GAMES_BELL_EMOJI) return;
+
+    const app = await AppConfigService.getOrCreateConfig();
+    const channels = app.config.channels ?? {};
+    const pingRoles = app.config.gamesPingRoles ?? {};
+
+    // Le message d'intro d'un post forum a le même id que le thread
+    const game = NOTIF_GAMES.find(({ key }) => channels[key] === reaction.message.id)?.key;
+    if (!game || !pingRoles[game]) return;
+
+    const guild = reaction.message.guild;
+    if (!guild) return;
+    const member = await guild.members.fetch(user.id).catch(() => null);
+    if (!member) return;
+
+    if (added) await member.roles.add(pingRoles[game]!).catch(() => {});
+    else await member.roles.remove(pingRoles[game]!).catch(() => {});
   }
 }

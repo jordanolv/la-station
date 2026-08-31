@@ -195,7 +195,7 @@ export class JustePrixService {
       components: [this.buildSpawnContainer(endsAt)],
       flags: MessageFlags.IsComponentsV2,
     });
-    await GamesForumService.pingInThread(post as ThreadChannel, `Une manche du Juste Prix démarre — un nombre entre ${JP_NUMBER_MIN} et ${JP_NUMBER_MAX}, révélation à ${JP_REVEAL_HOUR}h !`);
+    await GamesForumService.pingInThread(post as ThreadChannel, 'justePrix', `Une manche du Juste Prix démarre — un nombre entre ${JP_NUMBER_MIN} et ${JP_NUMBER_MAX}, révélation à ${JP_REVEAL_HOUR}h !`);
     const announceMessageId = await GamesForumService.announce(
       client,
       `💰 **Le Juste Prix est lancé !** Propose ton nombre avant ${JP_REVEAL_HOUR}h → <#${post.id}>`,
