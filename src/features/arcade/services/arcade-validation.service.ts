@@ -9,6 +9,7 @@ const GAME_LABELS: Record<ArcadeGameName, string> = {
   battle: 'La battle',
   morpion: 'Le morpion',
   bingo: 'Le bingo',
+  justePrix: 'Le Juste Prix',
 };
 
 export class ArcadeValidationService {

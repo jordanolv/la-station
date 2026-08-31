@@ -59,4 +59,13 @@ export class ArcadeStatsService {
       { new: true, upsert: true }
     );
   }
+
+  /** Incrément atomique du compteur global de parties (crée le chemin s'il manque) */
+  static async incrementTotalGames(gameName: ArcadeGameName): Promise<void> {
+    await AppConfigModel.updateOne(
+      {},
+      { $inc: { [`features.arcade.${gameName}.stats.totalGames`]: 1 } },
+      { upsert: true },
+    );
+  }
 }
