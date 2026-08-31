@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ridge — Admin</title>
+<style>
+  :root {
+    --bg: #0f1115; --card: #181b22; --border: #262a33;
+    --text: #e6e8ec; --muted: #8b91a0; --accent: #5865f2;
+    --green: #3fb47f; --red: #e5484d; --amber: #f5a623;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--text); min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 16px; }
+  h1 { font-size: 20px; display: flex; align-items: center; gap: 10px; }
+  h1 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; margin-top: 16px;
+  }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .muted { color: var(--muted); font-size: 13px; }
+  button {
+    background: var(--accent); color: #fff; border: 0; border-radius: 8px;
+    padding: 9px 16px; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  button:hover { filter: brightness(1.1); }
+  button:disabled { opacity: .5; cursor: default; }
+  button.danger { background: var(--red); }
+  button.success { background: var(--green); }
+  button.ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  button.mini { padding: 5px 10px; font-size: 12px; }
+  input, textarea {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 10px 12px; font-size: 14px; width: 100%;
+    font-family: inherit;
+  }
+  input.small { width: 80px; padding: 6px 8px; text-align: center; }
+  select.cfg {
+    background: var(--bg); color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px; width: 100%; margin-top: 4px; font-size: 13px;
+  }
+  label.muted { display: block; }
+  nav { display: flex; gap: 6px; margin-top: 20px; flex-wrap: wrap; }
+  nav button {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    padding: 8px 14px; border-radius: 8px; font-weight: 500;
+  }
+  nav button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .back { margin-top: 18px; }
+
+  /* Grille de features façon Duffus */
+  .fgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 14px; margin-top: 16px; }
+  .fcard {
+    position: relative; background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px 14px 16px; text-align: center; cursor: pointer;
+    user-select: none; transition: border-color .15s, box-shadow .15s, transform .06s;
+  }
+  .fcard:hover { border-color: #3a3f4d; }
+  .fcard:active { transform: scale(.97); }
+  .fcard .ico { font-size: 38px; display: block; filter: grayscale(1); opacity: .4; transition: filter .2s, opacity .2s; }
+  .fcard .name { font-weight: 600; margin-top: 10px; font-size: 14px; color: var(--muted); }
+  .fcard .st { font-size: 11px; color: var(--muted); margin-top: 4px; opacity: .8; }
+  .fcard.on { border-color: rgba(88,101,242,.6); box-shadow: 0 0 20px rgba(88,101,242,.18); }
+  .fcard.on .ico { filter: none; opacity: 1; }
+  .fcard.on .name { color: var(--text); }
+  .fcard.on .st { color: var(--green); }
+  .fcard.neutral .ico { filter: none; opacity: .95; }
+  .fcard.neutral .name { color: var(--text); }
+  .fcard .gear {
+    position: absolute; top: 6px; right: 6px; background: transparent; border: 0;
+    font-size: 15px; padding: 5px; opacity: .5; line-height: 1;
+  }
+  .fcard .gear:hover { opacity: 1; filter: none; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 12px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 12px; }
+  .stat { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .stat .v { font-size: 22px; font-weight: 700; }
+  .stat .l { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-size: 12px; font-weight: 600; padding: 8px; border-bottom: 1px solid var(--border); }
+  td { padding: 8px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: 0; }
+  .item { border-top: 1px solid var(--border); padding: 13px 0; }
+  .item:first-of-type { border-top: 0; }
+  .question { border-top: 1px solid var(--border); padding: 14px 0; }
+  .question:first-of-type { border-top: 0; }
+  .theme { font-weight: 700; }
+  .sub { color: var(--muted); font-size: 12px; margin-left: 6px; }
+  .stats { display: flex; gap: 14px; margin-top: 6px; font-size: 13px; color: var(--muted); }
+  .answer { color: var(--green); font-size: 13px; margin-top: 4px; }
+  .qimg { max-width: 220px; border-radius: 8px; margin-top: 8px; display: block; }
+  .badge { font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .badge.on { background: rgba(63,180,127,.15); color: var(--green); }
+  .badge.off { background: rgba(229,72,77,.15); color: var(--red); }
+  .badge.pending { background: rgba(245,166,35,.15); color: var(--amber); }
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 18px; font-size: 14px; opacity: 0; transition: opacity .2s; z-index: 10;
+  }
+  .toast.show { opacity: 1; }
+  #login { max-width: 360px; margin: 15vh auto 0; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div id="login" class="card">
+  <h1>🏔️ The Ridge — Admin</h1>
+  <p class="muted" style="margin:12px 0">Entre le mot de passe admin pour continuer.</p>
+  <form id="loginForm">
+    <input id="password" type="password" placeholder="Mot de passe" autofocus>
+    <button style="margin-top:12px;width:100%">Connexion</button>
+  </form>
+  <p id="loginError" class="muted" style="color:var(--red);margin-top:10px"></p>
+</div>
+
+<div id="app" class="wrap hidden">
+  <div class="row">
+    <h1><span class="dot"></span> The Ridge — Admin</h1>
+    <div style="display:flex;gap:8px">
+      <button class="ghost" id="navUsers" onclick="switchTab('users')">👥 Joueurs</button>
+      <button class="ghost" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ Accueil ═══════════ -->
+  <section id="tab-overview" class="hidden">
+    <div id="featGrid" class="fgrid"></div>
+    <div class="card">
+      <strong>📊 Vue d'ensemble</strong>
+      <div id="ovStats" class="grid"></div>
+    </div>
+    <div class="card">
+      <strong>🔥 Top activité (semaine en cours)</strong>
+      <table id="ovTop"></table>
+    </div>
+  </section>
+
+  <!-- ═══════════ Quiz ═══════════ -->
+  <section id="tab-quiz" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>❓ Question du jour</strong>
+          <div id="quizSummary" class="muted" style="margin-top:4px">Chargement…</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button id="revealBtn" class="ghost" onclick="revealQuiz()">Révéler maintenant</button>
+          <button id="repostBtn" class="danger" onclick="repostQuiz()">🔄 Relancer</button>
+        </div>
+      </div>
+      <div id="questions" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ Arcade ═══════════ -->
+  <section id="tab-arcade" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <strong>🕹️ Arcade</strong>
+      <p class="muted" style="margin-top:4px">L'activation se fait d'un clic sur la carte Arcade de l'accueil (tous les jeux ensemble).</p>
+      <table id="arcadeTable"></table>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>🎯 Bingo</strong>
+          <div id="bingoStatus" class="muted" style="margin-top:4px"></div>
+        </div>
+        <button class="success" onclick="spawnBingo()">⚡ Lancer un bingo</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>💰 Juste Prix</strong>
+          <div id="jpStatus" class="muted" style="margin-top:4px"></div>
+        </div>
+        <button class="success" onclick="spawnJp()">⚡ Lancer une manche</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ Peak Hunters ═══════════ -->
+  <section id="tab-ph" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <strong>🏔️ Peak Hunters</strong>
+        <button class="success" onclick="forceSpawn()">⚡ Forcer un spawn</button>
+      </div>
+      <div id="phStats" class="grid"></div>
+      <div id="phDetails" class="muted" style="margin-top:12px"></div>
+    </div>
+    <div id="cfg-card-peak-hunters"></div>
+    <div class="card">
+      <strong>🎁 Distribuer des expéditions à tout le monde</strong>
+      <div class="row" style="margin-top:12px;justify-content:flex-start;align-items:flex-end">
+        <label class="muted">Palier<select id="expeTier" class="cfg" style="width:160px">
+          <option value="sentier">⛰️ Sentier</option>
+          <option value="falaise">🧗 Falaise</option>
+          <option value="sommet">🏔️ Sommet</option>
+        </select></label>
+        <label class="muted">Quantité<input id="expeAmount" class="small" style="display:block;margin-top:4px" type="number" min="1" max="999" value="1"></label>
+        <button onclick="giveExpeditions()">Distribuer</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ Joueurs ═══════════ -->
+  <section id="tab-users" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <strong>👥 Joueurs</strong>
+        <select id="userSort" onchange="loadUsers()" class="cfg" style="width:200px;margin-top:0">
+          <option value="activity">Points d'activité</option>
+          <option value="messages">Messages</option>
+          <option value="voice">Temps vocal</option>
+          <option value="level">Niveau</option>
+          <option value="money">Argent</option>
+        </select>
+      </div>
+      <table id="usersTable"></table>
+    </div>
+  </section>
+
+  <!-- ═══════════ Rôles d'activité ═══════════ -->
+  <section id="tab-roles" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <strong>🎖️ Rôles d'activité</strong>
+        <button class="ghost" onclick="runRolesNow()">▶️ Lancer maintenant</button>
+      </div>
+      <div class="grid2" style="margin-top:14px">
+        <label class="muted">🥇 Podium<select id="rolePodium" class="cfg"></select></label>
+        <label class="muted">🏕️ Campeur<select id="roleActive" class="cfg"></select></label>
+        <label class="muted">🧭 Explorateur<select id="roleRegular" class="cfg"></select></label>
+        <label class="muted">🌑 Void<select id="roleInactive" class="cfg"></select></label>
+      </div>
+      <div class="row" style="margin-top:14px;justify-content:flex-start">
+        <label class="muted">Seuil Campeur (top %) <input id="thActive" class="small" type="number" min="1" max="100"></label>
+        <label class="muted">Seuil Explorateur (top %) <input id="thRegular" class="small" type="number" min="1" max="100"></label>
+        <button onclick="saveRoles()">Enregistrer</button>
+      </div>
+      <p class="muted" style="margin-top:10px">Attribution automatique chaque lundi à minuit (Paris).</p>
+    </div>
+  </section>
+
+  <!-- ═══════════ Forum des jeux ═══════════ -->
+  <section id="tab-forum" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <strong>🗂️ Forum des jeux</strong>
+      <p class="muted" style="margin-top:6px">
+        Un post permanent par jeu (❓ Quiz du jour, 🎯 Bingo, 🕹️ Arcade), un rôle 🎮 opt-in pour être
+        pingé, et un post 🔔 avec le bouton pour le récupérer. Choisis un forum existant ou laisse le bot
+        créer le sien.
+      </p>
+      <div id="forumStatus" class="muted" style="margin-top:12px"></div>
+      <div class="grid2" style="margin-top:14px">
+        <label class="muted">Channel forum (vide = le bot le crée)<select id="forumSelect" class="cfg" data-create="forum"></select></label>
+        <label class="muted">Channel d'annonces (général)<select id="announceSelect" class="cfg" data-create="text"></select></label>
+      </div>
+      <button id="forumSetupBtn" class="success" style="margin-top:14px" onclick="setupForum()">🪄 Tout créer</button>
+      <p class="muted" style="margin-top:10px">
+        L'annonce (« la question du jour est là → lien ») part dans le channel général et est supprimée au récap.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════ Soirées ═══════════ -->
+  <section id="tab-party" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <strong>🎉 Config des soirées</strong>
+        <button onclick="savePartyConfig()">Enregistrer</button>
+      </div>
+      <div class="grid2">
+        <label class="muted">Forum des soirées<select id="partyChannel" class="cfg" data-create="forum"></select></label>
+        <label class="muted">Rôle à notifier<select id="partyRole" class="cfg"></select></label>
+      </div>
+    </div>
+    <div class="card">
+      <strong>➕ Nouvelle soirée</strong>
+      <div class="grid2">
+        <label class="muted">Nom *<input id="pvName" maxlength="100"></label>
+        <label class="muted">Jeu *<input id="pvGame" list="cgGamesList" placeholder="Jeu chat-gaming ou libre"></label>
+        <datalist id="cgGamesList"></datalist>
+        <label class="muted">Date et heure *<input id="pvDate" type="datetime-local"></label>
+        <label class="muted">Places *<input id="pvSlots" type="number" min="1" max="100" value="10"></label>
+        <label class="muted">Couleur<input id="pvColor" type="color" value="#ff6b6b" style="height:40px;padding:4px"></label>
+        <label class="muted">Image (URL)<input id="pvImage" placeholder="https://…"></label>
+      </div>
+      <label class="muted" style="margin-top:10px">Description<textarea id="pvDesc" rows="2" maxlength="500"></textarea></label>
+      <button class="success" style="margin-top:12px" onclick="createParty()">Créer la soirée</button>
+    </div>
+    <div class="card">
+      <strong>📅 Soirées actives</strong>
+      <div id="partyEvents"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ Anniversaires ═══════════ -->
+  <section id="tab-birthday" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div id="cfg-card-birthday"></div>
+  </section>
+
+  <!-- ═══════════ Suggestions ═══════════ -->
+  <section id="tab-suggestion" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div id="cfg-card-suggestion"></div>
+  </section>
+
+  <!-- ═══════════ Chat Gaming ═══════════ -->
+  <section id="tab-chat-gaming" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <strong>🎲 Config Chat Gaming</strong>
+        <button onclick="saveCgConfig()">Enregistrer</button>
+      </div>
+      <label class="muted" style="max-width:340px">Forum des jeux<select id="cgChannel" class="cfg" data-create="forum"></select></label>
+    </div>
+    <div class="card">
+      <strong>➕ Nouveau jeu</strong>
+      <div class="grid2">
+        <label class="muted">Nom *<input id="cgName"></label>
+        <label class="muted">Couleur<input id="cgColor" type="color" value="#5865f2" style="height:40px;padding:4px"></label>
+        <label class="muted">Image (URL)<input id="cgImage" placeholder="https://…"></label>
+        <label class="muted">Description<input id="cgDesc"></label>
+      </div>
+      <button class="success" style="margin-top:12px" onclick="createCgGame()">Créer le jeu</button>
+    </div>
+    <div class="card">
+      <strong>🎮 Jeux</strong>
+      <div id="cgGames"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ Leveling ═══════════ -->
+  <section id="tab-leveling" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div id="cfg-card-leveling"></div>
+  </section>
+
+  <!-- ═══════════ Test de personnalité ═══════════ -->
+  <section id="tab-ptest" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <strong>🧬 Config</strong>
+        <button onclick="savePtestConfig()">Enregistrer</button>
+      </div>
+      <label class="muted" style="max-width:340px">Channel des tests<select id="ptChannel" class="cfg" data-create="text"></select></label>
+    </div>
+    <div class="card">
+      <strong>🚀 Lancer un test</strong>
+      <div class="row" style="margin-top:10px;align-items:flex-end">
+        <label class="muted" style="flex:1;min-width:260px">Sujet<input id="ptSubject" maxlength="500" placeholder="Ex : Quel type de montagnard es-tu ?"></label>
+        <button id="ptLaunchBtn" class="success" onclick="launchPtest()">Lancer</button>
+      </div>
+      <p class="muted" style="margin-top:8px">Le bot génère les questions par IA et crée le thread dans le channel configuré.</p>
+    </div>
+    <div class="card">
+      <strong>📋 Tests en cours</strong>
+      <div id="ptSessions"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ Vocaux ═══════════ -->
+  <section id="tab-voice" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <strong>🔊 Vocaux</strong>
+        <button onclick="saveVoiceConfig()">Enregistrer</button>
+      </div>
+      <label class="muted" style="max-width:340px">Channel des récaps de session<select id="voiceNotif" class="cfg" data-create="text"></select></label>
+    </div>
+    <div class="card">
+      <strong>➕ Salons « rejoindre pour créer »</strong>
+      <div class="row" style="margin-top:10px;align-items:flex-end">
+        <label class="muted" style="min-width:260px">Salon vocal<select id="voiceJoinSelect" class="cfg"></select></label>
+        <button onclick="addJoinChannel()">Ajouter</button>
+      </div>
+      <div id="voiceJoinList" style="margin-top:8px"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ Général ═══════════ -->
+  <section id="tab-general" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <strong>⚙️ Général</strong>
+        <button onclick="saveGeneral()">Enregistrer</button>
+      </div>
+      <div class="grid2">
+        <label class="muted">Préfixe<input id="genPrefix" maxlength="5" style="width:90px"></label>
+        <label class="muted">Couleur primaire<input id="genColor" type="color" style="height:40px;padding:4px"></label>
+        <label class="muted">Salon bienvenue<select id="genWelcome" class="cfg" data-create="text"></select></label>
+        <label class="muted">Salon commandes<select id="genCommandes" class="cfg" data-create="text"></select></label>
+        <label class="muted">Salon arcade (fallback bingo)<select id="genArcade" class="cfg" data-create="text"></select></label>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let token = localStorage.getItem('adminToken');
+let currentTab = 'overview';
+
+function toast(msg) {
+  $('toast').textContent = msg;
+  $('toast').classList.add('show');
+  setTimeout(() => $('toast').classList.remove('show'), 2600);
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, ...opts.headers },
+  });
+  if (res.status === 401) { logout(); throw new Error('Session expirée'); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Erreur ' + res.status);
+  return data;
+}
+
+function logout() {
+  localStorage.removeItem('adminToken');
+  token = null;
+  $('app').classList.add('hidden');
+  $('login').classList.remove('hidden');
+}
+
+function fmt(n) { return (n ?? 0).toLocaleString('fr-FR'); }
+function fmtVoice(sec) {
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+  return h > 0 ? h + 'h' + String(m).padStart(2, '0') : m + ' min';
+}
+function esc(s) { const d = document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+
+// ── Guild meta + selects avec création de channel ──
+let guildMeta = null;
+async function getMeta() {
+  if (!guildMeta) guildMeta = await api('/api/admin/guild-meta');
+  return guildMeta;
+}
+function optionsHtml(list, current, prefix, withCreate) {
+  return '<option value="">— aucun —</option>' +
+    (list ?? []).map((x) => `<option value="${x.id}" ${x.id === current ? 'selected' : ''}>${prefix}${esc(x.name)}</option>`).join('') +
+    (withCreate ? '<option value="__create__">➕ Créer un channel…</option>' : '');
+}
+function fillSelect(el, list, current, prefix) {
+  el.innerHTML = optionsHtml(list, current, prefix, el.dataset.create);
+  el.dataset.prev = current ?? '';
+}
+
+document.addEventListener('change', async (e) => {
+  const el = e.target;
+  if (!(el instanceof HTMLSelectElement) || !el.dataset.create) return;
+  if (el.value !== '__create__') { el.dataset.prev = el.value; return; }
+  const name = prompt('Nom du nouveau channel :');
+  if (!name) { el.value = el.dataset.prev ?? ''; return; }
+  try {
+    const created = await api('/api/admin/channels', { method: 'POST', body: JSON.stringify({ name, type: el.dataset.create }) });
+    guildMeta = null;
+    const opt = document.createElement('option');
+    opt.value = created.id;
+    opt.textContent = (el.dataset.create === 'forum' ? '🗂️ ' : '#') + created.name;
+    el.insertBefore(opt, el.lastElementChild);
+    el.value = created.id;
+    el.dataset.prev = created.id;
+    toast('Channel « ' + created.name + ' » créé ✅');
+  } catch (err) { toast(err.message); el.value = el.dataset.prev ?? ''; }
+});
+
+function switchTab(id) {
+  currentTab = id;
+  document.querySelectorAll('section[id^="tab-"]').forEach((s) => s.classList.add('hidden'));
+  $('tab-' + id).classList.remove('hidden');
+  $('navUsers').classList.toggle('on', id === 'users');
+  (TAB_LOADERS[id] ?? (() => Promise.resolve()))().catch((err) => toast(err.message));
+}
+
+// ── Accueil : grille de features ──
+const FEATURES = [
+  { key: 'quiz', name: 'Quiz', ico: '❓', tab: 'quiz', kind: 'config' },
+  { key: 'arcade', name: 'Arcade', ico: '🕹️', tab: 'arcade', kind: 'arcade' },
+  { key: 'peak-hunters', name: 'Peak Hunters', ico: '🏔️', tab: 'ph', kind: 'config' },
+  { key: 'chat-gaming', name: 'Chat Gaming', ico: '🎲', tab: 'chat-gaming', kind: 'config' },
+  { key: 'party', name: 'Soirées', ico: '🎉', tab: 'party', kind: 'config' },
+  { key: 'birthday', name: 'Anniversaires', ico: '🎂', tab: 'birthday', kind: 'config' },
+  { key: 'suggestion', name: 'Suggestions', ico: '💡', tab: 'suggestion', kind: 'config' },
+  { key: 'leveling', name: 'Leveling', ico: '📈', tab: 'leveling', kind: 'config' },
+  { key: 'voice', name: 'Vocaux', ico: '🔊', tab: 'voice', kind: 'voice' },
+  { key: 'activity-roles', name: 'Rôles d\'activité', ico: '🎖️', tab: 'roles', kind: 'roles' },
+  { key: 'personality-test', name: 'Test perso', ico: '🧬', tab: 'ptest', kind: null },
+  { key: 'games-forum', name: 'Forum jeux', ico: '🗂️', tab: 'forum', kind: null },
+  { key: 'general', name: 'Général', ico: '⚙️', tab: 'general', kind: null },
+];
+
+async function loadHome() {
+  const [cfg, arcade, roles, voice, o] = await Promise.all([
+    api('/api/admin/config'), api('/api/admin/arcade'), api('/api/admin/activity-roles'),
+    api('/api/admin/voice'), api('/api/admin/overview'),
+  ]);
+  const stateOf = (f) => {
+    if (f.kind === 'arcade') return arcade.enabled;
+    if (f.kind === 'roles') return roles.enabled;
+    if (f.kind === 'voice') return voice.enabled;
+    if (f.kind === 'config') return cfg[f.key]?.enabled ?? false;
+    return null;
+  };
+  $('featGrid').innerHTML = FEATURES.map((f) => {
+    const state = stateOf(f);
+    const cls = state === null ? 'neutral' : state ? 'on' : '';
+    const st = state === null ? '' : `<div class="st">${state ? 'Activé' : 'Désactivé'}</div>`;
+    return `
+      <div class="fcard ${cls}" onclick="featClick('${f.key}', ${state})">
+        <button class="gear" onclick="event.stopPropagation(); switchTab('${f.tab}')" title="Paramètres">⚙️</button>
+        <span class="ico">${f.ico}</span>
+        <div class="name">${f.name}</div>
+        ${st}
+      </div>`;
+  }).join('');
+
+  $('ovStats').innerHTML = [
+    ['Membres Discord', o.guild ? fmt(o.guild.memberCount) : '—'],
+    ['Joueurs en base', fmt(o.userCount)],
+    ['Messages totaux', fmt(o.totals.totalMsg)],
+    ['Temps vocal total', fmtVoice(o.totals.voiceTime)],
+    ['Dailies récupérés', fmt(o.totals.totalDailies)],
+    ['Points activité (semaine)', fmt(o.totals.activityPoints)],
+  ].map(([l, v]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  $('ovTop').innerHTML = '<tr><th>#</th><th>Joueur</th><th>Points</th><th>Messages</th><th>Vocal</th></tr>' +
+    o.topActivity.map((u, i) => `<tr><td>${i + 1}</td><td>${esc(u.name)}</td><td>${fmt(u.activityPoints)}</td><td>${fmt(u.totalMsg)}</td><td>${fmtVoice(u.voiceTime)}</td></tr>`).join('');
+}
+
+async function featClick(key, state) {
+  const f = FEATURES.find((x) => x.key === key);
+  if (state === null) { switchTab(f.tab); return; }
+  try {
+    if (f.kind === 'arcade') await api('/api/admin/arcade/toggle-all', { method: 'POST', body: JSON.stringify({ enabled: !state }) });
+    else if (f.kind === 'roles') await api('/api/admin/activity-roles', { method: 'POST', body: JSON.stringify({ enabled: !state }) });
+    else if (f.kind === 'voice') await api('/api/admin/voice', { method: 'POST', body: JSON.stringify({ enabled: !state }) });
+    else await api('/api/admin/config/' + key, { method: 'POST', body: JSON.stringify({ enabled: !state }) });
+    await loadHome();
+  } catch (err) { toast(err.message); }
+}
+
+// ── Quiz ──
+async function loadQuiz() {
+  const q = await api('/api/admin/quiz');
+  if (!q.active) {
+    $('quizSummary').textContent = 'Aucune question active — la prochaine part à 13h.';
+    $('questions').innerHTML = '';
+    $('repostBtn').textContent = '🚀 Lancer maintenant';
+    $('repostBtn').classList.remove('danger');
+    $('revealBtn').classList.add('hidden');
+    return;
+  }
+  $('repostBtn').textContent = '🔄 Relancer';
+  $('repostBtn').classList.add('danger');
+  $('revealBtn').classList.remove('hidden');
+  $('quizSummary').textContent = q.participants + ' participant(s) · ' + q.answered + ' réponse(s) · récap à 22h';
+  $('questions').innerHTML = q.questions.map((item) => `
+    <div class="question">
+      <span class="theme">${esc(item.theme)}</span><span class="sub">${esc(item.subtheme ?? '')}</span>
+      <div style="margin-top:4px">${esc(item.question)}</div>
+      ${item.image ? `<img class="qimg" src="${item.image}">` : ''}
+      <div class="answer">✅ ${esc(item.choices[item.answer])}</div>
+      <div class="stats">
+        <span>👥 ${item.picks} choix</span>
+        <span>✍️ ${item.answered} réponses</span>
+        <span>✅ ${item.correct} bonnes</span>
+      </div>
+    </div>`).join('');
+}
+async function repostQuiz() {
+  if (!confirm('Relancer ? Le message actuel est supprimé et les réponses en cours sont annulées.')) return;
+  $('repostBtn').disabled = true;
+  try { await api('/api/admin/quiz/repost', { method: 'POST' }); toast('Nouvelle question lancée ✅'); await loadQuiz(); }
+  catch (err) { toast(err.message); }
+  finally { $('repostBtn').disabled = false; }
+}
+async function revealQuiz() {
+  if (!confirm('Révéler le récap maintenant ?')) return;
+  $('revealBtn').disabled = true;
+  try { await api('/api/admin/quiz/reveal', { method: 'POST' }); toast('Récap publié ✅'); await loadQuiz(); }
+  catch (err) { toast(err.message); }
+  finally { $('revealBtn').disabled = false; }
+}
+
+// ── Arcade (stats en lecture, activation groupée sur l'accueil) ──
+const GAME_LABELS = { shifumi: '✊ Shifumi', puissance4: '🔴 Puissance 4', morpion: '❌ Morpion', battle: '⚔️ Battle', bingo: '🎯 Bingo', justePrix: '💰 Juste Prix' };
+async function loadArcade() {
+  const a = await api('/api/admin/arcade');
+  $('arcadeTable').innerHTML = '<tr><th>Jeu</th><th>Parties jouées</th><th>État</th></tr>' +
+    a.games.map((g) => `
+      <tr>
+        <td>${GAME_LABELS[g.key] ?? g.key}</td>
+        <td>${fmt(g.totalGames)}</td>
+        <td><span class="badge ${g.enabled ? 'on' : 'off'}">${g.enabled ? 'Activé' : 'Désactivé'}</span></td>
+      </tr>`).join('');
+
+  const when = (d) => d ? new Date(d).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : null;
+  $('bingoStatus').innerHTML = [
+    a.bingo.active ? `🟢 Partie en cours — ${a.bingo.guessCount} tentative(s)` : '⚪ Pas de partie en cours',
+    a.bingo.jackpot > 0 ? `💰 Cagnotte : <b>+${a.bingo.jackpot} pack${a.bingo.jackpot > 1 ? 's' : ''}</b>` : null,
+    when(a.bingo.nextSpawnAt) ? `⏰ Prochain spawn : ${when(a.bingo.nextSpawnAt)}` : null,
+    '3 tentatives/joueur · expire à minuit (cagnotte roulante)',
+  ].filter(Boolean).join(' · ');
+  $('jpStatus').innerHTML = [
+    a.justePrix.active ? `🟢 Manche en cours — ${a.justePrix.guessCount} proposition(s), révélation ${when(a.justePrix.endsAt) ?? '21h'}` : '⚪ Pas de manche en cours',
+    when(a.justePrix.nextSpawnAt) ? `⏰ Prochain spawn : ${when(a.justePrix.nextSpawnAt)}` : null,
+    'Une proposition/joueur · le plus proche gagne · exact = jackpot',
+  ].filter(Boolean).join(' · ');
+}
+async function spawnBingo() {
+  if (!confirm('Lancer un bingo maintenant ?')) return;
+  try { await api('/api/admin/arcade/bingo/spawn', { method: 'POST' }); toast('Bingo lancé 🎯'); await loadArcade(); }
+  catch (err) { toast(err.message); }
+}
+async function spawnJp() {
+  if (!confirm('Lancer une manche du Juste Prix maintenant ?')) return;
+  try { await api('/api/admin/arcade/juste-prix/spawn', { method: 'POST' }); toast('Manche lancée 💰'); await loadArcade(); }
+  catch (err) { toast(err.message); }
+}
+
+// ── Peak Hunters ──
+async function loadPh() {
+  const p = await api('/api/admin/peak-hunters');
+  const nextSpawn = p.nextSpawns.length
+    ? new Date(p.nextSpawns[0]).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    : '—';
+  $('phStats').innerHTML = [
+    ['État', p.enabled ? '✅ Actif' : '❌ Inactif'],
+    ['Montagnes', fmt(p.mountainsCount)],
+    ['Spawns aujourd\'hui', p.spawnsToday],
+    ['Prochain spawn', nextSpawn],
+    ['Spawns en cours', p.activeSpawns],
+  ].map(([l, v]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  $('phDetails').innerHTML = [
+    p.spawnChannel ? 'Channel spawn : <b>' + esc(p.spawnChannel) + '</b>' : '⚠️ Aucun channel de spawn configuré',
+    p.notificationChannel ? 'Notifications : <b>' + esc(p.notificationChannel) + '</b>' : null,
+    p.raidChannel ? 'Raid : <b>' + esc(p.raidChannel) + '</b>' : null,
+    p.dailyMountain ? 'Montagne du jour : <b>' + esc(decodeURIComponent(p.dailyMountain.mountainId).replace(/_/g, ' ')) + '</b>' : null,
+  ].filter(Boolean).join(' · ');
+  await loadFeatureCard('peak-hunters');
+}
+async function forceSpawn() {
+  if (!confirm('Forcer un spawn de montagne maintenant ?')) return;
+  try { await api('/api/admin/peak-hunters/spawn', { method: 'POST' }); toast('Montagne spawnée ⚡'); await loadPh(); }
+  catch (err) { toast(err.message); }
+}
+async function giveExpeditions() {
+  const tier = $('expeTier').value;
+  const amount = parseInt($('expeAmount').value, 10);
+  if (!amount || amount < 1) { toast('Quantité invalide'); return; }
+  if (!confirm(`Distribuer ${amount} expédition(s) ${tier} à TOUS les joueurs ?`)) return;
+  try {
+    const r = await api('/api/admin/peak-hunters/give-expeditions', { method: 'POST', body: JSON.stringify({ tier, amount }) });
+    toast(`✅ Distribué à ${r.count} joueur(s)`);
+  } catch (err) { toast(err.message); }
+}
+
+// ── Joueurs ──
+async function loadUsers() {
+  const u = await api('/api/admin/users?sort=' + $('userSort').value + '&limit=25');
+  $('usersTable').innerHTML = '<tr><th>#</th><th>Joueur</th><th>Niv.</th><th>Points</th><th>Messages</th><th>Vocal</th><th>Streak</th><th>💰</th></tr>' +
+    u.users.map((x, i) => `<tr><td>${i + 1}</td><td>${esc(x.name)}</td><td>${x.lvl}</td><td>${fmt(x.activityPoints)}</td><td>${fmt(x.totalMsg)}</td><td>${fmtVoice(x.voiceTime)}</td><td>${x.dailyStreak}</td><td>${fmt(x.money)}</td></tr>`).join('');
+}
+
+// ── Rôles d'activité ──
+async function loadRolesTab() {
+  const [r, meta] = await Promise.all([api('/api/admin/activity-roles'), getMeta()]);
+  $('thActive').value = r.activeThresholdPercent;
+  $('thRegular').value = r.regularThresholdPercent;
+  fillSelect($('rolePodium'), meta.roles, r.roleIds.podium, '@');
+  fillSelect($('roleActive'), meta.roles, r.roleIds.active, '@');
+  fillSelect($('roleRegular'), meta.roles, r.roleIds.regular, '@');
+  fillSelect($('roleInactive'), meta.roles, r.roleIds.inactive, '@');
+}
+async function saveRoles() {
+  try {
+    await api('/api/admin/activity-roles', {
+      method: 'POST',
+      body: JSON.stringify({
+        activeThresholdPercent: $('thActive').value,
+        regularThresholdPercent: $('thRegular').value,
+        podiumRoleId: $('rolePodium').value,
+        activeRoleId: $('roleActive').value,
+        regularRoleId: $('roleRegular').value,
+        inactiveRoleId: $('roleInactive').value,
+      }),
+    });
+    toast('Rôles et seuils enregistrés ✅');
+    await loadRolesTab();
+  } catch (err) { toast(err.message); }
+}
+async function runRolesNow() {
+  if (!confirm('Lancer la rotation des rôles maintenant ? Les points d\'activité seront remis à zéro.')) return;
+  try { await api('/api/admin/activity-roles/run', { method: 'POST' }); toast('Rotation lancée ✅'); }
+  catch (err) { toast(err.message); }
+}
+
+// ── Forum des jeux ──
+async function loadForum() {
+  const [f, meta] = await Promise.all([api('/api/admin/game-forum'), getMeta()]);
+  fillSelect($('forumSelect'), meta.forums, f.forumChannelId, '🗂️ ');
+  fillSelect($('announceSelect'), meta.channels, f.announceChannelId, '#');
+  $('forumSetupBtn').textContent = f.forumChannelId ? '🪄 Mettre à jour' : '🪄 Tout créer';
+  $('forumStatus').innerHTML = f.forumChannelId
+    ? [
+        'Forum : <b>' + esc(f.forumName ?? '?') + '</b>',
+        f.quizThreadName ? '❓ <b>' + esc(f.quizThreadName) + '</b>' : '⚠️ post quiz manquant',
+        f.bingoThreadName ? '🎯 <b>' + esc(f.bingoThreadName) + '</b>' : '⚠️ post bingo manquant',
+        f.arcadeThreadName ? '🕹️ <b>' + esc(f.arcadeThreadName) + '</b>' : '⚠️ post arcade manquant',
+        f.justePrixThreadName ? '💰 <b>' + esc(f.justePrixThreadName) + '</b>' : '⚠️ post Juste Prix manquant',
+        f.pingRoleName ? '🎮 Rôle ping : <b>@' + esc(f.pingRoleName) + '</b>' : '⚠️ rôle ping manquant',
+        f.announceChannelName ? '📣 Annonces : <b>#' + esc(f.announceChannelName) + '</b>' : '📣 Annonces : désactivées',
+      ].join(' · ')
+    : 'Rien n\'est configuré — clique sur « Tout créer » et le bot fabrique le forum, le rôle et les posts.';
+}
+async function setupForum() {
+  $('forumSetupBtn').disabled = true;
+  try {
+    await api('/api/admin/game-forum/setup', {
+      method: 'POST',
+      body: JSON.stringify({ announceChannelId: $('announceSelect').value, forumChannelId: $('forumSelect').value }),
+    });
+    toast('Forum des jeux prêt ✅');
+    guildMeta = null;
+    await loadForum();
+  } catch (err) { toast(err.message); }
+  finally { $('forumSetupBtn').disabled = false; }
+}
+
+// ── Soirées ──
+async function loadParty() {
+  const [p, meta, cg] = await Promise.all([api('/api/admin/party'), getMeta(), api('/api/admin/chat-gaming')]);
+  fillSelect($('partyChannel'), meta.forums, p.channelId, '🗂️ ');
+  fillSelect($('partyRole'), meta.roles, p.defaultRoleId, '@');
+  $('cgGamesList').innerHTML = cg.games.map((g) => `<option value="${esc(g.name)}">`).join('');
+  $('partyEvents').innerHTML = p.events.length === 0
+    ? '<p class="muted" style="margin-top:8px">Aucune soirée active.</p>'
+    : p.events.map((e) => {
+        const date = new Date(e.dateTime).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+        const badge = e.status === 'started' ? '<span class="badge on">En cours</span>' : '<span class="badge pending">Prévue</span>';
+        const players = e.participants.map((x) => esc(x.name)).join(', ') || 'personne';
+        return `
+        <div class="item">
+          <div class="row">
+            <div>
+              <strong>${esc(e.name)}</strong> ${badge}
+              <div class="muted" style="margin-top:3px">🎮 ${esc(e.game)} · 📅 ${date} · 👥 ${e.participants.length}/${e.maxSlots} — ${players}</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              ${e.status === 'pending' ? `<button class="mini success" onclick="startParty('${e.id}')">▶️ Démarrer</button>` : ''}
+              ${e.status === 'started' ? `<button class="mini" onclick="toggleEndForm('${e.id}')">🏁 Clôturer</button>` : ''}
+              <button class="mini danger" onclick="deleteParty('${e.id}')">🗑️</button>
+            </div>
+          </div>
+          <div id="endForm-${e.id}" class="hidden" style="margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px">
+            <div class="muted" style="margin-bottom:6px">Qui était présent ?</div>
+            ${e.participants.map((x) => `<label class="muted" style="display:inline-flex;gap:6px;margin-right:14px"><input type="checkbox" class="att-${e.id}" value="${x.id}" checked> ${esc(x.name)}</label>`).join('') || '<span class="muted">Aucun inscrit</span>'}
+            <div class="row" style="margin-top:10px;justify-content:flex-start;align-items:flex-end">
+              <label class="muted">💰 / présent<input id="endMoney-${e.id}" class="small" style="display:block;margin-top:4px" type="number" min="0" value="0"></label>
+              <label class="muted">XP / présent<input id="endXp-${e.id}" class="small" style="display:block;margin-top:4px" type="number" min="0" value="0"></label>
+              <button class="mini success" onclick="endParty('${e.id}')">Confirmer la clôture</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+}
+async function savePartyConfig() {
+  try {
+    await api('/api/admin/config/party', {
+      method: 'POST',
+      body: JSON.stringify({ channelId: $('partyChannel').value || null, defaultRoleId: $('partyRole').value || null }),
+    });
+    toast('Config soirées enregistrée ✅');
+  } catch (err) { toast(err.message); }
+}
+async function createParty() {
+  const body = {
+    name: $('pvName').value, game: $('pvGame').value, dateTime: $('pvDate').value,
+    maxSlots: $('pvSlots').value, description: $('pvDesc').value, color: $('pvColor').value,
+    image: $('pvImage').value,
+  };
+  try {
+    await api('/api/admin/party/events', { method: 'POST', body: JSON.stringify(body) });
+    toast('Soirée créée 🎉');
+    ['pvName', 'pvGame', 'pvDate', 'pvDesc', 'pvImage'].forEach((id) => { $(id).value = ''; });
+    await loadParty();
+  } catch (err) { toast(err.message); }
+}
+function toggleEndForm(id) { $('endForm-' + id).classList.toggle('hidden'); }
+async function startParty(id) {
+  try { await api(`/api/admin/party/events/${id}/start`, { method: 'POST' }); toast('Soirée démarrée ▶️'); await loadParty(); }
+  catch (err) { toast(err.message); }
+}
+async function endParty(id) {
+  const attendedIds = [...document.querySelectorAll('.att-' + id + ':checked')].map((el) => el.value);
+  try {
+    await api(`/api/admin/party/events/${id}/end`, {
+      method: 'POST',
+      body: JSON.stringify({ attendedIds, money: $('endMoney-' + id).value, xp: $('endXp-' + id).value }),
+    });
+    toast('Soirée clôturée 🏁');
+    await loadParty();
+  } catch (err) { toast(err.message); }
+}
+async function deleteParty(id) {
+  if (!confirm('Supprimer cette soirée ? Le post Discord sera supprimé.')) return;
+  try { await api(`/api/admin/party/events/${id}`, { method: 'DELETE' }); toast('Soirée supprimée'); await loadParty(); }
+  catch (err) { toast(err.message); }
+}
+
+// ── Chat Gaming ──
+async function loadChatGaming() {
+  const [cg, meta] = await Promise.all([api('/api/admin/chat-gaming'), getMeta()]);
+  fillSelect($('cgChannel'), meta.forums, cg.channelId, '🗂️ ');
+  $('cgGames').innerHTML = cg.games.length === 0
+    ? '<p class="muted" style="margin-top:8px">Aucun jeu.</p>'
+    : cg.games.map((g) => `
+      <div class="item">
+        <div class="grid2">
+          <label class="muted">Nom<input id="cgn-${g.id}" value="${esc(g.name)}"></label>
+          <label class="muted">Couleur<input id="cgc-${g.id}" type="color" value="${g.color && /^#[0-9a-fA-F]{6}$/.test(g.color) ? g.color : '#5865f2'}" style="height:40px;padding:4px"></label>
+          <label class="muted">Image (URL)<input id="cgi-${g.id}" value="${esc(g.image ?? '')}"></label>
+          <label class="muted">Description<input id="cgd-${g.id}" value="${esc(g.description ?? '')}"></label>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="mini" onclick="saveCgGame('${g.id}')">Enregistrer</button>
+          <button class="mini danger" onclick="deleteCgGame('${g.id}', '${esc(g.name)}')">Supprimer</button>
+        </div>
+      </div>`).join('');
+}
+async function saveCgConfig() {
+  try {
+    await api('/api/admin/config/chat-gaming', { method: 'POST', body: JSON.stringify({ channelId: $('cgChannel').value || null }) });
+    toast('Config Chat Gaming enregistrée ✅');
+  } catch (err) { toast(err.message); }
+}
+async function createCgGame() {
+  try {
+    await api('/api/admin/chat-gaming/games', {
+      method: 'POST',
+      body: JSON.stringify({ name: $('cgName').value, description: $('cgDesc').value, color: $('cgColor').value, image: $('cgImage').value }),
+    });
+    toast('Jeu créé ✅');
+    ['cgName', 'cgDesc', 'cgImage'].forEach((id) => { $(id).value = ''; });
+    await loadChatGaming();
+  } catch (err) { toast(err.message); }
+}
+async function saveCgGame(id) {
+  try {
+    await api('/api/admin/chat-gaming/games/' + id, {
+      method: 'PUT',
+      body: JSON.stringify({ name: $('cgn-' + id).value, description: $('cgd-' + id).value, color: $('cgc-' + id).value, image: $('cgi-' + id).value }),
+    });
+    toast('Jeu mis à jour ✅');
+    await loadChatGaming();
+  } catch (err) { toast(err.message); }
+}
+async function deleteCgGame(id, name) {
+  if (!confirm(`Supprimer le jeu « ${name} » ? Son contenu Discord sera nettoyé.`)) return;
+  try { await api('/api/admin/chat-gaming/games/' + id, { method: 'DELETE' }); toast('Jeu supprimé'); await loadChatGaming(); }
+  catch (err) { toast(err.message); }
+}
+
+// ── Test de personnalité ──
+async function loadPtest() {
+  const [p, meta] = await Promise.all([api('/api/admin/personality-test'), getMeta()]);
+  fillSelect($('ptChannel'), meta.channels, p.channelId, '#');
+  $('ptSessions').innerHTML = p.sessions.length === 0
+    ? '<p class="muted" style="margin-top:8px">Aucun test en cours.</p>'
+    : p.sessions.map((s) => `
+      <div class="item row">
+        <div><strong>${esc(s.subject)}</strong><div class="muted">${new Date(s.createdAt).toLocaleString('fr-FR')}</div></div>
+        <button class="mini danger" onclick="closePtest('${esc(s.testId)}')">Fermer</button>
+      </div>`).join('');
+}
+async function savePtestConfig() {
+  try {
+    await api('/api/admin/config/personality-test', { method: 'POST', body: JSON.stringify({ channelId: $('ptChannel').value || null }) });
+    toast('Config test perso enregistrée ✅');
+  } catch (err) { toast(err.message); }
+}
+async function launchPtest() {
+  const subject = $('ptSubject').value.trim();
+  if (!subject) { toast('Entre un sujet'); return; }
+  $('ptLaunchBtn').disabled = true;
+  try {
+    await api('/api/admin/personality-test/launch', { method: 'POST', body: JSON.stringify({ subject }) });
+    toast('Test lancé 🚀');
+    $('ptSubject').value = '';
+    await loadPtest();
+  } catch (err) { toast(err.message); }
+  finally { $('ptLaunchBtn').disabled = false; }
+}
+async function closePtest(testId) {
+  if (!confirm('Fermer ce test ?')) return;
+  try { await api('/api/admin/personality-test/close', { method: 'POST', body: JSON.stringify({ testId }) }); toast('Test fermé'); await loadPtest(); }
+  catch (err) { toast(err.message); }
+}
+
+// ── Vocaux ──
+async function loadVoice() {
+  const [v, meta] = await Promise.all([api('/api/admin/voice'), getMeta()]);
+  fillSelect($('voiceNotif'), meta.channels, v.notificationChannelId, '#');
+  $('voiceJoinSelect').innerHTML = optionsHtml(meta.voiceChannels, null, '🔊 ');
+  $('voiceJoinList').innerHTML = v.joinChannels.length === 0
+    ? '<p class="muted">Aucun salon configuré.</p>'
+    : v.joinChannels.map((j) => `
+      <div class="item row">
+        <div>🔊 <b>${esc(j.name)}</b> <span class="muted">· modèle : ${esc(j.nameTemplate)}</span></div>
+        <button class="mini danger" onclick="removeJoinChannel('${j.id}')">Retirer</button>
+      </div>`).join('');
+}
+async function saveVoiceConfig() {
+  try {
+    await api('/api/admin/voice', { method: 'POST', body: JSON.stringify({ notificationChannelId: $('voiceNotif').value || '' }) });
+    toast('Config vocaux enregistrée ✅');
+  } catch (err) { toast(err.message); }
+}
+async function addJoinChannel() {
+  const channelId = $('voiceJoinSelect').value;
+  if (!channelId) { toast('Choisis un salon vocal'); return; }
+  try { await api('/api/admin/voice/join-channels', { method: 'POST', body: JSON.stringify({ channelId }) }); toast('Salon ajouté ✅'); await loadVoice(); }
+  catch (err) { toast(err.message); }
+}
+async function removeJoinChannel(id) {
+  try { await api('/api/admin/voice/join-channels/' + id, { method: 'DELETE' }); toast('Salon retiré'); await loadVoice(); }
+  catch (err) { toast(err.message); }
+}
+
+// ── Général ──
+async function loadGeneral() {
+  const [cfg, meta] = await Promise.all([api('/api/admin/config'), getMeta()]);
+  const g = cfg.general;
+  $('genPrefix').value = g.prefix;
+  $('genColor').value = /^#[0-9a-fA-F]{6}$/.test(g.primaryColor) ? g.primaryColor : '#dac1ff';
+  fillSelect($('genWelcome'), meta.channels, g.welcomeChannelId, '#');
+  fillSelect($('genCommandes'), meta.channels, g.commandesChannelId, '#');
+  fillSelect($('genArcade'), meta.channels, g.arcadeChannelId, '#');
+}
+async function saveGeneral() {
+  try {
+    await api('/api/admin/config/general', {
+      method: 'POST',
+      body: JSON.stringify({
+        prefix: $('genPrefix').value,
+        primaryColor: $('genColor').value,
+        welcomeChannelId: $('genWelcome').value || null,
+        commandesChannelId: $('genCommandes').value || null,
+        arcadeChannelId: $('genArcade').value || null,
+      }),
+    });
+    toast('Config générale enregistrée ✅');
+  } catch (err) { toast(err.message); }
+}
+
+// ── Pages simples (channel + options) via moteur générique ──
+const CONFIG_FEATURES = [
+  { id: 'peak-hunters', title: '⚙️ Channels', fields: [
+    { key: 'spawnChannelId', type: 'channel', label: 'Channel spawn (montagnes + fallback quiz)' },
+    { key: 'notificationChannelId', type: 'channel', label: 'Channel notifications' },
+    { key: 'raidChannelId', type: 'channel', label: 'Channel raid' },
+  ]},
+  { id: 'birthday', title: '🎂 Anniversaires', fields: [
+    { key: 'channelId', type: 'channel', label: 'Channel des anniversaires' },
+  ]},
+  { id: 'suggestion', title: '💡 Suggestions', fields: [
+    { key: 'channelIds', type: 'channels', label: 'Channels surveillés (Ctrl+clic pour multi)' },
+  ]},
+  { id: 'leveling', title: '📈 Leveling', fields: [
+    { key: 'notifLevelUp', type: 'bool', label: 'Notification de level up' },
+    { key: 'taux', type: 'number', label: 'Taux XP' },
+  ]},
+];
+
+function fieldHtml(featId, field, value, meta) {
+  const id = `cfg-${featId}-${field.key}`;
+  if (field.type === 'bool') {
+    return `<label class="muted" style="display:inline-flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="${id}" ${value ? 'checked' : ''}> ${field.label}</label>`;
+  }
+  if (field.type === 'channel') {
+    return `<label class="muted">${field.label}<select id="${id}" class="cfg" data-create="text" data-prev="${value ?? ''}">${optionsHtml(meta.channels, value, '#', true)}</select></label>`;
+  }
+  if (field.type === 'channels') {
+    const opts = meta.channels.map((c) =>
+      `<option value="${c.id}" ${(value ?? []).includes(c.id) ? 'selected' : ''}>#${esc(c.name)}</option>`).join('');
+    return `<label class="muted">${field.label}<select id="${id}" class="cfg" multiple size="6">${opts}</select></label>`;
+  }
+  return `<label class="muted">${field.label}<input id="${id}" class="small" style="display:block;margin-top:4px" type="number" step="0.1" min="0.1" value="${value ?? ''}"></label>`;
+}
+
+async function loadFeatureCard(featId) {
+  const [cfg, meta] = await Promise.all([api('/api/admin/config'), getMeta()]);
+  const feat = CONFIG_FEATURES.find((f) => f.id === featId);
+  $('cfg-card-' + featId).innerHTML = `
+    <div class="card">
+      <div class="row">
+        <strong>${feat.title}</strong>
+        <button onclick="saveConfig('${feat.id}')">Enregistrer</button>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        ${feat.fields.map((f) => fieldHtml(feat.id, f, cfg[feat.id]?.[f.key], meta)).join('')}
+      </div>
+    </div>`;
+}
+
+async function saveConfig(featId) {
+  const feat = CONFIG_FEATURES.find((f) => f.id === featId);
+  const body = {};
+  for (const f of feat.fields) {
+    const el = $(`cfg-${featId}-${f.key}`);
+    if (f.type === 'bool') body[f.key] = el.checked;
+    else if (f.type === 'channels') body[f.key] = [...el.selectedOptions].map((o) => o.value).filter(Boolean);
+    else if (f.type === 'number') body[f.key] = el.value;
+    else body[f.key] = el.value || null;
+  }
+  try {
+    await api('/api/admin/config/' + featId, { method: 'POST', body: JSON.stringify(body) });
+    toast(feat.title + ' enregistré ✅');
+    await loadFeatureCard(featId);
+  } catch (err) { toast(err.message); }
+}
+
+// ── Routing des onglets ──
+const TAB_LOADERS = {
+  overview: loadHome,
+  quiz: loadQuiz,
+  arcade: loadArcade,
+  ph: loadPh,
+  users: loadUsers,
+  roles: loadRolesTab,
+  forum: loadForum,
+  party: loadParty,
+  birthday: () => loadFeatureCard('birthday'),
+  suggestion: () => loadFeatureCard('suggestion'),
+  'chat-gaming': loadChatGaming,
+  leveling: () => loadFeatureCard('leveling'),
+  ptest: loadPtest,
+  voice: loadVoice,
+  general: loadGeneral,
+};
+
+$('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('loginError').textContent = '';
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: $('password').value }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur');
+    token = data.token;
+    localStorage.setItem('adminToken', token);
+    show();
+  } catch (err) {
+    $('loginError').textContent = err.message;
+  }
+});
+
+async function show() {
+  $('login').classList.add('hidden');
+  $('app').classList.remove('hidden');
+  switchTab(currentTab);
+}
+
+if (token) show();
+setInterval(() => {
+  if (token && !$('app').classList.contains('hidden') && ['overview', 'quiz'].includes(currentTab)) {
+    (TAB_LOADERS[currentTab] ?? (() => Promise.resolve()))().catch(() => {});
+  }
+}, 30000);
+</script>
+</body>
+</html>

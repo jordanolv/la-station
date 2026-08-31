@@ -12,7 +12,7 @@ async function main() {
     console.log(chalk.cyan('═'.repeat(60)));
 
     const botClient = await startBot();
-    startWebServer();
+    startWebServer(botClient);
 
     console.log(chalk.cyan('═'.repeat(60)));
     console.log(chalk.green.bold('          ✅ THE RIDGE EST EN LIGNE'));
