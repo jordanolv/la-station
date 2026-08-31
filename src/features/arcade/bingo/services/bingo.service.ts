@@ -235,6 +235,8 @@ export class BingoService {
     if (forumConfig.bingoThreadId) {
       const post = await guild.channels.fetch(forumConfig.bingoThreadId).catch(() => null);
       if (post?.isThread()) {
+        await GamesForumService.setThreadLocked(client, post.id, false);
+        await post.setRateLimitPerUser(BINGO_THREAD_SLOWMODE_SECONDS).catch(() => {});
         const message = await post.send({
           components: [this.buildSpawnContainer(jackpot)],
           flags: MessageFlags.IsComponentsV2,
@@ -364,8 +366,8 @@ export class BingoService {
       ).catch(() => {});
 
       const forumConfig = await GamesForumService.getConfig();
+      await thread.setLocked(true).catch(() => {});
       if (thread.id !== forumConfig.bingoThreadId) {
-        await thread.setLocked(true).catch(() => {});
         await thread.setArchived(true).catch(() => {});
       }
     }
@@ -504,10 +506,12 @@ export class BingoService {
       ].join('\n'),
     }).catch(() => {});
 
-    // En mode forum, le post 🎯 Bingo est permanent : on ne le verrouille pas
+    // Post permanent : reverrouillé jusqu'à la prochaine partie ; thread legacy : verrouillé + archivé
     const forumConfig = await GamesForumService.getConfig();
     const thread = message.channel as ThreadChannel;
-    if (thread.id !== forumConfig.bingoThreadId) {
+    if (thread.id === forumConfig.bingoThreadId) {
+      await thread.setLocked(true).catch(() => {});
+    } else {
       await thread.setLocked(true).catch(() => {});
       await thread.setArchived(true).catch(() => {});
     }

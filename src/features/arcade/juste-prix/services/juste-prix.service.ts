@@ -190,6 +190,7 @@ export class JustePrixService {
     }
 
     const target = JP_NUMBER_MIN + Math.floor(Math.random() * (JP_NUMBER_MAX - JP_NUMBER_MIN + 1));
+    await GamesForumService.setThreadLocked(client, post.id, false);
     const message = await post.send({
       components: [this.buildSpawnContainer(endsAt)],
       flags: MessageFlags.IsComponentsV2,
@@ -283,6 +284,9 @@ export class JustePrixService {
       }
     }
 
+    if (thread?.isThread()) {
+      await thread.setLocked(true).catch(() => {});
+    }
     await GamesForumService.deleteAnnounce(client, state.announceMessageId);
     await JustePrixRepository.clearActive();
   }

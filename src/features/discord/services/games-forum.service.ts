@@ -7,10 +7,13 @@ import {
   ForumChannel,
   Guild,
   MessageFlags,
+  PermissionFlagsBits,
   ThreadChannel,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
 import { AppConfigService } from './app-config.service';
+import { BingoRepository } from '../../arcade/bingo/repositories/bingo.repository';
+import { JustePrixRepository } from '../../arcade/juste-prix/repositories/juste-prix.repository';
 
 export const GAMES_PING_BUTTON_ID = 'games:pingrole';
 
@@ -83,6 +86,29 @@ export class GamesForumService {
     }
     channels.gamesForum = forum.id;
 
+    // Permissions : personne ne crée de posts, les réponses se font dans les fils (déverrouillés par les jeux)
+    await forum.permissionOverwrites.set([
+      {
+        id: guild.roles.everyone.id,
+        allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessagesInThreads],
+        deny: [
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.CreatePublicThreads,
+          PermissionFlagsBits.CreatePrivateThreads,
+        ],
+      },
+      {
+        id: client.user!.id,
+        allow: [
+          PermissionFlagsBits.ViewChannel,
+          PermissionFlagsBits.SendMessages,
+          PermissionFlagsBits.SendMessagesInThreads,
+          PermissionFlagsBits.ManageThreads,
+          PermissionFlagsBits.ManageMessages,
+        ],
+      },
+    ]).catch(() => {});
+
     if (!app.config.gamesPingRoleId || !guild.roles.cache.has(app.config.gamesPingRoleId)) {
       const role = await guild.roles.create({ name: '🎮 Jeux', mentionable: true, reason: 'Rôle opt-in notifications jeux' });
       app.config.gamesPingRoleId = role.id;
@@ -119,6 +145,25 @@ export class GamesForumService {
 
     app.markModified('config.channels');
     await app.save();
+
+    // Quiz et Notifications : verrouillés en permanence (tout passe par les boutons).
+    // Bingo et Juste Prix : verrouillés par défaut, les jeux les déverrouillent pendant les parties —
+    // sauf si une partie est en cours au moment du setup.
+    const [bingoState, jpState] = await Promise.all([BingoRepository.get(), JustePrixRepository.get()]);
+    const activeThreads = new Set([bingoState?.activeThreadId, jpState?.activeThreadId].filter(Boolean));
+    for (const key of ['quiz', 'gamesPingPost', 'bingo', 'justePrix']) {
+      const threadId = channels[key];
+      if (threadId && !activeThreads.has(threadId)) await this.setThreadLocked(client, threadId, true);
+    }
+  }
+
+  /** (Dé)verrouille un post de jeu — utilisé au spawn et en fin de partie. */
+  static async setThreadLocked(client: BotClient, threadId: string, locked: boolean): Promise<void> {
+    const guild = client.guilds.cache.get(process.env.GUILD_ID!);
+    const thread = await guild?.channels.fetch(threadId).catch(() => null);
+    if (!thread?.isThread()) return;
+    if (thread.archived) await thread.setArchived(false).catch(() => {});
+    await thread.setLocked(locked).catch(() => {});
   }
 
   /** Poste une annonce dans le channel général configuré. Retourne l'id du message (à supprimer plus tard). */
