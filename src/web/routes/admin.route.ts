@@ -323,7 +323,7 @@ export default function adminRoute(client: BotClient): Router {
     if (!guild) { res.status(503).json({ error: 'Guild introuvable' }); return; }
     res.json({
       channels: guild.channels.cache
-        .filter((c) => c.type === ChannelType.GuildText)
+        .filter((c) => c.type === ChannelType.GuildText || c.type === ChannelType.GuildAnnouncement)
         .map((c) => ({ id: c.id, name: c.name }))
         .sort((a, b) => a.name.localeCompare(b.name)),
       forums: guild.channels.cache
