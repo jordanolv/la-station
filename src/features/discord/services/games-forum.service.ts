@@ -169,12 +169,14 @@ export class GamesForumService {
     app.markModified('config.gamesPingRoles');
     await app.save();
 
-    // Quiz : verrouillé en permanence (tout passe par les boutons).
+    // Quiz : jamais verrouillé — un thread lock grise les boutons pour les non-modos.
+    // Les messages des membres y sont auto-supprimés (messageCreate).
     // Bingo et Juste Prix : verrouillés par défaut, les jeux les déverrouillent pendant les parties —
     // sauf si une partie est en cours au moment du setup.
+    if (channels.quiz) await this.setThreadLocked(client, channels.quiz, false);
     const [bingoState, jpState] = await Promise.all([BingoRepository.get(), JustePrixRepository.get()]);
     const activeThreads = new Set([bingoState?.activeThreadId, jpState?.activeThreadId].filter(Boolean));
-    for (const key of ['quiz', 'bingo', 'justePrix']) {
+    for (const key of ['bingo', 'justePrix']) {
       const threadId = channels[key];
       if (threadId && !activeThreads.has(threadId)) await this.setThreadLocked(client, threadId, true);
     }

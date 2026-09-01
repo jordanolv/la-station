@@ -197,6 +197,11 @@ export class QuizService {
     const channel = await this.getChannel(client);
     if (!channel) return;
 
+    // Un thread lock grise les boutons pour les non-modos — on s'assure qu'il est ouvert.
+    if (channel.isThread() && channel.locked) {
+      await GamesForumService.setThreadLocked(client, channel.id, false);
+    }
+
     const existing = await QuizConfigRepository.getOrCreate();
     if (existing.enabled === false || existing.activeMessageId) return;
 

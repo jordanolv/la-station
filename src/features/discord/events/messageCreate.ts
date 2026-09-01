@@ -22,6 +22,12 @@ export default {
       const guildData = await AppConfigService.getOrCreateConfig();
       if (!guildData) return;
 
+      // Post quiz : lecture seule, tout passe par les boutons — on supprime les messages.
+      if (guildData.config.channels?.quiz === message.channelId) {
+        await message.delete().catch(() => {});
+        return;
+      }
+
       const prefix = guildData.config.prefix;
 
       if (message.content.startsWith(prefix)) {
