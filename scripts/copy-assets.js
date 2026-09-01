@@ -34,6 +34,7 @@ const assetsToCopy = [
   { source: '../src/assets', dest: '../dist/assets', name: 'src/assets/' },
   { source: '../src/features/voc-manager/data', dest: '../dist/features/voc-manager/data', name: 'src/features/voc-manager/data/' },
   { source: '../src/features/peak-hunters/data', dest: '../dist/features/peak-hunters/data', name: 'src/features/peak-hunters/data/' },
+  { source: '../src/features/quiz/data', dest: '../dist/features/quiz/data', name: 'src/features/quiz/data/' },
   { source: '../src/web/public', dest: '../dist/web/public', name: 'src/web/public/' },
   { source: '../src/web/data', dest: '../dist/web/data', name: 'src/web/data/' }
 ];
