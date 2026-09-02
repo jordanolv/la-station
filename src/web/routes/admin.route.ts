@@ -25,9 +25,11 @@ import { BingoRepository } from '../../features/arcade/bingo/repositories/bingo.
 import { BingoService } from '../../features/arcade/bingo/services/bingo.service';
 import { JustePrixRepository } from '../../features/arcade/juste-prix/repositories/juste-prix.repository';
 import { JustePrixService } from '../../features/arcade/juste-prix/services/juste-prix.service';
+import { AvalancheRepository } from '../../features/arcade/avalanche/repositories/avalanche.repository';
+import { AvalancheService } from '../../features/arcade/avalanche/services/avalanche.service';
 
 const TOKEN_TTL = '7d';
-const ARCADE_GAMES = ['shifumi', 'puissance4', 'morpion', 'battle', 'bingo', 'justePrix'] as const;
+const ARCADE_GAMES = ['shifumi', 'puissance4', 'morpion', 'battle', 'bingo', 'justePrix', 'avalanche'] as const;
 
 function getSecret(): string {
   const s = process.env.WEB_JWT_SECRET;
@@ -209,13 +211,16 @@ export default function adminRoute(client: BotClient): Router {
       totalGames: arcade[key]?.stats?.totalGames ?? 0,
     }));
 
-    const [bingoState, jpState] = await Promise.all([BingoRepository.get(), JustePrixRepository.get()]);
+    const [bingoState, jpState, avalancheState] = await Promise.all([
+      BingoRepository.get(),
+      JustePrixRepository.get(),
+      AvalancheRepository.get(),
+    ]);
     res.json({
       enabled: games.every((g) => g.enabled),
       games,
       bingo: {
         active: Boolean(bingoState?.activeThreadId),
-        jackpot: bingoState?.jackpotBonus ?? 0,
         nextSpawnAt: bingoState?.nextSpawnAt ?? null,
         guessCount: bingoState?.activeGuessers?.length ?? 0,
       },
@@ -224,6 +229,12 @@ export default function adminRoute(client: BotClient): Router {
         endsAt: jpState?.activeEndsAt ?? null,
         nextSpawnAt: jpState?.nextSpawnAt ?? null,
         guessCount: Object.keys(jpState?.guesses ?? {}).length,
+      },
+      avalanche: {
+        active: Boolean(avalancheState?.activeThreadId),
+        registrationEndsAt: avalancheState?.registrationEndsAt ?? null,
+        playerCount: Object.keys(avalancheState?.players ?? {}).length,
+        eliminatedCount: (avalancheState?.eliminatedNumbers ?? []).length,
       },
     });
   });
@@ -243,6 +254,15 @@ export default function adminRoute(client: BotClient): Router {
     await JustePrixService.spawn(client);
     const after = await JustePrixRepository.get();
     if (!after?.activeThreadId) { res.status(409).json({ error: 'Spawn impossible : configure le forum des jeux (post 💰) et vérifie qu\'il n\'est pas trop tard (révélation 21h)' }); return; }
+    res.json({ ok: true });
+  });
+
+  router.post('/api/admin/arcade/avalanche/spawn', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
+    const state = await AvalancheRepository.get();
+    if (state?.activeThreadId) { res.status(409).json({ error: 'Une avalanche est déjà en cours' }); return; }
+    await AvalancheService.spawn(client);
+    const after = await AvalancheRepository.get();
+    if (!after?.activeThreadId) { res.status(409).json({ error: 'Spawn impossible : configure le forum des jeux (post 🏔️) et vérifie qu\'il n\'est pas trop tard (inscriptions jusqu\'à 13h)' }); return; }
     res.json({ ok: true });
   });
 
@@ -501,6 +521,7 @@ export default function adminRoute(client: BotClient): Router {
       bingoThreadName: name(config.bingoThreadId),
       arcadeThreadName: name(config.arcadeThreadId),
       justePrixThreadName: name(config.justePrixThreadId),
+      avalancheThreadName: name(config.avalancheThreadId),
       announceChannelId: config.announceChannelId,
       announceChannelName: name(config.announceChannelId),
       pingRoleNames: Object.fromEntries(Object.entries(config.pingRoles).map(([k, id]) =>

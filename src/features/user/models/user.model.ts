@@ -77,6 +77,9 @@ class ArcadeStats {
 
   @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
   justePrix!: GameStats;
+
+  @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
+  avalanche!: GameStats;
 }
 
 class UserStats {

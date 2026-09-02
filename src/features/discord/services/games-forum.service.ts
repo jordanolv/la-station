@@ -10,10 +10,11 @@ import { BotClient } from '../../../bot/client';
 import { AppConfigService } from './app-config.service';
 import { BingoRepository } from '../../arcade/bingo/repositories/bingo.repository';
 import { JustePrixRepository } from '../../arcade/juste-prix/repositories/juste-prix.repository';
+import { AvalancheRepository } from '../../arcade/avalanche/repositories/avalanche.repository';
 
 export const GAMES_BELL_EMOJI = '🔔';
 
-export type NotifGameKey = 'quiz' | 'bingo' | 'justePrix';
+export type NotifGameKey = 'quiz' | 'bingo' | 'justePrix' | 'avalanche';
 
 export interface GamesForumConfig {
   forumId: string | null;
@@ -21,11 +22,12 @@ export interface GamesForumConfig {
   bingoThreadId: string | null;
   arcadeThreadId: string | null;
   justePrixThreadId: string | null;
+  avalancheThreadId: string | null;
   announceChannelId: string | null;
   pingRoles: Record<NotifGameKey, string | null>;
 }
 
-const POSTS: { key: 'quiz' | 'bingo' | 'arcadePost' | 'justePrix'; name: string; content: string }[] = [
+const POSTS: { key: 'quiz' | 'bingo' | 'arcadePost' | 'justePrix' | 'avalanche'; name: string; content: string }[] = [
   {
     key: 'quiz',
     name: '❓ Quiz du jour',
@@ -42,6 +44,11 @@ const POSTS: { key: 'quiz' | 'bingo' | 'arcadePost' | 'justePrix'; name: string;
     content: '**Le salon des mini-jeux.**\nShifumi, Puissance 4, Morpion, Battle — lancez vos défis ici !',
   },
   {
+    key: 'avalanche',
+    name: '🏔️ L\'Avalanche',
+    content: '**L\'Avalanche.**\nPrends ta position sur la montagne avant 13h, puis l\'avalanche emporte les grimpeurs un par un jusqu\'au soir. Le dernier debout remporte tout ! 🏆\n\n🔔 **Réagis à ce message pour être notifié à chaque partie !**',
+  },
+  {
     key: 'justePrix',
     name: '💰 Juste Prix',
     content: '**Le Juste Prix.**\nQuand une manche démarre, propose **UN** nombre — tu peux le changer jusqu\'à la révélation. Le plus proche gagne, le nombre exact fait sauter la banque ! 🎯\n\n🔔 **Réagis à ce message pour être notifié à chaque manche !**',
@@ -52,6 +59,7 @@ const NOTIF_GAMES: { key: NotifGameKey; roleName: string }[] = [
   { key: 'quiz', roleName: '🔔 Quiz' },
   { key: 'bingo', roleName: '🔔 Bingo' },
   { key: 'justePrix', roleName: '🔔 Juste Prix' },
+  { key: 'avalanche', roleName: '🔔 Avalanche' },
 ];
 
 export class GamesForumService {
@@ -65,11 +73,13 @@ export class GamesForumService {
       bingoThreadId: channels.bingo ?? null,
       arcadeThreadId: channels.arcadePost ?? null,
       justePrixThreadId: channels.justePrix ?? null,
+      avalancheThreadId: channels.avalanche ?? null,
       announceChannelId: channels.gamesAnnounce ?? null,
       pingRoles: {
         quiz: roles.quiz ?? null,
         bingo: roles.bingo ?? null,
         justePrix: roles.justePrix ?? null,
+        avalanche: roles.avalanche ?? null,
       },
     };
   }
@@ -174,9 +184,15 @@ export class GamesForumService {
     // Bingo et Juste Prix : verrouillés par défaut, les jeux les déverrouillent pendant les parties —
     // sauf si une partie est en cours au moment du setup.
     if (channels.quiz) await this.setThreadLocked(client, channels.quiz, false);
-    const [bingoState, jpState] = await Promise.all([BingoRepository.get(), JustePrixRepository.get()]);
-    const activeThreads = new Set([bingoState?.activeThreadId, jpState?.activeThreadId].filter(Boolean));
-    for (const key of ['bingo', 'justePrix']) {
+    const [bingoState, jpState, avalancheState] = await Promise.all([
+      BingoRepository.get(),
+      JustePrixRepository.get(),
+      AvalancheRepository.get(),
+    ]);
+    const activeThreads = new Set(
+      [bingoState?.activeThreadId, jpState?.activeThreadId, avalancheState?.activeThreadId].filter(Boolean),
+    );
+    for (const key of ['bingo', 'justePrix', 'avalanche']) {
       const threadId = channels[key];
       if (threadId && !activeThreads.has(threadId)) await this.setThreadLocked(client, threadId, true);
     }

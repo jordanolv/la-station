@@ -5,6 +5,7 @@ import { ActivityRolesCronManager } from '../../features/activity-roles/cron';
 import { QuizCronManager } from '../../features/quiz/cron';
 import { BingoCronManager } from '../../features/arcade/bingo/cron';
 import { JustePrixCronManager } from '../../features/arcade/juste-prix/cron';
+import { AvalancheCronManager } from '../../features/arcade/avalanche/cron';
 import { BaseCronManager, IStartStoppable } from './base-cron-manager';
 import { LogsDayCron } from './logs-day.cron';
 import { BotClient } from '../../bot/client';
@@ -16,6 +17,7 @@ export class CronManager extends BaseCronManager {
     private quizCronManager: QuizCronManager;
     private bingoCronManager: BingoCronManager;
     private justePrixCronManager: JustePrixCronManager;
+    private avalancheCronManager: AvalancheCronManager;
     private logsDayCron: LogsDayCron;
 
     constructor(client: BotClient) {
@@ -27,6 +29,7 @@ export class CronManager extends BaseCronManager {
         this.quizCronManager = new QuizCronManager(client);
         this.bingoCronManager = new BingoCronManager(client);
         this.justePrixCronManager = new JustePrixCronManager(client);
+        this.avalancheCronManager = new AvalancheCronManager(client);
         this.logsDayCron = new LogsDayCron(client);
 
         this.addCron(this.userCronManager);
@@ -35,6 +38,7 @@ export class CronManager extends BaseCronManager {
         this.addCron(this.quizCronManager);
         this.addCron(this.bingoCronManager);
         this.addCron(this.justePrixCronManager);
+        this.addCron(this.avalancheCronManager);
         this.addCron(this.logsDayCron);
     }
 

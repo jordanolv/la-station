@@ -8,6 +8,7 @@ import { SuggestionService } from '../../suggestion/services/suggestion.service'
 import { UserService } from '../../user/services/user.service';
 import { BingoService } from '../../arcade/bingo/services/bingo.service';
 import { JustePrixService } from '../../arcade/juste-prix/services/juste-prix.service';
+import { AvalancheService } from '../../arcade/avalanche/services/avalanche.service';
 import { getGuildId } from '../../../shared/guild';
 
 export default {
@@ -53,6 +54,7 @@ export default {
       await SuggestionService.handleMessage(message);
       await BingoService.handleMessage(message, client);
       await JustePrixService.handleMessage(message, client);
+      await AvalancheService.handleMessage(message, client);
 
     } catch (error) {
       console.error('Erreur dans l\'événement messageCreate:', error);

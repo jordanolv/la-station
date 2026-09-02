@@ -186,6 +186,15 @@
         <button class="success" onclick="spawnJp()">⚡ Lancer une manche</button>
       </div>
     </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>🏔️ L'Avalanche</strong>
+          <div id="avalancheStatus" class="muted" style="margin-top:4px"></div>
+        </div>
+        <button class="success" onclick="spawnAvalanche()">⚡ Lancer une avalanche</button>
+      </div>
+    </div>
   </section>
 
   <!-- ═══════════ Peak Hunters ═══════════ -->
@@ -608,7 +617,7 @@ async function revealQuiz() {
 }
 
 // ── Arcade (stats en lecture, activation groupée sur l'accueil) ──
-const GAME_LABELS = { shifumi: '✊ Shifumi', puissance4: '🔴 Puissance 4', morpion: '❌ Morpion', battle: '⚔️ Battle', bingo: '🎯 Bingo', justePrix: '💰 Juste Prix' };
+const GAME_LABELS = { shifumi: '✊ Shifumi', puissance4: '🔴 Puissance 4', morpion: '❌ Morpion', battle: '⚔️ Battle', bingo: '🎯 Bingo', justePrix: '💰 Juste Prix', avalanche: '🏔️ Avalanche' };
 async function loadArcade() {
   const a = await api('/api/admin/arcade');
   $('arcadeTable').innerHTML = '<tr><th>Jeu</th><th>Parties jouées</th><th>État</th></tr>' +
@@ -622,15 +631,27 @@ async function loadArcade() {
   const when = (d) => d ? new Date(d).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : null;
   $('bingoStatus').innerHTML = [
     a.bingo.active ? `🟢 Partie en cours — ${a.bingo.guessCount} tentative(s)` : '⚪ Pas de partie en cours',
-    a.bingo.jackpot > 0 ? `💰 Cagnotte : <b>+${a.bingo.jackpot} pack${a.bingo.jackpot > 1 ? 's' : ''}</b>` : null,
     when(a.bingo.nextSpawnAt) ? `⏰ Prochain spawn : ${when(a.bingo.nextSpawnAt)}` : null,
-    '3 tentatives/joueur · expire à minuit (cagnotte roulante)',
+    'Essais illimités · numéros bonus cachés',
   ].filter(Boolean).join(' · ');
   $('jpStatus').innerHTML = [
     a.justePrix.active ? `🟢 Manche en cours — ${a.justePrix.guessCount} proposition(s), révélation ${when(a.justePrix.endsAt) ?? '21h'}` : '⚪ Pas de manche en cours',
     when(a.justePrix.nextSpawnAt) ? `⏰ Prochain spawn : ${when(a.justePrix.nextSpawnAt)}` : null,
     'Une proposition/joueur · le plus proche gagne · exact = jackpot',
   ].filter(Boolean).join(' · ');
+  $('avalancheStatus').innerHTML = [
+    a.avalanche.active
+      ? (a.avalanche.eliminatedCount > 0
+          ? `🟢 Avalanche en cours — ${a.avalanche.playerCount} grimpeurs, ${a.avalanche.eliminatedCount} emporté(s)`
+          : `🟢 Inscriptions ouvertes — ${a.avalanche.playerCount} grimpeur(s)${when(a.avalanche.registrationEndsAt) ? `, clôture ${when(a.avalanche.registrationEndsAt)}` : ''}`)
+      : '⚪ Pas de partie en cours',
+    'Une position/joueur avant 13h · éliminations jusqu\'à 21h · dernier debout gagne',
+  ].filter(Boolean).join(' · ');
+}
+async function spawnAvalanche() {
+  if (!confirm('Lancer une avalanche maintenant ?')) return;
+  try { await api('/api/admin/arcade/avalanche/spawn', { method: 'POST' }); toast('Avalanche lancée 🏔️'); await loadArcade(); }
+  catch (err) { toast(err.message); }
 }
 async function spawnBingo() {
   if (!confirm('Lancer un bingo maintenant ?')) return;
@@ -733,8 +754,9 @@ async function loadForum() {
         f.bingoThreadName ? '🎯 <b>' + esc(f.bingoThreadName) + '</b>' : '⚠️ post bingo manquant',
         f.arcadeThreadName ? '🕹️ <b>' + esc(f.arcadeThreadName) + '</b>' : '⚠️ post arcade manquant',
         f.justePrixThreadName ? '💰 <b>' + esc(f.justePrixThreadName) + '</b>' : '⚠️ post Juste Prix manquant',
-        ['quiz', 'bingo', 'justePrix'].every((k) => f.pingRoleNames?.[k])
-          ? '🔔 Rôles notif : <b>' + ['quiz', 'bingo', 'justePrix'].map((k) => '@' + esc(f.pingRoleNames[k])).join(', ') + '</b>'
+        f.avalancheThreadName ? '🏔️ <b>' + esc(f.avalancheThreadName) + '</b>' : '⚠️ post Avalanche manquant',
+        ['quiz', 'bingo', 'justePrix', 'avalanche'].every((k) => f.pingRoleNames?.[k])
+          ? '🔔 Rôles notif : <b>' + ['quiz', 'bingo', 'justePrix', 'avalanche'].map((k) => '@' + esc(f.pingRoleNames[k])).join(', ') + '</b>'
           : '⚠️ rôles notif manquants',
         f.announceChannelName ? '📣 Annonces : <b>#' + esc(f.announceChannelName) + '</b>' : '📣 Annonces : désactivées',
       ].join(' · ')

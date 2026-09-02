@@ -22,6 +22,7 @@ import { SpawnService } from '../../peak-hunters/services/spawn.service';
 import { QuizService } from '../../quiz/services/quiz.service';
 import { BingoService } from '../../arcade/bingo/services/bingo.service';
 import { JustePrixService } from '../../arcade/juste-prix/services/juste-prix.service';
+import { AvalancheService } from '../../arcade/avalanche/services/avalanche.service';
 import { VoiceSessionService } from '../../voice/services/voice-session.service';
 import { registerPeakHuntersVoiceListeners } from '../../peak-hunters/services/peak-hunters.register';
 import { registerStatsVoiceListeners } from '../../stats/services/stats.voice-listener';
@@ -73,6 +74,7 @@ export default {
     await QuizService.rehydrate(client);
     await BingoService.rehydrate(client);
     await JustePrixService.rehydrate(client);
+    await AvalancheService.rehydrate(client);
     await PersonalityTestService.rehydrate(client);
     await ConfigPanelService.init(client).catch((err) =>
       console.error('[ConfigPanel] Erreur init:', err),

@@ -68,6 +68,12 @@ export default {
         `🎲 Manches jouées : **${justePrix.attempts ?? 0}**`,
       ];
 
+      const avalanche = (arcade as any)?.avalanche ?? { wins: 0, attempts: 0 };
+      const avalancheLines = [
+        `🏆 Victoires : **${avalanche.wins ?? 0}**`,
+        `🎲 Parties jouées : **${avalanche.attempts ?? 0}**`,
+      ];
+
       const arcadeLines = Object.entries(ARCADE_LABELS).map(([game, label]) => {
         const g = (arcade as any)?.[game] ?? { wins: 0, losses: 0 };
         return `${label} — 🏆 **${g.wins ?? 0}** · 💀 **${g.losses ?? 0}**`;
@@ -115,6 +121,10 @@ export default {
         .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(['## 💰 Juste Prix', ...jpLines].join('\n')),
+        )
+        .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(['## 🏔️ Avalanche', ...avalancheLines].join('\n')),
         )
         .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
         .addTextDisplayComponents(
