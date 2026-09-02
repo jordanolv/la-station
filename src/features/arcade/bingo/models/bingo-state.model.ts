@@ -34,10 +34,6 @@ export class BingoState {
   /** Message d'annonce dans le channel général, supprimé en fin de partie */
   @prop()
   announceMessageId?: string;
-
-  /** Packs bonus accumulés par les bingos expirés sans gagnant */
-  @prop({ default: 0 })
-  jackpotBonus?: number;
 }
 
 const BingoStateModel = getModelForClass(BingoState, {

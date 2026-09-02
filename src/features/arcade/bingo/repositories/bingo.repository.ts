@@ -65,14 +65,6 @@ export class BingoRepository {
     );
   }
 
-  static async addJackpot(amount: number): Promise<void> {
-    await BingoStateModel.updateOne({}, { $inc: { jackpotBonus: amount } });
-  }
-
-  static async resetJackpot(): Promise<void> {
-    await BingoStateModel.updateOne({}, { $set: { jackpotBonus: 0 } });
-  }
-
   static async setLastGuesser(userId: string): Promise<void> {
     await BingoStateModel.updateOne({}, { $set: { activeLastGuesserId: userId } });
   }
