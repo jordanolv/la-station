@@ -439,5 +439,47 @@
         ]
       }
     ]
+  },
+  {
+    "version": "1.9.0",
+    "timestamp": 1788349503,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🏔️ L'Avalanche — nouveau jeu !",
+            "items": [
+              "Prends ta **position sur la montagne** (un nombre entre **1 et 50**) — inscriptions ouvertes jusqu'à **13h**, une position par grimpeur, premier arrivé premier servi",
+              "De **13h30 à 21h**, l'avalanche gronde : elle emporte une position au hasard, régulièrement, avec un ping à chaque victime 💀",
+              "**Le dernier grimpeur debout remporte tout** : 500 💰 · 400 XP · 3 packs d'expédition",
+              "Les emportés repartent avec **2 fragments** de consolation",
+              "Tout le monde a les mêmes chances : une position = une chance, pas besoin de camper 😌",
+              "Réagis 🔔 sur le post du forum pour être notifié à chaque partie"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "🎯 Bingo — retour aux sources",
+            "items": [
+              "Les **essais illimités** sont de retour — tente ta chance autant que tu veux (toujours pas deux réponses d'affilée)",
+              "Plus d'expiration à minuit ni de cagnotte : la partie vit jusqu'à ce que quelqu'un trouve le nombre",
+              "Le bingo devient **plus rare** pour laisser tourner les jeux — quand il arrive, c'est l'événement !"
+            ]
+          },
+          {
+            "title": "💰 Juste Prix — propositions secrètes",
+            "items": [
+              "Ta proposition est désormais **vraiment secrète** : le message est supprimé dès l'envoi 🤫",
+              "**Un nombre = un joueur** — si quelqu'un l'a déjà pris, choisis-en un autre"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
