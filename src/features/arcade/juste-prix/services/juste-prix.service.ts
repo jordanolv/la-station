@@ -66,6 +66,7 @@ export class JustePrixService {
           '',
           '**Règles :**',
           '• Propose **UN SEUL** nombre dans le fil — le renvoyer remplace ta proposition',
+          '• Ta proposition reste **secrète** jusqu\'à la révélation',
           `• Révélation <t:${unix}:R> (<t:${unix}:t>)`,
           '• **Le plus proche gagne** — tomber juste double la mise !',
           '',
@@ -228,10 +229,18 @@ export class JustePrixService {
     const num = Number(message.content.trim());
     if (!Number.isInteger(num) || num < JP_NUMBER_MIN || num > JP_NUMBER_MAX) return;
 
+    await message.delete().catch(() => {});
+
+    const taken = Object.entries(state.guesses ?? {}).some(([userId, g]) => userId !== message.author.id && g.value === num);
+    if (taken) {
+      await message.channel.send(`🔄 <@${message.author.id}> ce nombre est déjà pris, tente autre chose !`).catch(() => {});
+      return;
+    }
+
     const isUpdate = Boolean(state.guesses?.[message.author.id]);
     await JustePrixRepository.setGuess(message.author.id, num);
     if (!isUpdate) await UserService.recordArcadeAttempt(message.author.id, 'justePrix' as any);
-    await message.react(isUpdate ? '🔄' : '✅').catch(() => {});
+    await message.channel.send(`✅ <@${message.author.id}> a participé !`).catch(() => {});
   }
 
   static async resolve(client: BotClient): Promise<void> {
