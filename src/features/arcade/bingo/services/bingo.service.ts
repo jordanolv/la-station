@@ -18,6 +18,7 @@ import { awardExpeditions } from '../../../peak-hunters/services/expedition.serv
 import { ArcadeScheduleService } from '../../schedule/services/arcade-schedule.service';
 import { LogService } from '../../../../shared/logs/logs.service';
 import { toParisDayYMD, todayAtParis } from '../../../../shared/time/day-split';
+import { GameResultRepository } from '../../results/repositories/game-result.repository';
 import { BingoRepository } from '../repositories/bingo.repository';
 import type { IBingoStateDoc } from '../models/bingo-state.model';
 import {
@@ -427,6 +428,7 @@ export class BingoService {
     await LevelingService.giveXpDirectly(client, user.id, BINGO_REWARD.xp);
     const expeditions = await awardExpeditions(user.id, totalPacks);
     await UserService.recordArcadeWin(user.id, 'bingo');
+    await GameResultRepository.record('bingo', user.id, 1, { attempts: guessCount, players: new Set(state.activeGuessers ?? []).size });
 
     const participants = [...new Set(state.activeGuessers ?? [])].filter((id) => id !== user.id);
     for (const participantId of participants) {

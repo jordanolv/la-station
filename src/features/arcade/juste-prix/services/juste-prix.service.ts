@@ -17,6 +17,7 @@ import { UserService } from '../../../user/services/user.service';
 import { LevelingService } from '../../../leveling/services/leveling.service';
 import { awardExpeditions, addFragmentsAndAward } from '../../../peak-hunters/services/expedition.service';
 import { ArcadeStatsService } from '../../services/arcade-stats.service';
+import { GameResultRepository } from '../../results/repositories/game-result.repository';
 import { JustePrixRepository } from '../repositories/juste-prix.repository';
 import type { IJustePrixStateDoc } from '../models/juste-prix-state.model';
 import {
@@ -260,6 +261,7 @@ export class JustePrixService {
         await LevelingService.giveXpDirectly(client, winner.userId, JP_REWARD_CLOSEST.xp);
         const expeditions = await awardExpeditions(winner.userId, packs);
         await UserService.recordArcadeWin(winner.userId, 'justePrix' as any);
+        await GameResultRepository.record('justePrix', winner.userId, 1, { exact, diff: winner.diff, players: ranking.length });
         await ArcadeStatsService.incrementTotalGames('justePrix');
 
         const participants = ranking.slice(1);

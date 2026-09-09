@@ -24,6 +24,7 @@ import { LevelingService } from '../../../leveling/services/leveling.service';
 import { awardExpeditions, addFragmentsAndAward } from '../../../peak-hunters/services/expedition.service';
 import { ArcadeStatsService } from '../../services/arcade-stats.service';
 import { ArcadeScheduleService } from '../../schedule/services/arcade-schedule.service';
+import { GameResultRepository } from '../../results/repositories/game-result.repository';
 import { EnigmeRepository } from '../repositories/enigme.repository';
 import type { IEnigmeStateDoc, Riddle } from '../models/enigme-state.model';
 import { EnigmeBankService, ENIGME_TYPE_LABELS } from './enigme-bank.service';
@@ -352,6 +353,7 @@ export class EnigmeService {
       await UserService.updateUserMoney(solver.userId, reward.money);
       await LevelingService.giveXpDirectly(client, solver.userId, reward.xp);
       const expeditions = await awardExpeditions(solver.userId, reward.expeditions);
+      await GameResultRepository.record('enigme', solver.userId, i + 1, { timeMs: new Date(solver.at).getTime() - startedAt, type: state.riddle.type, players: Object.keys(state.attempts ?? {}).length });
       podiumLines.push(`${MEDALS[i]} <@${solver.userId}> · ${formatDuration(new Date(solver.at).getTime() - startedAt)} · +${reward.money} 💰 · +${reward.xp} XP · +${reward.expeditions} pack${reward.expeditions > 1 ? 's' : ''} ${expeditions.summary}`);
     }
     for (const solver of solvers.slice(ENIGME_PODIUM_REWARDS.length)) {

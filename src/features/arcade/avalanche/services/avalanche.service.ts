@@ -18,6 +18,7 @@ import { UserService } from '../../../user/services/user.service';
 import { LevelingService } from '../../../leveling/services/leveling.service';
 import { awardExpeditions, addFragmentsAndAward } from '../../../peak-hunters/services/expedition.service';
 import { ArcadeStatsService } from '../../services/arcade-stats.service';
+import { GameResultRepository } from '../../results/repositories/game-result.repository';
 import { AvalancheRepository } from '../repositories/avalanche.repository';
 import type { IAvalancheStateDoc } from '../models/avalanche-state.model';
 import {
@@ -332,6 +333,7 @@ export class AvalancheService {
       await LevelingService.giveXpDirectly(client, winner.userId, AVALANCHE_REWARD.xp);
       const expeditions = await awardExpeditions(winner.userId, AVALANCHE_REWARD.expeditions);
       await UserService.recordArcadeWin(winner.userId, 'avalanche');
+      await GameResultRepository.record('avalanche', winner.userId, 1, { players: Object.keys(state.players ?? {}).length, position: winner.num });
       await ArcadeStatsService.incrementTotalGames('avalanche');
 
       const eliminated = Object.keys(state.players ?? {}).filter((id) => id !== winner.userId);

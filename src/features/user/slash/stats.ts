@@ -10,6 +10,7 @@ import {
 import { isSilentDiscordError } from '../../../shared/utils/discord-errors';
 import { BotClient } from '../../../bot/client';
 import { UserService } from '../services/user.service';
+import { GameResultRepository } from '../../arcade/results/repositories/game-result.repository';
 import UserMountainsModel from '../../peak-hunters/models/user-mountains.model';
 import { EXPEDITION_TIER_CONFIG, RARITY_CONFIG } from '../../peak-hunters/constants/peak-hunters.constants';
 import type { MountainRarity } from '../../peak-hunters/types/peak-hunters.types';
@@ -48,6 +49,9 @@ export default {
       }
 
       const mountains = await UserMountainsModel.findOne({ userId: interaction.user.id });
+      const lastWins = await GameResultRepository.lastWinsOf(interaction.user.id);
+      const lastWinLine = (game: keyof typeof lastWins) =>
+        lastWins[game] ? [`🗓️ Dernière victoire : <t:${Math.floor(lastWins[game]!.getTime() / 1000)}:D>`] : [];
       const stats = user.stats;
       const arcade = stats.arcade;
 
@@ -61,23 +65,27 @@ export default {
       if (bingoWins > 0) {
         bingoLines.push(`📊 Moyenne : **${(bingoAttempts / bingoWins).toFixed(1)}** coups/victoire`);
       }
+      bingoLines.push(...lastWinLine('bingo'));
 
       const justePrix = (arcade as any)?.justePrix ?? { wins: 0, attempts: 0 };
       const jpLines = [
         `🏆 Victoires : **${justePrix.wins ?? 0}**`,
         `🎲 Manches jouées : **${justePrix.attempts ?? 0}**`,
+        ...lastWinLine('justePrix'),
       ];
 
       const avalanche = (arcade as any)?.avalanche ?? { wins: 0, attempts: 0 };
       const avalancheLines = [
         `🏆 Victoires : **${avalanche.wins ?? 0}**`,
         `🎲 Parties jouées : **${avalanche.attempts ?? 0}**`,
+        ...lastWinLine('avalanche'),
       ];
 
       const enigme = (arcade as any)?.enigme ?? { wins: 0, attempts: 0 };
       const enigmeLines = [
         `🥇 Podiums en or : **${enigme.wins ?? 0}**`,
         `🎲 Énigmes tentées : **${enigme.attempts ?? 0}**`,
+        ...lastWinLine('enigme'),
       ];
 
       const arcadeLines = Object.entries(ARCADE_LABELS).map(([game, label]) => {

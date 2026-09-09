@@ -85,7 +85,7 @@ export class UserService {
   static async recordArcadeWin(discordId: string, gameName: ArcadeGameName) {
     return UserModel.findOneAndUpdate(
       { discordId },
-      { $inc: { [`stats.arcade.${gameName}.wins`]: 1, [`stats.arcade.${gameName}.weeklyWins`]: 1, 'stats.arcade.weeklyWins': 1 } },
+      { $inc: { [`stats.arcade.${gameName}.wins`]: 1 } },
       { new: true, upsert: true }
     );
   }
