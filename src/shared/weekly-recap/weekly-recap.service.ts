@@ -2,9 +2,9 @@ import { ContainerBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } 
 import { BotClient } from '../../bot/client';
 import { GameResultRepository } from '../../features/arcade/results/repositories/game-result.repository';
 import { GamesForumService } from '../../features/discord/services/games-forum.service';
-import { ArcadeScheduleService } from '../../features/arcade/schedule/services/arcade-schedule.service';
+import { ArcadeScheduleService, weekDays } from '../../features/arcade/schedule/services/arcade-schedule.service';
 import { getGuildId } from '../guild';
-import { PARIS_TZ } from '../time/day-split';
+import { PARIS_TZ, parisMidnightUTC } from '../time/day-split';
 import { LogService } from '../logs/logs.service';
 
 export interface ActivityScore {
@@ -23,11 +23,14 @@ const fmtDate = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', mon
 export class WeeklyRecapService {
   static async post(client: BotClient, activity: ActivityScore[]): Promise<void> {
     const now = new Date();
-    const lastMonday = new Date(now.getTime() - 7 * 86_400_000);
-    const nextSunday = new Date(now.getTime() + 6 * 86_400_000);
+    const thisWeek = weekDays(now).map(parisMidnightUTC);
+    const lastMonday = new Date(thisWeek[0].getTime() - 7 * 86_400_000);
+    const lastSunday = new Date(thisWeek[0].getTime() - 86_400_000);
+    const thisMonday = thisWeek[0];
+    const thisSunday = thisWeek[6];
 
     const [champions, scheduleLines] = await Promise.all([
-      GameResultRepository.championsBetween(lastMonday, now),
+      GameResultRepository.championsBetween(lastMonday, thisMonday),
       ArcadeScheduleService.buildCurrentWeekLines(client),
     ]);
 
@@ -42,7 +45,7 @@ export class WeeklyRecapService {
     const lastWeek = new ContainerBuilder()
       .setAccentColor(ACCENT_COLOR)
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `# 🗞️ La semaine passée sur ${guildName}\n-# Du ${fmtDate(lastMonday)} au ${fmtDate(new Date(now.getTime() - 86_400_000))}`,
+        `# 🗞️ La semaine passée sur ${guildName}\n-# Du ${fmtDate(lastMonday)} au ${fmtDate(lastSunday)}`,
       ))
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -53,10 +56,10 @@ export class WeeklyRecapService {
         ['## 🎮 Champions des jeux', ...(championLines.length ? championLines : ['*Aucune victoire cette semaine…*']), `-# ${champions.total} partie${champions.total > 1 ? 's' : ''} remportée${champions.total > 1 ? 's' : ''} cette semaine`].join('\n'),
       ));
 
-    const thisWeek = new ContainerBuilder()
+    const schedule = new ContainerBuilder()
       .setAccentColor(SCHEDULE_ACCENT_COLOR)
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `# 📅 La semaine qui arrive\n-# Du ${fmtDate(now)} au ${fmtDate(nextSunday)}`,
+        `# 📅 La semaine qui arrive\n-# Du ${fmtDate(thisMonday)} au ${fmtDate(thisSunday)}`,
       ))
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(scheduleLines.join('\n')))
@@ -64,7 +67,7 @@ export class WeeklyRecapService {
       .addTextDisplayComponents(new TextDisplayBuilder().setContent('-# Un jeu par jour, rendez-vous dans le forum 🗂️ · réagis 🔔 sur un post pour être notifié · bonne semaine ! 🎉'));
 
     const config = await GamesForumService.getConfig();
-    await GamesForumService.announce(client, { components: [lastWeek, thisWeek], flags: MessageFlags.IsComponentsV2 }, config.scheduleChannelId);
+    await GamesForumService.announce(client, { components: [lastWeek, schedule], flags: MessageFlags.IsComponentsV2 }, config.scheduleChannelId);
 
     LogService.info(
       [`**Activité** : ${activityLines.join(' · ') || 'aucune'}`, `**Jeux** : ${championLines.join(' · ') || 'aucune victoire'}`].join('\n'),

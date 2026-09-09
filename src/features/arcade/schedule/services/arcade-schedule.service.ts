@@ -42,7 +42,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /** Les 7 jours de la semaine Paris contenant `date`, lundi en premier. */
-function weekDays(date: Date): string[] {
+export function weekDays(date: Date): string[] {
   const p = toZonedTime(date, PARIS_TZ);
   const offsetToMonday = (p.getDay() + 6) % 7;
   return Array.from({ length: 7 }, (_, i) => {
@@ -103,7 +103,7 @@ export class ArcadeScheduleService {
     return days.map((d, i) => {
       if (d < today) return `~~${DAY_LABELS[i]}~~`;
       const day = d === today ? `**${DAY_LABELS[i]}** ◀` : DAY_LABELS[i];
-      const game = games[d] ? `${GAME_LABELS[games[d]].split(' ')[0]} ${link(games[d])}  ·  ${GAME_HOURS[games[d]]}` : '*repos*';
+      const game = games[d] ? `${link(games[d])}  ·  ${GAME_HOURS[games[d]]}` : '*repos*';
       return `${day}  ·  ${game}`;
     });
   }
