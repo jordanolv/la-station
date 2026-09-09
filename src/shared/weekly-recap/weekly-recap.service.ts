@@ -3,6 +3,7 @@ import { BotClient } from '../../bot/client';
 import { GameResultRepository } from '../../features/arcade/results/repositories/game-result.repository';
 import { GamesForumService } from '../../features/discord/services/games-forum.service';
 import { ArcadeScheduleService } from '../../features/arcade/schedule/services/arcade-schedule.service';
+import { getGuildId } from '../guild';
 import { PARIS_TZ } from '../time/day-split';
 import { LogService } from '../logs/logs.service';
 
@@ -14,6 +15,7 @@ export interface ActivityScore {
 const MEDALS = ['🥇', '🥈', '🥉'];
 const GAME_EMOJI: Record<string, string> = { bingo: '🎯', justePrix: '💰', avalanche: '🏔️', enigme: '🧩' };
 const ACCENT_COLOR = 0xdac1ff;
+const SCHEDULE_ACCENT_COLOR = 0xf4a261;
 
 const fmtDate = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: PARIS_TZ });
 
@@ -35,10 +37,12 @@ export class WeeklyRecapService {
       return `${MEDALS[i]} <@${c.userId}> — **${c.wins}** victoire${c.wins > 1 ? 's' : ''} · ${games}`;
     });
 
-    const container = new ContainerBuilder()
+    const guildName = client.guilds.cache.get(getGuildId())?.name ?? 'le serveur';
+
+    const lastWeek = new ContainerBuilder()
       .setAccentColor(ACCENT_COLOR)
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(
-        `# 🗞️ La semaine à La Station\n-# Récap du ${fmtDate(lastMonday)} au ${fmtDate(new Date(now.getTime() - 86_400_000))} · programme jusqu'au ${fmtDate(nextSunday)}`,
+        `# 🗞️ La semaine passée sur ${guildName}\n-# Du ${fmtDate(lastMonday)} au ${fmtDate(new Date(now.getTime() - 86_400_000))}`,
       ))
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(
@@ -47,14 +51,20 @@ export class WeeklyRecapService {
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(
         ['## 🎮 Champions des jeux', ...(championLines.length ? championLines : ['*Aucune victoire cette semaine…*']), `-# ${champions.total} partie${champions.total > 1 ? 's' : ''} remportée${champions.total > 1 ? 's' : ''} cette semaine`].join('\n'),
+      ));
+
+    const thisWeek = new ContainerBuilder()
+      .setAccentColor(SCHEDULE_ACCENT_COLOR)
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        `# 📅 La semaine qui arrive\n-# Du ${fmtDate(now)} au ${fmtDate(nextSunday)}`,
       ))
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-      .addTextDisplayComponents(new TextDisplayBuilder().setContent(['## 📅 Planning de la semaine', ...scheduleLines].join('\n')))
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(scheduleLines.join('\n')))
       .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
       .addTextDisplayComponents(new TextDisplayBuilder().setContent('-# Un jeu par jour, rendez-vous dans le forum 🗂️ · réagis 🔔 sur un post pour être notifié · bonne semaine ! 🎉'));
 
     const config = await GamesForumService.getConfig();
-    await GamesForumService.announce(client, { components: [container], flags: MessageFlags.IsComponentsV2 }, config.scheduleChannelId);
+    await GamesForumService.announce(client, { components: [lastWeek, thisWeek], flags: MessageFlags.IsComponentsV2 }, config.scheduleChannelId);
 
     LogService.info(
       [`**Activité** : ${activityLines.join(' · ') || 'aucune'}`, `**Jeux** : ${championLines.join(' · ') || 'aucune victoire'}`].join('\n'),
