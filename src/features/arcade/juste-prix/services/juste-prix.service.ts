@@ -15,7 +15,7 @@ import { GamesForumService } from '../../../discord/services/games-forum.service
 import { AppConfigService } from '../../../discord/services/app-config.service';
 import { UserService } from '../../../user/services/user.service';
 import { LevelingService } from '../../../leveling/services/leveling.service';
-import { awardExpeditions } from '../../../peak-hunters/services/expedition.service';
+import { awardExpeditions, addFragmentsAndAward } from '../../../peak-hunters/services/expedition.service';
 import { ArcadeStatsService } from '../../services/arcade-stats.service';
 import { JustePrixRepository } from '../repositories/juste-prix.repository';
 import type { IJustePrixStateDoc } from '../models/juste-prix-state.model';
@@ -27,6 +27,7 @@ import {
   JP_NUMBER_MAX,
   JP_NUMBER_MIN,
   JP_REVEAL_HOUR,
+  JP_PARTICIPATION_FRAGMENTS,
   JP_REWARD_CLOSEST,
 } from '../constants/juste-prix.constants';
 
@@ -55,8 +56,9 @@ export class JustePrixService {
           `• Révélation <t:${unix}:R> (<t:${unix}:t>)`,
           '• **Le plus proche gagne** — tomber juste double la mise !',
           '',
-          `🏆 Le plus proche : **${JP_REWARD_CLOSEST.money}** 💰 · **${JP_REWARD_CLOSEST.xp}** XP · **${JP_REWARD_CLOSEST.expeditions}** pack`,
+          `🏆 Le plus proche : **${JP_REWARD_CLOSEST.money}** 💰 · **${JP_REWARD_CLOSEST.xp}** XP · **${JP_REWARD_CLOSEST.expeditions}** packs`,
           `🎯 Nombre exact : **+${JP_EXACT_BONUS_EXPEDITIONS}** packs bonus !`,
+          `🤝 Les autres participants repartent avec **${JP_PARTICIPATION_FRAGMENTS}** fragments`,
         ].join('\n'),
       ));
   }
@@ -260,12 +262,18 @@ export class JustePrixService {
         await UserService.recordArcadeWin(winner.userId, 'justePrix' as any);
         await ArcadeStatsService.incrementTotalGames('justePrix');
 
+        const participants = ranking.slice(1);
+        for (const { userId } of participants) {
+          await addFragmentsAndAward(userId, JP_PARTICIPATION_FRAGMENTS).catch(() => {});
+        }
+
         await thread.send({
           content: [
             exact
               ? `🎯 **INCROYABLE !** <@${winner.userId}> a trouvé le nombre EXACT : **${target}** !`
               : `💰 **RÉVÉLATION !** Le nombre était **${target}** — <@${winner.userId}> gagne avec **${winner.value}** (à ${winner.diff} près) !`,
             `🏆 +**${JP_REWARD_CLOSEST.money}** 💰 · +**${JP_REWARD_CLOSEST.xp}** XP · +**${packs}** pack${packs > 1 ? 's' : ''} ${expeditions.summary}`,
+            ...(participants.length > 0 ? [`🤝 ${participants.length} participant${participants.length > 1 ? 's' : ''} repartent avec **${JP_PARTICIPATION_FRAGMENTS}** fragments chacun !`] : []),
           ].join('\n'),
         }).catch(() => {});
 

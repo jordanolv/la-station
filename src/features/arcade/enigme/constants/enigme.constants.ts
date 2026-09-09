@@ -6,15 +6,15 @@ export const ENIGME_MAX_ATTEMPTS = 3;
 
 /** 🥇 🥈 🥉 — ordre d'arrivée des bonnes réponses */
 export const ENIGME_PODIUM_REWARDS = [
-  { money: 500, xp: 300, expeditions: 2 },
-  { money: 300, xp: 200, expeditions: 1 },
-  { money: 150, xp: 100, expeditions: 1 },
+  { money: 750, xp: 600, expeditions: 4 },
+  { money: 400, xp: 300, expeditions: 2 },
+  { money: 200, xp: 150, expeditions: 1 },
 ];
 
 /** Bonne réponse hors podium */
 export const ENIGME_SOLVER_FRAGMENTS = 10;
 /** A tenté sans trouver */
-export const ENIGME_PARTICIPATION_FRAGMENTS = 3;
+export const ENIGME_PARTICIPATION_FRAGMENTS = 5;
 
 export const ENIGME_BUTTON_ID = 'enigme:answer';
 export const ENIGME_MODAL_ID = 'enigme:modal';
