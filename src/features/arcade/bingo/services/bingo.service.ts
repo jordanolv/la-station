@@ -17,6 +17,7 @@ import { LevelingService } from '../../../leveling/services/leveling.service';
 import { awardExpeditions } from '../../../peak-hunters/services/expedition.service';
 import { ArcadeScheduleService } from '../../schedule/services/arcade-schedule.service';
 import { LogService } from '../../../../shared/logs/logs.service';
+import { toParisDayYMD } from '../../../../shared/time/day-split';
 import { BingoRepository } from '../repositories/bingo.repository';
 import type { IBingoStateDoc } from '../models/bingo-state.model';
 import {
@@ -127,7 +128,7 @@ export class BingoService {
   static async planDay(client: BotClient): Promise<void> {
     const state = await BingoRepository.getOrCreate();
 
-    if (state.activeThreadId) return;
+    if (state.activeThreadId) await this.expire(client, state);
     if (state.nextSpawnAt && state.nextSpawnAt.getTime() > Date.now()) return;
 
     if (!(await ArcadeScheduleService.isToday(client, 'bingo'))) {
@@ -151,6 +152,10 @@ export class BingoService {
 
   static async rehydrate(client: BotClient): Promise<void> {
     const state = await BingoRepository.get();
+    if (state?.activeThreadId && state.activeStartedAt && toParisDayYMD(state.activeStartedAt) !== toParisDayYMD(new Date())) {
+      await this.expire(client, state);
+      return;
+    }
     if (!state?.nextSpawnAt) return;
 
     const ts = state.nextSpawnAt.getTime();
@@ -384,6 +389,25 @@ export class BingoService {
     await thread.send({
       components: [container],
       flags: MessageFlags.IsComponentsV2,
+    }).catch(() => {});
+  }
+
+  /** Minuit : partie non gagnée → nombre révélé, post reverrouillé, état effacé. */
+  static async expire(client: BotClient, state: IBingoStateDoc): Promise<void> {
+    if (!state.activeThreadId) return;
+
+    const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
+    const thread = guild ? await guild.channels.fetch(state.activeThreadId).catch(() => null) : null;
+    if (thread?.isThread()) {
+      await thread.send(`⏰ Minuit ! Personne n'a trouvé le nombre mystère… c'était **${state.activeTarget}**. À la prochaine partie !`).catch(() => {});
+      await thread.setLocked(true).catch(() => {});
+    }
+
+    await GamesForumService.deleteAnnounce(client, state.announceMessageId);
+    await BingoRepository.clearActive();
+    LogService.info(`Bingo expiré à minuit sans gagnant (cible **${state.activeTarget}**, ${(state.activeGuesses ?? []).length} essai(s)).`, {
+      feature: LOG_FEATURE,
+      title: '⏰ Expiré',
     }).catch(() => {});
   }
 
