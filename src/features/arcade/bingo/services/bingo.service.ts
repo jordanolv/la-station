@@ -17,10 +17,11 @@ import { LevelingService } from '../../../leveling/services/leveling.service';
 import { awardExpeditions } from '../../../peak-hunters/services/expedition.service';
 import { ArcadeScheduleService } from '../../schedule/services/arcade-schedule.service';
 import { LogService } from '../../../../shared/logs/logs.service';
-import { toParisDayYMD } from '../../../../shared/time/day-split';
+import { toParisDayYMD, todayAtParis } from '../../../../shared/time/day-split';
 import { BingoRepository } from '../repositories/bingo.repository';
 import type { IBingoStateDoc } from '../models/bingo-state.model';
 import {
+  BINGO_SPAWN_HOUR,
   BINGO_ACCENT_COLOR,
   BINGO_BONUS_COUNT,
   BINGO_BONUS_EXPEDITIONS,
@@ -33,7 +34,6 @@ import {
   BINGO_THREAD_AUTO_ARCHIVE_MINUTES,
   BINGO_THREAD_SLOWMODE_SECONDS,
 } from '../constants/bingo.constants';
-import { generateBingoDate } from '../utils/bingo-date.utils';
 import { addFragmentsAndAward } from '../../../peak-hunters/services/expedition.service';
 
 const LOG_FEATURE = '🎯 Bingo';
@@ -139,7 +139,7 @@ export class BingoService {
       return;
     }
 
-    const nextSpawnAt = generateBingoDate();
+    const nextSpawnAt = todayAtParis(BINGO_SPAWN_HOUR);
     await BingoRepository.setNextSpawn(nextSpawnAt);
     this.scheduleTimer(client, nextSpawnAt);
 

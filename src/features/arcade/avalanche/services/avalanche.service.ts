@@ -6,10 +6,11 @@ import {
   MessageFlags,
   ThreadChannel,
 } from 'discord.js';
-import { toZonedTime, fromZonedTime } from 'date-fns-tz';
+import { toZonedTime } from 'date-fns-tz';
 import { BotClient } from '../../../../bot/client';
 import { getGuildId } from '../../../../shared/guild';
 import { ArcadeScheduleService } from '../../schedule/services/arcade-schedule.service';
+import { todayAtParis } from '../../../../shared/time/day-split';
 import { LogService } from '../../../../shared/logs/logs.service';
 import { GamesForumService } from '../../../discord/services/games-forum.service';
 import { AppConfigService } from '../../../discord/services/app-config.service';
@@ -34,14 +35,6 @@ import {
 
 const TZ = 'Europe/Paris';
 const LOG_FEATURE = '🏔️ Avalanche';
-
-function todayAtParis(hourFraction: number): Date {
-  const nowParis = toZonedTime(new Date(), TZ);
-  const hour = Math.floor(hourFraction);
-  const minute = Math.round((hourFraction - hour) * 60);
-  const naive = new Date(nowParis.getFullYear(), nowParis.getMonth(), nowParis.getDate(), hour, minute, 0);
-  return fromZonedTime(naive, TZ);
-}
 
 function todayKeyParis(): string {
   const p = toZonedTime(new Date(), TZ);

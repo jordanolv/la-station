@@ -4,6 +4,9 @@ import { BotClient } from '../../../../bot/client';
 import { GamesForumConfig, GamesForumService } from '../../../discord/services/games-forum.service';
 import { LogService } from '../../../../shared/logs/logs.service';
 import { PARIS_TZ, toParisDayYMD } from '../../../../shared/time/day-split';
+import { BINGO_SPAWN_HOUR } from '../../bingo/constants/bingo.constants';
+import { JP_SPAWN_HOUR } from '../../juste-prix/constants/juste-prix.constants';
+import { AVALANCHE_REGISTRATION_END_HOUR } from '../../avalanche/constants/avalanche.constants';
 import ArcadeScheduleModel, { IArcadeScheduleDoc, ScheduledGame } from '../models/arcade-schedule.model';
 
 const GAMES: ScheduledGame[] = ['bingo', 'justePrix', 'avalanche'];
@@ -17,6 +20,11 @@ const THREAD_KEYS: Record<ScheduledGame, 'bingoThreadId' | 'justePrixThreadId' |
   bingo: 'bingoThreadId',
   justePrix: 'justePrixThreadId',
   avalanche: 'avalancheThreadId',
+};
+const GAME_HOURS: Record<ScheduledGame, string> = {
+  bingo: `${BINGO_SPAWN_HOUR}h`,
+  justePrix: `${JP_SPAWN_HOUR}h`,
+  avalanche: `inscriptions jusqu'à ${AVALANCHE_REGISTRATION_END_HOUR}h`,
 };
 const ACCENT_COLOR = 0xf4a261;
 
@@ -84,7 +92,7 @@ export class ArcadeScheduleService {
     const lines = days.map((d, i) => {
       if (d < today) return `~~${DAY_LABELS[i]}~~`;
       const day = d === today ? `**${DAY_LABELS[i]}** ◀` : DAY_LABELS[i];
-      const game = games[d] ? `${GAME_LABELS[games[d]].split(' ')[0]} ${link(games[d])}` : '*repos*';
+      const game = games[d] ? `${GAME_LABELS[games[d]].split(' ')[0]} ${link(games[d])}  ·  ${GAME_HOURS[games[d]]}` : '*repos*';
       return `${day}  ·  ${game}`;
     });
     const [first, last] = [days[0], days[6]].map((d) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: PARIS_TZ }));

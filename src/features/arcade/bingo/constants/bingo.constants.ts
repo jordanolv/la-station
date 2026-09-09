@@ -1,6 +1,5 @@
 
-export const BINGO_HOUR_START = 10;
-export const BINGO_HOUR_END = 15;
+export const BINGO_SPAWN_HOUR = 12;
 
 export const BINGO_NUMBER_MIN = 1;
 export const BINGO_NUMBER_MAX = 100;

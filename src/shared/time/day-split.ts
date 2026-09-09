@@ -1,3 +1,5 @@
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
+
 export const PARIS_TZ = 'Europe/Paris';
 
 export interface DayChunk {
@@ -14,6 +16,14 @@ const ymdFormatter = new Intl.DateTimeFormat('en-CA', {
 
 export function toParisDayYMD(date: Date): string {
   return ymdFormatter.format(date);
+}
+
+/** Aujourd'hui (Paris) à l'heure donnée, fractions acceptées (13.5 = 13h30). */
+export function todayAtParis(hourFraction: number): Date {
+  const nowParis = toZonedTime(new Date(), PARIS_TZ);
+  const hour = Math.floor(hourFraction);
+  const minute = Math.round((hourFraction - hour) * 60);
+  return fromZonedTime(new Date(nowParis.getFullYear(), nowParis.getMonth(), nowParis.getDate(), hour, minute, 0), PARIS_TZ);
 }
 
 export function parisMidnightUTC(dayYMD: string): Date {

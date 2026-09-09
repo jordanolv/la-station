@@ -6,10 +6,10 @@ import {
   MessageFlags,
   ThreadChannel,
 } from 'discord.js';
-import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import { BotClient } from '../../../../bot/client';
 import { getGuildId } from '../../../../shared/guild';
 import { ArcadeScheduleService } from '../../schedule/services/arcade-schedule.service';
+import { todayAtParis } from '../../../../shared/time/day-split';
 import { LogService } from '../../../../shared/logs/logs.service';
 import { GamesForumService } from '../../../discord/services/games-forum.service';
 import { AppConfigService } from '../../../discord/services/app-config.service';
@@ -23,30 +23,15 @@ import {
   JP_ACCENT_COLOR,
   JP_EXACT_BONUS_EXPEDITIONS,
   JP_FINISHED_ACCENT_COLOR,
-  JP_HOUR_END,
-  JP_HOUR_START,
+  JP_SPAWN_HOUR,
   JP_NUMBER_MAX,
   JP_NUMBER_MIN,
   JP_REVEAL_HOUR,
   JP_REWARD_CLOSEST,
 } from '../constants/juste-prix.constants';
 
-const TZ = 'Europe/Paris';
 const LOG_FEATURE = '💰 Juste Prix';
 
-function generateSpawnDate(): Date {
-  const nowParis = toZonedTime(new Date(), TZ);
-  const hourRange = JP_HOUR_END - JP_HOUR_START;
-  const hour = JP_HOUR_START + Math.floor(Math.random() * (hourRange + 1));
-  const naive = new Date(nowParis.getFullYear(), nowParis.getMonth(), nowParis.getDate(), hour, Math.floor(Math.random() * 60), 0);
-  return fromZonedTime(naive, TZ);
-}
-
-function todayRevealDate(): Date {
-  const nowParis = toZonedTime(new Date(), TZ);
-  const naive = new Date(nowParis.getFullYear(), nowParis.getMonth(), nowParis.getDate(), JP_REVEAL_HOUR, 0, 0);
-  return fromZonedTime(naive, TZ);
-}
 
 export class JustePrixService {
   private static async isEnabled(): Promise<boolean> {
@@ -123,7 +108,7 @@ export class JustePrixService {
       return;
     }
 
-    const nextSpawnAt = generateSpawnDate();
+    const nextSpawnAt = todayAtParis(JP_SPAWN_HOUR);
     await JustePrixRepository.setNextSpawn(nextSpawnAt);
     this.scheduleTimer(client, nextSpawnAt, () => this.spawn(client));
 
@@ -184,7 +169,7 @@ export class JustePrixService {
       return;
     }
 
-    const endsAt = todayRevealDate();
+    const endsAt = todayAtParis(JP_REVEAL_HOUR);
     if (endsAt.getTime() <= Date.now()) {
       await JustePrixRepository.setNextSpawn(null);
       return;

@@ -1,6 +1,5 @@
 
-export const JP_HOUR_START = 10;
-export const JP_HOUR_END = 14;
+export const JP_SPAWN_HOUR = 12;
 export const JP_REVEAL_HOUR = 21;
 
 export const JP_NUMBER_MIN = 1;
