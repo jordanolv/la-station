@@ -29,6 +29,7 @@ import { ArcadeScheduleService } from '../../features/arcade/schedule/services/a
 import { AvalancheRepository } from '../../features/arcade/avalanche/repositories/avalanche.repository';
 import { AvalancheService } from '../../features/arcade/avalanche/services/avalanche.service';
 import { EnigmeRepository } from '../../features/arcade/enigme/repositories/enigme.repository';
+import { WeeklyRecapService } from '../../shared/weekly-recap/weekly-recap.service';
 import { EnigmeService } from '../../features/arcade/enigme/services/enigme.service';
 
 const TOKEN_TTL = '7d';
@@ -254,6 +255,14 @@ export default function adminRoute(client: BotClient): Router {
 
   router.post('/api/admin/arcade/schedule/generate', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
     await ArcadeScheduleService.regenerate(client);
+    res.json({ ok: true });
+  });
+
+  /** Aperçu du récap du lundi : points d'activité actuels, sans reset ni rôles. */
+  router.post('/api/admin/arcade/recap/preview', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
+    const users = await UserModel.find({ 'stats.activityPoints': { $gt: 0 } })
+      .sort({ 'stats.activityPoints': -1 }).limit(3).select('discordId stats.activityPoints').lean();
+    await WeeklyRecapService.post(client, users.map((u) => ({ userId: u.discordId, points: u.stats.activityPoints ?? 0 })));
     res.json({ ok: true });
   });
 

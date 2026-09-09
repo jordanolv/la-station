@@ -174,7 +174,10 @@
           <strong>📅 Planning de la semaine</strong>
           <div id="scheduleStatus" class="muted" style="margin-top:4px"></div>
         </div>
-        <button class="ghost" onclick="generateSchedule()">🔁 Regénérer</button>
+        <div>
+          <button class="ghost" onclick="generateSchedule()">🔁 Regénérer</button>
+          <button class="ghost" onclick="previewRecap()">🗞️ Poster le récap du lundi</button>
+        </div>
       </div>
     </div>
     <div class="card">
@@ -678,6 +681,11 @@ async function loadArcade() {
     when(a.enigme.nextSpawnAt) ? `⏰ Prochain spawn : ${when(a.enigme.nextSpawnAt)}` : null,
     'Réponse secrète par bouton · 3 essais · podium des 3 premiers · indice 15h',
   ].filter(Boolean).join(' · ');
+}
+async function previewRecap() {
+  if (!confirm('Poster le récap hebdo maintenant ? Points d\'activité actuels, sans reset ni changement de rôles.')) return;
+  try { await api('/api/admin/arcade/recap/preview', { method: 'POST' }); toast('Récap posté 🗞️'); }
+  catch (err) { toast(err.message); }
 }
 async function spawnEnigme() {
   if (!confirm('Lancer une énigme maintenant ?')) return;
