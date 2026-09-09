@@ -79,7 +79,14 @@ export class ArcadeScheduleService {
   }
 
   static async regenerate(client: BotClient): Promise<IArcadeScheduleDoc> {
-    return this.createWeek(client, weekDays(new Date()));
+    return this.createWeek(client, weekDays(new Date()), true);
+  }
+
+  /** Lignes Lundi → Dimanche de la semaine courante, prêtes à afficher. */
+  static async buildCurrentWeekLines(client: BotClient): Promise<string[]> {
+    const week = await this.getOrCreateWeek(client);
+    const config = await GamesForumService.getConfig();
+    return this.buildLines(config, weekDays(new Date()), week.days, toParisDayYMD(new Date()));
   }
 
   static async getCurrentWeek(): Promise<{ days: string[]; games: Record<string, ScheduledGame> }> {
@@ -88,17 +95,21 @@ export class ArcadeScheduleService {
     return { days, games: doc?.days ?? {} };
   }
 
-  private static buildAnnounce(config: GamesForumConfig, days: string[], games: Record<string, ScheduledGame>, today: string): ContainerBuilder {
+  private static buildLines(config: GamesForumConfig, days: string[], games: Record<string, ScheduledGame>, today: string): string[] {
     const link = (game: ScheduledGame) => {
       const threadId = config[THREAD_KEYS[game]];
       return threadId ? `<#${threadId}>` : `**${GAME_LABELS[game]}**`;
     };
-    const lines = days.map((d, i) => {
+    return days.map((d, i) => {
       if (d < today) return `~~${DAY_LABELS[i]}~~`;
       const day = d === today ? `**${DAY_LABELS[i]}** ◀` : DAY_LABELS[i];
       const game = games[d] ? `${GAME_LABELS[games[d]].split(' ')[0]} ${link(games[d])}  ·  ${GAME_HOURS[games[d]]}` : '*repos*';
       return `${day}  ·  ${game}`;
     });
+  }
+
+  private static buildAnnounce(config: GamesForumConfig, days: string[], games: Record<string, ScheduledGame>, today: string): ContainerBuilder {
+    const lines = this.buildLines(config, days, games, today);
     const [first, last] = [days[0], days[6]].map((d) => new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: PARIS_TZ }));
 
     return new ContainerBuilder()
@@ -110,18 +121,23 @@ export class ArcadeScheduleService {
       .addTextDisplayComponents(new TextDisplayBuilder().setContent('-# Un jeu par jour, rendez-vous dans le forum 🗂️ · réagis 🔔 sur un post pour être notifié'));
   }
 
-  /** Planifie du jour courant au dimanche, les jours déjà passés restent vides. */
-  private static async createWeek(client: BotClient, days: string[]): Promise<IArcadeScheduleDoc> {
+  /**
+   * Planifie du jour courant au dimanche, les jours déjà passés restent vides.
+   * Le lundi, c'est le récap hebdo qui affiche le planning ; l'annonce dédiée ne sert qu'au regenerate.
+   */
+  private static async createWeek(client: BotClient, days: string[], announce = false): Promise<IArcadeScheduleDoc> {
     const previous = await ArcadeScheduleModel.findOne({ weekKey: days[0] });
     await GamesForumService.deleteAnnounce(client, previous?.announceMessageId, previous?.announceChannelId);
 
     const config = await GamesForumService.getConfig();
     const today = toParisDayYMD(new Date());
     const games = generateWeek(days.slice(days.indexOf(today)));
-    const announceMessageId = await GamesForumService.announce(client, {
-      components: [this.buildAnnounce(config, days, games, today)],
-      flags: MessageFlags.IsComponentsV2,
-    }, config.scheduleChannelId);
+    const announceMessageId = announce
+      ? await GamesForumService.announce(client, {
+        components: [this.buildAnnounce(config, days, games, today)],
+        flags: MessageFlags.IsComponentsV2,
+      }, config.scheduleChannelId)
+      : null;
     LogService.info(
       days.map((d, i) => `**${DAY_LABELS[i]}** · ${games[d] ? GAME_LABELS[games[d]] : '—'}`).join('\n'),
       { feature: '🕹️ Arcade', title: '📅 Planning de la semaine' },

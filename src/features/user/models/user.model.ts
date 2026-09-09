@@ -36,6 +36,10 @@ class GameStats {
 
   @prop({ default: 0 })
   attempts!: number;
+
+  /** Victoires de la semaine en cours, remis à 0 le lundi par le récap hebdo */
+  @prop({ default: 0 })
+  weeklyWins!: number;
 }
 
 class QuizStats {
@@ -83,6 +87,10 @@ class ArcadeStats {
 
   @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
   enigme!: GameStats;
+
+  /** Total des victoires de la semaine, tous jeux confondus */
+  @prop({ default: 0 })
+  weeklyWins!: number;
 }
 
 class UserStats {

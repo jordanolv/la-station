@@ -4,8 +4,7 @@ import { BotClient } from '../../../bot/client';
 import { getGuildId } from '../../../shared/guild';
 import { LogService } from '../../../shared/logs/logs.service';
 import UserModel from '../../user/models/user.model';
-import AppConfigModel from '../../discord/models/app-config.model';
-import { ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, MessageFlags } from 'discord.js';
+import { WeeklyRecapService } from '../../../shared/weekly-recap/weekly-recap.service';
 
 const LOG_FEATURE = '🎖️ Activity Roles';
 const userRepo = new UserRepository();
@@ -30,6 +29,8 @@ export class ActivityRolesService {
       [{ $set: { 'stats.lastWeekActivityPoints': '$stats.activityPoints', 'stats.activityPoints': 0 } }],
     );
     console.log(`[ActivityRoles] activityPoints remis à 0 pour tous les users`);
+
+    await WeeklyRecapService.post(client, scores).catch((err) => console.error('[ActivityRoles] Erreur récap hebdo:', err));
 
     const config = await ActivityRolesConfigRepository.get();
     if (!config?.enabled) return;
@@ -100,50 +101,5 @@ export class ActivityRolesService {
             `Mise à jour des rôles d'activité terminée.\n**${assigned}** rôle(s) attribué(s), **${removed}** retiré(s)\n\n**🏆 Top 3**\n${top3 || 'Aucun'}`,
       { feature: LOG_FEATURE, title: '🗓️ Rotation hebdomadaire' },
     ).catch(() => {});
-
-    await this.sendWeeklyLeaderboard(client, scores);
-  }
-
-  private static async sendWeeklyLeaderboard(
-    client: BotClient,
-    scores: { userId: string; name: string; points: number }[],
-  ): Promise<void> {
-    try {
-      const appConfig = await AppConfigModel.findOne({});
-      const channelId = (appConfig?.config?.channels as any)?.commandes;
-      if (!channelId) return;
-
-      const channel = await client.channels.fetch(channelId).catch(() => null);
-      if (!channel?.isTextBased()) return;
-
-      const medals = ['🥇', '🥈', '🥉'];
-      if (!scores.length) return;
-
-      const rows = scores.map((s, i) =>
-        `${medals[i] ?? `**${i + 1}.**`} ${s.name} — **${s.points.toLocaleString('fr-FR')}** pts`,
-      ).join('\n');
-
-      const container = new ContainerBuilder()
-        .setAccentColor(0xdac1ff)
-        .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(`# 🏆 Classement de la semaine`),
-        )
-        .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-        .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(rows),
-        )
-        .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-        .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(`-# Les rôles d'activité viennent d'être mis à jour. Bonne semaine ! 🎉`),
-        );
-
-      await (channel as any).send({
-        components: [container],
-        flags: MessageFlags.IsComponentsV2,
-      });
-    } catch (err) {
-      console.error('[ActivityRoles] Erreur envoi classement:', err);
-    }
   }
 }
-
