@@ -1,6 +1,7 @@
 import {
   ChannelType,
   ForumChannel,
+  MessageCreateOptions,
   MessageReaction,
   PermissionFlagsBits,
   ThreadChannel,
@@ -208,13 +209,13 @@ export class GamesForumService {
   }
 
   /** Poste une annonce dans le channel général configuré. Retourne l'id du message (à supprimer plus tard). */
-  static async announce(client: BotClient, content: string): Promise<string | null> {
+  static async announce(client: BotClient, payload: string | MessageCreateOptions): Promise<string | null> {
     const config = await this.getConfig();
     if (!config.announceChannelId) return null;
     const guild = client.guilds.cache.get(process.env.GUILD_ID!);
     const channel = await guild?.channels.fetch(config.announceChannelId).catch(() => null);
     if (!channel?.isTextBased()) return null;
-    const message = await channel.send({ content }).catch(() => null);
+    const message = await channel.send(typeof payload === 'string' ? { content: payload } : payload).catch(() => null);
     return message?.id ?? null;
   }
 
