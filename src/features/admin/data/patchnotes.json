@@ -481,5 +481,68 @@
         ]
       }
     ]
+  },
+  {
+    "version": "1.10.0",
+    "timestamp": 1788968606,
+    "sections": [
+      {
+        "type": "new",
+        "blocks": [
+          {
+            "title": "🧩 L'Énigme — nouveau jeu !",
+            "items": [
+              "Suite logique, anagramme, calcul mental, devinette, charade ou film en emojis : **une énigme différente à chaque fois**",
+              "Réponds **en secret** avec le bouton 🧩 Répondre — **3 essais** par personne, personne ne voit ta réponse",
+              "Les **trois premiers** à trouver montent sur le podium 🥇🥈🥉, avec ton temps de résolution affiché",
+              "**Indice à 15h** si tu sèches, **révélation à 21h** avec le podium et la réponse",
+              "Ceux qui trouvent après le podium repartent avec **10 fragments**, ceux qui ont tenté avec **5**",
+              "Réagis 🔔 sur le post du forum pour être notifié à chaque énigme"
+            ]
+          },
+          {
+            "title": "📅 Planning de la semaine",
+            "items": [
+              "**Un jeu par jour**, tiré au sort chaque semaine : Bingo, Juste Prix, Avalanche et Énigme passent tous au moins une fois",
+              "Le planning est posté **chaque lundi** dans le panneau d'affichage, avec l'heure de chaque jeu",
+              "Fini le suspense inutile : Bingo, Juste Prix et Énigme démarrent **à 12h pile**, l'Avalanche ouvre ses inscriptions dès minuit"
+            ]
+          },
+          {
+            "title": "🗞️ Récap du lundi",
+            "items": [
+              "Chaque lundi, un récap de la semaine passée : **top 3 de l'activité** et **champions des jeux** (qui a gagné le plus de parties)",
+              "Suivi du planning de la semaine qui arrive"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "update",
+        "blocks": [
+          {
+            "title": "🏆 Récompenses revues à la hausse",
+            "items": [
+              "**Une victoire vaut la même chose partout** : 750 💰 · 600 XP · 4 packs d'expédition au Bingo, à l'Avalanche, au Juste Prix et pour le 🥇 de l'Énigme",
+              "**Tout le monde repart avec quelque chose** : 5 fragments pour chaque participant qui n'a pas gagné, Juste Prix inclus",
+              "Les bonus restent : +1 pack par numéro bonus au Bingo, +3 packs pour le nombre exact au Juste Prix",
+              "Quiz : **2 packs** par bonne réponse au lieu d'un, **3** si tu es le premier sur ton thème"
+            ]
+          },
+          {
+            "title": "🎯 Bingo",
+            "items": [
+              "Une partie non gagnée se termine **à minuit** : le nombre est révélé et le post se referme jusqu'à la prochaine"
+            ]
+          },
+          {
+            "title": "📊 /stats",
+            "items": [
+              "Nouvelle section **🧩 Énigme** et la **date de ta dernière victoire** sous chaque jeu"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
