@@ -59,11 +59,8 @@ export class ArcadeScheduleService {
     return this.pending;
   }
 
-  /** Regénère la semaine courante ; `fromToday` laisse vides les jours déjà passés. */
-  static async regenerate(client: BotClient, fromToday: boolean): Promise<IArcadeScheduleDoc> {
-    const days = weekDays(new Date());
-    const from = fromToday ? days.indexOf(toParisDayYMD(new Date())) : 0;
-    return this.createWeek(client, days, from);
+  static async regenerate(client: BotClient): Promise<IArcadeScheduleDoc> {
+    return this.createWeek(client, weekDays(new Date()));
   }
 
   static async getCurrentWeek(): Promise<{ days: string[]; games: Record<string, ScheduledGame> }> {
@@ -72,11 +69,12 @@ export class ArcadeScheduleService {
     return { days, games: doc?.days ?? {} };
   }
 
-  private static async createWeek(client: BotClient, days: string[], from = 0): Promise<IArcadeScheduleDoc> {
+  /** Planifie du jour courant au dimanche, les jours déjà passés restent vides. */
+  private static async createWeek(client: BotClient, days: string[]): Promise<IArcadeScheduleDoc> {
     const previous = await ArcadeScheduleModel.findOne({ weekKey: days[0] });
     await GamesForumService.deleteAnnounce(client, previous?.announceMessageId);
 
-    const games = generateWeek(days.slice(from));
+    const games = generateWeek(days.slice(days.indexOf(toParisDayYMD(new Date()))));
     const lines = days.map((d, i) => `**${DAY_LABELS[i]}** · ${games[d] ? GAME_LABELS[games[d]] : '—'}`);
     const announceMessageId = await GamesForumService.announce(
       client,

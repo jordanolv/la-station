@@ -241,8 +241,8 @@ export default function adminRoute(client: BotClient): Router {
     });
   });
 
-  router.post('/api/admin/arcade/schedule/generate', requireAdmin, async (req: Request, res: Response): Promise<void> => {
-    await ArcadeScheduleService.regenerate(client, Boolean(req.body?.fromToday));
+  router.post('/api/admin/arcade/schedule/generate', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
+    await ArcadeScheduleService.regenerate(client);
     res.json({ ok: true });
   });
 
