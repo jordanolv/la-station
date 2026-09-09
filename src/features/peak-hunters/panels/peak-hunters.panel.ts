@@ -10,10 +10,6 @@ import {
   ChannelType,
   ButtonInteraction,
   ChannelSelectMenuInteraction,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
-  ModalSubmitInteraction,
   MessageFlags,
 } from 'discord.js';
 import { BotClient } from '../../../bot/client';
@@ -21,9 +17,7 @@ import { ConfigPanel, panelCustomId } from '../../config-panel/services/config-p
 import { ConfigPanelService } from '../../config-panel/services/config-panel.service';
 import { PeakHuntersConfigRepository } from '../repositories/peak-hunters-config.repository';
 import { MountainService } from '../services/mountain.service';
-import { UserMountainsRepository } from '../repositories/user-mountains.repository';
-import { SPAWN_MAX_PER_DAY, SPAWN_HOUR_START, SPAWN_HOUR_END, EXPEDITION_TIER_CONFIG } from '../constants/peak-hunters.constants';
-import type { ExpeditionTier } from '../types/peak-hunters.types';
+import { SPAWN_MAX_PER_DAY, SPAWN_HOUR_START, SPAWN_HOUR_END } from '../constants/peak-hunters.constants';
 
 const PANEL_ID = 'mountain';
 const ACCENT_ON = 0x2ecc71;
@@ -118,57 +112,12 @@ export const peakHuntersPanel: ConfigPanel = {
             .setPlaceholder('Annonces de raids (début, progression, résultats)')
             .setChannelTypes(ChannelType.GuildText),
         ),
-      )
-      .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent('### 🗺️ Distribution d\'expéditions'),
-      )
-      .addActionRowComponents(
-        new ActionRowBuilder<ButtonBuilder>().addComponents(
-          new ButtonBuilder()
-            .setCustomId(panelCustomId(PANEL_ID, 'give_expe_sentier'))
-            .setLabel('Sentier')
-            .setStyle(ButtonStyle.Secondary),
-          new ButtonBuilder()
-            .setCustomId(panelCustomId(PANEL_ID, 'give_expe_falaise'))
-            .setLabel('Falaise')
-            .setStyle(ButtonStyle.Primary),
-          new ButtonBuilder()
-            .setCustomId(panelCustomId(PANEL_ID, 'give_expe_sommet'))
-            .setLabel('Sommet')
-            .setStyle(ButtonStyle.Danger),
-        ),
       );
 
     return [container];
   },
 
   async handleButton(interaction: ButtonInteraction, client: BotClient): Promise<void> {
-    const action = interaction.customId.split(':')[2];
-
-    const TIERS: ExpeditionTier[] = ['sentier', 'falaise', 'sommet'];
-    const matchedTier = TIERS.find(t => action === `give_expe_${t}`);
-    if (matchedTier) {
-      const { label } = EXPEDITION_TIER_CONFIG[matchedTier];
-      const modal = new ModalBuilder()
-        .setCustomId(panelCustomId(PANEL_ID, `modal_give_expe_${matchedTier}`))
-        .setTitle(`🗺️ Expéditions ${label}`)
-        .addComponents(
-          new ActionRowBuilder<TextInputBuilder>().addComponents(
-            new TextInputBuilder()
-              .setCustomId('amount')
-              .setLabel(`Expéditions ${label} à donner`)
-              .setStyle(TextInputStyle.Short)
-              .setPlaceholder('Ex: 5')
-              .setMinLength(1)
-              .setMaxLength(3)
-              .setRequired(true),
-          ),
-        );
-      await interaction.showModal(modal);
-      return;
-    }
-
     const config = await PeakHuntersConfigRepository.getOrCreate();
     await PeakHuntersConfigRepository.toggle(!config.enabled);
 
@@ -213,24 +162,4 @@ export const peakHuntersPanel: ConfigPanel = {
     await ConfigPanelService.refreshPanel(client, PANEL_ID);
   },
 
-  async handleModal(interaction: ModalSubmitInteraction, _client: BotClient): Promise<void> {
-    const action = interaction.customId.split(':')[2];
-
-    const TIERS: ExpeditionTier[] = ['sentier', 'falaise', 'sommet'];
-    const matchedTier = TIERS.find(t => action === `modal_give_expe_${t}`);
-    if (matchedTier) {
-      const raw = interaction.fields.getTextInputValue('amount').trim();
-      const amount = parseInt(raw, 10);
-
-      if (isNaN(amount) || amount <= 0) {
-        await interaction.reply({ content: '❌ Nombre invalide.', flags: MessageFlags.Ephemeral });
-        return;
-      }
-
-      const { label, emoji } = EXPEDITION_TIER_CONFIG[matchedTier];
-      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-      const count = await UserMountainsRepository.addExpeditionsToAll(amount, matchedTier);
-      await interaction.editReply({ content: `✅ **+${amount} expédition${amount > 1 ? 's' : ''}** ${emoji} **${label}** distribuées à **${count}** joueurs.` });
-    }
-  },
 };

@@ -1,7 +1,7 @@
 import { CronJob } from 'cron';
 import { BotClient } from '../../../../bot/client';
 import { JustePrixService } from '../services/juste-prix.service';
-import { JP_HOUR_END, JP_HOUR_START, JP_SPAWN_CHANCE } from '../constants/juste-prix.constants';
+import { JP_HOUR_END, JP_HOUR_START } from '../constants/juste-prix.constants';
 
 const TZ = 'Europe/Paris';
 
@@ -26,7 +26,7 @@ export class JustePrixCron {
     console.log(
       chalk.yellow('   ├─ 💰 Juste Prix') +
         chalk.gray(
-          ` • minuit ${TZ}, ${Math.round(JP_SPAWN_CHANCE * 100)}% chance/jour, fenêtre ${JP_HOUR_START}h-${JP_HOUR_END}h, révélation 21h`,
+          ` • minuit ${TZ}, selon planning hebdo, fenêtre ${JP_HOUR_START}h-${JP_HOUR_END}h, révélation 21h`,
         ),
     );
   }

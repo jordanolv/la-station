@@ -9,6 +9,7 @@ import {
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import { BotClient } from '../../../../bot/client';
 import { getGuildId } from '../../../../shared/guild';
+import { ArcadeScheduleService } from '../../schedule/services/arcade-schedule.service';
 import { LogService } from '../../../../shared/logs/logs.service';
 import { GamesForumService } from '../../../discord/services/games-forum.service';
 import { AppConfigService } from '../../../discord/services/app-config.service';
@@ -28,7 +29,6 @@ import {
   JP_NUMBER_MIN,
   JP_REVEAL_HOUR,
   JP_REWARD_CLOSEST,
-  JP_SPAWN_CHANCE,
 } from '../constants/juste-prix.constants';
 
 const TZ = 'Europe/Paris';
@@ -115,8 +115,8 @@ export class JustePrixService {
     }
     if (state.nextSpawnAt && state.nextSpawnAt.getTime() > Date.now()) return;
 
-    if (Math.random() >= JP_SPAWN_CHANCE) {
-      LogService.info("Pas de Juste Prix aujourd'hui (tirage).", {
+    if (!(await ArcadeScheduleService.isToday(client, 'justePrix'))) {
+      LogService.info("Pas de Juste Prix aujourd'hui (planning).", {
         feature: LOG_FEATURE,
         title: '🗓️ Planification du jour',
       }).catch(() => {});

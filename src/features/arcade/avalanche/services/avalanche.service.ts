@@ -9,6 +9,7 @@ import {
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import { BotClient } from '../../../../bot/client';
 import { getGuildId } from '../../../../shared/guild';
+import { ArcadeScheduleService } from '../../schedule/services/arcade-schedule.service';
 import { LogService } from '../../../../shared/logs/logs.service';
 import { GamesForumService } from '../../../discord/services/games-forum.service';
 import { AppConfigService } from '../../../discord/services/app-config.service';
@@ -29,7 +30,6 @@ import {
   AVALANCHE_PARTICIPATION_FRAGMENTS,
   AVALANCHE_REGISTRATION_END_HOUR,
   AVALANCHE_REWARD,
-  AVALANCHE_SPAWN_CHANCE,
 } from '../constants/avalanche.constants';
 
 const TZ = 'Europe/Paris';
@@ -109,8 +109,8 @@ export class AvalancheService {
     if (state.lastPlanDate === today) return;
     await AvalancheRepository.setLastPlanDate(today);
 
-    if (Math.random() >= AVALANCHE_SPAWN_CHANCE) {
-      LogService.info("Pas d'avalanche aujourd'hui (tirage).", {
+    if (!(await ArcadeScheduleService.isToday(client, 'avalanche'))) {
+      LogService.info("Pas d'avalanche aujourd'hui (planning).", {
         feature: LOG_FEATURE,
         title: '🗓️ Planification du jour',
       }).catch(() => {});

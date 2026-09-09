@@ -1,4 +1,3 @@
-export const AVALANCHE_SPAWN_CHANCE = 1 / 2;
 
 /** Inscriptions de minuit à 13h, éliminations de 13h30 à 21h */
 export const AVALANCHE_REGISTRATION_END_HOUR = 13;

@@ -15,6 +15,7 @@ import { ArcadeStatsService } from '../../services/arcade-stats.service';
 import { UserService } from '../../../user/services/user.service';
 import { LevelingService } from '../../../leveling/services/leveling.service';
 import { awardExpeditions } from '../../../peak-hunters/services/expedition.service';
+import { ArcadeScheduleService } from '../../schedule/services/arcade-schedule.service';
 import { LogService } from '../../../../shared/logs/logs.service';
 import { BingoRepository } from '../repositories/bingo.repository';
 import type { IBingoStateDoc } from '../models/bingo-state.model';
@@ -28,7 +29,6 @@ import {
   BINGO_NUMBER_MIN,
   BINGO_RECAP_EVERY,
   BINGO_REWARD,
-  BINGO_SPAWN_CHANCE,
   BINGO_THREAD_AUTO_ARCHIVE_MINUTES,
   BINGO_THREAD_SLOWMODE_SECONDS,
 } from '../constants/bingo.constants';
@@ -130,8 +130,8 @@ export class BingoService {
     if (state.activeThreadId) return;
     if (state.nextSpawnAt && state.nextSpawnAt.getTime() > Date.now()) return;
 
-    if (Math.random() >= BINGO_SPAWN_CHANCE) {
-      LogService.info("Pas de bingo aujourd'hui (tirage).", {
+    if (!(await ArcadeScheduleService.isToday(client, 'bingo'))) {
+      LogService.info("Pas de bingo aujourd'hui (planning).", {
         feature: LOG_FEATURE,
         title: '🗓️ Planification du jour',
       }).catch(() => {});

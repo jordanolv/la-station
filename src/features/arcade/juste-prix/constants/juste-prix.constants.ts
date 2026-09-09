@@ -1,4 +1,3 @@
-export const JP_SPAWN_CHANCE = 1 / 3;
 
 export const JP_HOUR_START = 10;
 export const JP_HOUR_END = 14;

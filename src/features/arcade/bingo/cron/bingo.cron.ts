@@ -4,7 +4,6 @@ import { BingoService } from '../services/bingo.service';
 import {
   BINGO_HOUR_END,
   BINGO_HOUR_START,
-  BINGO_SPAWN_CHANCE,
 } from '../constants/bingo.constants';
 
 const TZ = 'Europe/Paris';
@@ -31,7 +30,7 @@ export class BingoCron {
     console.log(
       chalk.yellow('   ├─ 🎯 Bingo') +
         chalk.gray(
-          ` • minuit ${TZ}, ${Math.round(BINGO_SPAWN_CHANCE * 100)}% chance/jour, fenêtre ${BINGO_HOUR_START}h-${BINGO_HOUR_END}h`,
+          ` • minuit ${TZ}, selon planning hebdo, fenêtre ${BINGO_HOUR_START}h-${BINGO_HOUR_END}h`,
         ),
     );
   }
