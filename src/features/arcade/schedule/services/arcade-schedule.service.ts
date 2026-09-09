@@ -102,9 +102,8 @@ export class ArcadeScheduleService {
     };
     return days.map((d, i) => {
       if (d < today) return `~~${DAY_LABELS[i]}~~`;
-      const day = d === today ? `**${DAY_LABELS[i]}** ◀` : DAY_LABELS[i];
       const game = games[d] ? `${link(games[d])}  ·  ${GAME_HOURS[games[d]]}` : '*repos*';
-      return `${day}  ·  ${game}`;
+      return `**${DAY_LABELS[i]}**  ·  ${game}`;
     });
   }
 
