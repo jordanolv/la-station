@@ -10,12 +10,12 @@ export const AVALANCHE_NUMBER_MAX = 50;
 export const AVALANCHE_MIN_PLAYERS = 2;
 
 export const AVALANCHE_REWARD = {
-  money: 500,
-  xp: 400,
-  expeditions: 3,
+  money: 750,
+  xp: 600,
+  expeditions: 4,
 };
 
-export const AVALANCHE_PARTICIPATION_FRAGMENTS = 2;
+export const AVALANCHE_PARTICIPATION_FRAGMENTS = 5;
 
 export const AVALANCHE_ACCENT_COLOR = 0x8ecae6;
 export const AVALANCHE_FINISHED_ACCENT_COLOR = 0x57cc99;

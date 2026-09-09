@@ -371,7 +371,7 @@ export class QuizService {
 
     if (isCorrect) {
       const streakBonus = streak > 0 && streak % 5 === 0 ? 1 : 0;
-      const packs = (isFirst ? 2 : 1) + streakBonus;
+      const packs = (isFirst ? 3 : 2) + streakBonus;
       const { summary } = await awardExpeditions(userId, packs);
       await LogService.info(`<@${userId}> a remporté **${packs} expédition${packs > 1 ? 's' : ''}** ${summary}${isFirst ? ` (premier sur ${question.theme})` : ''}${streakBonus ? ` (série de ${streak})` : ''}`, { feature: 'Quiz', title: '🗺️ Expéditions gagnées' });
 
