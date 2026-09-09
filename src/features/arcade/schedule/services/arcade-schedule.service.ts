@@ -1,7 +1,7 @@
 import { ContainerBuilder, MessageFlags, SeparatorBuilder, TextDisplayBuilder } from 'discord.js';
 import { toZonedTime } from 'date-fns-tz';
 import { BotClient } from '../../../../bot/client';
-import { GamesForumService } from '../../../discord/services/games-forum.service';
+import { GamesForumConfig, GamesForumService } from '../../../discord/services/games-forum.service';
 import { LogService } from '../../../../shared/logs/logs.service';
 import { PARIS_TZ, toParisDayYMD } from '../../../../shared/time/day-split';
 import ArcadeScheduleModel, { IArcadeScheduleDoc, ScheduledGame } from '../models/arcade-schedule.model';
@@ -76,8 +76,7 @@ export class ArcadeScheduleService {
     return { days, games: doc?.days ?? {} };
   }
 
-  private static async buildAnnounce(days: string[], games: Record<string, ScheduledGame>, today: string): Promise<ContainerBuilder> {
-    const config = await GamesForumService.getConfig();
+  private static buildAnnounce(config: GamesForumConfig, days: string[], games: Record<string, ScheduledGame>, today: string): ContainerBuilder {
     const link = (game: ScheduledGame) => {
       const threadId = config[THREAD_KEYS[game]];
       return threadId ? `<#${threadId}>` : `**${GAME_LABELS[game]}**`;
@@ -102,14 +101,15 @@ export class ArcadeScheduleService {
   /** Planifie du jour courant au dimanche, les jours déjà passés restent vides. */
   private static async createWeek(client: BotClient, days: string[]): Promise<IArcadeScheduleDoc> {
     const previous = await ArcadeScheduleModel.findOne({ weekKey: days[0] });
-    await GamesForumService.deleteAnnounce(client, previous?.announceMessageId);
+    await GamesForumService.deleteAnnounce(client, previous?.announceMessageId, previous?.announceChannelId);
 
+    const config = await GamesForumService.getConfig();
     const today = toParisDayYMD(new Date());
     const games = generateWeek(days.slice(days.indexOf(today)));
     const announceMessageId = await GamesForumService.announce(client, {
-      components: [await this.buildAnnounce(days, games, today)],
+      components: [this.buildAnnounce(config, days, games, today)],
       flags: MessageFlags.IsComponentsV2,
-    });
+    }, config.scheduleChannelId);
     LogService.info(
       days.map((d, i) => `**${DAY_LABELS[i]}** · ${games[d] ? GAME_LABELS[games[d]] : '—'}`).join('\n'),
       { feature: '🕹️ Arcade', title: '📅 Planning de la semaine' },
@@ -117,7 +117,7 @@ export class ArcadeScheduleService {
 
     return ArcadeScheduleModel.findOneAndUpdate(
       { weekKey: days[0] },
-      { $set: { days: games, announceMessageId: announceMessageId ?? undefined } },
+      { $set: { days: games, announceMessageId: announceMessageId ?? undefined, announceChannelId: config.scheduleChannelId ?? undefined } },
       { upsert: true, new: true },
     );
   }

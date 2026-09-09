@@ -13,6 +13,9 @@ export class ArcadeSchedule {
 
   @prop()
   announceMessageId?: string;
+
+  @prop()
+  announceChannelId?: string;
 }
 
 const ArcadeScheduleModel = getModelForClass(ArcadeSchedule, {

@@ -531,6 +531,8 @@ export default function adminRoute(client: BotClient): Router {
       avalancheThreadName: name(config.avalancheThreadId),
       announceChannelId: config.announceChannelId,
       announceChannelName: name(config.announceChannelId),
+      scheduleChannelId: config.scheduleChannelId,
+      scheduleChannelName: name(config.scheduleChannelId),
       pingRoleNames: Object.fromEntries(Object.entries(config.pingRoles).map(([k, id]) =>
         [k, id ? guild?.roles.cache.get(id)?.name ?? '(inconnu)' : null])),
     });
@@ -541,6 +543,7 @@ export default function adminRoute(client: BotClient): Router {
     try {
       await GamesForumService.setup(client, {
         announceChannelId: str2(req.body?.announceChannelId),
+        scheduleChannelId: str2(req.body?.scheduleChannelId),
         forumChannelId: str2(req.body?.forumChannelId),
       });
       res.json({ ok: true });

@@ -25,6 +25,8 @@ export interface GamesForumConfig {
   justePrixThreadId: string | null;
   avalancheThreadId: string | null;
   announceChannelId: string | null;
+  /** Channel du planning hebdo (défaut : channel d'annonces) */
+  scheduleChannelId: string | null;
   pingRoles: Record<NotifGameKey, string | null>;
 }
 
@@ -76,6 +78,7 @@ export class GamesForumService {
       justePrixThreadId: channels.justePrix ?? null,
       avalancheThreadId: channels.avalanche ?? null,
       announceChannelId: channels.gamesAnnounce ?? null,
+      scheduleChannelId: channels.arcadeSchedule ?? channels.gamesAnnounce ?? null,
       pingRoles: {
         quiz: roles.quiz ?? null,
         bingo: roles.bingo ?? null,
@@ -90,7 +93,7 @@ export class GamesForumService {
    * posts par jeu avec la cloche 🔔 en réaction. Idempotent : applique permissions et
    * verrous sur l'existant, ne crée que ce qui manque.
    */
-  static async setup(client: BotClient, options: { announceChannelId?: string | null; forumChannelId?: string | null }): Promise<void> {
+  static async setup(client: BotClient, options: { announceChannelId?: string | null; scheduleChannelId?: string | null; forumChannelId?: string | null }): Promise<void> {
     const guild = client.guilds.cache.get(process.env.GUILD_ID!);
     if (!guild) throw new Error('Guild introuvable');
 
@@ -175,6 +178,10 @@ export class GamesForumService {
       if (options.announceChannelId) channels.gamesAnnounce = options.announceChannelId;
       else delete channels.gamesAnnounce;
     }
+    if (options.scheduleChannelId !== undefined) {
+      if (options.scheduleChannelId) channels.arcadeSchedule = options.scheduleChannelId;
+      else delete channels.arcadeSchedule;
+    }
 
     app.markModified('config.channels');
     app.markModified('config.gamesPingRoles');
@@ -208,23 +215,23 @@ export class GamesForumService {
     await thread.setLocked(locked).catch(() => {});
   }
 
-  /** Poste une annonce dans le channel général configuré. Retourne l'id du message (à supprimer plus tard). */
-  static async announce(client: BotClient, payload: string | MessageCreateOptions): Promise<string | null> {
-    const config = await this.getConfig();
-    if (!config.announceChannelId) return null;
+  /** Poste une annonce dans le channel général configuré (ou `channelId`). Retourne l'id du message (à supprimer plus tard). */
+  static async announce(client: BotClient, payload: string | MessageCreateOptions, channelId?: string | null): Promise<string | null> {
+    const targetId = channelId ?? (await this.getConfig()).announceChannelId;
+    if (!targetId) return null;
     const guild = client.guilds.cache.get(process.env.GUILD_ID!);
-    const channel = await guild?.channels.fetch(config.announceChannelId).catch(() => null);
+    const channel = await guild?.channels.fetch(targetId).catch(() => null);
     if (!channel?.isTextBased()) return null;
     const message = await channel.send(typeof payload === 'string' ? { content: payload } : payload).catch(() => null);
     return message?.id ?? null;
   }
 
-  static async deleteAnnounce(client: BotClient, messageId?: string | null): Promise<void> {
+  static async deleteAnnounce(client: BotClient, messageId?: string | null, channelId?: string | null): Promise<void> {
     if (!messageId) return;
-    const config = await this.getConfig();
-    if (!config.announceChannelId) return;
+    const targetId = channelId ?? (await this.getConfig()).announceChannelId;
+    if (!targetId) return;
     const guild = client.guilds.cache.get(process.env.GUILD_ID!);
-    const channel = await guild?.channels.fetch(config.announceChannelId).catch(() => null);
+    const channel = await guild?.channels.fetch(targetId).catch(() => null);
     if (!channel?.isTextBased()) return;
     const message = await channel.messages.fetch(messageId).catch(() => null);
     await message?.delete().catch(() => {});
