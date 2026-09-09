@@ -74,6 +74,12 @@ export default {
         `🎲 Parties jouées : **${avalanche.attempts ?? 0}**`,
       ];
 
+      const enigme = (arcade as any)?.enigme ?? { wins: 0, attempts: 0 };
+      const enigmeLines = [
+        `🥇 Podiums en or : **${enigme.wins ?? 0}**`,
+        `🎲 Énigmes tentées : **${enigme.attempts ?? 0}**`,
+      ];
+
       const arcadeLines = Object.entries(ARCADE_LABELS).map(([game, label]) => {
         const g = (arcade as any)?.[game] ?? { wins: 0, losses: 0 };
         return `${label} — 🏆 **${g.wins ?? 0}** · 💀 **${g.losses ?? 0}**`;
@@ -125,6 +131,10 @@ export default {
         .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(['## 🏔️ Avalanche', ...avalancheLines].join('\n')),
+        )
+        .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(['## 🧩 Énigme', ...enigmeLines].join('\n')),
         )
         .addSeparatorComponents(new SeparatorBuilder().setDivider(true).setSpacing(SeparatorSpacingSize.Small))
         .addTextDisplayComponents(

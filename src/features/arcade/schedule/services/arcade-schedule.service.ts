@@ -7,24 +7,28 @@ import { PARIS_TZ, toParisDayYMD } from '../../../../shared/time/day-split';
 import { BINGO_SPAWN_HOUR } from '../../bingo/constants/bingo.constants';
 import { JP_SPAWN_HOUR } from '../../juste-prix/constants/juste-prix.constants';
 import { AVALANCHE_REGISTRATION_END_HOUR } from '../../avalanche/constants/avalanche.constants';
+import { ENIGME_SPAWN_HOUR } from '../../enigme/constants/enigme.constants';
 import ArcadeScheduleModel, { IArcadeScheduleDoc, ScheduledGame } from '../models/arcade-schedule.model';
 
-const GAMES: ScheduledGame[] = ['bingo', 'justePrix', 'avalanche'];
+const GAMES: ScheduledGame[] = ['bingo', 'justePrix', 'avalanche', 'enigme'];
 const GAME_LABELS: Record<ScheduledGame, string> = {
   bingo: '🎯 Bingo',
   justePrix: '💰 Juste Prix',
   avalanche: "🏔️ L'Avalanche",
+  enigme: '🧩 Énigme',
 };
 const DAY_LABELS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-const THREAD_KEYS: Record<ScheduledGame, 'bingoThreadId' | 'justePrixThreadId' | 'avalancheThreadId'> = {
+const THREAD_KEYS: Record<ScheduledGame, 'bingoThreadId' | 'justePrixThreadId' | 'avalancheThreadId' | 'enigmeThreadId'> = {
   bingo: 'bingoThreadId',
   justePrix: 'justePrixThreadId',
   avalanche: 'avalancheThreadId',
+  enigme: 'enigmeThreadId',
 };
 const GAME_HOURS: Record<ScheduledGame, string> = {
   bingo: `${BINGO_SPAWN_HOUR}h`,
   justePrix: `${JP_SPAWN_HOUR}h`,
   avalanche: `inscriptions jusqu'à ${AVALANCHE_REGISTRATION_END_HOUR}h`,
+  enigme: `${ENIGME_SPAWN_HOUR}h`,
 };
 const ACCENT_COLOR = 0xf4a261;
 

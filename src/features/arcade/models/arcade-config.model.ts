@@ -31,4 +31,10 @@ export class ArcadeConfig {
 
   @prop({ type: () => GameConfig, default: () => ({ enabled: true, stats: { totalGames: 0 } }) })
   justePrix!: GameConfig;
+
+  @prop({ type: () => GameConfig, default: () => ({ enabled: true, stats: { totalGames: 0 } }) })
+  avalanche!: GameConfig;
+
+  @prop({ type: () => GameConfig, default: () => ({ enabled: true, stats: { totalGames: 0 } }) })
+  enigme!: GameConfig;
 }

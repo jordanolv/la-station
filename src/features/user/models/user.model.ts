@@ -80,6 +80,9 @@ class ArcadeStats {
 
   @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
   avalanche!: GameStats;
+
+  @prop({ type: () => GameStats, default: () => ({ wins: 0, losses: 0 }) })
+  enigme!: GameStats;
 }
 
 class UserStats {

@@ -1,7 +1,7 @@
 /**
  * Liste de tous les jeux disponibles dans l'arcade
  */
-export type ArcadeGameName = 'shifumi' | 'puissance4' | 'morpion' | 'battle' | 'bingo' | 'justePrix' | 'avalanche';
+export type ArcadeGameName = 'shifumi' | 'puissance4' | 'morpion' | 'battle' | 'bingo' | 'justePrix' | 'avalanche' | 'enigme';
 
 /**
  * Constante avec tous les noms de jeux

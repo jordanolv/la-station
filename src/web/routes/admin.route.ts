@@ -28,9 +28,11 @@ import { JustePrixService } from '../../features/arcade/juste-prix/services/just
 import { ArcadeScheduleService } from '../../features/arcade/schedule/services/arcade-schedule.service';
 import { AvalancheRepository } from '../../features/arcade/avalanche/repositories/avalanche.repository';
 import { AvalancheService } from '../../features/arcade/avalanche/services/avalanche.service';
+import { EnigmeRepository } from '../../features/arcade/enigme/repositories/enigme.repository';
+import { EnigmeService } from '../../features/arcade/enigme/services/enigme.service';
 
 const TOKEN_TTL = '7d';
-const ARCADE_GAMES = ['shifumi', 'puissance4', 'morpion', 'battle', 'bingo', 'justePrix', 'avalanche'] as const;
+const ARCADE_GAMES = ['shifumi', 'puissance4', 'morpion', 'battle', 'bingo', 'justePrix', 'avalanche', 'enigme'] as const;
 
 function getSecret(): string {
   const s = process.env.WEB_JWT_SECRET;
@@ -212,10 +214,11 @@ export default function adminRoute(client: BotClient): Router {
       totalGames: arcade[key]?.stats?.totalGames ?? 0,
     }));
 
-    const [bingoState, jpState, avalancheState] = await Promise.all([
+    const [bingoState, jpState, avalancheState, enigmeState] = await Promise.all([
       BingoRepository.get(),
       JustePrixRepository.get(),
       AvalancheRepository.get(),
+      EnigmeRepository.get(),
     ]);
     res.json({
       enabled: games.every((g) => g.enabled),
@@ -237,6 +240,14 @@ export default function adminRoute(client: BotClient): Router {
         registrationEndsAt: avalancheState?.registrationEndsAt ?? null,
         playerCount: Object.keys(avalancheState?.players ?? {}).length,
         eliminatedCount: (avalancheState?.eliminatedNumbers ?? []).length,
+      },
+      enigme: {
+        active: Boolean(enigmeState?.activeThreadId),
+        type: enigmeState?.riddle?.type ?? null,
+        endsAt: enigmeState?.endsAt ?? null,
+        nextSpawnAt: enigmeState?.nextSpawnAt ?? null,
+        solverCount: (enigmeState?.solvers ?? []).length,
+        attemptCount: Object.keys(enigmeState?.attempts ?? {}).length,
       },
     });
   });
@@ -270,6 +281,15 @@ export default function adminRoute(client: BotClient): Router {
     await AvalancheService.spawn(client);
     const after = await AvalancheRepository.get();
     if (!after?.activeThreadId) { res.status(409).json({ error: 'Spawn impossible : configure le forum des jeux (post 🏔️) et vérifie qu\'il n\'est pas trop tard (inscriptions jusqu\'à 13h)' }); return; }
+    res.json({ ok: true });
+  });
+
+  router.post('/api/admin/arcade/enigme/spawn', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
+    const state = await EnigmeRepository.get();
+    if (state?.activeThreadId) { res.status(409).json({ error: 'Une énigme est déjà en cours' }); return; }
+    await EnigmeService.spawn(client);
+    const after = await EnigmeRepository.get();
+    if (!after?.activeThreadId) { res.status(409).json({ error: 'Spawn impossible : configure le forum des jeux (post 🧩) et vérifie qu\'il n\'est pas trop tard (révélation 21h)' }); return; }
     res.json({ ok: true });
   });
 
@@ -529,6 +549,7 @@ export default function adminRoute(client: BotClient): Router {
       arcadeThreadName: name(config.arcadeThreadId),
       justePrixThreadName: name(config.justePrixThreadId),
       avalancheThreadName: name(config.avalancheThreadId),
+      enigmeThreadName: name(config.enigmeThreadId),
       announceChannelId: config.announceChannelId,
       announceChannelName: name(config.announceChannelId),
       scheduleChannelId: config.scheduleChannelId,

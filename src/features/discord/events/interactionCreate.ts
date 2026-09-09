@@ -56,6 +56,8 @@ import {
   handleCdmSelect,
   handleCdmChannelSelect,
 } from '../../cdm/events/cdm-interactions';
+import { EnigmeService } from '../../arcade/enigme/services/enigme.service';
+import { ENIGME_BUTTON_ID, ENIGME_MODAL_ID } from '../../arcade/enigme/constants/enigme.constants';
 import { QuizService, QUIZ_BUTTON_PREFIX, QUIZ_THEME_PREFIX } from '../../quiz/services/quiz.service';
 import { PersonalityTestService, PTEST_BUTTON_PREFIX } from '../../personality-test/services/personality-test.service';
 import { isSilentDiscordError } from '../../../shared/utils/discord-errors';
@@ -161,6 +163,8 @@ export default {
           await QuizService.handleAnswer(client, interaction);
         } else if (interaction.customId.startsWith(QUIZ_THEME_PREFIX + ':')) {
           await QuizService.handleThemePick(client, interaction);
+        } else if (interaction.customId === ENIGME_BUTTON_ID) {
+          await EnigmeService.handleButton(interaction);
         } else if (interaction.customId.startsWith(PTEST_BUTTON_PREFIX + ':')) {
           await PersonalityTestService.handleButton(client, interaction);
         } else if (interaction.customId.startsWith(GIVE_EXPEDITION_BUTTON_PREFIX)) {
@@ -212,7 +216,9 @@ export default {
       }
 
       else if (interaction.isModalSubmit()) {
-        if (interaction.customId.startsWith(GROUP_DESC_MODAL_PREFIX + ':')) {
+        if (interaction.customId === ENIGME_MODAL_ID) {
+          await EnigmeService.handleModal(interaction);
+        } else if (interaction.customId.startsWith(GROUP_DESC_MODAL_PREFIX + ':')) {
           await handleGroupDescModal(interaction);
         } else if (interaction.customId.startsWith(GROUP_TIME_MODAL_PREFIX + ':')) {
           await handleGroupTimeModal(interaction);

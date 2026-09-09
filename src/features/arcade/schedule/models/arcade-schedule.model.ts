@@ -1,6 +1,6 @@
 import { prop, getModelForClass, DocumentType } from '@typegoose/typegoose';
 
-export type ScheduledGame = 'bingo' | 'justePrix' | 'avalanche';
+export type ScheduledGame = 'bingo' | 'justePrix' | 'avalanche' | 'enigme';
 
 export class ArcadeSchedule {
   /** Lundi de la semaine (YYYY-MM-DD Paris) */

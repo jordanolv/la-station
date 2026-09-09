@@ -12,10 +12,11 @@ import { AppConfigService } from './app-config.service';
 import { BingoRepository } from '../../arcade/bingo/repositories/bingo.repository';
 import { JustePrixRepository } from '../../arcade/juste-prix/repositories/juste-prix.repository';
 import { AvalancheRepository } from '../../arcade/avalanche/repositories/avalanche.repository';
+import { EnigmeRepository } from '../../arcade/enigme/repositories/enigme.repository';
 
 export const GAMES_BELL_EMOJI = '🔔';
 
-export type NotifGameKey = 'quiz' | 'bingo' | 'justePrix' | 'avalanche';
+export type NotifGameKey = 'quiz' | 'bingo' | 'justePrix' | 'avalanche' | 'enigme';
 
 export interface GamesForumConfig {
   forumId: string | null;
@@ -24,13 +25,14 @@ export interface GamesForumConfig {
   arcadeThreadId: string | null;
   justePrixThreadId: string | null;
   avalancheThreadId: string | null;
+  enigmeThreadId: string | null;
   announceChannelId: string | null;
   /** Channel du planning hebdo (défaut : channel d'annonces) */
   scheduleChannelId: string | null;
   pingRoles: Record<NotifGameKey, string | null>;
 }
 
-const POSTS: { key: 'quiz' | 'bingo' | 'arcadePost' | 'justePrix' | 'avalanche'; name: string; content: string }[] = [
+const POSTS: { key: 'quiz' | 'bingo' | 'arcadePost' | 'justePrix' | 'avalanche' | 'enigme'; name: string; content: string }[] = [
   {
     key: 'quiz',
     name: '❓ Quiz du jour',
@@ -56,6 +58,11 @@ const POSTS: { key: 'quiz' | 'bingo' | 'arcadePost' | 'justePrix' | 'avalanche';
     name: '💰 Juste Prix',
     content: '**Le Juste Prix.**\nQuand une manche démarre, propose **UN** nombre — tu peux le changer jusqu\'à la révélation. Le plus proche gagne, le nombre exact fait sauter la banque ! 🎯\n\n🔔 **Réagis à ce message pour être notifié à chaque manche !**',
   },
+  {
+    key: 'enigme',
+    name: '🧩 Énigme',
+    content: '**L\'Énigme du jour.**\nSuite logique, anagramme, charade, devinette, film en emojis… Réponds en secret avec le bouton, 3 essais chacun. Les trois premiers à trouver montent sur le podium, indice à 15h, révélation à 21h. 🧠\n\n🔔 **Réagis à ce message pour être notifié à chaque énigme !**',
+  },
 ];
 
 const NOTIF_GAMES: { key: NotifGameKey; roleName: string }[] = [
@@ -63,6 +70,7 @@ const NOTIF_GAMES: { key: NotifGameKey; roleName: string }[] = [
   { key: 'bingo', roleName: '🔔 Bingo' },
   { key: 'justePrix', roleName: '🔔 Juste Prix' },
   { key: 'avalanche', roleName: '🔔 Avalanche' },
+  { key: 'enigme', roleName: '🔔 Énigme' },
 ];
 
 export class GamesForumService {
@@ -77,6 +85,7 @@ export class GamesForumService {
       arcadeThreadId: channels.arcadePost ?? null,
       justePrixThreadId: channels.justePrix ?? null,
       avalancheThreadId: channels.avalanche ?? null,
+      enigmeThreadId: channels.enigme ?? null,
       announceChannelId: channels.gamesAnnounce ?? null,
       scheduleChannelId: channels.arcadeSchedule ?? channels.gamesAnnounce ?? null,
       pingRoles: {
@@ -84,6 +93,7 @@ export class GamesForumService {
         bingo: roles.bingo ?? null,
         justePrix: roles.justePrix ?? null,
         avalanche: roles.avalanche ?? null,
+        enigme: roles.enigme ?? null,
       },
     };
   }
@@ -192,15 +202,16 @@ export class GamesForumService {
     // Bingo et Juste Prix : verrouillés par défaut, les jeux les déverrouillent pendant les parties —
     // sauf si une partie est en cours au moment du setup.
     if (channels.quiz) await this.setThreadLocked(client, channels.quiz, false);
-    const [bingoState, jpState, avalancheState] = await Promise.all([
+    const [bingoState, jpState, avalancheState, enigmeState] = await Promise.all([
       BingoRepository.get(),
       JustePrixRepository.get(),
       AvalancheRepository.get(),
+      EnigmeRepository.get(),
     ]);
     const activeThreads = new Set(
-      [bingoState?.activeThreadId, jpState?.activeThreadId, avalancheState?.activeThreadId].filter(Boolean),
+      [bingoState?.activeThreadId, jpState?.activeThreadId, avalancheState?.activeThreadId, enigmeState?.activeThreadId].filter(Boolean),
     );
-    for (const key of ['bingo', 'justePrix', 'avalanche']) {
+    for (const key of ['bingo', 'justePrix', 'avalanche', 'enigme']) {
       const threadId = channels[key];
       if (threadId && !activeThreads.has(threadId)) await this.setThreadLocked(client, threadId, true);
     }
