@@ -33,9 +33,9 @@ function weekDays(date: Date): string[] {
   });
 }
 
-/** Chaque jeu passe au moins une fois, les jours restants sont tirés au hasard. */
+/** Chaque jeu passe au moins une fois (si assez de jours), le reste est tiré au hasard. */
 export function generateWeek(days: string[]): Record<string, ScheduledGame> {
-  const picks = shuffle(GAMES);
+  const picks = shuffle(GAMES).slice(0, days.length);
   while (picks.length < days.length) picks.push(GAMES[Math.floor(Math.random() * GAMES.length)]);
   return Object.fromEntries(shuffle(picks).map((game, i) => [days[i], game]));
 }
@@ -59,12 +59,35 @@ export class ArcadeScheduleService {
     return this.pending;
   }
 
-  private static async createWeek(client: BotClient, days: string[]): Promise<IArcadeScheduleDoc> {
-    const doc = await ArcadeScheduleModel.create({ weekKey: days[0], days: generateWeek(days) });
-    const lines = days.map((d, i) => `**${DAY_LABELS[i]}** · ${GAME_LABELS[doc.days[d]]}`);
-    const content = `📅 **Planning des jeux de la semaine**\n${lines.join('\n')}`;
-    await GamesForumService.announce(client, content);
+  /** Regénère la semaine courante ; `fromToday` laisse vides les jours déjà passés. */
+  static async regenerate(client: BotClient, fromToday: boolean): Promise<IArcadeScheduleDoc> {
+    const days = weekDays(new Date());
+    const from = fromToday ? days.indexOf(toParisDayYMD(new Date())) : 0;
+    return this.createWeek(client, days, from);
+  }
+
+  static async getCurrentWeek(): Promise<{ days: string[]; games: Record<string, ScheduledGame> }> {
+    const days = weekDays(new Date());
+    const doc = await ArcadeScheduleModel.findOne({ weekKey: days[0] });
+    return { days, games: doc?.days ?? {} };
+  }
+
+  private static async createWeek(client: BotClient, days: string[], from = 0): Promise<IArcadeScheduleDoc> {
+    const previous = await ArcadeScheduleModel.findOne({ weekKey: days[0] });
+    await GamesForumService.deleteAnnounce(client, previous?.announceMessageId);
+
+    const games = generateWeek(days.slice(from));
+    const lines = days.map((d, i) => `**${DAY_LABELS[i]}** · ${games[d] ? GAME_LABELS[games[d]] : '—'}`);
+    const announceMessageId = await GamesForumService.announce(
+      client,
+      `📅 **Planning des jeux de la semaine**\n${lines.join('\n')}`,
+    );
     LogService.info(lines.join('\n'), { feature: '🕹️ Arcade', title: '📅 Planning de la semaine' }).catch(() => {});
-    return doc;
+
+    return ArcadeScheduleModel.findOneAndUpdate(
+      { weekKey: days[0] },
+      { $set: { days: games, announceMessageId: announceMessageId ?? undefined } },
+      { upsert: true, new: true },
+    );
   }
 }

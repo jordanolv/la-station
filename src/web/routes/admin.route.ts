@@ -25,6 +25,7 @@ import { BingoRepository } from '../../features/arcade/bingo/repositories/bingo.
 import { BingoService } from '../../features/arcade/bingo/services/bingo.service';
 import { JustePrixRepository } from '../../features/arcade/juste-prix/repositories/juste-prix.repository';
 import { JustePrixService } from '../../features/arcade/juste-prix/services/juste-prix.service';
+import { ArcadeScheduleService } from '../../features/arcade/schedule/services/arcade-schedule.service';
 import { AvalancheRepository } from '../../features/arcade/avalanche/repositories/avalanche.repository';
 import { AvalancheService } from '../../features/arcade/avalanche/services/avalanche.service';
 
@@ -219,6 +220,7 @@ export default function adminRoute(client: BotClient): Router {
     res.json({
       enabled: games.every((g) => g.enabled),
       games,
+      schedule: await ArcadeScheduleService.getCurrentWeek(),
       bingo: {
         active: Boolean(bingoState?.activeThreadId),
         nextSpawnAt: bingoState?.nextSpawnAt ?? null,
@@ -237,6 +239,11 @@ export default function adminRoute(client: BotClient): Router {
         eliminatedCount: (avalancheState?.eliminatedNumbers ?? []).length,
       },
     });
+  });
+
+  router.post('/api/admin/arcade/schedule/generate', requireAdmin, async (req: Request, res: Response): Promise<void> => {
+    await ArcadeScheduleService.regenerate(client, Boolean(req.body?.fromToday));
+    res.json({ ok: true });
   });
 
   router.post('/api/admin/arcade/bingo/spawn', requireAdmin, async (_req: Request, res: Response): Promise<void> => {

@@ -171,6 +171,18 @@
     <div class="card">
       <div class="row">
         <div>
+          <strong>📅 Planning de la semaine</strong>
+          <div id="scheduleStatus" class="muted" style="margin-top:4px"></div>
+        </div>
+        <div>
+          <button class="ghost" onclick="generateSchedule(true)">🔁 À partir d'aujourd'hui</button>
+          <button class="ghost" onclick="generateSchedule(false)">🔁 Toute la semaine</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
           <strong>🎯 Bingo</strong>
           <div id="bingoStatus" class="muted" style="margin-top:4px"></div>
         </div>
@@ -628,6 +640,11 @@ async function loadArcade() {
         <td><span class="badge ${g.enabled ? 'on' : 'off'}">${g.enabled ? 'Activé' : 'Désactivé'}</span></td>
       </tr>`).join('');
 
+  const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  $('scheduleStatus').innerHTML = a.schedule.days
+    .map((d, i) => `<b>${DAYS[i]}</b> ${GAME_LABELS[a.schedule.games[d]] ?? '—'}`)
+    .join(' · ');
+
   const when = (d) => d ? new Date(d).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : null;
   $('bingoStatus').innerHTML = [
     a.bingo.active ? `🟢 Partie en cours — ${a.bingo.guessCount} tentative(s)` : '⚪ Pas de partie en cours',
@@ -647,6 +664,11 @@ async function loadArcade() {
       : '⚪ Pas de partie en cours',
     'Une position/joueur avant 13h · éliminations jusqu\'à 21h · dernier debout gagne',
   ].filter(Boolean).join(' · ');
+}
+async function generateSchedule(fromToday) {
+  if (!confirm(fromToday ? 'Regénérer le planning à partir d\'aujourd\'hui ? Les jours passés resteront vides.' : 'Regénérer tout le planning de la semaine ?')) return;
+  try { await api('/api/admin/arcade/schedule/generate', { method: 'POST', body: JSON.stringify({ fromToday }) }); toast('Planning posté 📅'); await loadArcade(); }
+  catch (err) { toast(err.message); }
 }
 async function spawnAvalanche() {
   if (!confirm('Lancer une avalanche maintenant ?')) return;

@@ -10,6 +10,9 @@ export class ArcadeSchedule {
   /** YYYY-MM-DD → jeu du jour */
   @prop({ type: Object, required: true })
   days!: Record<string, ScheduledGame>;
+
+  @prop()
+  announceMessageId?: string;
 }
 
 const ArcadeScheduleModel = getModelForClass(ArcadeSchedule, {
