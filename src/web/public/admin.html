@@ -165,56 +165,8 @@
     <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
     <div class="card">
       <strong>🕹️ Arcade</strong>
-      <p class="muted" style="margin-top:4px">L'activation se fait d'un clic sur la carte Arcade de l'accueil (tous les jeux ensemble).</p>
+      <p class="muted" style="margin-top:4px">Mini-jeux à la demande (Shifumi, Puissance 4, Morpion, Battle). L'activation se fait d'un clic sur la carte Arcade de l'accueil. Les jeux du jour ont leur propre onglet.</p>
       <table id="arcadeTable"></table>
-    </div>
-    <div class="card">
-      <div class="row">
-        <div>
-          <strong>📅 Planning de la semaine</strong>
-          <div id="scheduleStatus" class="muted" style="margin-top:4px"></div>
-        </div>
-        <div>
-          <button class="ghost" onclick="generateSchedule()">🔁 Regénérer</button>
-          <button class="ghost" onclick="previewRecap()">🗞️ Poster le récap du lundi</button>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="row">
-        <div>
-          <strong>🎯 Bingo</strong>
-          <div id="bingoStatus" class="muted" style="margin-top:4px"></div>
-        </div>
-        <button class="success" onclick="spawnBingo()">⚡ Lancer un bingo</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="row">
-        <div>
-          <strong>💰 Juste Prix</strong>
-          <div id="jpStatus" class="muted" style="margin-top:4px"></div>
-        </div>
-        <button class="success" onclick="spawnJp()">⚡ Lancer une manche</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="row">
-        <div>
-          <strong>🏔️ L'Avalanche</strong>
-          <div id="avalancheStatus" class="muted" style="margin-top:4px"></div>
-        </div>
-        <button class="success" onclick="spawnAvalanche()">⚡ Lancer une avalanche</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="row">
-        <div>
-          <strong>🧩 Énigme</strong>
-          <div id="enigmeStatus" class="muted" style="margin-top:4px"></div>
-        </div>
-        <button class="success" onclick="spawnEnigme()">⚡ Lancer une énigme</button>
-      </div>
     </div>
   </section>
 
@@ -286,12 +238,65 @@
   </section>
 
   <!-- ═══════════ Forum des jeux ═══════════ -->
-  <section id="tab-forum" class="hidden">
+  <section id="tab-games" class="hidden">
     <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
     <div class="card">
-      <strong>🗂️ Forum des jeux</strong>
+      <strong>🎮 Jeux du jour</strong>
+      <p class="muted" style="margin-top:4px">Un jeu par jour selon le planning hebdo, chacun dans son post du forum. Le quiz a son propre onglet.</p>
+      <table id="dailyGamesTable"></table>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>📅 Planning de la semaine</strong>
+          <div id="scheduleStatus" class="muted" style="margin-top:4px"></div>
+        </div>
+        <div>
+          <button class="ghost" onclick="generateSchedule()">🔁 Regénérer</button>
+          <button class="ghost" onclick="previewRecap()">🗞️ Poster le récap du lundi</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>🎯 Bingo</strong>
+          <div id="bingoStatus" class="muted" style="margin-top:4px"></div>
+        </div>
+        <button class="success" onclick="spawnBingo()">⚡ Lancer un bingo</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>💰 Juste Prix</strong>
+          <div id="jpStatus" class="muted" style="margin-top:4px"></div>
+        </div>
+        <button class="success" onclick="spawnJp()">⚡ Lancer une manche</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>🏔️ L'Avalanche</strong>
+          <div id="avalancheStatus" class="muted" style="margin-top:4px"></div>
+        </div>
+        <button class="success" onclick="spawnAvalanche()">⚡ Lancer une avalanche</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div>
+          <strong>🧩 Énigme</strong>
+          <div id="enigmeStatus" class="muted" style="margin-top:4px"></div>
+        </div>
+        <button class="success" onclick="spawnEnigme()">⚡ Lancer une énigme</button>
+      </div>
+    </div>
+    <div class="card">
+      <strong>🗂️ Forum, annonces et notifications</strong>
       <p class="muted" style="margin-top:6px">
-        Un post permanent par jeu (❓ Quiz, 🎯 Bingo, 💰 Juste Prix, 🕹️ Arcade). Chaque post notifiable
+        Un post permanent par jeu (❓ Quiz, 🎯 Bingo, 💰 Juste Prix, 🏔️ Avalanche, 🧩 Énigme, 🕹️ Arcade). Chaque post notifiable
         porte une réaction 🔔 : réagir = recevoir le rôle de notification du jeu, la retirer = ne plus être
         pingé. Choisis un forum existant ou laisse le bot créer le sien.
       </p>
@@ -542,7 +547,7 @@ const FEATURES = [
   { key: 'voice', name: 'Vocaux', ico: '🔊', tab: 'voice', kind: 'voice' },
   { key: 'activity-roles', name: 'Rôles d\'activité', ico: '🎖️', tab: 'roles', kind: 'roles' },
   { key: 'personality-test', name: 'Test perso', ico: '🧬', tab: 'ptest', kind: null },
-  { key: 'games-forum', name: 'Forum jeux', ico: '🗂️', tab: 'forum', kind: null },
+  { key: 'daily-games', name: 'Jeux du jour', ico: '🎮', tab: 'games', kind: null },
   { key: 'general', name: 'Général', ico: '⚙️', tab: 'general', kind: null },
 ];
 
@@ -642,13 +647,15 @@ async function revealQuiz() {
 const GAME_LABELS = { shifumi: '✊ Shifumi', puissance4: '🔴 Puissance 4', morpion: '❌ Morpion', battle: '⚔️ Battle', bingo: '🎯 Bingo', justePrix: '💰 Juste Prix', avalanche: '🏔️ Avalanche', enigme: '🧩 Énigme' };
 async function loadArcade() {
   const a = await api('/api/admin/arcade');
-  $('arcadeTable').innerHTML = '<tr><th>Jeu</th><th>Parties jouées</th><th>État</th></tr>' +
-    a.games.map((g) => `
+  const DAILY = ['bingo', 'justePrix', 'avalanche', 'enigme'];
+  const gameRows = (games) => '<tr><th>Jeu</th><th>Parties jouées</th><th>État</th></tr>' + games.map((g) => `
       <tr>
         <td>${GAME_LABELS[g.key] ?? g.key}</td>
         <td>${fmt(g.totalGames)}</td>
         <td><span class="badge ${g.enabled ? 'on' : 'off'}">${g.enabled ? 'Activé' : 'Désactivé'}</span></td>
       </tr>`).join('');
+  $('arcadeTable').innerHTML = gameRows(a.games.filter((g) => !DAILY.includes(g.key)));
+  $('dailyGamesTable').innerHTML = gameRows(a.games.filter((g) => DAILY.includes(g.key)));
 
   const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
   $('scheduleStatus').innerHTML = a.schedule.days
@@ -1129,7 +1136,7 @@ const TAB_LOADERS = {
   ph: loadPh,
   users: loadUsers,
   roles: loadRolesTab,
-  forum: loadForum,
+  games: () => Promise.all([loadArcade(), loadForum()]),
   party: loadParty,
   birthday: () => loadFeatureCard('birthday'),
   suggestion: () => loadFeatureCard('suggestion'),
