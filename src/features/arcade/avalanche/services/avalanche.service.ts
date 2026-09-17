@@ -23,6 +23,7 @@ import { AvalancheRepository } from '../repositories/avalanche.repository';
 import type { IAvalancheStateDoc } from '../models/avalanche-state.model';
 import {
   AVALANCHE_ACCENT_COLOR,
+  AVALANCHE_DEATHS,
   AVALANCHE_ELIMINATION_END_HOUR,
   AVALANCHE_ELIMINATION_START_HOUR,
   AVALANCHE_FINISHED_ACCENT_COLOR,
@@ -47,6 +48,31 @@ function survivorsOf(state: IAvalancheStateDoc): { userId: string; num: number }
   return Object.entries(state.players ?? {})
     .map(([userId, num]) => ({ userId, num }))
     .filter((p) => !eliminated.has(p.num));
+}
+
+// ponytail: sac en RAM, pas de répétition tant qu'il reste des raisons ; un restart le remélange
+let deathBag: string[] = [];
+
+function drawDeath(): string {
+  if (deathBag.length === 0) {
+    deathBag = [...AVALANCHE_DEATHS].sort(() => Math.random() - 0.5);
+  }
+  return deathBag.pop()!;
+}
+
+function eliminationLine(victim: { userId: string; num: number }): string {
+  const death = drawDeath();
+  return `🌨️ <@${victim.userId}> (position **${victim.num}**) ${death}… emporté par la coulée ! 💀`;
+}
+
+function survivorsLine(survivors: { userId: string; num: number }[]): string {
+  const list = survivors
+    .sort((a, b) => a.num - b.num)
+    .map((s) => `**${s.num}** <@${s.userId}>`)
+    .join(' · ');
+  // ponytail: au-delà de 12 on n'affiche que le compte, sinon le message explose
+  if (survivors.length > 12) return `🧗 Encore **${survivors.length}** grimpeurs en course.`;
+  return `🧗 Encore **${survivors.length}** en course : ${list}`;
 }
 
 export class AvalancheService {
@@ -295,22 +321,25 @@ export class AvalancheService {
     const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
     const thread = guild ? await guild.channels.fetch(state.activeThreadId).catch(() => null) : null;
 
+    const stillIn = survivors.filter((s) => s.num !== victim.num);
+
     if (remaining === 1) {
-      const winner = survivors.find((s) => s.num !== victim.num)!;
       if (thread?.isThread()) {
-        await thread.send(
-          `🌨️ L'avalanche emporte la position **${victim.num}**… <@${victim.userId}> dévale la pente ! 💀`,
-        ).catch(() => {});
+        await thread.send({
+          content: [eliminationLine(victim), `🧗 Il ne reste que <@${stillIn[0].userId}> (position **${stillIn[0].num}**)…`].join('\n'),
+          allowedMentions: { users: [victim.userId] },
+        }).catch(() => {});
       }
       const fresh = await AvalancheRepository.get();
-      await this.crown(client, fresh ?? state, winner);
+      await this.crown(client, fresh ?? state, stillIn[0]);
       return;
     }
 
     if (thread?.isThread()) {
-      await thread.send(
-        `🌨️ L'avalanche emporte la position **${victim.num}**… <@${victim.userId}> dévale la pente ! 💀 Encore **${remaining}** grimpeurs debout.`,
-      ).catch(() => {});
+      await thread.send({
+        content: [eliminationLine(victim), survivorsLine(stillIn)].join('\n'),
+        allowedMentions: { users: [victim.userId] },
+      }).catch(() => {});
     }
 
     const fresh = await AvalancheRepository.get();
