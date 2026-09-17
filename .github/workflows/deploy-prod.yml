@@ -45,8 +45,7 @@ jobs:
             npm ci
             npm run build
 
-            # ponytail: migration de nom PM2 — supprimable après le 1er déploiement réussi.
-            # Sans ça l'ancien process resterait en vie à côté du nouveau : deux bots en ligne.
+            # Ancien nom PM2 : à supprimer de ce workflow après le 1er déploiement.
             pm2 delete the-ridge-bot 2>/dev/null || true
 
             APP_ENV=prod pm2 startOrReload ecosystem.config.cjs --update-env

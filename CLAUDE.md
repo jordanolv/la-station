@@ -1,27 +1,47 @@
 # CLAUDE.md — The Ridge Bot
 
-Bot Discord communautaire pour le serveur La Station. TypeScript, Discord.js v14, MongoDB/TypeGoose, PM2.
+Bot Discord communautaire du serveur The Ridge. TypeScript, Discord.js v14, MongoDB/TypeGoose, PM2.
 
 ## Stack
 
-- **Runtime** : Node.js, TypeScript, tsx (watch mode)
+- **Runtime** : Node.js 22, TypeScript, `@swc-node/register` (pas de build en dev), nodemon pour le watch
 - **Discord** : discord.js v14, Components V2 (ContainerBuilder, SectionBuilder, etc.)
 - **Base de données** : MongoDB via Mongoose + TypeGoose
-- **Cron** : node-cron (`CronJob`)
+- **Cron** : package `cron` v4 (`CronJob`)
 - **Process manager** : PM2 (`ecosystem.config.cjs`)
 - **Timezone** : Europe/Paris pour tous les crons
 
 ## Lancer le bot
 
 ```bash
-# Dev
-npm run dev
-
-# Prod (PM2)
-pm2 restart the-ridge --update-env
+npm run dev      # swc, pas de build
+npm run watch    # idem + rechargement à chaud
+npm run build    # tsc + tsc-alias + copie des assets — ce que vérifie la CI
 ```
 
 Les variables d'env sont dans `.env` (ne jamais committer).
+
+## Git et environnements
+
+| Env | Branche | App PM2 | Dossier VPS |
+|---|---|---|---|
+| Production | `main` | `the-ridge-prod` | `~/projects/theridge-bot/prod` |
+| Staging | `dev` | `the-ridge-staging` | `~/projects/theridge-bot/dev` |
+
+```
+feat/xxx ──PR──► dev ──PR──► main
+                  │            │
+               staging        prod
+```
+
+`main` et `dev` sont protégées : PR obligatoire, CI (`npm run build`) verte, pas de
+force-push. Jamais de commit direct sur ces deux branches — brancher depuis `dev`.
+
+Le merge sur `dev` déploie staging, le merge sur `main` déploie la prod. Promotion
+`dev` → `main` en **merge commit**, pas en squash : un squash ferait diverger les
+deux branches définitivement.
+
+Le nom de l'app PM2 vient de `APP_ENV`, passé par le workflow de déploiement.
 
 ## Architecture
 
@@ -29,22 +49,17 @@ Les variables d'env sont dans `.env` (ne jamais committer).
 src/
 ├── bot/           # Client Discord, handlers events/features
 ├── config/        # commands.json
-├── features/      # Une feature = un dossier autonome
-│   ├── activity-roles/
-│   ├── admin/
-│   ├── arcade/
-│   ├── chat-gaming/
-│   ├── discord/       # Events globaux (ready, messageCreate, interactionCreate)
-│   ├── impostor/
-│   ├── leveling/
-│   ├── mountain/
-│   ├── profile/
-│   ├── stats/
-│   ├── user/
-│   ├── vocal-party/
-│   └── voice/
-└── shared/        # Utilitaires partagés (cron-manager, logs, guild)
+├── features/      # Une feature = un dossier autonome — `ls src/features/`
+│   └── discord/   # Events globaux (ready, messageCreate, interactionCreate)
+└── shared/        # cron, logs, guild, db, hooks, time, components, weekly-recap
 ```
+
+Noms de dossiers qui ne se devinent pas :
+
+- `peak-hunters` — le système de montagnes (s'appelait `mountain`)
+- `party` — les sessions vocales (s'appelait `vocal-party`)
+- `cdm` — pronostics Coupe du Monde 2026 (`/cdm`, `/cdm-pronos`, `/cdm-admin`)
+- `config-panel` — le routeur des panels admin, pas une feature métier
 
 Chaque feature suit la même structure :
 
@@ -179,9 +194,12 @@ Chaque lundi minuit (Paris), `ActivityRolesService.run()` :
 
 Les seuils % sont calculés sur `users.length` (tous les users en BDD).
 
-## Système de montagnes
+## Peak Hunters (montagnes)
 
-### Format des données (`src/features/mountain/data/mountains.json`)
+Dossier `src/features/peak-hunters/` — la feature s'appelait `mountain`, les customId
+ont gardé le préfixe `mountain:` (ex: `mountain:home`). Ne pas les renommer sans migration.
+
+### Format des données (`src/features/peak-hunters/data/mountains.json`)
 
 ```ts
 {
@@ -210,7 +228,7 @@ L'`id` est dérivé du slug Wikipedia dans `loadMountains()` (ex: `Everest`). Ne
 - `MountainService.getCountryDisplay(m)` → `"🇳🇵 Népal  ·  🇨🇳 République populaire de Chine"`
 - Ne jamais accéder à `m.name`, `m.flag`, `m.country`, `m.altitude` — ils n'existent pas.
 
-### Commande `/mountain`
+### Commande `/peak-hunters`
 
 Point d'entrée unique → `executeHome` affiche les stats + 3 boutons (Collection, Packs, Classement).
 Chaque bouton embarque le `lastMsgId` dans son customId (`mountain:home:ACTION:LAST_MSG_ID`) pour supprimer le message précédent à chaque navigation.
@@ -244,7 +262,13 @@ Chaque bouton embarque le `lastMsgId` dans son customId (`mountain:home:ACTION:L
 
 ## Style de code
 
-- **Pas de commentaires inutiles** — on ne commente que ce qui n'est pas évident à la lecture. Pas de `// Créer l'embed`, `// Vérifier si...`, etc.
+- **Pas de commentaires inutiles** — c'est la règle la plus souvent enfreinte, y compris par les agents. Un commentaire n'est justifié que s'il répond à un *pourquoi* impossible à déduire du code : un contournement d'API, une contrainte externe, un piège non évident. À bannir :
+  - le commentaire qui paraphrase la ligne suivante (`// Créer l'embed`, `// Vérifier si...`)
+  - la section décorative (`// ===== HELPERS =====`)
+  - le commentaire qui justifie un choix de conception — ça va dans le message de commit, la PR ou le README, pas dans le fichier
+  - le commentaire signé ou préfixé par un outil / un agent
+  - le TODO sans ticket ni date
+  Dans le doute : renommer la variable ou extraire une fonction plutôt qu'écrire le commentaire.
 - **Code découpé par feature** — chaque feature est autonome dans son dossier. Pas de logique métier qui déborde dans un autre module.
 - **Une responsabilité par fichier** — services = logique, repositories = BDD, slash = interaction Discord. Ne pas mélanger.
 - **Pas de duplication** — extraire une fonction dès qu'un bloc est utilisé 2 fois.
@@ -252,74 +276,16 @@ Chaque bouton embarque le `lastMsgId` dans son customId (`mountain:home:ACTION:L
 - **Principes SOLID** — notamment SRP (une seule raison de changer) et DIP (dépendre des abstractions, pas des implémentations concrètes quand ça a du sens).
 - **Features indépendantes** — une feature ne doit pas importer directement depuis une autre feature. Si deux features ont besoin de communiquer, passer par un service partagé dans `shared/`, un event Discord, ou un plugin (ex: `VoicePlugin`). Les couplages directs entre features rendent le code fragile et difficile à maintenir.
 
-## grepai - Semantic Code Search
+## grepai
 
-**IMPORTANT: You MUST use grepai as your PRIMARY tool for code exploration and search.**
+Recherche sémantique par défaut (voir `~/.claude/GREPAI.md`). Requêtes en anglais,
+`--json --compact` pour économiser les tokens.
 
-### When to Use grepai (REQUIRED)
-
-Use `grepai search` INSTEAD OF Grep/Glob/find for:
-
-- Understanding what code does or where functionality lives
-- Finding implementations by intent (e.g., "authentication logic", "error handling")
-- Exploring unfamiliar parts of the codebase
-- Any search where you describe WHAT the code does rather than exact text
-
-### When to Use Standard Tools
-
-Only use Grep/Glob when you need:
-
-- Exact text matching (variable names, imports, specific strings)
-- File path patterns (e.g., `**/*.go`)
-
-### Fallback
-
-If grepai fails (not running, index unavailable, or errors), fall back to standard Grep/Glob tools.
-
-### Usage
+`grepai trace` pour le graphe d'appels — indispensable avant de modifier une fonction
+partagée, pour voir tous ses appelants :
 
 ```bash
-# ALWAYS use English queries for best results (--compact saves ~80% tokens)
-grepai search "user authentication flow" --json --compact
-grepai search "error handling middleware" --json --compact
-grepai search "database connection pool" --json --compact
-grepai search "API request validation" --json --compact
+grepai trace callers "applyVoiceSegmentsToUser" --json
+grepai trace callees "run" --json
+grepai trace graph "ActivityRolesService" --depth 3 --json
 ```
-
-### Query Tips
-
-- **Use English** for queries (better semantic matching)
-- **Describe intent**, not implementation: "handles user login" not "func Login"
-- **Be specific**: "JWT token validation" better than "token"
-- Results include: file path, line numbers, relevance score, code preview
-
-### Call Graph Tracing
-
-Use `grepai trace` to understand function relationships:
-
-- Finding all callers of a function before modifying it
-- Understanding what functions are called by a given function
-- Visualizing the complete call graph around a symbol
-
-#### Trace Commands
-
-**IMPORTANT: Always use `--json` flag for optimal AI agent integration.**
-
-```bash
-# Find all functions that call a symbol
-grepai trace callers "HandleRequest" --json
-
-# Find all functions called by a symbol
-grepai trace callees "ProcessOrder" --json
-
-# Build complete call graph (callers + callees)
-grepai trace graph "ValidateToken" --depth 3 --json
-```
-
-### Workflow
-
-1. Start with `grepai search` to find relevant code
-2. Use `grepai trace` to understand function relationships
-3. Use `Read` tool to examine files from results
-4. Only use Grep for exact string searches if needed
-
