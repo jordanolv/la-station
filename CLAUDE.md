@@ -49,16 +49,17 @@ Le nom de l'app PM2 vient de `APP_ENV`, passé par le workflow de déploiement.
 src/
 ├── bot/           # Client Discord, handlers events/features
 ├── config/        # commands.json
-├── features/      # Une feature = un dossier autonome
-│   ├── activity-roles/  bet/        cdm/         chat-gaming/
-│   ├── admin/           config-panel/            draft/
-│   ├── arcade/          group/      impostor/    leveling/
-│   ├── party/           peak-hunters/            personality-test/
-│   ├── quiz/            stats/      suggestion/  user/
-│   ├── voice/
+├── features/      # Une feature = un dossier autonome — `ls src/features/`
 │   └── discord/   # Events globaux (ready, messageCreate, interactionCreate)
 └── shared/        # cron, logs, guild, db, hooks, time, components, weekly-recap
 ```
+
+Noms de dossiers qui ne se devinent pas :
+
+- `peak-hunters` — le système de montagnes (s'appelait `mountain`)
+- `party` — les sessions vocales (s'appelait `vocal-party`)
+- `cdm` — pronostics Coupe du Monde 2026 (`/cdm`, `/cdm-pronos`, `/cdm-admin`)
+- `config-panel` — le routeur des panels admin, pas une feature métier
 
 Chaque feature suit la même structure :
 
