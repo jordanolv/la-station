@@ -21,6 +21,7 @@ import { ArcadeStatsService } from '../../services/arcade-stats.service';
 import { GameResultRepository } from '../../results/repositories/game-result.repository';
 import { AvalancheRepository } from '../repositories/avalanche.repository';
 import type { IAvalancheStateDoc } from '../models/avalanche-state.model';
+import { createBag } from '../../../../shared/utils/bag';
 import {
   AVALANCHE_ACCENT_COLOR,
   AVALANCHE_DEATHS,
@@ -50,18 +51,10 @@ function survivorsOf(state: IAvalancheStateDoc): { userId: string; num: number }
     .filter((p) => !eliminated.has(p.num));
 }
 
-// ponytail: sac en RAM, pas de répétition tant qu'il reste des raisons ; un restart le remélange
-let deathBag: string[] = [];
-
-function drawDeath(): string {
-  if (deathBag.length === 0) {
-    deathBag = [...AVALANCHE_DEATHS].sort(() => Math.random() - 0.5);
-  }
-  return deathBag.pop()!;
-}
+const deathBag = createBag(AVALANCHE_DEATHS);
 
 function eliminationLine(victim: { userId: string; num: number }): string {
-  const death = drawDeath();
+  const death = deathBag.draw();
   return `🌨️ <@${victim.userId}> (position **${victim.num}**) ${death}… emporté par la coulée ! 💀`;
 }
 
