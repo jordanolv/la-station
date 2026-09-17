@@ -1,16 +1,23 @@
 # The Ridge — bot Discord
 
-Bot Discord modulaire (TypeScript, discord.js, MongoDB), déployé sur VPS via PM2.
+Bot Discord modulaire (TypeScript, discord.js, MongoDB), déployé sur VPS via Dokploy.
 
 ## Environnements
 
-| Env | Branche | App PM2 | Dossier VPS | Déclencheur |
-|---|---|---|---|---|
-| Production | `main` | `the-ridge-prod` | `~/projects/theridge-bot/prod` | push sur `main` |
-| Staging | `dev` | `the-ridge-staging` | `~/projects/theridge-bot/dev` | push sur `dev` |
+Projet Dokploy **The Ridge**, un environnement par déploiement. Chaque environnement
+a son application `bot` (build Dockerfile) et son service Mongo `db`.
 
-Le nom de l'app PM2 vient de `APP_ENV`, passé par le workflow de déploiement.
-Chaque dossier VPS a son propre `.env` (jamais commité).
+| Env | Branche | Environnement Dokploy | Déclencheur |
+|---|---|---|---|
+| Production | `main` | `production` | push sur `main` |
+| Staging | `dev` | `staging` | push sur `dev` |
+
+Dokploy écoute les webhooks GitHub et redéploie tout seul : il n'y a pas de workflow
+de déploiement dans ce repo, et il ne faut pas en rajouter. Les variables d'env se
+gèrent dans l'onglet *Environment* de chaque application, jamais dans le repo.
+
+Les deux environnements ont leur propre bot Discord (token distinct) et leur propre
+serveur Discord.
 
 ## Flow de travail
 
@@ -34,5 +41,5 @@ feat/xxx ──PR──► dev ──PR──► main
 npm run dev      # lancer en local (swc, pas de build)
 npm run watch    # idem avec rechargement à chaud
 npm run build    # tsc + tsc-alias + copie des assets — c'est ce que la CI vérifie
-npm start        # pm2 startOrReload (sur le VPS, avec APP_ENV)
+npm start        # node dist/index.js — ce que lance le conteneur
 ```
