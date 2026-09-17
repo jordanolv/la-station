@@ -1,6 +1,6 @@
 # CLAUDE.md — The Ridge Bot
 
-Bot Discord communautaire du serveur The Ridge. TypeScript, Discord.js v14, MongoDB/TypeGoose, PM2.
+Bot Discord communautaire du serveur The Ridge. TypeScript, Discord.js v14, MongoDB/TypeGoose, Docker/Dokploy.
 
 ## Stack
 
@@ -8,7 +8,7 @@ Bot Discord communautaire du serveur The Ridge. TypeScript, Discord.js v14, Mong
 - **Discord** : discord.js v14, Components V2 (ContainerBuilder, SectionBuilder, etc.)
 - **Base de données** : MongoDB via Mongoose + TypeGoose
 - **Cron** : package `cron` v4 (`CronJob`)
-- **Process manager** : PM2 (`ecosystem.config.cjs`)
+- **Déploiement** : Docker (`Dockerfile`) via Dokploy
 - **Timezone** : Europe/Paris pour tous les crons
 
 ## Lancer le bot
@@ -23,10 +23,10 @@ Les variables d'env sont dans `.env` (ne jamais committer).
 
 ## Git et environnements
 
-| Env | Branche | App PM2 | Dossier VPS |
-|---|---|---|---|
-| Production | `main` | `the-ridge-prod` | `~/projects/theridge-bot/prod` |
-| Staging | `dev` | `the-ridge-staging` | `~/projects/theridge-bot/dev` |
+| Env | Branche | Environnement Dokploy |
+|---|---|---|
+| Production | `main` | projet The Ridge → `production` |
+| Staging | `dev` | projet The Ridge → `staging` |
 
 ```
 feat/xxx ──PR──► dev ──PR──► main
@@ -41,7 +41,10 @@ Le merge sur `dev` déploie staging, le merge sur `main` déploie la prod. Promo
 `dev` → `main` en **merge commit**, pas en squash : un squash ferait diverger les
 deux branches définitivement.
 
-Le nom de l'app PM2 vient de `APP_ENV`, passé par le workflow de déploiement.
+Dokploy redéploie sur webhook GitHub. Aucun workflow de déploiement dans le repo —
+ne pas en réintroduire. Les variables d'env vivent dans l'onglet *Environment* de
+chaque application Dokploy, et chaque environnement a son propre bot et son propre
+serveur Discord.
 
 ## Architecture
 
