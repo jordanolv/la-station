@@ -36,7 +36,7 @@ jobs:
             cd $PROJECT_DIR
 
             if [ ! -d ".git" ]; then
-              git clone -b main https://${{ secrets.GH_TOKEN }}@github.com/jordanolv/la-station.git .
+              git clone -b main https://${{ secrets.GH_TOKEN }}@github.com/jordanolv/the-ridge.git .
             else
               git fetch origin
               git reset --hard origin/main
