@@ -1,12 +1,12 @@
-name: 🚀 Deploy PROD to VPS
+name: 🧪 Deploy STAGING to VPS
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
   workflow_dispatch:
 
 concurrency:
-  group: deploy-prod
+  group: deploy-staging
   cancel-in-progress: false
 
 jobs:
@@ -31,22 +31,23 @@ jobs:
 
             set -e
 
-            PROJECT_DIR=~/projects/theridge-bot/prod
+            # ponytail: le dossier s'appelle encore "dev", l'app PM2 "the-ridge-staging".
+            PROJECT_DIR=~/projects/theridge-bot/dev
             mkdir -p $PROJECT_DIR
             cd $PROJECT_DIR
 
             if [ ! -d ".git" ]; then
-              git clone -b main https://${{ secrets.GH_TOKEN }}@github.com/jordanolv/la-station.git .
+              git clone -b dev https://${{ secrets.GH_TOKEN }}@github.com/jordanolv/la-station.git .
             else
               git fetch origin
-              git reset --hard origin/main
+              git reset --hard origin/dev
             fi
 
             npm ci
             npm run build
 
-            APP_ENV=prod pm2 startOrReload ecosystem.config.cjs --update-env
+            APP_ENV=staging pm2 startOrReload ecosystem.config.cjs --update-env
             pm2 save
 
-            echo "✅ PROD déployé"
+            echo "✅ STAGING déployé"
           EOF
