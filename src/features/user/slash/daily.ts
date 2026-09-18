@@ -7,7 +7,7 @@ import { DailyStoryService } from '../services/daily-story.service';
 import { awardExpeditions } from '../../peak-hunters/services/expedition.service';
 import { dropMountain } from '../../peak-hunters/services/mountain.service';
 
-const MAX_MONEY = 100;
+const MAX_MONEY = 10;
 const MAX_XP = 100;
 
 const PACK_CHANCES = [

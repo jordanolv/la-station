@@ -57,7 +57,7 @@ export const RAID_HP_BAR_LENGTH = 20;
 export const RAID_SPAWN_CHANCE_PER_HOUR = 0.15;
 
 export const RAID_RARITY_CONFIG: Record<Exclude<MountainRarity, 'common'>, RaidRarityConfig> = {
-  rare:      { hpMultiplier: 3,  durationDaysMin: 4, durationDaysMax: 5, baseXp: 300,  baseCoins: 200  },
-  epic:      { hpMultiplier: 7,  durationDaysMin: 5, durationDaysMax: 6, baseXp: 700,  baseCoins: 500  },
-  legendary: { hpMultiplier: 15, durationDaysMin: 6, durationDaysMax: 7, baseXp: 1500, baseCoins: 1000 },
+  rare:      { hpMultiplier: 3,  durationDaysMin: 4, durationDaysMax: 5, baseXp: 300,  baseCoins: 20  },
+  epic:      { hpMultiplier: 7,  durationDaysMin: 5, durationDaysMax: 6, baseXp: 700,  baseCoins: 50  },
+  legendary: { hpMultiplier: 15, durationDaysMin: 6, durationDaysMax: 7, baseXp: 1500, baseCoins: 100 },
 };

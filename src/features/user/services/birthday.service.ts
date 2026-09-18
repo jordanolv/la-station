@@ -30,7 +30,7 @@ export async function sendBirthdayAnnouncement(
   const discordUser = await client.users.fetch(discordId).catch(() => null);
   const avatarUrl = discordUser?.displayAvatarURL({ size: 256 });
 
-  const moneyGift = Math.floor(Math.random() * 901) + 100;
+  const moneyGift = Math.floor(Math.random() * 91) + 10;
 
   await Promise.all([
     UserModel.updateOne({ discordId }, { $inc: { 'profil.money': moneyGift } }),

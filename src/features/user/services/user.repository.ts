@@ -21,7 +21,7 @@ export class UserRepository {
     return UserModel.create({
       discordId: userData.discordId,
       name: userData.name,
-      profil: { money: 500, exp: 0, lvl: 1 },
+      profil: { money: 50, exp: 0, lvl: 1 },
       stats: { totalMsg: 0, voiceTime: 0, voiceHistory: [] },
       infos: {
         registeredAt: new Date(),

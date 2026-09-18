@@ -18,9 +18,10 @@ que le code applique déjà ces règles.
 | Champ `flow` sur les logs économie | ✅ implémenté |
 | Log du rake des bets (`burn`) | ✅ implémenté |
 | Ancrage 1 RC ≈ 1 € | 🟡 décidé, pas appliqué |
-| Redénomination ÷10 | 🟡 décidé, pas appliqué |
+| Redénomination ÷10 | 🟡 script prêt, **pas exécuté** |
 | Salaire hebdomadaire | ✅ implémenté, **désactivé** par défaut |
-| Suppression du money/minute | 🟡 décidé, pas appliqué |
+| Suppression du money/minute | ✅ implémenté |
+| Recalage des primes de jeu | ✅ implémenté |
 | Boutique (puits) | 🔴 à concevoir |
 
 ---
@@ -206,12 +207,16 @@ Les gains d'événements — bingo, avalanche, juste-prix, énigme, raids — so
 **primes hors salaire**, plafonnées à **10–20 % d'une paie hebdomadaire médiane**,
 soit **~25 à 50 RC**.
 
+Valeurs appliquées : bingo / avalanche / juste-prix **40**, énigme **40 / 25 / 15**,
+raids **20 / 50 / 100** selon la rareté (événement collectif sur plusieurs jours),
+daily **0–10**.
+
 Au-delà, elles recréent l'émission incontrôlée que le salaire vient d'éliminer.
 
-Note : les valeurs actuelles (750 par victoire) sont hors échelle d'un facteur ~20.
-L'ancrage les rend visiblement absurdes — gagner 750 € en devinant un nombre casse
+Les valeurs précédentes (750 par victoire) étaient hors échelle d'un facteur ~20.
+L'ancrage les rendait visiblement absurdes — gagner 750 € en devinant un nombre casse
 l'illusion immédiatement. C'est une fonctionnalité du système, pas un problème : il
-signale ce qui était mal calibré.
+signale ce qui est mal calibré.
 
 ---
 
@@ -258,9 +263,22 @@ updateMany({}, [{ $set: { 'profil.money': { $round: [{ $divide: ['$profil.money'
 Un solde de 50 000 coins devient 5 000 RC. L'arrondi absorbe au passage les soldes
 fractionnaires hérités du money/minute.
 
-Constantes à diviser par 10 dans le même passage : solde de départ (500 → 50), cadeau
-d'anniversaire (100–1000 → 10–100), `baseCoins` des raids. Le daily et le money/minute
-disparaissent avec le salaire.
+Le script est `scripts/redenominate.mjs`. Il tourne en dry-run par défaut, affiche la
+masse et les percentiles avant/après, et refuse de s'exécuter deux fois grâce à un
+marqueur dans la collection `migrations` :
+
+```bash
+node scripts/redenominate.mjs           # simulation
+node scripts/redenominate.mjs --apply   # execution
+```
+
+Les constantes, elles, sont déjà recalées dans le code : solde de départ 500 → 50,
+anniversaire 100–1000 → 10–100, `baseCoins` des raids 200/500/1000 → 20/50/100.
+
+Le money/minute du vocal a disparu. Le **daily** a été conservé mais ramené de 0–100 à
+0–10 : à l'ancienne échelle il versait 148 % d'un salaire hebdomadaire médian, à la
+nouvelle il en représente 15 %, ce qui le range dans la bande des primes (§6). C'est un
+rituel de feedback quotidien qui ne méritait pas d'être supprimé, seulement calibré.
 
 **Faire la redénomination et l'ouverture de la boutique dans le même patchnote.**
 « Nouvelle monnaie + voilà ce que vous pouvez acheter » est une annonce qui se tient ;
