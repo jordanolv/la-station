@@ -232,6 +232,38 @@
     </div>
   </section>
 
+  <!-- ═══════════ Paie hebdomadaire ═══════════ -->
+  <section id="tab-payroll" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+    <div class="card">
+      <div class="row">
+        <strong>💰 Paie hebdomadaire</strong>
+        <span class="muted" id="payrollState"></span>
+      </div>
+      <p class="muted" style="margin:10px 0 0">
+        Versée le lundi à minuit, sur les points d'activité de la semaine écoulée.
+        Règles et invariants : <code>economy.md</code>.
+      </p>
+      <div class="row" style="margin-top:14px;justify-content:flex-start;gap:18px;flex-wrap:wrap">
+        <label class="muted">Budget par actif (RC/sem) <input id="pBudget" class="small" type="number" min="1" max="100000"></label>
+        <label class="muted">Part SMIC (%) <input id="pSmic" class="small" type="number" min="0" max="100"></label>
+        <label class="muted">Seuil de qualification (pts) <input id="pSeuil" class="small" type="number" min="0"></label>
+      </div>
+      <div class="row" style="margin-top:14px;justify-content:flex-start;gap:10px">
+        <button onclick="savePayroll()">Enregistrer</button>
+        <button class="ghost" onclick="previewPayroll()">🔍 Simuler sur la semaine écoulée</button>
+      </div>
+      <p class="muted" style="margin:10px 0 0">
+        La simulation n'écrit rien. Elle rejoue le calcul sur les points réellement
+        enregistrés la semaine dernière, avec les valeurs saisies ci-dessus.
+      </p>
+    </div>
+    <div class="card hidden" id="payrollPreview">
+      <div class="row"><strong>Simulation</strong><span class="muted" id="pvSummary"></span></div>
+      <table id="pvTable" style="margin-top:12px"></table>
+    </div>
+  </section>
+
   <!-- ═══════════ Rôles d'activité ═══════════ -->
   <section id="tab-roles" class="hidden">
     <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
@@ -608,20 +640,22 @@ const FEATURES = [
   { key: 'leveling', name: 'Leveling', ico: '📈', tab: 'leveling', kind: 'config' },
   { key: 'voice', name: 'Vocaux', ico: '🔊', tab: 'voice', kind: 'voice' },
   { key: 'activity-roles', name: 'Rôles d\'activité', ico: '🎖️', tab: 'roles', kind: 'roles' },
+  { key: 'payroll', name: 'Paie hebdo', ico: '💰', tab: 'payroll', kind: 'payroll' },
   { key: 'personality-test', name: 'Test perso', ico: '🧬', tab: 'ptest', kind: null },
   { key: 'daily-games', name: 'Jeux du jour', ico: '🎮', tab: 'games', kind: null },
   { key: 'general', name: 'Général', ico: '⚙️', tab: 'general', kind: null },
 ];
 
 async function loadHome() {
-  const [cfg, arcade, roles, voice, o] = await Promise.all([
+  const [cfg, arcade, roles, voice, payroll, o] = await Promise.all([
     api('/api/admin/config'), api('/api/admin/arcade'), api('/api/admin/activity-roles'),
-    api('/api/admin/voice'), api('/api/admin/overview'),
+    api('/api/admin/voice'), api('/api/admin/payroll'), api('/api/admin/overview'),
   ]);
   const stateOf = (f) => {
     if (f.kind === 'arcade') return arcade.enabled;
     if (f.kind === 'roles') return roles.enabled;
     if (f.kind === 'voice') return voice.enabled;
+    if (f.kind === 'payroll') return payroll.enabled;
     if (f.kind === 'config') return cfg[f.key]?.enabled ?? false;
     return null;
   };
@@ -657,6 +691,7 @@ async function featClick(key, state) {
     if (f.kind === 'arcade') await api('/api/admin/arcade/toggle-all', { method: 'POST', body: JSON.stringify({ enabled: !state }) });
     else if (f.kind === 'roles') await api('/api/admin/activity-roles', { method: 'POST', body: JSON.stringify({ enabled: !state }) });
     else if (f.kind === 'voice') await api('/api/admin/voice', { method: 'POST', body: JSON.stringify({ enabled: !state }) });
+    else if (f.kind === 'payroll') await api('/api/admin/payroll', { method: 'POST', body: JSON.stringify({ enabled: !state }) });
     else await api('/api/admin/config/' + key, { method: 'POST', body: JSON.stringify({ enabled: !state }) });
     await loadHome();
   } catch (err) { toast(err.message); }
@@ -853,8 +888,48 @@ async function saveRoles() {
     await loadRolesTab();
   } catch (err) { toast(err.message); }
 }
+async function loadPayrollTab() {
+  const p = await api('/api/admin/payroll');
+  $('pBudget').value = p.budgetPerActive;
+  $('pSmic').value = p.smicPercent;
+  $('pSeuil').value = p.qualificationThreshold;
+  $('payrollState').textContent = p.enabled ? 'Activée' : 'Désactivée';
+  $('payrollPreview').classList.add('hidden');
+}
+async function savePayroll() {
+  try {
+    await api('/api/admin/payroll', {
+      method: 'POST',
+      body: JSON.stringify({
+        budgetPerActive: $('pBudget').value,
+        smicPercent: $('pSmic').value,
+        qualificationThreshold: $('pSeuil').value,
+      }),
+    });
+    toast('Paramètres de paie enregistrés ✅');
+    await loadPayrollTab();
+  } catch (err) { toast(err.message); }
+}
+async function previewPayroll() {
+  try {
+    const q = new URLSearchParams({
+      budgetPerActive: $('pBudget').value,
+      smicPercent: $('pSmic').value,
+      qualificationThreshold: $('pSeuil').value,
+    });
+    const r = await api('/api/admin/payroll/preview?' + q);
+    $('pvSummary').textContent =
+      `${r.qualified} qualifiés sur ${r.scored} · masse ${fmt(r.totalPaid)} RC · médiane ${fmt(r.median)} · min ${fmt(r.min)} · max ${fmt(r.max)}`;
+    $('pvTable').innerHTML =
+      '<tr><th>#</th><th>Joueur</th><th>Points</th><th>Part</th><th>Base</th><th>Variable</th><th>Paie</th></tr>' +
+      (r.slips.length
+        ? r.slips.map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.name)}</td><td>${fmt(s.points)}</td><td>${(s.share * 100).toFixed(1)}%</td><td>${fmt(s.base)}</td><td>${fmt(s.variable)}</td><td><strong>${fmt(s.total)}</strong></td></tr>`).join('')
+        : '<tr><td colspan="7" class="muted">Aucun qualifié — seuil trop haut, ou aucune semaine enregistrée.</td></tr>');
+    $('payrollPreview').classList.remove('hidden');
+  } catch (err) { toast(err.message); }
+}
 async function runRolesNow() {
-  if (!confirm('Lancer la rotation des rôles maintenant ? Les points d\'activité seront remis à zéro.')) return;
+  if (!confirm('Lancer la rotation hebdomadaire maintenant ?\n\nLa paie sera versée, les rôles réattribués et les points d\'activité remis à zéro.')) return;
   try { await api('/api/admin/activity-roles/run', { method: 'POST' }); toast('Rotation lancée ✅'); }
   catch (err) { toast(err.message); }
 }
@@ -1271,6 +1346,7 @@ const TAB_LOADERS = {
   ph: loadPh,
   users: loadUsers,
   roles: loadRolesTab,
+  payroll: loadPayrollTab,
   games: () => Promise.all([loadArcade(), loadForum()]),
   party: loadParty,
   birthday: () => loadFeatureCard('birthday'),

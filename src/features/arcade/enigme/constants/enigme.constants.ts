@@ -6,9 +6,9 @@ export const ENIGME_MAX_ATTEMPTS = 3;
 
 /** 🥇 🥈 🥉 — ordre d'arrivée des bonnes réponses */
 export const ENIGME_PODIUM_REWARDS = [
-  { money: 750, xp: 600, expeditions: 4 },
-  { money: 400, xp: 300, expeditions: 2 },
-  { money: 200, xp: 150, expeditions: 1 },
+  { money: 40, xp: 600, expeditions: 4 },
+  { money: 25, xp: 300, expeditions: 2 },
+  { money: 15, xp: 150, expeditions: 1 },
 ];
 
 /** Bonne réponse hors podium */

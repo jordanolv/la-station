@@ -13,6 +13,8 @@ import { PeakHuntersConfigRepository } from '../../features/peak-hunters/reposit
 import { MountainService } from '../../features/peak-hunters/services/mountain.service';
 import { SpawnService } from '../../features/peak-hunters/services/spawn.service';
 import { ActivityRolesConfigRepository } from '../../features/activity-roles/repositories/activity-roles-config.repository';
+import { PayrollConfigRepository } from '../../features/payroll/repositories/payroll-config.repository';
+import { computePayroll } from '../../features/payroll/services/payroll.service';
 import { PersonalityTestConfigRepository } from '../../features/personality-test/repositories/personality-test-config.repository';
 import { GamesForumService } from '../../features/discord/services/games-forum.service';
 import { PartyService } from '../../features/party/services/party.service';
@@ -22,7 +24,7 @@ import { PersonalityTestSessionRepository } from '../../features/personality-tes
 import { VoiceService } from '../../features/voice/services/voice.service';
 import { VoiceConfigRepository } from '../../features/voice/repositories/voice-config.repository';
 import { UserMountainsRepository } from '../../features/peak-hunters/repositories/user-mountains.repository';
-import { ActivityRolesService } from '../../features/activity-roles/services/activity-roles.service';
+import { runWeekly } from '../../shared/cron/weekly.cron';
 import { BingoRepository } from '../../features/arcade/bingo/repositories/bingo.repository';
 import { BingoService } from '../../features/arcade/bingo/services/bingo.service';
 import { JustePrixRepository } from '../../features/arcade/juste-prix/repositories/juste-prix.repository';
@@ -863,8 +865,77 @@ export default function adminRoute(client: BotClient): Router {
     res.json({ ok: true });
   });
 
+  router.get('/api/admin/payroll', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
+    const config = await PayrollConfigRepository.getOrCreate();
+    res.json({
+      enabled: config.enabled,
+      budgetPerActive: config.budgetPerActive,
+      smicPercent: config.smicPercent,
+      qualificationThreshold: config.qualificationThreshold,
+    });
+  });
+
+  router.post('/api/admin/payroll', requireAdmin, async (req: Request, res: Response): Promise<void> => {
+    const body = req.body ?? {};
+    const int = (v: unknown, min: number, max: number) => {
+      const n = parseInt(String(v), 10);
+      return Number.isFinite(n) ? Math.min(Math.max(n, min), max) : undefined;
+    };
+    const budget = int(body.budgetPerActive, 1, 100_000);
+    const smic = int(body.smicPercent, 0, 100);
+    const seuil = int(body.qualificationThreshold, 0, 10_000_000);
+    await PayrollConfigRepository.update({
+      ...(typeof body.enabled === 'boolean' ? { enabled: body.enabled } : {}),
+      ...(budget !== undefined ? { budgetPerActive: budget } : {}),
+      ...(smic !== undefined ? { smicPercent: smic } : {}),
+      ...(seuil !== undefined ? { qualificationThreshold: seuil } : {}),
+    });
+    res.json({ ok: true });
+  });
+
+  // Simule la paie sur la derniere semaine reellement enregistree, sans rien verser.
+  // C'est l'outil de calibrage : les parametres se reglent sur de vrais points.
+  router.get('/api/admin/payroll/preview', requireAdmin, async (req: Request, res: Response): Promise<void> => {
+    const config = await PayrollConfigRepository.getOrCreate();
+    const num = (v: unknown, fallback: number) => {
+      const n = parseInt(String(v), 10);
+      return Number.isFinite(n) ? n : fallback;
+    };
+    const params = {
+      budgetPerActive: num(req.query.budgetPerActive, config.budgetPerActive),
+      smicPercent: num(req.query.smicPercent, config.smicPercent),
+      qualificationThreshold: num(req.query.qualificationThreshold, config.qualificationThreshold),
+    };
+
+    const users = await UserModel.find({ 'stats.lastWeekActivityPoints': { $gt: 0 } })
+      .select('discordId name stats.lastWeekActivityPoints')
+      .lean();
+
+    const scores = users
+      .map(u => ({ userId: u.discordId, name: u.name, points: u.stats?.lastWeekActivityPoints ?? 0 }))
+      .sort((a, b) => b.points - a.points);
+
+    const byId = new Map(scores.map(s => [s.userId, s.name]));
+    const slips = computePayroll(scores, params).map(s => ({ ...s, name: byId.get(s.userId) ?? s.userId }));
+    const totals = slips.map(s => s.total).sort((a, b) => a - b);
+    const median = totals.length
+      ? totals.length % 2 ? totals[(totals.length - 1) / 2] : (totals[totals.length / 2 - 1] + totals[totals.length / 2]) / 2
+      : 0;
+
+    res.json({
+      params,
+      scored: scores.length,
+      qualified: slips.length,
+      totalPaid: slips.reduce((sum, s) => sum + s.total, 0),
+      median,
+      min: totals[0] ?? 0,
+      max: totals[totals.length - 1] ?? 0,
+      slips,
+    });
+  });
+
   router.post('/api/admin/activity-roles/run', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
-    await ActivityRolesService.run(client);
+    await runWeekly(client);
     res.json({ ok: true });
   });
 

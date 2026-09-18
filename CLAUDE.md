@@ -205,6 +205,16 @@ Chaque lundi minuit (Paris), `ActivityRolesService.run()` :
 
 Les seuils % sont calculés sur `users.length` (tous les users en BDD).
 
+## Économie
+
+**Toute modification touchant à l'argent (`profil.money`), aux récompenses ou aux prix
+se lit d'abord dans [`economy.md`](economy.md).** Les règles d'ancrage, la formule du
+salaire hebdomadaire et les invariants qui cassent en silence y sont fixés — ils ne
+sont pas déductibles du code.
+
+Tout mouvement d'argent passe par `LogService.economy` avec le bon `flow`
+(`mint` | `transfer` | `burn`), sinon la page Économie ment.
+
 ## Peak Hunters (montagnes)
 
 Dossier `src/features/peak-hunters/` — la feature s'appelait `mountain`, les customId
