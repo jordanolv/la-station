@@ -350,7 +350,7 @@ export class EnigmeService {
     const podiumLines: string[] = [];
     for (const [i, solver] of solvers.slice(0, ENIGME_PODIUM_REWARDS.length).entries()) {
       const reward = ENIGME_PODIUM_REWARDS[i];
-      await UserService.updateUserMoney(solver.userId, reward.money);
+      await UserService.updateUserMoney(solver.userId, reward.money, 'Énigme — gain');
       await LevelingService.giveXpDirectly(client, solver.userId, reward.xp);
       const expeditions = await awardExpeditions(solver.userId, reward.expeditions);
       await GameResultRepository.record('enigme', solver.userId, i + 1, { timeMs: new Date(solver.at).getTime() - startedAt, type: state.riddle.type, players: Object.keys(state.attempts ?? {}).length });

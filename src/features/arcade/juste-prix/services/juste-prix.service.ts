@@ -257,7 +257,7 @@ export class JustePrixService {
       if (winner) {
         const exact = winner.diff === 0;
         const packs = JP_REWARD_CLOSEST.expeditions + (exact ? JP_EXACT_BONUS_EXPEDITIONS : 0);
-        await UserService.updateUserMoney(winner.userId, JP_REWARD_CLOSEST.money);
+        await UserService.updateUserMoney(winner.userId, JP_REWARD_CLOSEST.money, 'Juste Prix — gain');
         await LevelingService.giveXpDirectly(client, winner.userId, JP_REWARD_CLOSEST.xp);
         const expeditions = await awardExpeditions(winner.userId, packs);
         await UserService.recordArcadeWin(winner.userId, 'justePrix' as any);

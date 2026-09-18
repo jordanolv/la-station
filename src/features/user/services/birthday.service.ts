@@ -36,6 +36,7 @@ export async function sendBirthdayAnnouncement(
     UserModel.updateOne({ discordId }, { $inc: { 'profil.money': moneyGift } }),
     UserMountainsRepository.addExpeditions(discordId, BIRTHDAY_EXPEDITIONS),
   ]);
+  await LogService.economy(discordId, moneyGift, 'Cadeau anniversaire', 'Birthday');
   await LogService.info(`<@${discordId}> a reçu **${BIRTHDAY_EXPEDITIONS} expéditions** 🗺️ pour son anniversaire 🎂`, { feature: 'Birthday', title: '🗺️ Expéditions gagnées' });
 
   const container = new ContainerBuilder()

@@ -424,7 +424,7 @@ export class BingoService {
 
     const totalPacks = BINGO_REWARD.expeditions;
 
-    await UserService.updateUserMoney(user.id, BINGO_REWARD.money);
+    await UserService.updateUserMoney(user.id, BINGO_REWARD.money, 'Bingo — gain');
     await LevelingService.giveXpDirectly(client, user.id, BINGO_REWARD.xp);
     const expeditions = await awardExpeditions(user.id, totalPacks);
     await UserService.recordArcadeWin(user.id, 'bingo');

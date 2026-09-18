@@ -251,8 +251,8 @@ export default {
         await ArcadeStatsService.incrementGameCount('shifumi');
 
         if (game.bet > 0) {
-          await UserService.updateUserMoney(loser.id, -game.bet);
-          await UserService.updateUserMoney(winner.id, game.bet);
+          await UserService.updateUserMoney(loser.id, -game.bet, 'Shifumi — pari perdu', 'transfer');
+          await UserService.updateUserMoney(winner.id, game.bet, 'Shifumi — pari gagné', 'transfer');
           victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
         }
       } catch (error) {
