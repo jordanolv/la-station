@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { computePayroll, parisWeekKey, ActivityScore } from './payroll.service';
 
-const PARAMS = { budgetPerActive: 250, smicPercent: 40, qualificationThreshold: 3600 };
+const PARAMS = { budgetPerActive: 250, smicPercent: 40, qualificationThreshold: 1800 };
 
 const reels: ActivityScore[] = [
   { userId: 'kass', points: 156_150 },
@@ -56,7 +56,7 @@ test('les comptes sous le seuil ne sont pas payés et ne gonflent pas la masse',
 });
 
 test('aucun qualifié ne produit aucune fiche de paie', () => {
-  assert.deepEqual(computePayroll([{ userId: 'a', points: 3599 }], PARAMS), []);
+  assert.deepEqual(computePayroll([{ userId: 'a', points: 1799 }], PARAMS), []);
 });
 
 test('la clé de semaine suit la semaine ISO parisienne', () => {

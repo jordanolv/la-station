@@ -13,7 +13,7 @@ export class PayrollConfig {
   smicPercent!: number;
 
   /** Points minimum pour entrer sur la feuille de paie — voir economy.md §4. */
-  @prop({ default: 3600 })
+  @prop({ default: 1800 })
   qualificationThreshold!: number;
 }
 

@@ -92,7 +92,7 @@ salaire(u)  = smic + (points(u) / total_points) × pool_var
 |---|---:|---|
 | `BUDGET_PAR_ACTIF` | 250 RC / semaine | revenu moyen visé par qualifié |
 | `PART_SMIC` | 40 % (= 100 RC) | base fixe ; le reste est au prorata |
-| `SEUIL_QUALIFICATION` | 3 600 pts | ≈ 1 h de vocal, ou ~8 créneaux de messages |
+| `SEUIL_QUALIFICATION` | 1 800 pts | ≈ 30 min de vocal, ou 4 créneaux de messages |
 
 Les points ne changent pas : **1 s de vocal = 1 pt**, **1 créneau de 30 min contenant
 au moins un message = 450 pts** (soit 25 % du vocal à durée égale).
@@ -105,32 +105,34 @@ au moins un message = 450 pts** (soit 25 % du vocal à durée égale).
 change de rang et personne n'est mieux payé. Le prorata préserve l'incitation
 individuelle.
 
-**Le SMIC compresse volontairement l'écart.** Sur une distribution réaliste, l'écart
-de points entre le premier et le dernier est de ~23×, l'écart de salaire de ~4,8×.
-C'est l'objectif : le classement reste vrai, mais la monnaie reste utilisable par
-tout le monde. Baisser `PART_SMIC` étire l'échelle, la monter l'écrase.
+**Le SMIC compresse l'écart.** Sur les données réelles (13 actifs, semaine du
+2026-W38), l'écart de points entre le premier et le dernier qualifié est de 42× et
+l'écart de salaire de 4,2×. Baisser `PART_SMIC` étire l'échelle, la monter l'écrase.
 
-| `PART_SMIC` | Médiane | Min | Max | Écart |
-|---|---:|---:|---:|---:|
-| 25 % | 200 | 88 | 655 | 7,4× |
-| **40 %** ← retenu | 210 | 121 | 574 | 4,8× |
-| 55 % | 220 | 153 | 493 | 3,2× |
+Note : la distribution d'activité réelle est bien moins étalée que prévu — 6,4× entre
+le premier et le médian, pas 23×. Le SMIC travaille donc surtout pour le bas du
+classement (le joueur à 0,8 h touche 109 au lieu de ~20 sans base fixe).
 
-**Le seuil crée une falaise, et c'est voulu.** À 3 599 points on touche 0, à 3 600 on
+**Le seuil crée une falaise, et c'est voulu.** À 1 799 points on touche 0, à 1 800 on
 touche le SMIC. Ne pas le lisser en rampe progressive : un seuil est un objectif
 (« il me manque 20 minutes pour être payé ») et il fait revenir les gens en vocal.
 Une rampe récompenserait le fait de rester juste en dessous.
 
 ### Revenus attendus
 
-Ordre de grandeur sur 20 qualifiés, avec les paramètres ci-dessus :
+Mesurés sur la semaine réelle 2026-W38 (13 actifs, 10 qualifiés) :
 
 | Profil | Vocal / sem | Paie / sem | ≈ / mois | Lecture |
 |---|---:|---:|---:|---|
-| Gros | 35 h | 574 | 2 485 | un temps plein |
-| Régulier | 12 h | 265 | 1 148 | un temps partiel |
-| Médian | ~8 h | 210 | 910 | — |
-| Occasionnel | 1,5 h | 121 | 524 | argent de poche |
+| 1ᵉʳ | 31 h | 459 | 1 987 | un temps plein |
+| 3ᵉ | 21 h | 344 | 1 490 | un gros temps partiel |
+| Médian | 4,9 h | 237 | 1 030 | — |
+| Dernier qualifié | 0,8 h | 109 | 472 | argent de poche |
+
+Masse émise : **2 501 RC/semaine**, soit ~130 000 RC/an — à comparer aux
+**795 682 RC déjà en circulation** (§9). L'émission nouvelle est donc marginale
+devant le stock existant : c'est la redénomination et la boutique qui traitent le
+stock, pas la paie.
 
 **Ce tableau est le garde-fou.** Toute nouvelle source de revenu doit être vérifiée
 contre lui : si elle déplace ces valeurs, elle casse la grille de prix.
@@ -266,24 +268,54 @@ disparaissent avec le salaire.
 
 ---
 
-## 9. Ce qui reste à calibrer
+## 9. État réel de l'économie — mesuré le 2026-09-18
 
-Les valeurs des §3 et §7 sont dérivées de **20 profils inventés**, pas de données
-réelles. Elles sont cohérentes entre elles, mais elles n'ont pas encore été confrontées
-au serveur. Quatre chiffres à confirmer avant de figer :
+Relevé en lecture seule sur la base de production (83 comptes).
 
-| À mesurer | Où | Pour fixer |
-|---|---|---|
-| Distribution des `lastWeekActivityPoints` | `users.stats` | `BUDGET_PAR_ACTIF`, `SEUIL_QUALIFICATION` |
-| Messages réels par créneau de 30 min | `bot_logs` | le poids réel du texte vs vocal |
-| Distribution des soldes (médiane, p90, max) | `users.profil.money` | le prix du palier prestige |
-| Nombre de qualifiés par semaine | `lastWeekActivityPoints` | la masse salariale réelle |
+### Soldes
 
-L'hypothèse la plus fragile est la deuxième : la conversion messages → créneaux a été
-posée à **6 messages par créneau**. Si les joueurs envoient en réalité 20 messages par
-salve, le texte pèse trois fois moins que ce que prévoient les tableaux ci-dessus.
+| | Valeur |
+|---|---:|
+| Masse en circulation | 795 682 RC |
+| Détenteurs | 83 |
+| Médiane | **505** |
+| Moyenne | 9 587 |
+| p90 | 24 888 |
+| Maximum | 140 503 |
+| Part du décile supérieur | **75,6 %** |
 
-**Comment calibrer** : l'onglet *Paie hebdo* du dashboard rejoue le calcul sur les
-`lastWeekActivityPoints` réels sans rien verser. On règle les trois paramètres, on
-simule, on compare la médiane obtenue au tableau des revenus attendus (§3), et on
-n'active la paie qu'une fois les valeurs jugées bonnes.
+**La médiane vaut le solde de départ.** La moitié du serveur n'a jamais rien gagné
+au-delà des 500 RC offerts à l'inscription, pendant que 8 comptes détiennent les
+trois quarts de la masse. Le problème n'est pas que l'économie soit inégale : elle
+n'existe pas pour la majorité.
+
+### Activité (semaine 2026-W38)
+
+13 comptes avec des points sur 83. Médiane 17 544 pts (4,9 h de vocal), maximum
+112 929 (31 h).
+
+| Seuil | Qualifiés |
+|---|---:|
+| 900 pts (15 min) | 13 |
+| **1 800 pts (30 min)** ← retenu | 10 |
+| 3 600 pts (1 h) | 9 |
+
+Le seuil de 3 600 initialement prévu écartait 4 actifs réels sur 13. Sur un serveur
+de cette taille c'est trop cher payé pour se protéger des comptes dormants : 1 800
+bloque toujours le message unique (450 pts) et la visite éclair.
+
+### Texte contre vocal
+
+1,7 message par heure de vocal sur tout l'historique. Le serveur est vocal à une
+écrasante majorité — la pondération des messages à 450 pts/créneau ne déplace
+pratiquement rien, et la crainte de maltraiter les joueurs textuels ne s'applique
+pas ici.
+
+### Ce qu'il reste à trancher
+
+Le seul paramètre encore ouvert est le **prix du palier prestige** de la boutique.
+Il doit absorber le solde du plus riche après redénomination, soit ~14 000 RC.
+
+Pour rejouer ces mesures : l'onglet *Paie hebdo* du dashboard simule le calcul sur
+les `lastWeekActivityPoints` réels sans rien verser, et la page *Économie* donne la
+distribution des soldes.
