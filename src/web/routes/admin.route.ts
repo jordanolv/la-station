@@ -22,7 +22,7 @@ import { PersonalityTestSessionRepository } from '../../features/personality-tes
 import { VoiceService } from '../../features/voice/services/voice.service';
 import { VoiceConfigRepository } from '../../features/voice/repositories/voice-config.repository';
 import { UserMountainsRepository } from '../../features/peak-hunters/repositories/user-mountains.repository';
-import { ActivityRolesService } from '../../features/activity-roles/services/activity-roles.service';
+import { runWeekly } from '../../shared/cron/weekly.cron';
 import { BingoRepository } from '../../features/arcade/bingo/repositories/bingo.repository';
 import { BingoService } from '../../features/arcade/bingo/services/bingo.service';
 import { JustePrixRepository } from '../../features/arcade/juste-prix/repositories/juste-prix.repository';
@@ -864,7 +864,7 @@ export default function adminRoute(client: BotClient): Router {
   });
 
   router.post('/api/admin/activity-roles/run', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
-    await ActivityRolesService.run(client);
+    await runWeekly(client);
     res.json({ ok: true });
   });
 

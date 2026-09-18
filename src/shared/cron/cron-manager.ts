@@ -1,7 +1,7 @@
 import { Client } from 'discord.js';
 import { UserCronManager } from '../../features/user/cron';
 import { PeakHuntersCronManager } from '../../features/peak-hunters/cron';
-import { ActivityRolesCronManager } from '../../features/activity-roles/cron';
+import { WeeklyCronManager } from './weekly-cron-manager';
 import { QuizCronManager } from '../../features/quiz/cron';
 import { BingoCronManager } from '../../features/arcade/bingo/cron';
 import { JustePrixCronManager } from '../../features/arcade/juste-prix/cron';
@@ -13,7 +13,7 @@ import { BotClient } from '../../bot/client';
 export class CronManager extends BaseCronManager {
     private userCronManager: UserCronManager;
     private mountainCronManager: PeakHuntersCronManager;
-    private activityRolesCronManager: ActivityRolesCronManager;
+    private weeklyCronManager: WeeklyCronManager;
     private quizCronManager: QuizCronManager;
     private bingoCronManager: BingoCronManager;
     private justePrixCronManager: JustePrixCronManager;
@@ -25,7 +25,7 @@ export class CronManager extends BaseCronManager {
 
         this.userCronManager = new UserCronManager(client);
         this.mountainCronManager = new PeakHuntersCronManager(client);
-        this.activityRolesCronManager = new ActivityRolesCronManager(client);
+        this.weeklyCronManager = new WeeklyCronManager(client);
         this.quizCronManager = new QuizCronManager(client);
         this.bingoCronManager = new BingoCronManager(client);
         this.justePrixCronManager = new JustePrixCronManager(client);
@@ -34,7 +34,7 @@ export class CronManager extends BaseCronManager {
 
         this.addCron(this.userCronManager);
         this.addCron(this.mountainCronManager);
-        this.addCron(this.activityRolesCronManager);
+        this.addCron(this.weeklyCronManager);
         this.addCron(this.quizCronManager);
         this.addCron(this.bingoCronManager);
         this.addCron(this.justePrixCronManager);

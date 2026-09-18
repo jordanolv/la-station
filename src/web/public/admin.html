@@ -854,7 +854,7 @@ async function saveRoles() {
   } catch (err) { toast(err.message); }
 }
 async function runRolesNow() {
-  if (!confirm('Lancer la rotation des rôles maintenant ? Les points d\'activité seront remis à zéro.')) return;
+  if (!confirm('Lancer la rotation hebdomadaire maintenant ?\n\nLa paie sera versée, les rôles réattribués et les points d\'activité remis à zéro.')) return;
   try { await api('/api/admin/activity-roles/run', { method: 'POST' }); toast('Rotation lancée ✅'); }
   catch (err) { toast(err.message); }
 }
