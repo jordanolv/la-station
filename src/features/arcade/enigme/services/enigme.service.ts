@@ -32,7 +32,7 @@ import {
   ENIGME_ACCENT_COLOR,
   ENIGME_BUTTON_ID,
   ENIGME_FINISHED_ACCENT_COLOR,
-  ENIGME_HINT_HOUR,
+  ENIGME_HINT_BUTTON_ID,
   ENIGME_MAX_ATTEMPTS,
   ENIGME_MODAL_ID,
   ENIGME_PARTICIPATION_FRAGMENTS,
@@ -45,6 +45,7 @@ import {
 
 const LOG_FEATURE = '🧩 Énigme';
 const MEDALS = ['🥇', '🥈', '🥉'];
+const hintMark = (usedHint: boolean) => (usedHint ? '💡' : '🧠');
 
 function formatDuration(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -70,7 +71,7 @@ export class EnigmeService {
     ];
   }
 
-  private static buildSpawnContainer(riddle: Riddle, endsAt: Date, hint?: string): ContainerBuilder {
+  private static buildSpawnContainer(riddle: Riddle, endsAt: Date): ContainerBuilder {
     const unix = Math.floor(endsAt.getTime() / 1000);
     const container = new ContainerBuilder()
       .setAccentColor(ENIGME_ACCENT_COLOR)
@@ -80,17 +81,11 @@ export class EnigmeService {
         '🔒 **L\'énigme est scellée.** Ouvre-la quand tu es prêt : ton chrono démarre à cet instant, pas avant.',
       ));
 
-    if (hint) {
-      container
-        .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-        .addTextDisplayComponents(new TextDisplayBuilder().setContent(`💡 **Indice :** ${hint}`));
-    }
-
     return container
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(
         [
-          `Tout se joue en secret. **${ENIGME_MAX_ATTEMPTS}** essais par personne.`,
+          `Tout se joue en secret. **${ENIGME_MAX_ATTEMPTS}** essais par personne, et un indice si tu le demandes.`,
           `Le podium récompense les **trois meilleurs chronos**, pas les plus matinaux · révélation <t:${unix}:t> (<t:${unix}:R>)`,
           '',
           ...this.buildRewardLines(),
@@ -109,18 +104,23 @@ export class EnigmeService {
     );
   }
 
-  private static buildAnswerRow(disabled = false): ActionRowBuilder<ButtonBuilder> {
+  private static buildPlayRow(usedHint: boolean): ActionRowBuilder<ButtonBuilder> {
     return new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId(ENIGME_BUTTON_ID)
         .setLabel('Répondre')
         .setEmoji('🧩')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(disabled),
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId(ENIGME_HINT_BUTTON_ID)
+        .setLabel(usedHint ? 'Indice utilisé' : "Demander l'indice")
+        .setEmoji('💡')
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(usedHint),
     );
   }
 
-  private static buildRiddleView(state: IEnigmeStateDoc, revealedAt: Date): ContainerBuilder {
+  private static buildRiddleView(state: IEnigmeStateDoc, revealedAt: Date, usedHint: boolean): ContainerBuilder {
     const riddle = state.riddle!;
     const unix = Math.floor(revealedAt.getTime() / 1000);
     const container = new ContainerBuilder()
@@ -129,7 +129,7 @@ export class EnigmeService {
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(riddle.question));
 
-    if (state.hintSent) {
+    if (usedHint) {
       container
         .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
         .addTextDisplayComponents(new TextDisplayBuilder().setContent(`💡 **Indice :** ${riddle.hint}`));
@@ -152,7 +152,7 @@ export class EnigmeService {
   private static buildResultContainer(state: IEnigmeStateDoc): ContainerBuilder {
     const riddle = state.riddle!;
     const ranked = this.rankSolvers(state);
-    const podium = ranked.slice(0, 3).map((s, i) => `${MEDALS[i]} <@${s.userId}> · ${formatDuration(s.durationMs)}`);
+    const podium = ranked.slice(0, 3).map((s, i) => `${MEDALS[i]} <@${s.userId}> · ${formatDuration(s.durationMs)} ${hintMark(s.usedHint)}`);
     const others = ranked.length - podium.length;
     const triedCount = Object.keys(state.attempts ?? {}).length;
 
@@ -169,6 +169,7 @@ export class EnigmeService {
           ...(podium.length > 0 ? podium : ['💨 Personne n\'a trouvé cette fois !']),
           ...(others > 0 ? [`🧠 et **${others}** autre${others > 1 ? 's' : ''} ont trouvé`] : []),
           `👥 ${triedCount} participant${triedCount > 1 ? 's' : ''}`,
+          '-# 🧠 trouvé sans indice · 💡 avec indice',
         ].join('\n'),
       ));
   }
@@ -202,7 +203,6 @@ export class EnigmeService {
         return;
       }
       this.scheduleTimer(state.endsAt, () => this.resolve(client));
-      if (!state.hintSent && state.hintAt) this.scheduleTimer(state.hintAt, () => this.sendHint(client));
       return;
     }
 
@@ -247,7 +247,6 @@ export class EnigmeService {
       await EnigmeRepository.setNextSpawn(null);
       return;
     }
-    const hintAt = todayAtParis(ENIGME_HINT_HOUR);
 
     const riddle = EnigmeBankService.pickRiddle();
     await GamesForumService.setThreadLocked(client, post.id, false);
@@ -255,14 +254,13 @@ export class EnigmeService {
       components: [this.buildSpawnContainer(riddle, endsAt), this.buildRevealRow()],
       flags: MessageFlags.IsComponentsV2,
     });
-    await GamesForumService.pingInThread(post as ThreadChannel, 'enigme', `Une énigme vient de tomber (${ENIGME_TYPE_LABELS[riddle.type]}) — révélation à ${ENIGME_REVEAL_HOUR}h !`);
+    await GamesForumService.pingInThread(post as ThreadChannel, 'enigme', `Une énigme vient de tomber (${ENIGME_TYPE_LABELS[riddle.type]}) — ton chrono part quand tu l'ouvres, révélation à ${ENIGME_REVEAL_HOUR}h !`);
     const announceMessageId = await GamesForumService.announce(
       client,
-      `🧩 **L'énigme du jour est là !** ${ENIGME_TYPE_LABELS[riddle.type]} · indice à ${ENIGME_HINT_HOUR}h, révélation à ${ENIGME_REVEAL_HOUR}h → <#${post.id}>`,
+      `🧩 **L'énigme du jour est là !** ${ENIGME_TYPE_LABELS[riddle.type]} · révélation à ${ENIGME_REVEAL_HOUR}h → <#${post.id}>`,
     );
 
-    await EnigmeRepository.setActive({ threadId: post.id, messageId: message.id, riddle, hintAt, endsAt, announceMessageId });
-    if (hintAt.getTime() > Date.now()) this.scheduleTimer(hintAt, () => this.sendHint(client));
+    await EnigmeRepository.setActive({ threadId: post.id, messageId: message.id, riddle, endsAt, announceMessageId });
     this.scheduleTimer(endsAt, () => this.resolve(client));
 
     LogService.info(`Énigme lancée dans <#${post.id}> (${ENIGME_TYPE_LABELS[riddle.type]}, réponse **${riddle.answers[0]}**)`, { feature: LOG_FEATURE, title: '🧩 Spawn' }).catch(() => {});
@@ -277,14 +275,30 @@ export class EnigmeService {
 
     const userId = interaction.user.id;
     const revealedAt = await EnigmeRepository.revealFor(userId);
+    const usedHint = Boolean(state.hintedAt?.[userId]);
     const solved = (state.solvers ?? []).some((s) => s.userId === userId);
     const exhausted = (state.attempts?.[userId] ?? 0) >= ENIGME_MAX_ATTEMPTS;
+    const view = this.buildRiddleView(state, revealedAt, usedHint);
 
     await interaction.reply({
-      components: solved || exhausted
-        ? [this.buildRiddleView(state, revealedAt)]
-        : [this.buildRiddleView(state, revealedAt), this.buildAnswerRow()],
+      components: solved || exhausted ? [view] : [view, this.buildPlayRow(usedHint)],
       flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+    });
+  }
+
+  static async handleHint(interaction: ButtonInteraction): Promise<void> {
+    const state = await EnigmeRepository.get();
+    if (!state?.activeThreadId || !state.riddle || (state.endsAt && state.endsAt.getTime() <= Date.now())) {
+      await interaction.reply({ content: "L'énigme est terminée.", flags: MessageFlags.Ephemeral });
+      return;
+    }
+
+    const userId = interaction.user.id;
+    await EnigmeRepository.takeHint(userId);
+    const revealedAt = state.revealedAt?.[userId] ?? state.startedAt ?? new Date();
+    await interaction.update({
+      components: [this.buildRiddleView(state, new Date(revealedAt), true), this.buildPlayRow(true)],
+      flags: MessageFlags.IsComponentsV2,
     });
   }
 
@@ -362,37 +376,19 @@ export class EnigmeService {
     const now = new Date();
     const startedFrom = state.revealedAt?.[userId] ?? state.startedAt ?? now;
     const durationMs = now.getTime() - new Date(startedFrom).getTime();
-    await EnigmeRepository.addSolver(userId, now, durationMs);
+    const usedHint = Boolean(state.hintedAt?.[userId]);
+    await EnigmeRepository.addSolver(userId, now, durationMs, usedHint);
     const elapsed = formatDuration(durationMs);
+    const hintMark = usedHint ? ' (avec indice 💡)' : ' sans indice 🧠';
     await interaction.editReply({
-      content: `✅ **Trouvé en ${elapsed} !** Le classement se joue au chrono : podium et récompenses à la révélation de ${ENIGME_REVEAL_HOUR}h.`,
+      content: `✅ **Trouvé en ${elapsed}${hintMark} !** Le classement se joue au chrono : podium et récompenses à la révélation de ${ENIGME_REVEAL_HOUR}h.`,
     });
 
     const guild = await interaction.client.guilds.fetch(getGuildId()).catch(() => null);
     const thread = guild ? await guild.channels.fetch(state.activeThreadId).catch(() => null) : null;
     if (thread?.isThread()) {
-      await thread.send(`🧠 <@${userId}> a trouvé en **${elapsed}** !`).catch(() => {});
+      await thread.send(`🧠 <@${userId}> a trouvé en **${elapsed}**${usedHint ? ' avec l\'indice' : ' sans indice'} !`).catch(() => {});
     }
-  }
-
-  static async sendHint(client: BotClient): Promise<void> {
-    const state = await EnigmeRepository.get();
-    if (!state?.activeThreadId || !state.riddle || state.hintSent) return;
-    if (state.endsAt && state.endsAt.getTime() <= Date.now()) return;
-
-    await EnigmeRepository.setHintSent();
-    const guild = await client.guilds.fetch(getGuildId()).catch(() => null);
-    const thread = guild ? await guild.channels.fetch(state.activeThreadId).catch(() => null) : null;
-    if (!thread?.isThread()) return;
-
-    if (state.activeMessageId) {
-      const mainMessage = await thread.messages.fetch(state.activeMessageId).catch(() => null);
-      await mainMessage?.edit({
-        components: [this.buildSpawnContainer(state.riddle, state.endsAt!, state.riddle.hint), this.buildRevealRow()],
-        flags: MessageFlags.IsComponentsV2,
-      }).catch(() => {});
-    }
-    await thread.send(`💡 **Indice :** ${state.riddle.hint}`).catch(() => {});
   }
 
   static async resolve(client: BotClient): Promise<void> {
@@ -411,7 +407,7 @@ export class EnigmeService {
       await LevelingService.giveXpDirectly(client, solver.userId, reward.xp);
       const expeditions = await awardExpeditions(solver.userId, reward.expeditions);
       await GameResultRepository.record('enigme', solver.userId, i + 1, { timeMs: solver.durationMs, type: state.riddle.type, players: Object.keys(state.attempts ?? {}).length });
-      podiumLines.push(`${MEDALS[i]} <@${solver.userId}> · ${formatDuration(solver.durationMs)} · +${reward.money} 💰 · +${reward.xp} XP · +${reward.expeditions} pack${reward.expeditions > 1 ? 's' : ''} ${expeditions.summary}`);
+      podiumLines.push(`${MEDALS[i]} <@${solver.userId}> · ${formatDuration(solver.durationMs)} ${hintMark(solver.usedHint)} · +${reward.money} 💰 · +${reward.xp} XP · +${reward.expeditions} pack${reward.expeditions > 1 ? 's' : ''} ${expeditions.summary}`);
     }
     for (const solver of solvers.slice(ENIGME_PODIUM_REWARDS.length)) {
       await addFragmentsAndAward(solver.userId, ENIGME_SOLVER_FRAGMENTS).catch(() => {});
