@@ -35,7 +35,10 @@ feat/xxx ──PR──► dev ──PR──► main
 ```
 
 `main` et `dev` sont protégées : PR obligatoire, CI (`npm run build`) verte, pas de
-force-push. Jamais de commit direct sur ces deux branches — brancher depuis `dev`.
+force-push (`enforce_admins` actif : la protection s'applique aussi aux admins).
+Jamais de commit direct sur ces deux branches — brancher depuis `dev`. Un hook
+`PreToolUse` (`.claude/hooks/block-direct-main-dev.sh`) refuse tout `git commit` /
+`git push` fait depuis `main` ou `dev`, ou poussé explicitement vers elles.
 
 Le merge sur `dev` déploie staging, le merge sur `main` déploie la prod. Promotion
 `dev` → `main` en **merge commit**, pas en squash : un squash ferait diverger les
