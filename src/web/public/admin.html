@@ -340,7 +340,10 @@
           <strong>🧩 Énigme</strong>
           <div id="enigmeStatus" class="muted" style="margin-top:4px"></div>
         </div>
-        <button class="success" onclick="spawnEnigme()">⚡ Lancer une énigme</button>
+        <div style="display:flex;gap:8px">
+          <button class="success" onclick="spawnEnigme()">⚡ Lancer une énigme</button>
+          <button onclick="resolveEnigme()">🏁 Terminer maintenant</button>
+        </div>
       </div>
     </div>
     <div class="card">
@@ -794,6 +797,11 @@ async function previewRecap() {
 async function spawnEnigme() {
   if (!confirm('Lancer une énigme maintenant ?')) return;
   try { await api('/api/admin/arcade/enigme/spawn', { method: 'POST' }); toast('Énigme lancée 🧩'); await loadArcade(); }
+  catch (err) { toast(err.message); }
+}
+async function resolveEnigme() {
+  if (!confirm('Terminer l\'énigme en cours ? La réponse est révélée et les récompenses distribuées, comme à 21h.')) return;
+  try { await api('/api/admin/arcade/enigme/resolve', { method: 'POST' }); toast('Énigme terminée 🏁'); await loadArcade(); }
   catch (err) { toast(err.message); }
 }
 async function generateSchedule() {

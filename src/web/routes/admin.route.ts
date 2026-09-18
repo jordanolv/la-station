@@ -303,6 +303,13 @@ export default function adminRoute(client: BotClient): Router {
     res.json({ ok: true });
   });
 
+  router.post('/api/admin/arcade/enigme/resolve', requireAdmin, async (_req: Request, res: Response): Promise<void> => {
+    const state = await EnigmeRepository.get();
+    if (!state?.activeThreadId) { res.status(409).json({ error: 'Aucune énigme en cours' }); return; }
+    await EnigmeService.resolve(client);
+    res.json({ ok: true });
+  });
+
   router.post('/api/admin/arcade/toggle-all', requireAdmin, async (req: Request, res: Response): Promise<void> => {
     const enabled = Boolean(req.body?.enabled);
     const appConfig = await AppConfigService.getOrCreateConfig();
