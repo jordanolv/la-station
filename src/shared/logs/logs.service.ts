@@ -88,6 +88,25 @@ export class LogService {
     });
   }
 
+  private static async findMessageDeleter(message: Message | PartialMessage): Promise<string> {
+    if (!message.guild || !message.author) return '*inconnu*';
+    const authorId = message.author.id;
+    try {
+      const auditLogs = await message.guild.fetchAuditLogs({ type: AuditLogEvent.MessageDelete, limit: 5 });
+      const entry = auditLogs.entries.find(
+        (e) =>
+          e.target?.id === authorId &&
+          e.extra?.channel?.id === message.channelId &&
+          Date.now() - e.createdTimestamp < 10_000,
+      );
+      // ponytail: Discord n'écrit rien dans l'audit log quand l'auteur supprime son propre
+      // message, et agrège les suppressions d'un même modérateur — d'où la fenêtre de 10s.
+      return entry?.executor ? `<@${entry.executor.id}>` : `<@${authorId}> (lui-même)`;
+    } catch {
+      return '*inconnu*';
+    }
+  }
+
   static async logMessageDelete(message: Message | PartialMessage): Promise<void> {
     if (!message.author || message.author.bot) return;
 
@@ -95,13 +114,15 @@ export class LogService {
       ? `\n**Fichiers** : ${message.attachments.map((a) => a.url).join(', ')}`
       : '';
 
+    const deleter = await this.findMessageDeleter(message);
+
     await this.record({
       level: 'error',
       kind: 'message.delete',
       title: 'Message supprimé',
       userId: message.author.id,
       channelId: message.channelId,
-      message: `<@${message.author.id}> — message supprimé dans <#${message.channelId}>\n${truncate(message.content)}${attachments}`,
+      message: `Message de <@${message.author.id}> supprimé par ${deleter} dans <#${message.channelId}>\n${truncate(message.content)}${attachments}`,
     });
   }
 
