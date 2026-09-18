@@ -76,9 +76,11 @@ export default function logsRoute(client: BotClient): Router {
     const days = clampInt(req.query.days, 30, MAX_DAYS);
     const since = new Date(Date.now() - days * 86_400_000);
     const match = { kind: 'economy', createdAt: { $gte: since } };
+    const sumIf = (cond: object) => ({ $sum: { $cond: [cond, '$amount', 0] } });
     const flows = {
-      in: { $sum: { $cond: [{ $gt: ['$amount', 0] }, '$amount', 0] } },
-      out: { $sum: { $cond: [{ $lt: ['$amount', 0] }, '$amount', 0] } },
+      mint: sumIf({ $eq: ['$flow', 'mint'] }),
+      burn: sumIf({ $eq: ['$flow', 'burn'] }),
+      transfer: sumIf({ $and: [{ $eq: ['$flow', 'transfer'] }, { $gt: ['$amount', 0] }] }),
       count: { $sum: 1 },
     };
 
@@ -95,7 +97,7 @@ export default function logsRoute(client: BotClient): Router {
       ]),
       BotLogModel.aggregate([
         { $match: match },
-        { $group: { _id: '$title', ...flows } },
+        { $group: { _id: { reason: '$title', flow: '$flow' }, total: { $sum: '$amount' }, count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]),
       UserModel.aggregate([{ $group: { _id: null, total: { $sum: '$profil.money' } } }]),
@@ -104,8 +106,13 @@ export default function logsRoute(client: BotClient): Router {
     res.json({
       days,
       supply: supply[0]?.total ?? 0,
-      byDay: byDay.map((d) => ({ date: d._id, in: d.in, out: d.out, count: d.count })),
-      byReason: byReason.map((r) => ({ reason: r._id ?? 'inconnu', in: r.in, out: r.out, count: r.count })),
+      byDay: byDay.map((d) => ({ date: d._id, mint: d.mint, burn: d.burn, transfer: d.transfer, count: d.count })),
+      byReason: byReason.map((r) => ({
+        reason: r._id.reason ?? 'inconnu',
+        flow: r._id.flow ?? 'mint',
+        total: r.total,
+        count: r.count,
+      })),
     });
   });
 

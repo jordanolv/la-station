@@ -76,7 +76,7 @@ export default {
 
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    const updated = await UserService.updateUserMoney(targetId, amount, `Ajustement admin (${interaction.user.tag})`);
+    const updated = await UserService.updateUserMoney(targetId, amount, `Ajustement admin (${interaction.user.tag})`, amount > 0 ? 'mint' : 'burn');
     if (!updated) {
       await interaction.editReply({ content: '❌ Utilisateur introuvable en base de données.' });
       return;

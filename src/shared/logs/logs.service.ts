@@ -11,7 +11,7 @@ import {
   Guild,
   AuditLogEvent,
 } from 'discord.js';
-import BotLogModel, { LogLevel } from './bot-log.model';
+import BotLogModel, { LogLevel, MoneyFlow } from './bot-log.model';
 
 interface LogEntry {
   level: LogLevel;
@@ -22,6 +22,7 @@ interface LogEntry {
   userId?: string;
   channelId?: string;
   amount?: number;
+  flow?: MoneyFlow;
 }
 
 const truncate = (value: string | null | undefined, max = 500): string =>
@@ -53,10 +54,11 @@ export class LogService {
   }
 
   static async economy(
-    userId: string,
+    userId: string | null,
     amount: number,
     reason: string,
     feature?: string,
+    flow: MoneyFlow = 'mint',
   ): Promise<void> {
     if (amount === 0) return;
     const sign = amount > 0 ? '+' : '';
@@ -65,9 +67,10 @@ export class LogService {
       kind: 'economy',
       title: reason,
       feature,
-      userId,
+      userId: userId ?? undefined,
       amount,
-      message: `<@${userId}> ${sign}${amount} 💰 — ${reason}`,
+      flow,
+      message: `${userId ? `<@${userId}> ` : ''}${sign}${amount} 💰 — ${reason}`,
     });
   }
 

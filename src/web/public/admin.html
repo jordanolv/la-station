@@ -1242,23 +1242,26 @@ async function loadLogs(append = false) {
   $('logMore').classList.toggle('hidden', !logCursor);
 }
 
+const FLOW_LABELS = { mint: '🪙 Création', burn: '🔥 Destruction', transfer: '🔁 Transfert' };
+
 async function loadEconomy() {
   const eco = await api('/api/admin/logs/economy?days=' + $('ecoDays').value);
-  const totalIn = eco.byDay.reduce((a, d) => a + d.in, 0);
-  const totalOut = eco.byDay.reduce((a, d) => a + d.out, 0);
+  const sum = (key) => eco.byDay.reduce((a, d) => a + d[key], 0);
+  const mint = sum('mint'), burn = sum('burn'), transfer = sum('transfer');
 
   $('ecoStats').innerHTML = [
     ['Masse monétaire', fmt(eco.supply)],
-    [`Créé (${eco.days} j)`, '+' + fmt(totalIn)],
-    [`Détruit (${eco.days} j)`, fmt(totalOut)],
-    ['Solde net', (totalIn + totalOut > 0 ? '+' : '') + fmt(totalIn + totalOut)],
+    [`Créé (${eco.days} j)`, '+' + fmt(mint)],
+    [`Détruit (${eco.days} j)`, fmt(burn)],
+    ['Inflation nette', (mint + burn > 0 ? '+' : '') + fmt(mint + burn)],
+    ['Échangé entre joueurs', fmt(transfer)],
   ].map(([l, v]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
 
-  $('ecoReasons').innerHTML = '<tr><th>Source</th><th>Entrées</th><th>Sorties</th><th>Opérations</th></tr>' +
-    eco.byReason.map((r) => `<tr><td>${esc(r.reason)}</td><td class="amount pos">+${fmt(r.in)}</td><td class="amount neg">${fmt(r.out)}</td><td>${fmt(r.count)}</td></tr>`).join('');
+  $('ecoReasons').innerHTML = '<tr><th>Source</th><th>Flux</th><th>Total</th><th>Opérations</th></tr>' +
+    eco.byReason.map((r) => `<tr><td>${esc(r.reason)}</td><td class="muted">${FLOW_LABELS[r.flow] ?? r.flow}</td><td class="amount ${r.total < 0 ? 'neg' : 'pos'}">${r.total > 0 ? '+' : ''}${fmt(r.total)}</td><td>${fmt(r.count)}</td></tr>`).join('');
 
-  $('ecoDaysTable').innerHTML = '<tr><th>Jour</th><th>Entrées</th><th>Sorties</th><th>Net</th></tr>' +
-    eco.byDay.map((d) => `<tr><td>${d.date}</td><td class="amount pos">+${fmt(d.in)}</td><td class="amount neg">${fmt(d.out)}</td><td>${fmt(d.in + d.out)}</td></tr>`).join('');
+  $('ecoDaysTable').innerHTML = '<tr><th>Jour</th><th>Créé</th><th>Détruit</th><th>Net</th><th>Échangé</th></tr>' +
+    eco.byDay.map((d) => `<tr><td>${d.date}</td><td class="amount pos">+${fmt(d.mint)}</td><td class="amount neg">${fmt(d.burn)}</td><td>${fmt(d.mint + d.burn)}</td><td class="muted">${fmt(d.transfer)}</td></tr>`).join('');
 }
 
 const TAB_LOADERS = {

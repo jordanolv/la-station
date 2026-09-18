@@ -126,13 +126,17 @@ Ajouter un réglage = une entrée dans `GET /api/admin/config`, une branche dans
 
 ```ts
 await LogService.info('message', { feature: 'party', title: 'Soirée créée' });
-await LogService.economy(userId, amount, 'Bingo — gain', 'arcade');
+await LogService.economy(userId, amount, 'Bingo — gain', 'arcade', 'mint');
 ```
 
 - `kind` classe l'entrée (`app`, `economy`, `message.delete`, `member.join`…) et sert de filtre côté dashboard.
 - Tout mouvement d'argent doit passer par `LogService.economy` — soit via
-  `UserService.updateUserMoney(discordId, amount, reason)`, soit par un appel explicite
+  `UserService.updateUserMoney(discordId, amount, reason, flow)`, soit par un appel explicite
   quand le `$inc` est fait à la main. Sans ça la page Économie ment.
+- Le `flow` dit ce que le mouvement fait à la masse monétaire : `mint` (création, défaut),
+  `burn` (destruction), `transfer` (circulation entre joueurs, masse inchangée). Un pari PvP
+  ou un duel d'arcade est un `transfer` des deux côtés — le compter en `mint`/`burn`
+  gonflerait l'inflation affichée.
 - Les messages sont écrits en markup Discord (`<@id>`, `<#id>`) ; `renderMentions`
   (`src/web/logs-render.ts`) les résout côté serveur pour le dashboard.
 

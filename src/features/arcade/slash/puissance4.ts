@@ -237,8 +237,8 @@ export default {
         await ArcadeStatsService.incrementGameCount('puissance4');
 
         if (game.bet > 0) {
-          await UserService.updateUserMoney(loser.id, -game.bet, 'Puissance 4 — pari perdu');
-          await UserService.updateUserMoney(winner.id, game.bet, 'Puissance 4 — pari gagné');
+          await UserService.updateUserMoney(loser.id, -game.bet, 'Puissance 4 — pari perdu', 'transfer');
+          await UserService.updateUserMoney(winner.id, game.bet, 'Puissance 4 — pari gagné', 'transfer');
           victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
         }
       } catch (error) {

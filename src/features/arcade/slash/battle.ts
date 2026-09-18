@@ -226,8 +226,8 @@ export default {
       await ArcadeStatsService.incrementGameCount('battle');
 
       if (game.bet > 0) {
-        await UserService.updateUserMoney(loser.id, -game.bet, 'Battle — pari perdu');
-        await UserService.updateUserMoney(winner.id, game.bet, 'Battle — pari gagné');
+        await UserService.updateUserMoney(loser.id, -game.bet, 'Battle — pari perdu', 'transfer');
+        await UserService.updateUserMoney(winner.id, game.bet, 'Battle — pari gagné', 'transfer');
         victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
       }
     } catch (error) {

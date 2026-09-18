@@ -2,6 +2,7 @@ import { BetRepository } from '../repositories/bet.repository';
 import { IBet } from '../models/bet.model';
 import { UserService } from '../../user/services/user.service';
 import UserModel from '../../user/models/user.model';
+import { LogService } from '../../../shared/logs/logs.service';
 
 export class BetService {
   static async placeBet(
@@ -26,7 +27,7 @@ export class BetService {
       return { success: false, message: `Solde insuffisant. Tu as **${user.profil.money.toLocaleString('fr-FR')} coins**.` };
     }
 
-    await UserService.updateUserMoney(userId, -amount, 'Pari — mise');
+    await UserService.updateUserMoney(userId, -amount, 'Pari — mise', 'transfer');
     const updated = await BetRepository.addEntry(betId, userId, optionIndex, amount);
     return { success: true, message: 'Pari enregistré !', bet: updated ?? undefined };
   }
@@ -67,8 +68,10 @@ export class BetService {
       const gain = Math.floor((entry.amount / winnerPot) * redistributable);
       const total = entry.amount + gain;
       payouts.push({ userId: entry.userId, amount: total, gain });
-      await UserService.updateUserMoney(entry.userId, total, 'Pari — gains');
+      await UserService.updateUserMoney(entry.userId, total, 'Pari — gains', 'transfer');
     }
+
+    await LogService.economy(null, -rake, 'Pari — rake', 'bet', 'burn');
 
     const updated = await BetRepository.setStatus(betId, 'closed', winnerIndex);
     return { success: true, message: 'Bet terminé.', bet: updated ?? undefined, payouts };
@@ -80,7 +83,7 @@ export class BetService {
     if (bet.status === 'closed' || bet.status === 'refunded') return { success: false, message: 'Ce bet est déjà terminé.' };
 
     for (const entry of bet.entries) {
-      await UserService.updateUserMoney(entry.userId, entry.amount, 'Pari — remboursement');
+      await UserService.updateUserMoney(entry.userId, entry.amount, 'Pari — remboursement', 'transfer');
     }
 
     const updated = await BetRepository.setStatus(betId, 'refunded');

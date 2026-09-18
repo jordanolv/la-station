@@ -314,8 +314,8 @@ export default {
         await ArcadeStatsService.incrementGameCount('morpion');
 
         if (game.bet > 0) {
-          await UserService.updateUserMoney(loser.id, -game.bet, 'Morpion — pari perdu');
-          await UserService.updateUserMoney(winner.id, game.bet, 'Morpion — pari gagné');
+          await UserService.updateUserMoney(loser.id, -game.bet, 'Morpion — pari perdu', 'transfer');
+          await UserService.updateUserMoney(winner.id, game.bet, 'Morpion — pari gagné', 'transfer');
           victoryMsg += `\n\n💰 **+${game.bet}** RidgeCoins pour ${winner.username}`;
         }
       } catch (error) {
