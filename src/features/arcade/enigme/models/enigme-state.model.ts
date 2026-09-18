@@ -13,6 +13,7 @@ export interface Solver {
   userId: string;
   at: Date;
   durationMs: number;
+  usedHint: boolean;
 }
 
 export class EnigmeState {
@@ -32,17 +33,15 @@ export class EnigmeState {
   startedAt?: Date;
 
   @prop()
-  hintAt?: Date;
-
-  @prop({ default: false })
-  hintSent?: boolean;
-
-  @prop()
   endsAt?: Date;
 
   /** userId -> date de découverte de l'énigme, départ de son chrono */
   @prop({ type: Object, default: {} })
   revealedAt?: Record<string, Date>;
+
+  /** userId -> date de demande de l'indice */
+  @prop({ type: Object, default: {} })
+  hintedAt?: Record<string, Date>;
 
   /** userId -> nombre d'essais */
   @prop({ type: Object, default: {} })

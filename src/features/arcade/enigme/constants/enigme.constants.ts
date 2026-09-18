@@ -1,5 +1,4 @@
 export const ENIGME_SPAWN_HOUR = 12;
-export const ENIGME_HINT_HOUR = 15;
 export const ENIGME_REVEAL_HOUR = 21;
 
 export const ENIGME_MAX_ATTEMPTS = 3;
@@ -17,6 +16,7 @@ export const ENIGME_SOLVER_FRAGMENTS = 10;
 export const ENIGME_PARTICIPATION_FRAGMENTS = 5;
 
 export const ENIGME_REVEAL_BUTTON_ID = 'enigme:reveal';
+export const ENIGME_HINT_BUTTON_ID = 'enigme:hint';
 export const ENIGME_BUTTON_ID = 'enigme:answer';
 export const ENIGME_MODAL_ID = 'enigme:modal';
 

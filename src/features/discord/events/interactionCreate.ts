@@ -47,7 +47,7 @@ import {
   handleDraftStringSelect,
 } from '../../draft/events/draft-interactions';
 import { EnigmeService } from '../../arcade/enigme/services/enigme.service';
-import { ENIGME_BUTTON_ID, ENIGME_MODAL_ID, ENIGME_REVEAL_BUTTON_ID } from '../../arcade/enigme/constants/enigme.constants';
+import { ENIGME_BUTTON_ID, ENIGME_HINT_BUTTON_ID, ENIGME_MODAL_ID, ENIGME_REVEAL_BUTTON_ID } from '../../arcade/enigme/constants/enigme.constants';
 import { QuizService, QUIZ_BUTTON_PREFIX, QUIZ_THEME_PREFIX } from '../../quiz/services/quiz.service';
 import { PersonalityTestService, PTEST_BUTTON_PREFIX } from '../../personality-test/services/personality-test.service';
 import { isSilentDiscordError } from '../../../shared/utils/discord-errors';
@@ -133,6 +133,8 @@ export default {
           await QuizService.handleThemePick(client, interaction);
         } else if (interaction.customId === ENIGME_REVEAL_BUTTON_ID) {
           await EnigmeService.handleReveal(interaction);
+        } else if (interaction.customId === ENIGME_HINT_BUTTON_ID) {
+          await EnigmeService.handleHint(interaction);
         } else if (interaction.customId === ENIGME_BUTTON_ID) {
           await EnigmeService.handleButton(interaction);
         } else if (interaction.customId.startsWith(PTEST_BUTTON_PREFIX + ':')) {
