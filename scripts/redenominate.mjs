@@ -45,6 +45,24 @@ try {
     process.exit(1);
   }
 
+  // Des montants en ancienne echelle survivent ailleurs que dans profil.money. S'ils sont
+  // regles APRES la redenomination, ils versent dix fois trop. On refuse plutot que de
+  // migrer une base dans un etat incoherent.
+  const bets = await db.collection('bets').countDocuments({ status: { $in: ['open', 'locked'] } });
+  const parties = await db.collection('party_items').countDocuments({
+    rewardAmount: { $gt: 0 },
+    status: { $nin: ['ended', 'done', 'finished', 'completed'] },
+  });
+
+  if (bets || parties) {
+    console.error('Etat non migrable — des montants en ancienne echelle seront verses apres coup :');
+    if (bets) console.error(`  ${bets} bet(s) ouvert(s) ou verrouille(s) : les cloturer ou les rembourser d abord.`);
+    if (parties) console.error(`  ${parties} soiree(s) non terminee(s) avec une recompense : les cloturer, ou remettre rewardAmount a zero.`);
+    console.error('\nLes paris d arcade en cours (shifumi, morpion, P4, battle) vivent en memoire :');
+    console.error('ne pas migrer pendant une partie, elle se reglerait a l ancienne echelle.');
+    process.exit(1);
+  }
+
   const users = await db.collection('users').find({}, { projection: { 'profil.money': 1 } }).toArray();
   const before = users.map((u) => u?.profil?.money ?? 0);
   const after = before.map((v) => Math.round(v / FACTOR));
@@ -74,7 +92,9 @@ try {
     modified: res.modifiedCount,
   });
 
-  console.log(`\n${res.modifiedCount} soldes redénominés. Marqueur « ${MIGRATION_ID} » posé.`);
+  console.log(`\n${res.modifiedCount} soldes redenomines. Marqueur « ${MIGRATION_ID} » pose.`);
+  console.log('\nLes bot_logs anterieurs restent en ancienne echelle : la page Economie');
+  console.log('melangera les deux jusqu a expiration du TTL de 90 jours. C est attendu.');
 } finally {
   await client.close();
 }

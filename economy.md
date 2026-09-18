@@ -267,10 +267,22 @@ Le script est `scripts/redenominate.mjs`. Il tourne en dry-run par défaut, affi
 masse et les percentiles avant/après, et refuse de s'exécuter deux fois grâce à un
 marqueur dans la collection `migrations` :
 
+Il tourne **depuis le conteneur du bot**, qui a déjà `MONGODB_URI` en environnement —
+la base n'est pas joignable depuis l'extérieur du réseau Docker :
+
 ```bash
-node scripts/redenominate.mjs           # simulation
-node scripts/redenominate.mjs --apply   # execution
+docker exec <conteneur-bot> node scripts/redenominate.mjs           # simulation
+docker exec <conteneur-bot> node scripts/redenominate.mjs --apply   # execution
 ```
+
+**`profil.money` n'est pas le seul endroit où dorment des montants.** Le script refuse
+de s'exécuter s'il reste des bets ouverts ou verrouillés, ou des soirées non terminées
+avec une récompense : réglés après la migration, ils verseraient dix fois trop. Les
+paris d'arcade (shifumi, morpion, P4, battle) vivent en mémoire et ne sont pas
+détectables — ne pas migrer pendant une partie.
+
+Les `bot_logs` antérieurs restent en ancienne échelle. La page Économie mélangera les
+deux jusqu'à expiration du TTL de 90 jours ; ça ne se corrige pas, ça se sait.
 
 Les constantes, elles, sont déjà recalées dans le code : solde de départ 500 → 50,
 anniversaire 100–1000 → 10–100, `baseCoins` des raids 200/500/1000 → 20/50/100.
