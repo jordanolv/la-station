@@ -57,15 +57,14 @@ src/
 ├── config/        # commands.json
 ├── features/      # Une feature = un dossier autonome — `ls src/features/`
 │   └── discord/   # Events globaux (ready, messageCreate, interactionCreate)
-└── shared/        # cron, logs, guild, db, hooks, time, components, weekly-recap
+├── shared/        # cron, logs, guild, db, hooks, time, components, weekly-recap
+└── web/           # Dashboard admin (Express + public/admin.html)
 ```
 
 Noms de dossiers qui ne se devinent pas :
 
 - `peak-hunters` — le système de montagnes (s'appelait `mountain`)
 - `party` — les sessions vocales (s'appelait `vocal-party`)
-- `cdm` — pronostics Coupe du Monde 2026 (`/cdm`, `/cdm-pronos`, `/cdm-admin`)
-- `config-panel` — le routeur des panels admin, pas une feature métier
 
 Chaque feature suit la même structure :
 
@@ -75,7 +74,6 @@ feature/
 ├── repositories/  # Accès BDD (findById, create, update...)
 ├── services/      # Logique métier
 ├── slash/         # Commandes slash Discord
-├── panels/        # Panels admin (ConfigPanel)
 ├── cron/          # Jobs planifiés
 └── events/        # Event listeners Discord
 ```
@@ -104,36 +102,39 @@ export type IMyModel = DocumentType<MyModel>;
 export default MyModelDB;
 ```
 
-### Panels admin (ConfigPanel)
+### Dashboard admin
 
-Format customId : `cpanel:panelId:action`
+Toute l'administration passe par le dashboard web (`/admin`, port `WEB_PORT`), protégé
+par `ADMIN_PASSWORD` + JWT (`WEB_JWT_SECRET`). Il n'y a plus de panels de config dans
+Discord : le forum `⚙️┃config-bot` et le système `ConfigPanel` ont été supprimés.
 
-```ts
-export class MyPanel implements ConfigPanel {
-  id = 'my-panel';
-
-  async render(interaction): Promise<void> {
-    // Construire l'UI avec ContainerBuilder, SectionBuilder...
-    await interaction.reply({ components: [...], flags: MessageFlags.IsComponentsV2 });
-  }
-
-  async handleButton(interaction, client): Promise<void> {
-    const id = interaction.customId.split(':')[2]; // ← toujours [2]
-    if (id === 'my_action') { ... }
-  }
-
-  async handleSelectMenu(interaction, client): Promise<void> {
-    const id = interaction.customId.split(':')[2];
-    ...
-  }
-}
+```
+src/web/
+├── server.ts              # Express, sert /admin et /map
+├── auth.ts                # requireAdmin (JWT) partagé par les routes
+├── routes/admin.route.ts  # config des features, actions, joueurs
+├── routes/logs.route.ts   # journal + agrégats économie
+└── public/admin.html      # UI complète (vanilla, un seul fichier)
 ```
 
-Enregistrement dans `src/features/discord/events/ready.ts` :
+Ajouter un réglage = une entrée dans `GET /api/admin/config`, une branche dans
+`POST /api/admin/config/:feature`, et une carte dans `admin.html`.
+
+### Logs
+
+`LogService` écrit dans la collection `bot_logs` (TTL 90 jours), plus rien dans Discord.
 
 ```ts
-panelRegistry.register(new MyPanel());
+await LogService.info('message', { feature: 'party', title: 'Soirée créée' });
+await LogService.economy(userId, amount, 'Bingo — gain', 'arcade');
 ```
+
+- `kind` classe l'entrée (`app`, `economy`, `message.delete`, `member.join`…) et sert de filtre côté dashboard.
+- Tout mouvement d'argent doit passer par `LogService.economy` — soit via
+  `UserService.updateUserMoney(discordId, amount, reason)`, soit par un appel explicite
+  quand le `$inc` est fait à la main. Sans ça la page Économie ment.
+- Les messages sont écrits en markup Discord (`<@id>`, `<#id>`) ; `renderMentions`
+  (`src/web/logs-render.ts`) les résout côté serveur pour le dashboard.
 
 ### Cron managers
 
@@ -191,7 +192,7 @@ Chaque lundi minuit (Paris), `ActivityRolesService.run()` :
 - **Voc** : 1 seconde = 1 point (ajouté dans `StatsService.applyVoiceSegmentsToUser`)
 - **Messages** : cooldown 30min en RAM (`Map<userId, timestamp>`), 1 slot valide = 450 points (= 25% du voc à activité égale)
 
-**Rôles (configurables via panel admin) :**
+**Rôles (configurables via le dashboard) :**
 
 - Top 3 → Podium
 - Top `activeThresholdPercent`% (défaut 10%) → Campeur
@@ -260,9 +261,7 @@ Chaque bouton embarque le `lastMsgId` dans son customId (`mountain:home:ACTION:L
 ## Conventions
 
 - Pas d'`ephemeral: true` → utiliser `flags: 64` (ou `MessageFlags.Ephemeral`)
-- Panels : ne jamais `deferUpdate` dans le router, laisser chaque panel gérer sa propre interaction
 - Ownership des interactions : `interaction.message.interactionMetadata?.user.id`
-- Toujours utiliser `split(':')[2]` pour extraire l'action d'un customId de panel
 - Toutes les vues utilisent ComponentsV2 (`ContainerBuilder`) — ne pas revenir aux `EmbedBuilder` pour les nouvelles features sauf si l'affichage est préférable
 - Pattern navigation avec suppression du message précédent : embarquer le `lastMsgId` dans le customId, `deferUpdate` → delete → `followUp({fetchReply:true})` → `editReply` avec le nouveau msgId
 

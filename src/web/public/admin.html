@@ -105,6 +105,23 @@
     padding: 10px 18px; font-size: 14px; opacity: 0; transition: opacity .2s; z-index: 10;
   }
   .toast.show { opacity: 1; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .filters select, .filters input { width: auto; min-width: 150px; margin-top: 0; }
+  .logline {
+    display: grid; grid-template-columns: 132px 1fr; gap: 12px;
+    padding: 8px 0; border-top: 1px solid var(--border); font-size: 13px;
+  }
+  .logline .t { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .logline .msg { white-space: pre-wrap; word-break: break-word; }
+  .logline .tag {
+    font-size: 11px; padding: 1px 6px; border-radius: 5px;
+    background: rgba(255,255,255,.06); color: var(--muted); margin-right: 6px;
+  }
+  .lv-success { color: var(--green); }
+  .lv-warning { color: var(--amber); }
+  .lv-error { color: var(--red); }
+  .amount.pos { color: var(--green); }
+  .amount.neg { color: var(--red); }
   #login { max-width: 360px; margin: 15vh auto 0; }
   .hidden { display: none; }
 </style>
@@ -125,6 +142,7 @@
     <h1><span class="dot"></span> The Ridge — Admin</h1>
     <div style="display:flex;gap:8px">
       <button class="ghost" id="navUsers" onclick="switchTab('users')">👥 Joueurs</button>
+      <button class="ghost" id="navLogs" onclick="switchTab('logs')">📋 Logs</button>
       <button class="ghost" onclick="logout()">Déconnexion</button>
     </div>
   </div>
@@ -434,6 +452,48 @@
     </div>
   </section>
 
+  <!-- ═══════════ Logs ═══════════ -->
+  <section id="tab-logs" class="hidden">
+    <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
+
+    <div class="card">
+      <div class="row">
+        <strong>💰 Économie</strong>
+        <select id="ecoDays" onchange="loadEconomy()" class="cfg" style="width:150px;margin-top:0">
+          <option value="7">7 jours</option>
+          <option value="30" selected>30 jours</option>
+          <option value="90">90 jours</option>
+        </select>
+      </div>
+      <div id="ecoStats" class="grid"></div>
+      <div class="row" style="margin-top:16px">
+        <table id="ecoReasons"></table>
+      </div>
+      <table id="ecoDaysTable" style="margin-top:16px"></table>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <strong>📋 Journal</strong>
+        <button class="ghost mini" onclick="loadLogs()">↻ Rafraîchir</button>
+      </div>
+      <div class="filters">
+        <select id="logLevel" onchange="loadLogs()" class="cfg">
+          <option value="">Tous les niveaux</option>
+          <option value="info">Info</option>
+          <option value="success">Succès</option>
+          <option value="warning">Avertissement</option>
+          <option value="error">Erreur</option>
+        </select>
+        <select id="logFeature" onchange="loadLogs()" class="cfg"></select>
+        <select id="logKind" onchange="loadLogs()" class="cfg"></select>
+        <input id="logQ" placeholder="Rechercher…" onchange="loadLogs()">
+      </div>
+      <div id="logList" style="margin-top:12px"></div>
+      <button class="ghost" id="logMore" style="margin-top:12px" onclick="loadLogs(true)">Charger plus</button>
+    </div>
+  </section>
+
   <!-- ═══════════ Général ═══════════ -->
   <section id="tab-general" class="hidden">
     <button class="ghost back" onclick="switchTab('overview')">← Accueil</button>
@@ -531,6 +591,8 @@ function switchTab(id) {
   document.querySelectorAll('section[id^="tab-"]').forEach((s) => s.classList.add('hidden'));
   $('tab-' + id).classList.remove('hidden');
   $('navUsers').classList.toggle('on', id === 'users');
+  $('navLogs').classList.toggle('on', id === 'logs');
+  if (id === 'logs') logCursor = null;
   (TAB_LOADERS[id] ?? (() => Promise.resolve()))().catch((err) => toast(err.message));
 }
 
@@ -857,6 +919,7 @@ async function loadParty() {
             <div style="display:flex;gap:6px;flex-wrap:wrap">
               ${e.status === 'pending' ? `<button class="mini success" onclick="startParty('${e.id}')">▶️ Démarrer</button>` : ''}
               ${e.status === 'started' ? `<button class="mini" onclick="toggleEndForm('${e.id}')">🏁 Clôturer</button>` : ''}
+              <button class="mini ghost" onclick="setPartyImage('${e.id}')">🖼️</button>
               <button class="mini danger" onclick="deleteParty('${e.id}')">🗑️</button>
             </div>
           </div>
@@ -909,6 +972,12 @@ async function endParty(id) {
     toast('Soirée clôturée 🏁');
     await loadParty();
   } catch (err) { toast(err.message); }
+}
+async function setPartyImage(id) {
+  const image = prompt('URL de l\'image de la soirée :');
+  if (!image) return;
+  try { await api(`/api/admin/party/events/${id}/image`, { method: 'POST', body: JSON.stringify({ image }) }); toast('Image mise à jour 🖼️'); await loadParty(); }
+  catch (err) { toast(err.message); }
 }
 async function deleteParty(id) {
   if (!confirm('Supprimer cette soirée ? Le post Discord sera supprimé.')) return;
@@ -1129,6 +1198,69 @@ async function saveConfig(featId) {
 }
 
 // ── Routing des onglets ──
+// ── Logs ──
+let logCursor = null;
+
+function logQuery() {
+  const p = new URLSearchParams();
+  for (const [key, id] of [['level', 'logLevel'], ['feature', 'logFeature'], ['kind', 'logKind'], ['q', 'logQ']]) {
+    const v = $(id).value;
+    if (v) p.set(key, v);
+  }
+  return p;
+}
+
+function fillFilter(el, values, label) {
+  const current = el.value;
+  el.innerHTML = `<option value="">${label}</option>` +
+    values.map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  el.value = current;
+}
+
+function logLine(l) {
+  const when = new Date(l.createdAt).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const tags = [l.feature, l.title].filter(Boolean).map((t) => `<span class="tag">${esc(t)}</span>`).join('');
+  const amount = l.amount === null ? '' :
+    ` <span class="amount ${l.amount > 0 ? 'pos' : 'neg'}">${l.amount > 0 ? '+' : ''}${fmt(l.amount)}</span>`;
+  return `<div class="logline">
+    <span class="t">${when}</span>
+    <span class="msg lv-${l.level}">${tags}${esc(l.message)}${amount}</span>
+  </div>`;
+}
+
+async function loadLogs(append = false) {
+  const p = logQuery();
+  if (append && logCursor) p.set('before', logCursor);
+  const data = await api('/api/admin/logs?' + p.toString());
+
+  fillFilter($('logFeature'), data.filters.features, 'Toutes les features');
+  fillFilter($('logKind'), data.filters.kinds, 'Tous les types');
+
+  const html = data.logs.map(logLine).join('') || '<p class="muted">Aucun log.</p>';
+  $('logList').innerHTML = append ? $('logList').innerHTML + html : html;
+  logCursor = data.logs.length ? data.logs[data.logs.length - 1].createdAt : null;
+  $('logMore').classList.toggle('hidden', !logCursor);
+}
+
+async function loadEconomy() {
+  const eco = await api('/api/admin/logs/economy?days=' + $('ecoDays').value);
+  const totalIn = eco.byDay.reduce((a, d) => a + d.in, 0);
+  const totalOut = eco.byDay.reduce((a, d) => a + d.out, 0);
+
+  $('ecoStats').innerHTML = [
+    ['Masse monétaire', fmt(eco.supply)],
+    [`Créé (${eco.days} j)`, '+' + fmt(totalIn)],
+    [`Détruit (${eco.days} j)`, fmt(totalOut)],
+    ['Solde net', (totalIn + totalOut > 0 ? '+' : '') + fmt(totalIn + totalOut)],
+  ].map(([l, v]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+
+  $('ecoReasons').innerHTML = '<tr><th>Source</th><th>Entrées</th><th>Sorties</th><th>Opérations</th></tr>' +
+    eco.byReason.map((r) => `<tr><td>${esc(r.reason)}</td><td class="amount pos">+${fmt(r.in)}</td><td class="amount neg">${fmt(r.out)}</td><td>${fmt(r.count)}</td></tr>`).join('');
+
+  $('ecoDaysTable').innerHTML = '<tr><th>Jour</th><th>Entrées</th><th>Sorties</th><th>Net</th></tr>' +
+    eco.byDay.map((d) => `<tr><td>${d.date}</td><td class="amount pos">+${fmt(d.in)}</td><td class="amount neg">${fmt(d.out)}</td><td>${fmt(d.in + d.out)}</td></tr>`).join('');
+}
+
 const TAB_LOADERS = {
   overview: loadHome,
   quiz: loadQuiz,
@@ -1145,6 +1277,7 @@ const TAB_LOADERS = {
   ptest: loadPtest,
   voice: loadVoice,
   general: loadGeneral,
+  logs: () => Promise.all([loadEconomy(), loadLogs()]),
 };
 
 $('loginForm').addEventListener('submit', async (e) => {
@@ -1174,7 +1307,7 @@ async function show() {
 
 if (token) show();
 setInterval(() => {
-  if (token && !$('app').classList.contains('hidden') && ['overview', 'quiz'].includes(currentTab)) {
+  if (token && !$('app').classList.contains('hidden') && ['overview', 'quiz', 'logs'].includes(currentTab)) {
     (TAB_LOADERS[currentTab] ?? (() => Promise.resolve()))().catch(() => {});
   }
 }, 30000);

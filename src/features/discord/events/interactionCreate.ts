@@ -1,6 +1,6 @@
-import {
-  MessageFlags, ChannelSelectMenuInteraction, Events, Interaction, ModalSubmitInteraction, RoleSelectMenuInteraction, StringSelectMenuInteraction, UserSelectMenuInteraction } from 'discord.js';
+import { MessageFlags, Events, Interaction } from 'discord.js';
 import { BotClient } from '../../../bot/client';
+import { LogService } from '../../../shared/logs/logs.service';
 import { AppConfigService } from '../services/app-config.service';
 import {
   handleGroupButton,
@@ -18,11 +18,6 @@ import {
   handleVocInviteUserSelect,
   VOC_CONFIG_MODAL_ID
 } from '../../voice/interactions/vocConfigHandler';
-import {
-  PANEL_BUTTON_PREFIX,
-  parsePanelCustomId,
-  panelRegistry,
-} from '../../config-panel/services/config-panel.registry';
 import { MONEY_MODAL_PREFIX } from '../../admin/slash/money';
 import giveExpeditionCommand, { GIVE_EXPEDITION_BUTTON_PREFIX, GIVE_EXPEDITION_MODAL_PREFIX } from '../../peak-hunters/slash/give-expedition';
 import { EMBED_EDIT_MODAL_PREFIX } from '../../admin/slash/embed';
@@ -58,28 +53,6 @@ import { PersonalityTestService, PTEST_BUTTON_PREFIX } from '../../personality-t
 import { isSilentDiscordError } from '../../../shared/utils/discord-errors';
 const PROFILE_MODAL_ID = 'profile-config-modal';
 
-async function routeToPanelSelectMenu(
-  interaction: ChannelSelectMenuInteraction | RoleSelectMenuInteraction | StringSelectMenuInteraction | UserSelectMenuInteraction,
-  client: BotClient,
-): Promise<boolean> {
-  const parsed = parsePanelCustomId(interaction.customId);
-  if (!parsed) return false;
-  const panel = panelRegistry.get(parsed.panelId);
-  if (panel?.handleSelectMenu) await panel.handleSelectMenu(interaction as any, client);
-  return true;
-}
-
-async function routeToPanelModal(
-  interaction: ModalSubmitInteraction,
-  client: BotClient,
-): Promise<boolean> {
-  const parsed = parsePanelCustomId(interaction.customId);
-  if (!parsed) return false;
-  const panel = panelRegistry.get(parsed.panelId);
-  if (panel?.handleModal) await panel.handleModal(interaction, client);
-  return true;
-}
-
 export default {
   name: Events.InteractionCreate,
   once: false,
@@ -107,6 +80,14 @@ export default {
             return;
           }
           await command.execute(interaction, client);
+          await LogService.record({
+            level: 'info',
+            kind: 'command',
+            title: `/${interaction.commandName}`,
+            userId: interaction.user.id,
+            channelId: interaction.channelId ?? undefined,
+            message: `<@${interaction.user.id}> a utilisé \`/${interaction.commandName}\` dans <#${interaction.channelId}>`,
+          });
         } catch (error) {
           if (isSilentDiscordError(error)) return;
           console.error(`[InteractionCreate] Erreur dans /${interaction.commandName}:`, error);
@@ -121,12 +102,6 @@ export default {
       else if (interaction.isButton()) {
         if (interaction.customId.startsWith(GROUP_BUTTON_PREFIX + ':')) {
           await handleGroupButton(interaction, client);
-        } else if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
-          const parsed = parsePanelCustomId(interaction.customId);
-          if (parsed) {
-            const panel = panelRegistry.get(parsed.panelId);
-            if (panel?.handleButton) await panel.handleButton(interaction, client);
-          }
         } else if (interaction.customId.startsWith('leaderboard_')) {
           const leaderboardCommand = client.slashCommands.get('leaderboard');
           if (leaderboardCommand && typeof leaderboardCommand.handleButtonInteraction === 'function') {
@@ -171,8 +146,6 @@ export default {
           if (groupNotifsCommand?.handleSelect) await groupNotifsCommand.handleSelect(interaction, client);
         } else if (interaction.customId.startsWith(GROUP_BUTTON_PREFIX + ':')) {
           await handleGroupSelectMenu(interaction, client);
-        } else if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
-          await routeToPanelSelectMenu(interaction, client);
         } else if (interaction.customId.startsWith('bet:winner:')) {
           await handleBetSelectMenu(interaction, client);
         } else if (interaction.customId.startsWith('bet:place:')) {
@@ -184,18 +157,8 @@ export default {
         }
       }
 
-      else if (interaction.isChannelSelectMenu()) {
-        await routeToPanelSelectMenu(interaction, client);
-      }
-
-      else if (interaction.isRoleSelectMenu()) {
-        await routeToPanelSelectMenu(interaction, client);
-      }
-
       else if (interaction.isUserSelectMenu()) {
-        if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
-          await routeToPanelSelectMenu(interaction, client);
-        } else if (interaction.customId.startsWith(VOC_INVITE_USER_SELECT_ID)) {
+        if (interaction.customId.startsWith(VOC_INVITE_USER_SELECT_ID)) {
           await handleVocInviteUserSelect(interaction, client);
         } else if (interaction.customId.startsWith('draft:')) {
           await handleDraftUserSelect(interaction, client);
@@ -209,8 +172,6 @@ export default {
           await handleGroupDescModal(interaction);
         } else if (interaction.customId.startsWith(GROUP_TIME_MODAL_PREFIX + ':')) {
           await handleGroupTimeModal(interaction);
-        } else if (interaction.customId.startsWith(PANEL_BUTTON_PREFIX + ':')) {
-          await routeToPanelModal(interaction, client);
         } else if (interaction.customId === PROFILE_MODAL_ID) {
           const profileCommand = client.slashCommands.get('profil');
           if (profileCommand && typeof profileCommand.handleModal === 'function') {

@@ -3,6 +3,7 @@ import path from 'path';
 import chalk from 'chalk';
 import mountainMapRoute from './routes/mountain-map.route';
 import adminRoute from './routes/admin.route';
+import logsRoute from './routes/logs.route';
 import { BotClient } from '../bot/client';
 
 export function startWebServer(client: BotClient): void {
@@ -14,6 +15,7 @@ export function startWebServer(client: BotClient): void {
 
   app.use(mountainMapRoute);
   app.use(adminRoute(client));
+  app.use(logsRoute(client));
 
   // Page globe — sert l'HTML pour toute route /map/*
   app.get('/map', (_req, res) => {

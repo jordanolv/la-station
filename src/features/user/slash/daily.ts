@@ -95,6 +95,8 @@ export default {
         return;
       }
 
+      await LogService.economy(interaction.user.id, moneyReward, 'Daily', 'Daily');
+
       let expeditionSummary = '';
       if (packsReward > 0) {
         const result = await awardExpeditions(interaction.user.id, packsReward);

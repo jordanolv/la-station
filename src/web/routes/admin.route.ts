@@ -2,6 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { ChannelType } from 'discord.js';
 import jwt from 'jsonwebtoken';
 import { createHash, timingSafeEqual } from 'crypto';
+import { requireAdmin, getSecret, TOKEN_TTL } from '../auth';
+import { LogService } from '../../shared/logs/logs.service';
 import { BotClient } from '../../bot/client';
 import { QuizConfigRepository } from '../../features/quiz/repositories/quiz-config.repository';
 import { QuizService } from '../../features/quiz/services/quiz.service';
@@ -32,29 +34,10 @@ import { EnigmeRepository } from '../../features/arcade/enigme/repositories/enig
 import { WeeklyRecapService } from '../../shared/weekly-recap/weekly-recap.service';
 import { EnigmeService } from '../../features/arcade/enigme/services/enigme.service';
 
-const TOKEN_TTL = '7d';
 const ARCADE_GAMES = ['shifumi', 'puissance4', 'morpion', 'battle', 'bingo', 'justePrix', 'avalanche', 'enigme'] as const;
-
-function getSecret(): string {
-  const s = process.env.WEB_JWT_SECRET;
-  if (!s) throw new Error('WEB_JWT_SECRET manquant');
-  return s;
-}
 
 function sha256(input: string): Buffer {
   return createHash('sha256').update(input).digest();
-}
-
-function requireAdmin(req: Request, res: Response, next: NextFunction): void {
-  const token = req.headers.authorization?.replace(/^Bearer /, '');
-  if (!token) { res.status(401).json({ error: 'Token manquant' }); return; }
-  try {
-    const payload = jwt.verify(token, getSecret()) as { admin?: boolean };
-    if (!payload.admin) throw new Error();
-    next();
-  } catch {
-    res.status(401).json({ error: 'Token invalide ou expiré' });
-  }
 }
 
 export default function adminRoute(client: BotClient): Router {
@@ -66,6 +49,22 @@ export default function adminRoute(client: BotClient): Router {
     const channel = guild?.channels.cache.get(channelId);
     return channel ? `#${channel.name}` : `(inconnu : ${channelId})`;
   }
+
+  router.use((req: Request, res: Response, next: NextFunction): void => {
+    if (req.method === 'GET' || req.path === '/api/admin/login') { next(); return; }
+    res.on('finish', () => {
+      if (res.statusCode >= 400) return;
+      const body = JSON.stringify(req.body ?? {});
+      LogService.record({
+        level: 'info',
+        kind: 'dashboard',
+        feature: 'dashboard',
+        title: `${req.method} ${req.path}`,
+        message: `Dashboard : \`${req.method} ${req.path}\`${body === '{}' ? '' : ` ${body.slice(0, 500)}`}`,
+      }).catch(() => {});
+    });
+    next();
+  });
 
   router.post('/api/admin/login', (req: Request, res: Response): void => {
     const expected = process.env.ADMIN_PASSWORD;
@@ -668,6 +667,17 @@ export default function adminRoute(client: BotClient): Router {
       res.json({ ok: true });
     } catch (err) {
       res.status(500).json({ error: err instanceof Error ? err.message : 'Clôture impossible' });
+    }
+  });
+
+  router.post('/api/admin/party/events/:id/image', requireAdmin, async (req: Request, res: Response): Promise<void> => {
+    const image = String(req.body?.image ?? '').trim();
+    if (!image.startsWith('http')) { res.status(400).json({ error: 'URL d\'image invalide' }); return; }
+    try {
+      await PartyService.updateEventImage(client, String(req.params.id), image);
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(500).json({ error: err instanceof Error ? err.message : 'Mise à jour impossible' });
     }
   });
 

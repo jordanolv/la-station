@@ -26,7 +26,7 @@ export class BetService {
       return { success: false, message: `Solde insuffisant. Tu as **${user.profil.money.toLocaleString('fr-FR')} coins**.` };
     }
 
-    await UserService.updateUserMoney(userId, -amount);
+    await UserService.updateUserMoney(userId, -amount, 'Pari — mise');
     const updated = await BetRepository.addEntry(betId, userId, optionIndex, amount);
     return { success: true, message: 'Pari enregistré !', bet: updated ?? undefined };
   }
@@ -67,7 +67,7 @@ export class BetService {
       const gain = Math.floor((entry.amount / winnerPot) * redistributable);
       const total = entry.amount + gain;
       payouts.push({ userId: entry.userId, amount: total, gain });
-      await UserService.updateUserMoney(entry.userId, total);
+      await UserService.updateUserMoney(entry.userId, total, 'Pari — gains');
     }
 
     const updated = await BetRepository.setStatus(betId, 'closed', winnerIndex);
@@ -80,7 +80,7 @@ export class BetService {
     if (bet.status === 'closed' || bet.status === 'refunded') return { success: false, message: 'Ce bet est déjà terminé.' };
 
     for (const entry of bet.entries) {
-      await UserService.updateUserMoney(entry.userId, entry.amount);
+      await UserService.updateUserMoney(entry.userId, entry.amount, 'Pari — remboursement');
     }
 
     const updated = await BetRepository.setStatus(betId, 'refunded');

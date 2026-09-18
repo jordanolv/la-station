@@ -2,6 +2,7 @@ import { User as DiscordUser, Guild } from 'discord.js';
 import UserModel, { IUser } from '../models/user.model';
 import { ArcadeGameName } from '../../arcade/types/arcade.types';
 import { toParisDayYMD, parisMidnightUTC } from '../../../shared/time/day-split';
+import { LogService } from '../../../shared/logs/logs.service';
 
 export class UserService {
 
@@ -69,12 +70,14 @@ export class UserService {
       .sort((a, b) => a.date.getTime() - b.date.getTime());
   }
 
-  static async updateUserMoney(discordId: string, amount: number) {
-    return UserModel.findOneAndUpdate(
+  static async updateUserMoney(discordId: string, amount: number, reason = 'inconnu') {
+    const updated = await UserModel.findOneAndUpdate(
       { discordId },
       { $inc: { 'profil.money': amount } },
       { new: true }
     );
+    await LogService.economy(discordId, amount, reason);
+    return updated;
   }
 
   static async getUserMoney(discordId: string): Promise<number> {

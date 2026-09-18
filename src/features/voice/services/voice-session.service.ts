@@ -408,6 +408,10 @@ export class VoiceSessionService {
           await user.save();
           leveledUp = user.profil.lvl > oldLevel;
           newLevel = user.profil.lvl;
+          if (leveledUp) {
+            await LogService.info(`<@${session.userId}> passe niveau **${newLevel}**`, { feature: 'leveling', title: 'Level up' });
+          }
+          await LogService.economy(session.userId, moneyGained, `Vocal — ${activeMinutes} min actives`, 'voice');
         }
       } catch (err) {
         console.error('[VoiceSession] Erreur mise à jour récompenses:', err);

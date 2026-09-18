@@ -351,7 +351,7 @@ export class AvalancheService {
       : null;
 
     if (winner) {
-      await UserService.updateUserMoney(winner.userId, AVALANCHE_REWARD.money);
+      await UserService.updateUserMoney(winner.userId, AVALANCHE_REWARD.money, 'Avalanche — gain');
       await LevelingService.giveXpDirectly(client, winner.userId, AVALANCHE_REWARD.xp);
       const expeditions = await awardExpeditions(winner.userId, AVALANCHE_REWARD.expeditions);
       await UserService.recordArcadeWin(winner.userId, 'avalanche');

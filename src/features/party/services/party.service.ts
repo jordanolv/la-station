@@ -11,7 +11,6 @@ import UserModel from '../../user/models/user.model';
 import AppConfigModel from '../../discord/models/app-config.model';
 import { getGuildId } from '../../../shared/guild';
 import { LevelingService } from '../../leveling/services/leveling.service';
-import { ConfigPanelService } from '../../config-panel/services/config-panel.service';
 
 export interface CreateEventInput {
   name: string;
@@ -57,7 +56,6 @@ export class PartyService {
       const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
         `<@${userId}> a rejoint · ${updated.participants.length}/${event.eventInfo.maxSlots} places`;
       await LogService.info(logMessage, { feature: 'party', title: 'Participant ajouté' });
-      await ConfigPanelService.refreshPanel(client, 'party');
     } catch (err) {
       console.error('[Party] Erreur réaction add:', err);
     }
@@ -76,7 +74,6 @@ export class PartyService {
       const logMessage = `**${event.eventInfo.name}** — ${event.eventInfo.game}\n` +
         `<@${userId}> a quitté · ${updated.participants.length}/${event.eventInfo.maxSlots} places`;
       await LogService.info(logMessage, { feature: 'party', title: 'Participant retiré' });
-      await ConfigPanelService.refreshPanel(client, 'party');
     } catch (err) {
       console.error('[Party] Erreur réaction remove:', err);
     }
@@ -267,6 +264,10 @@ export class PartyService {
             $inc: { 'stats.partyParticipated': 1 },
           },
         );
+
+        if (rewardAmount > 0) {
+          await LogService.economy(participantId, rewardAmount, `Soirée : ${event.eventInfo.name}`, 'party');
+        }
 
         if (xpAmount > 0) {
           await LevelingService.giveXpDirectly(client, participantId, xpAmount);
