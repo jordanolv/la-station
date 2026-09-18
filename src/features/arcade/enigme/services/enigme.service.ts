@@ -28,6 +28,7 @@ import { GameResultRepository } from '../../results/repositories/game-result.rep
 import { EnigmeRepository } from '../repositories/enigme.repository';
 import type { IEnigmeStateDoc, Riddle, Solver } from '../models/enigme-state.model';
 import { EnigmeBankService, ENIGME_TYPE_LABELS } from './enigme-bank.service';
+import { podiumSolvers, rankSolvers } from './enigme-ranking';
 import {
   ENIGME_ACCENT_COLOR,
   ENIGME_BUTTON_ID,
@@ -45,7 +46,6 @@ import {
 
 const LOG_FEATURE = '🧩 Énigme';
 const MEDALS = ['🥇', '🥈', '🥉'];
-const hintMark = (usedHint: boolean) => (usedHint ? '💡' : '🧠');
 
 function formatDuration(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -67,7 +67,7 @@ export class EnigmeService {
     const podium = ENIGME_PODIUM_REWARDS.map((r, i) => `${MEDALS[i]} **${r.money}** 💰 · **${r.xp}** XP · **${r.expeditions}** pack${r.expeditions > 1 ? 's' : ''}`);
     return [
       ...podium,
-      `🧠 Bonne réponse hors podium : **${ENIGME_SOLVER_FRAGMENTS}** fragments · tentative : **${ENIGME_PARTICIPATION_FRAGMENTS}** fragments`,
+      `🧠 Bonne réponse hors podium ou avec indice : **${ENIGME_SOLVER_FRAGMENTS}** fragments · tentative : **${ENIGME_PARTICIPATION_FRAGMENTS}** fragments`,
     ];
   }
 
@@ -86,7 +86,7 @@ export class EnigmeService {
       .addTextDisplayComponents(new TextDisplayBuilder().setContent(
         [
           `Tout se joue en secret. **${ENIGME_MAX_ATTEMPTS}** essais par personne, et un indice si tu le demandes.`,
-          `Le podium récompense les **trois meilleurs chronos**, pas les plus matinaux · révélation <t:${unix}:t> (<t:${unix}:R>)`,
+          `Le podium récompense les **trois meilleurs chronos sans indice**, pas les plus matinaux · révélation <t:${unix}:t> (<t:${unix}:R>)`,
           '',
           ...this.buildRewardLines(),
         ].join('\n'),
@@ -113,7 +113,7 @@ export class EnigmeService {
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId(ENIGME_HINT_BUTTON_ID)
-        .setLabel(usedHint ? 'Indice utilisé' : "Demander l'indice")
+        .setLabel(usedHint ? 'Indice utilisé — hors podium' : "Indice (abandonne le podium)")
         .setEmoji('💡')
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(usedHint),
@@ -137,23 +137,29 @@ export class EnigmeService {
 
     return container
       .addSeparatorComponents(new SeparatorBuilder().setDivider(true))
-      .addTextDisplayComponents(new TextDisplayBuilder().setContent(`⏱️ Chrono lancé <t:${unix}:R>.`));
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(
+        usedHint
+          ? `⏱️ Chrono lancé <t:${unix}:R> · 💡 indice pris, tu joues pour les fragments.`
+          : `⏱️ Chrono lancé <t:${unix}:R> · l'indice te sort du podium, à toi de voir.`,
+      ));
   }
 
   /** Le podium se joue au chrono personnel, pas à l'ordre d'arrivée. */
+  private static podiumSolvers(state: IEnigmeStateDoc): Solver[] {
+    return podiumSolvers(state.solvers ?? [], state.startedAt);
+  }
+
   private static rankSolvers(state: IEnigmeStateDoc): Solver[] {
-    const startedAt = state.startedAt?.getTime() ?? 0;
-    // Une énigme lancée avant le passage au chrono personnel n'a pas de durationMs :
-    // on retombe sur l'ordre d'arrivée pour ne pas la classer au hasard.
-    const duration = (s: Solver) => s.durationMs ?? new Date(s.at).getTime() - startedAt;
-    return [...(state.solvers ?? [])].sort((a, b) => duration(a) - duration(b));
+    return rankSolvers(state.solvers ?? [], state.startedAt);
   }
 
   private static buildResultContainer(state: IEnigmeStateDoc): ContainerBuilder {
     const riddle = state.riddle!;
     const ranked = this.rankSolvers(state);
-    const podium = ranked.slice(0, 3).map((s, i) => `${MEDALS[i]} <@${s.userId}> · ${formatDuration(s.durationMs)} ${hintMark(s.usedHint)}`);
-    const others = ranked.length - podium.length;
+    const winners = this.podiumSolvers(state);
+    const winnerIds = new Set(winners.map((s) => s.userId));
+    const podium = winners.map((s, i) => `${MEDALS[i]} <@${s.userId}> · ${formatDuration(s.durationMs)}`);
+    const others = ranked.filter((s) => !winnerIds.has(s.userId));
     const triedCount = Object.keys(state.attempts ?? {}).length;
 
     return new ContainerBuilder()
@@ -166,10 +172,10 @@ export class EnigmeService {
         [
           `✅ La réponse était : **${riddle.answers[0]}**`,
           '',
-          ...(podium.length > 0 ? podium : ['💨 Personne n\'a trouvé cette fois !']),
-          ...(others > 0 ? [`🧠 et **${others}** autre${others > 1 ? 's' : ''} ont trouvé`] : []),
+          ...(podium.length > 0 ? podium : ['💨 Personne n\'a trouvé sans indice cette fois !']),
+          ...(others.length > 0 ? [`🧠 et **${others.length}** autre${others.length > 1 ? 's' : ''} ont trouvé (dont ${others.filter((s) => s.usedHint).length} avec l'indice 💡)`] : []),
           `👥 ${triedCount} participant${triedCount > 1 ? 's' : ''}`,
-          '-# 🧠 trouvé sans indice · 💡 avec indice',
+          "-# L'indice fait sortir du podium, mais garde les fragments.",
         ].join('\n'),
       ));
   }
@@ -379,15 +385,19 @@ export class EnigmeService {
     const usedHint = Boolean(state.hintedAt?.[userId]);
     await EnigmeRepository.addSolver(userId, now, durationMs, usedHint);
     const elapsed = formatDuration(durationMs);
-    const hintMark = usedHint ? ' (avec indice 💡)' : ' sans indice 🧠';
     await interaction.editReply({
-      content: `✅ **Trouvé en ${elapsed}${hintMark} !** Le classement se joue au chrono : podium et récompenses à la révélation de ${ENIGME_REVEAL_HOUR}h.`,
+      content: usedHint
+        ? `✅ **Trouvé en ${elapsed}**, mais avec l'indice 💡 — hors podium. Tu repars avec **${ENIGME_SOLVER_FRAGMENTS}** fragments à ${ENIGME_REVEAL_HOUR}h.`
+        : `✅ **Trouvé en ${elapsed} sans indice 🧠 !** Le podium se joue au chrono, verdict à la révélation de ${ENIGME_REVEAL_HOUR}h.`,
     });
 
     const guild = await interaction.client.guilds.fetch(getGuildId()).catch(() => null);
     const thread = guild ? await guild.channels.fetch(state.activeThreadId).catch(() => null) : null;
     if (thread?.isThread()) {
-      await thread.send(`🧠 <@${userId}> a trouvé en **${elapsed}**${usedHint ? ' avec l\'indice' : ' sans indice'} !`).catch(() => {});
+      await thread.send(usedHint
+        ? `💡 <@${userId}> a trouvé en **${elapsed}**, avec l'indice.`
+        : `🧠 <@${userId}> a trouvé en **${elapsed}**, sans indice !`,
+      ).catch(() => {});
     }
   }
 
@@ -399,23 +409,25 @@ export class EnigmeService {
     const thread = guild ? await guild.channels.fetch(state.activeThreadId).catch(() => null) : null;
     const solvers = this.rankSolvers(state);
     const solverIds = new Set(solvers.map((s) => s.userId));
+    const winners = this.podiumSolvers(state);
+    const winnerIds = new Set(winners.map((s) => s.userId));
 
     const podiumLines: string[] = [];
-    for (const [i, solver] of solvers.slice(0, ENIGME_PODIUM_REWARDS.length).entries()) {
+    for (const [i, solver] of winners.entries()) {
       const reward = ENIGME_PODIUM_REWARDS[i];
       await UserService.updateUserMoney(solver.userId, reward.money, 'Énigme — gain');
       await LevelingService.giveXpDirectly(client, solver.userId, reward.xp);
       const expeditions = await awardExpeditions(solver.userId, reward.expeditions);
       await GameResultRepository.record('enigme', solver.userId, i + 1, { timeMs: solver.durationMs, type: state.riddle.type, players: Object.keys(state.attempts ?? {}).length });
-      podiumLines.push(`${MEDALS[i]} <@${solver.userId}> · ${formatDuration(solver.durationMs)} ${hintMark(solver.usedHint)} · +${reward.money} 💰 · +${reward.xp} XP · +${reward.expeditions} pack${reward.expeditions > 1 ? 's' : ''} ${expeditions.summary}`);
+      podiumLines.push(`${MEDALS[i]} <@${solver.userId}> · ${formatDuration(solver.durationMs)} · +${reward.money} 💰 · +${reward.xp} XP · +${reward.expeditions} pack${reward.expeditions > 1 ? 's' : ''} ${expeditions.summary}`);
     }
-    for (const solver of solvers.slice(ENIGME_PODIUM_REWARDS.length)) {
+    for (const solver of solvers.filter((s) => !winnerIds.has(s.userId))) {
       await addFragmentsAndAward(solver.userId, ENIGME_SOLVER_FRAGMENTS).catch(() => {});
     }
     for (const userId of Object.keys(state.attempts ?? {})) {
       if (!solverIds.has(userId)) await addFragmentsAndAward(userId, ENIGME_PARTICIPATION_FRAGMENTS).catch(() => {});
     }
-    if (solvers[0]) await UserService.recordArcadeWin(solvers[0].userId, 'enigme');
+    if (winners[0]) await UserService.recordArcadeWin(winners[0].userId, 'enigme');
     await ArcadeStatsService.incrementTotalGames('enigme');
 
     if (thread?.isThread()) {
@@ -423,7 +435,7 @@ export class EnigmeService {
         const mainMessage = await thread.messages.fetch(state.activeMessageId).catch(() => null);
         await mainMessage?.edit({ components: [this.buildResultContainer(state)], flags: MessageFlags.IsComponentsV2 }).catch(() => {});
       }
-      const others = solvers.length - Math.min(solvers.length, ENIGME_PODIUM_REWARDS.length);
+      const others = solvers.length - winners.length;
       await thread.send({
         content: [
           `🧩 **RÉVÉLATION !** La réponse était **${state.riddle.answers[0]}**.`,
