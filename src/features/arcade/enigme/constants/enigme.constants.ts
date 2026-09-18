@@ -16,6 +16,7 @@ export const ENIGME_SOLVER_FRAGMENTS = 10;
 /** A tenté sans trouver */
 export const ENIGME_PARTICIPATION_FRAGMENTS = 5;
 
+export const ENIGME_REVEAL_BUTTON_ID = 'enigme:reveal';
 export const ENIGME_BUTTON_ID = 'enigme:answer';
 export const ENIGME_MODAL_ID = 'enigme:modal';
 
