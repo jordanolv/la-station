@@ -12,6 +12,7 @@ export interface Riddle {
 export interface Solver {
   userId: string;
   at: Date;
+  durationMs: number;
 }
 
 export class EnigmeState {
@@ -38,6 +39,10 @@ export class EnigmeState {
 
   @prop()
   endsAt?: Date;
+
+  /** userId -> date de découverte de l'énigme, départ de son chrono */
+  @prop({ type: Object, default: {} })
+  revealedAt?: Record<string, Date>;
 
   /** userId -> nombre d'essais */
   @prop({ type: Object, default: {} })
