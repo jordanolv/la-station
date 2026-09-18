@@ -84,7 +84,7 @@ export default function logsRoute(client: BotClient): Router {
       count: { $sum: 1 },
     };
 
-    const [byDay, byReason, supply] = await Promise.all([
+    const [byDay, byReason, supply, holders] = await Promise.all([
       BotLogModel.aggregate([
         { $match: match },
         {
@@ -101,11 +101,28 @@ export default function logsRoute(client: BotClient): Router {
         { $sort: { count: -1 } },
       ]),
       UserModel.aggregate([{ $group: { _id: null, total: { $sum: '$profil.money' } } }]),
+      UserModel.find({ 'profil.money': { $gt: 0 } }).select('profil.money').lean(),
     ]);
+
+    // Percentiles calcules en JS plutot qu'avec $percentile : l'effectif est petit et
+    // l'operateur demande MongoDB 7+.
+    const balances = holders.map((u) => u.profil?.money ?? 0).sort((a, b) => a - b);
+    const at = (q: number) => (balances.length ? balances[Math.min(balances.length - 1, Math.floor(q * balances.length))] : 0);
+    const totalHeld = balances.reduce((sum, v) => sum + v, 0);
+    const topCount = Math.max(1, Math.round(balances.length * 0.1));
+    const topShare = totalHeld ? balances.slice(-topCount).reduce((sum, v) => sum + v, 0) / totalHeld : 0;
 
     res.json({
       days,
       supply: supply[0]?.total ?? 0,
+      distribution: {
+        holders: balances.length,
+        median: at(0.5),
+        p90: at(0.9),
+        max: balances[balances.length - 1] ?? 0,
+        min: balances[0] ?? 0,
+        topDecileShare: topShare,
+      },
       byDay: byDay.map((d) => ({ date: d._id, mint: d.mint, burn: d.burn, transfer: d.transfer, count: d.count })),
       byReason: byReason.map((r) => ({
         reason: r._id.reason ?? 'inconnu',
