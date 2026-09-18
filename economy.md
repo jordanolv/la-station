@@ -19,7 +19,7 @@ que le code applique déjà ces règles.
 | Log du rake des bets (`burn`) | ✅ implémenté |
 | Ancrage 1 RC ≈ 1 € | 🟡 décidé, pas appliqué |
 | Redénomination ÷10 | 🟡 décidé, pas appliqué |
-| Salaire hebdomadaire | 🟡 décidé, pas implémenté |
+| Salaire hebdomadaire | ✅ implémenté, **désactivé** par défaut |
 | Suppression du money/minute | 🟡 décidé, pas appliqué |
 | Boutique (puits) | 🔴 à concevoir |
 
@@ -282,3 +282,8 @@ au serveur. Quatre chiffres à confirmer avant de figer :
 L'hypothèse la plus fragile est la deuxième : la conversion messages → créneaux a été
 posée à **6 messages par créneau**. Si les joueurs envoient en réalité 20 messages par
 salve, le texte pèse trois fois moins que ce que prévoient les tableaux ci-dessus.
+
+**Comment calibrer** : l'onglet *Paie hebdo* du dashboard rejoue le calcul sur les
+`lastWeekActivityPoints` réels sans rien verser. On règle les trois paramètres, on
+simule, on compare la médiane obtenue au tableau des revenus attendus (§3), et on
+n'active la paie qu'une fois les valeurs jugées bonnes.
