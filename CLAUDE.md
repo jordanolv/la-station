@@ -208,7 +208,7 @@ Les seuils % sont calculés sur `users.length` (tous les users en BDD).
 ## Économie
 
 **Toute modification touchant à l'argent (`profil.money`), aux récompenses ou aux prix
-se lit d'abord dans [`economy.md`](economy.md).** Les règles d'ancrage, la formule du
+se lit d'abord dans [`docs/economy.md`](docs/economy.md).** Les règles d'ancrage, la formule du
 salaire hebdomadaire et les invariants qui cassent en silence y sont fixés — ils ne
 sont pas déductibles du code.
 
